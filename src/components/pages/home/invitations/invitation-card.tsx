@@ -27,7 +27,7 @@ interface InvitationCardProps {
 const InvitationCard: React.FC<InvitationCardProps> = ({ invitation }) => {
   return (
     <div>
-      <div className="w-full relative border rounded-lg cursor-pointer">
+      <div className="w-full relative rounded-lg cursor-pointer">
         <div className="relative w-full h-[382px] rounded-lg">
           <Image
             src={invitation?.image?.imageUrl || ""}

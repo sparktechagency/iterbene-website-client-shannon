@@ -23,7 +23,7 @@ interface UpcomingEventCardProps {
 
 const UpcomingEventCard: React.FC<UpcomingEventCardProps> = ({ event }) => {
   return (
-    <div className="w-full relative border rounded-lg cursor-pointer">
+    <div className="w-full relative  rounded-lg cursor-pointer">
       <div className="relative w-full h-[382px] rounded-lg">
         <Image
           src={event?.image?.imageUrl || ""}

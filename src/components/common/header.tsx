@@ -85,7 +85,7 @@ const MessagesDropdown: React.FC<DropdownProps> = ({ isOpen }) => {
                 </div>
               ))}
           </div>
-          <div className="mt-3 border-t-2 pt-5 flex justify-center items-center">
+          <div className="mt-3 border-t border-gray-300 pt-5 flex justify-center items-center">
             <h1 className="text-primary text-sm">View all messages</h1>
           </div>
         </motion.div>
@@ -161,7 +161,7 @@ const NotificationsDropdown: React.FC<DropdownProps> = ({
                 </div>
               ))}
           </div>
-          <div className="mt-3 border-t-2 pt-5 flex justify-center items-center">
+          <div className="mt-3 border-t border-gray-300 pt-5 flex justify-center items-center">
             <h1 className="text-primary text-sm">View all notifications</h1>
           </div>
         </motion.div>
@@ -425,7 +425,7 @@ const Header: React.FC = () => {
         <Link href={"/"}>
           <Image src={logo.src} alt="logo" width={80} height={80} />
         </Link>
-        <div className="w-full max-w-xl px-2 bg-white rounded-xl border flex justify-between items-center">
+        <div className="w-full max-w-xl px-2 bg-white rounded-xl border border-white flex justify-between items-center">
           <input
             type="text"
             name="search"
