@@ -21,7 +21,7 @@ const MyGroupCard: React.FC<MyGroupCardProps> = ({ image, name, members }) => {
           height={350}
           className="w-full h-full object-cover rounded-2xl mb-4"
         />
-        <div className="absolute top-0 left-0 right-0 bottom-0 bg-gray-950/30 rounded-xl"></div>
+        <div className="absolute top-0 left-0 right-0 bottom-0 bg-gray-950/20 rounded-xl"></div>
         {/* Member Count Overlay */}
         <div className="absolute top-5 right-5 bg-white rounded-full px-4 py-2 flex items-center gap-1">
          <PiUserBold size={24} className="text-secondary" />

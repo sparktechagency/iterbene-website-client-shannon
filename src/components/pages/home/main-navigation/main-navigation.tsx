@@ -1,64 +1,64 @@
 import {
-  CalendarArrowDown,
   File,
   Image as Images,
-  Users,
-  Watch,
 } from "lucide-react";
-import Link from "next/link";
+import { HiOutlineUserGroup, HiOutlineUsers } from "react-icons/hi";
+import { FaRegCalendarMinus } from "react-icons/fa";
+import { FiPlayCircle } from "react-icons/fi";
+import ActiveNavigation from "./active-navigation";
 
 const MainNavigation = () => {
-    const user = true;
+  const user = true;
   const userNotExistsMenuNavigationLinks = [
     {
-      icon: <File />,
+      icon: <File size={24} />,
       name: "Feed",
       href: "/feed",
     },
     {
-      icon: <CalendarArrowDown />,
+      icon: <FaRegCalendarMinus size={24} />,
       name: "Events",
       href: "/events",
     },
     {
-      icon: <Watch />,
+      icon: <FiPlayCircle size={24} />,
       name: "Watch Videos",
       href: "/watch-videos",
     },
     {
-      icon: <Images />,
+      icon: <Images size={24} />,
       name: "Photo",
       href: "/photos",
     },
   ];
   const userExistsMenuNavigationLinks = [
     {
-      icon: <File />,
+      icon: <File size={24} />,
       name: "Feed",
       href: "/feed",
     },
     {
-      icon: <Users />,
+      icon: <HiOutlineUsers size={24} />,
       name: "Connections",
       href: "/connections",
     },
     {
-      icon: <Users />,
+      icon: <HiOutlineUserGroup size={24} />,
       name: "Groups",
       href: "/groups",
     },
     {
-      icon: <CalendarArrowDown />,
+      icon: <FaRegCalendarMinus size={24} />,
       name: "Events",
       href: "/events",
     },
     {
-      icon: <Watch />,
+      icon: <FiPlayCircle size={24} />,
       name: "Watch Videos",
       href: "/watch-videos",
     },
     {
-      icon: <Images />,
+      icon: <Images size={24} />,
       name: "Photo",
       href: "/photos",
     },
@@ -68,10 +68,7 @@ const MainNavigation = () => {
     <section className="w-full bg-white p-6 rounded-2xl">
       <div className="flex flex-col gap-6">
         {menuNavigationLinks?.map((link) => (
-          <Link href={link.href} className="flex items-center gap-4 hover:bg-[#C4F5F0] px-4 py-3 rounded-xl cursor-pointer transition-all duration-200" key={link.name}>
-            {link.icon}
-            <span className="text-lg font-semibold">{link.name}</span>
-          </Link>
+          <ActiveNavigation key={link.href} navLink={link} />
         ))}
       </div>
     </section>
