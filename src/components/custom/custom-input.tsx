@@ -56,7 +56,7 @@ const CustomInput = ({
                 varient === "outline"
                   ? "bg-transparent border-b rounded-none"
                   : "border rounded-xl"
-              } ${error ? "border-red-500" : "border-[#40E0D0]"}`}
+              } ${error ? "border-red-500" : "border-primary"}`}
             >
               {/* Icon in front of the input */}
               {icon && <div className="pl-2">{icon}</div>}

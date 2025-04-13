@@ -55,7 +55,7 @@ const MessagesDropdown: React.FC<DropdownProps> = ({ isOpen }) => {
         >
           <div className="flex justify-between items-center mb-2">
             <h3 className="font-semibold text-lg">Messages</h3>
-            <button className="text-sm text-[#40E0D0]">Mark all as read</button>
+            <button className="text-sm text-primary">Mark all as read</button>
           </div>
           <div className="space-y-3">
             {Array(4)
@@ -80,13 +80,13 @@ const MessagesDropdown: React.FC<DropdownProps> = ({ isOpen }) => {
                     <p className="text-sm text-gray-500">1 min ago</p>
                   </div>
                   <div className="ml-auto">
-                    <span className="w-3 h-3 bg-[#40E0D0] rounded-full block"></span>
+                    <span className="w-3 h-3 bg-primary rounded-full block"></span>
                   </div>
                 </div>
               ))}
           </div>
           <div className="mt-3 border-t-2 pt-5 flex justify-center items-center">
-            <h1 className="text-[#40E0D0] text-sm">View all messages</h1>
+            <h1 className="text-primary text-sm">View all messages</h1>
           </div>
         </motion.div>
       )}
@@ -130,7 +130,7 @@ const NotificationsDropdown: React.FC<DropdownProps> = ({
         >
           <div className="flex justify-between items-center mb-2">
             <h3 className="font-semibold text-lg">Notifications</h3>
-            <button className="text-sm text-[#40E0D0]">Mark all as read</button>
+            <button className="text-sm text-primary">Mark all as read</button>
           </div>
           <div className="space-y-3">
             {Array(6)
@@ -156,13 +156,13 @@ const NotificationsDropdown: React.FC<DropdownProps> = ({
                     <p className="text-sm text-gray-500">1 week ago</p>
                   </div>
                   <div className="ml-auto">
-                    <span className="w-3 h-3 bg-[#40E0D0] rounded-full block"></span>
+                    <span className="w-3 h-3 bg-primary rounded-full block"></span>
                   </div>
                 </div>
               ))}
           </div>
           <div className="mt-3 border-t-2 pt-5 flex justify-center items-center">
-            <h1 className="text-[#40E0D0] text-sm">View all notifications</h1>
+            <h1 className="text-primary text-sm">View all notifications</h1>
           </div>
         </motion.div>
       )}
@@ -299,7 +299,7 @@ const UserDropdown: React.FC<DropdownProps> = ({ isOpen }) => {
             >
               <IoChatboxEllipsesOutline size={24} />
               <span>Messages</span>
-              <span className="ml-2 bg-[#40E0D0] text-white rounded-full px-2 py-1 text-xs">
+              <span className="ml-2 bg-primary text-white rounded-full px-2 py-1 text-xs">
                 5
               </span>
             </Link>

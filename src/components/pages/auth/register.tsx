@@ -11,8 +11,8 @@ import { FieldValues } from "react-hook-form";
 import CustomInput from "@/components/custom/custom-input";
 import { Lock, Mail, UserRound } from "lucide-react";
 import Link from "next/link";
-import { Checkbox } from "@/components/ui/checkbox";
 import CustomButton from "@/components/custom/custom-button";
+import { Checkbox } from "antd";
 const Register = () => {
   const handleRegister = async (values: FieldValues) => {
     console.log(values);
@@ -33,7 +33,7 @@ const Register = () => {
       {/* Semi-transparent color overlay */}
       <div className="absolute top-0 left-0 w-full h-full bg-[#40E0D054]"></div>
       {/* Content that remains sharp */}
-      <div className="w-full max-w-[500px] mx-auto px-8 md:px-[65px] py-12 md:py-[56px] bg-[#FFFFFF] z-30 rounded-lg border-2 border-[#40E0D0] shadow-xl shadow-gray-900">
+      <div className="w-full max-w-[500px] mx-auto px-8 md:px-[65px] py-12 md:py-[56px] bg-[#FFFFFF] z-30 rounded-lg border-2 border-primary shadow-xl shadow-gray-900">
         <div className="flex justify-between">
           <h1 className="text-xl lg:text-3xl xl:text-4xl font-semibold">
             Register
@@ -58,7 +58,7 @@ const Register = () => {
               type="text"
               varient="outline"
               size="lg"
-              icon={<UserRound size={24} className="text-[#F95F19]" />}
+              icon={<UserRound size={24} className="text-secondary" />}
               fullWidth
               placeholder="Enter your full name"
             />
@@ -67,7 +67,7 @@ const Register = () => {
               label="Email"
               type="email"
               varient="outline"
-              icon={<Mail size={24} className="text-[#F95F19]" />}
+              icon={<Mail size={24} className="text-secondary" />}
               size="lg"
               fullWidth
               placeholder="Enter your email"
@@ -78,7 +78,7 @@ const Register = () => {
               varient="outline"
               type="password"
               size="lg"
-              icon={<Lock size={24} className="text-[#F95F19]" />}
+              icon={<Lock size={24} className="text-secondary" />}
               fullWidth
               placeholder="Enter your password"
             />
@@ -87,7 +87,7 @@ const Register = () => {
                 <div className="flex items-center">
                   <Checkbox
                     id="remember"
-                    className="border-[#40E0D0] cursor-pointer "
+                    className="border-primary cursor-pointer "
                   />
                   <label htmlFor="remember" className="ml-2 block text-sm md:text-[16px]">
                     I agree to all terms & conditions.
@@ -104,7 +104,7 @@ const Register = () => {
               </span>
               <Link
                 href="/login"
-                className="text-md font-medium text-[#40E0D0] hover:underline"
+                className="text-md font-medium text-primary hover:underline"
               >
                 Login
               </Link>

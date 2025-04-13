@@ -79,11 +79,11 @@ const PostHeader = ({
           <div className="text-sm text-gray-900 flex items-center gap-2 mt-1">
             {post.location && (
               <>
-                <TiLocation size={28} className="text-[#40E0D0]" />
+                <TiLocation size={28} className="text-primary" />
                 <span className="flex items-center">{post.location}</span>
               </>
             )}
-            <HiGlobe size={28} className="text-[#40E0D0]" />
+            <HiGlobe size={28} className="text-primary" />
           </div>
         </div>
       </div>

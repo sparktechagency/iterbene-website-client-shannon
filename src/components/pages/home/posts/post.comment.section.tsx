@@ -14,14 +14,14 @@ const PostCommentSection = ({ comments }: { comments: IComment[] }) => {
               alt={comment.username}
               width={48}
               height={48}
-              className="size-[48px] ring ring-[#40E0D0] rounded-full"
+              className="size-[48px] ring ring-primary rounded-full"
             />
             <div className="bg-[#ECFCFA] p-3 rounded-lg flex-1 space-y-2">
               <p className="font-bold">{comment.username}</p>
               <p className="text-gray-700 text-sm">{comment.text}</p>
               <div className="flex items-center gap-5">
                 <div className="flex items-center space-x-2 mt-1 text-gray-500 text-xs">
-                  <FaHeart className="size-5 text-[#40E0D0]" />
+                  <FaHeart className="size-5 text-primary" />
                   <span className="font-semibold">
                     {" "}
                     {comment.replies?.length || 0}
@@ -81,7 +81,7 @@ const PostCommentSection = ({ comments }: { comments: IComment[] }) => {
       ))}
       <div className="flex justify-center items-center my-5">
         {comments.length > 2 && (
-          <button className="text-[#40E0D0] text-center">
+          <button className="text-primary text-center">
             View all {comments.length} comments
           </button>
         )}

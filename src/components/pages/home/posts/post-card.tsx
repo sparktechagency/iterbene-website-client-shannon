@@ -81,7 +81,7 @@ const PostCard: React.FC<PostCardProps> = ({ post }) => {
           onMouseLeave={() => setShowReactions(false)}
         >
           <button className="text-gray-600 flex gap-2 items-center cursor-pointer">
-            <FaHeart className="size-6 text-[#40E0D0]" />
+            <FaHeart className="size-6 text-primary" />
             {sortedReactions.length > 0
               ? sortedReactions[0][0].charAt(0).toUpperCase() +
                 sortedReactions[0][0].slice(1)
@@ -117,11 +117,11 @@ const PostCard: React.FC<PostCardProps> = ({ post }) => {
           )}
         </div>
         <div className="flex items-center space-x-2 cursor-pointer">
-          <RiMessage2Fill className="size-6 text-[#40E0D0]" />
+          <RiMessage2Fill className="size-6 text-primary" />
           <span className="font-semibold">{comments.length}</span>
         </div>
         <div className="flex items-center space-x-2 cursor-pointer">
-          <FaCalendarCheck className="h-5 w-5 text-[#40E0D0]" />
+          <FaCalendarCheck className="h-5 w-5 text-primary" />
           <span className="font-semibold">{post.shares}</span>
         </div>
       </div>
@@ -160,7 +160,7 @@ const PostCard: React.FC<PostCardProps> = ({ post }) => {
                     onMouseLeave={() => setShowReactions(false)}
                   >
                     <button className="text-gray-600 flex gap-2 items-center cursor-pointer">
-                      <FaHeart className="size-6 text-[#40E0D0]" />
+                      <FaHeart className="size-6 text-primary" />
                       {sortedReactions.length > 0
                         ? sortedReactions[0][0].charAt(0).toUpperCase() +
                           sortedReactions[0][0].slice(1)
@@ -196,11 +196,11 @@ const PostCard: React.FC<PostCardProps> = ({ post }) => {
                     )}
                   </div>
                   <div className="flex items-center space-x-2 cursor-pointer">
-                    <RiMessage2Fill className="size-6 text-[#40E0D0]" />
+                    <RiMessage2Fill className="size-6 text-primary" />
                     <span className="font-semibold">{comments.length}</span>
                   </div>
                   <div className="flex items-center space-x-2 cursor-pointer">
-                    <FaCalendarCheck className="h-5 w-5 text-[#40E0D0]" />
+                    <FaCalendarCheck className="h-5 w-5 text-primary" />
                     <span className="font-semibold">{post.shares}</span>
                   </div>
                 </div>

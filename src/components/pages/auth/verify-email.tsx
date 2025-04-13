@@ -37,7 +37,7 @@ const VerifyEmail = () => {
       {/* Semi-transparent color overlay */}
       <div className="absolute top-0 left-0 w-full h-full bg-[#40E0D054]"></div>
       {/* Content that remains sharp */}
-      <div className="w-full max-w-[500px] mx-auto px-8 md:px-[65px] py-12 md:py-[56px] bg-[#FFFFFF] z-30 rounded-lg border-2 border-[#40E0D0] shadow-xl shadow-gray-900">
+      <div className="w-full max-w-[500px] mx-auto px-8 md:px-[65px] py-12 md:py-[56px] bg-[#FFFFFF] z-30 rounded-lg border-2 border-primary shadow-xl shadow-gray-900">
         <div className="flex items-center  justify-between">
           <h1 className="text-xl lg:text-3xl xl:text-4xl font-semibold">
             Verify Email
@@ -78,7 +78,7 @@ const VerifyEmail = () => {
             <span className="text-sm md:text-[16px] font-medium">
               Don&apos;t receive OTP?
             </span>
-            <button className="text-sm md:text-[16px] font-medium text-[#40E0D0] hover:underline">
+            <button className="text-sm md:text-[16px] font-medium text-primary hover:underline">
               Resend OTP
             </button>
           </div>

@@ -30,7 +30,7 @@ const StoryCard: React.FC<StoryCardProps> = ({
             alt={authorName}
             width={48}
             height={48}
-            className="size-[48px] rounded-full object-cover ring-2 ring-[#40E0D0]"
+            className="size-[48px] rounded-full object-cover ring-2 ring-primary"
           />
           <span className="text-white text-sm font-semibold">{authorName}</span>
         </div>

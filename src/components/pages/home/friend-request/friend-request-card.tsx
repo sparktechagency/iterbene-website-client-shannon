@@ -21,7 +21,7 @@ const FriendRequestCard: React.FC<FriendRequestCardProps> = ({ request }) => {
           alt="Profile"
           width={60}
           height={60}
-          className="size-[60px] rounded-full object-cover mr-4 ring ring-[#40E0D0] flex-shrink-0"
+          className="size-[60px] rounded-full object-cover mr-4 ring ring-primary flex-shrink-0"
         />
         <h1>
           <span className="text-[18px] font-bold ">{request.name}</span> {" "}

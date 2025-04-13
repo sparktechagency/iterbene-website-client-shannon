@@ -39,7 +39,7 @@ const InvitedGroups = () => {
         <h1 className="text-xl md:text-2xl font-semibold text-gray-800">
           Your Groups Awaits{" "}
         </h1>
-        <button className="text-[#40E0D0] hover:underline">Show more</button>
+        <button className="text-primary hover:underline">Show more</button>
       </div>
 
       {/* Cards Section */}

@@ -44,7 +44,7 @@ const InvitationCard: React.FC<InvitationCardProps> = ({ invitation }) => {
               alt={invitation.author.fullName}
               width={60}
               height={60}
-              className="size-[60px] rounded-full object-cover mr-3 ring-2 ring-[#40E0D0]"
+              className="size-[60px] rounded-full object-cover mr-3 ring-2 ring-primary"
             />
             <h2 className="text-xl md:text-2xl font-semibold text-white">
               {invitation.title}

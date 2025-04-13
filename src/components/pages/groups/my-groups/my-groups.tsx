@@ -37,7 +37,7 @@ const MyGroups: React.FC = () => {
       {/* Header Section */}
       <div className="w-full flex items-center justify-between mb-6">
         <h1 className="text-xl md:text-2xl font-semibold text-gray-800">My Groups</h1>
-        <button className="text-[#40E0D0] hover:underline">Show more</button>
+        <button className="text-primary hover:underline">Show more</button>
       </div>
 
       {/* Cards Section */}

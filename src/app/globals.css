@@ -1,27 +1,29 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
+@theme {
+  /* Colors */
+  --color-primary: oklch(80.5% 0.135 192.5); /* #40E0D0 (turquoise) */
+  --color-secondary: oklch(67.85% 0.202 40.38); /* RGB for #40E0D0 to support opacity like #40E0D054 */
 
-.otp-input:focus {
-  border-color: #40E0D0 !important; /* Change to #40E0D0 when focused */
+  /* Breakpoints for all devices */
+  --breakpoint-xs: 480px; /* Extra small devices (small phones) */
+  --breakpoint-sm: 640px; /* Small devices (phones) */
+  --breakpoint-md: 768px; /* Medium devices (tablets) */
+  --breakpoint-lg: 1024px; /* Large devices (laptops) */
+  --breakpoint-xl: 1280px; /* Extra large devices (desktops) */
+  --breakpoint-2xl: 1536px; /* 2X large devices (large desktops) */
+  --breakpoint-3xl: 1920px; /* Ultra-wide screens */
 }
 
-.otp-input:valid {
-  border-color: #40E0D0 !important; /* Change to #40E0D0 when the input has a value */
-}
-
-
-.bg-primary {
-  background-color: #40E0D0;
-}
-.bg-secondary {
-  background-color: #f95f19;
-}
+/* Container */
 
 @utility container {
   margin-inline: auto;
   max-width: 100%;
   padding-inline: 1rem;
-  
+  @media (min-width: 480px) {
+    max-width: 480px;
+  }
   @media (min-width: 640px) {
     max-width: 640px;
   }
@@ -43,24 +45,22 @@
   }
 }
 
-/* Add this to your global CSS or component-specific CSS */
-.emoji-picker ::-webkit-scrollbar {
-  width: 8px;
+/* OTP Input Styles (using Tailwind utilities where possible) */
+.otp-input {
+  @apply border border-gray-300; /* Default border */
 }
 
-.emoji-picker ::-webkit-scrollbar-track {
-  background: #ffffff; /* White track */
+.otp-input:focus {
+  @apply border-primary outline-none; /* #40E0D0 when focused */
 }
 
-.emoji-picker ::-webkit-scrollbar-thumb {
-  background: #888; /* Gray thumb */
-  border-radius: 4px;
+.otp-input:valid {
+  @apply border-primary; /* #40E0D0 when valid */
 }
 
-.emoji-picker ::-webkit-scrollbar-thumb:hover {
-  background: #555;
-}
+/* Remove manual bg-primary and bg-secondary since they're now in @theme */
 @layer utilities {
+  /* Custom Scrollbar */
   .custom-scrollbar {
     scrollbar-width: thin;
     scrollbar-color: white transparent;
@@ -82,4 +82,22 @@
   .custom-scrollbar::-webkit-scrollbar-thumb:hover {
     @apply bg-gray-200;
   }
+}
+
+/* Emoji Picker Scrollbar */
+.emoji-picker::-webkit-scrollbar {
+  width: 8px;
+}
+
+.emoji-picker::-webkit-scrollbar-track {
+  background: #ffffff; /* White track */
+}
+
+.emoji-picker::-webkit-scrollbar-thumb {
+  background: #888; /* Gray thumb */
+  border-radius: 4px;
+}
+
+.emoji-picker::-webkit-scrollbar-thumb:hover {
+  background: #555; /* Darker gray on hover */
 }

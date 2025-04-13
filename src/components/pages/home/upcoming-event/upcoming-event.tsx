@@ -93,7 +93,7 @@ const UpcomingEvent = () => {
     <section className="w-full">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold uppercase">Upcoming</h1>
-        <div className="size-8 rounded-full bg-[#40E0D0] flex items-center justify-center text-white">
+        <div className="size-8 rounded-full bg-primary flex items-center justify-center text-white">
           <span>5</span>
         </div>
       </div>

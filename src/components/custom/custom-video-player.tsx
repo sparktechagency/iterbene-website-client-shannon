@@ -190,7 +190,7 @@ const CustomVideoPlayer: React.FC<VideoPlayerProps> = ({ url }) => {
           onClick={handleProgressClick}
         >
           <div
-            className="h-full bg-[#40E0D0] rounded-full"
+            className="h-full bg-primary rounded-full"
             style={{ width: `${progress}%` }}
           />
         </div>
@@ -200,7 +200,7 @@ const CustomVideoPlayer: React.FC<VideoPlayerProps> = ({ url }) => {
             {/* Play/Pause */}
             <button
               onClick={togglePlay}
-              className="text-white hover:text-[#40E0D0] transition-colors cursor-pointer"
+              className="text-white hover:text-primary transition-colors cursor-pointer"
             >
               {isPlaying ? <Pause size={24} /> : <Play size={24} />}
             </button>
@@ -209,7 +209,7 @@ const CustomVideoPlayer: React.FC<VideoPlayerProps> = ({ url }) => {
             <div className="flex items-center space-x-2">
               <button
                 onClick={toggleMute}
-                className="text-white hover:text-[#40E0D0] transition-colors cursor-pointer"
+                className="text-white hover:text-primary transition-colors cursor-pointer"
               >
                 {isMuted ? <VolumeX size={24} /> : <Volume2 size={24} />}
               </button>
@@ -220,7 +220,7 @@ const CustomVideoPlayer: React.FC<VideoPlayerProps> = ({ url }) => {
                 step="0.1"
                 value={isMuted ? 0 : volume}
                 onChange={handleVolumeChange}
-                className="w-20 accent-[#40E0D0]" // Change range color
+                className="w-20 accent-primary" // Change range color
               />
             </div>
 
@@ -234,7 +234,7 @@ const CustomVideoPlayer: React.FC<VideoPlayerProps> = ({ url }) => {
             {/* Fullscreen Toggle */}
             <button
               onClick={toggleFullscreen}
-              className="text-white hover:text-[#40E0D0] transition-colors cursor-pointer"
+              className="text-white hover:text-primary transition-colors cursor-pointer"
             >
               {isFullscreen ? <Minimize size={24} /> : <Maximize size={24} />}
             </button>

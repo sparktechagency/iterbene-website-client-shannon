@@ -266,7 +266,7 @@ const CreateGroupModal: React.FC<CreateGroupModalProps> = ({ isOpen, onClose }) 
                     />
                     <div
                       className={`w-11 h-6 rounded-full transition-all ${
-                        showPeopleList ? 'bg-[#40E0D0]' : 'bg-gray-200'
+                        showPeopleList ? 'bg-primary' : 'bg-gray-200'
                       }`}
                     ></div>
                     <div

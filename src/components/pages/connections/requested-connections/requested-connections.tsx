@@ -78,11 +78,11 @@ const RequestedConnections: React.FC = () => {
       <div className="w-full flex items-center justify-between mb-6">
         <div className="flex items-center gap-4">
           <h1 className="text-xl md:text-2xl font-semibold">Requests</h1>
-          <div className="size-6 rounded-full bg-[#40E0D0] flex items-center justify-center text-white">
+          <div className="size-6 rounded-full bg-primary flex items-center justify-center text-white">
             <h1 className="text-sm font-semibold">5</h1>
           </div>
         </div>
-        <button className="text-[#40E0D0] hover:underline">Show more</button>
+        <button className="text-primary hover:underline">Show more</button>
       </div>
 
       {/* Cards Section */}

@@ -118,7 +118,7 @@ const CreatePost = () => {
           alt="User Profile"
           width={46}
           height={46}
-          className="size-[46px] rounded-full object-cover mr-3 ring ring-[#40E0D0] flex-shrink-0"
+          className="size-[46px] rounded-full object-cover mr-3 ring ring-primary flex-shrink-0"
         />
         <input
           type="text"
@@ -136,7 +136,7 @@ const CreatePost = () => {
           {/* Display Selected Location */}
           {selectedLocation && (
             <div className="flex items-center gap-2 text-gray-600">
-              <MapPin className="w-5 h-5 text-[#40E0D0]" />
+              <MapPin className="w-5 h-5 text-primary" />
               <span className="text-sm">{selectedLocation}</span>
               <button
                 onClick={() => setSelectedLocation(null)}
@@ -194,7 +194,7 @@ const CreatePost = () => {
               {itinerary.map((day, index) => (
                 <div
                   key={index}
-                  className="border-l-2 border-[#40E0D0] pl-3 mt-2"
+                  className="border-l-2 border-primary pl-3 mt-2"
                 >
                   <div className="flex items-center justify-between">
                     <div>
@@ -258,8 +258,8 @@ const CreatePost = () => {
               >
                 <MapPin
                   className={`w-6 h-6 ${
-                    selectedLocation ? "text-[#40E0D0]" : "text-gray-500"
-                  } hover:text-[#40E0D0] transition-colors`}
+                    selectedLocation ? "text-primary" : "text-gray-500"
+                  } hover:text-primary transition-colors`}
                 />
               </button>
               {showLocationPopup && (
@@ -306,8 +306,8 @@ const CreatePost = () => {
             >
               <ImageIcon
                 className={`w-6 h-6 ${
-                  images.length > 0 ? "text-[#40E0D0]" : "text-gray-500"
-                } hover:text-[#40E0D0] transition-colors`}
+                  images.length > 0 ? "text-primary" : "text-gray-500"
+                } hover:text-primary transition-colors`}
               />
             </button>
             <input
@@ -326,8 +326,8 @@ const CreatePost = () => {
             >
               <Video
                 className={`w-6 h-6 ${
-                  videos.length > 0 ? "text-[#40E0D0]" : "text-gray-500"
-                } hover:text-[#40E0D0] transition-colors`}
+                  videos.length > 0 ? "text-primary" : "text-gray-500"
+                } hover:text-primary transition-colors`}
               />
             </button>
             <input
@@ -346,15 +346,15 @@ const CreatePost = () => {
             >
               <CalendarCheck
                 className={`w-6 h-6 ${
-                  itinerary.length > 0 ? "text-[#40E0D0]" : "text-gray-500"
-                } hover:text-[#40E0D0] transition-colors`}
+                  itinerary.length > 0 ? "text-primary" : "text-gray-500"
+                } hover:text-primary transition-colors`}
               />
             </button>
             {/* Privacy Icon */}
             <button onClick={() => setPrivacy("Public")} title="Set Privacy">
               <Globe
                 className={`w-6 h-6 ${
-                  privacy === "Public" ? "text-[#40E0D0]" : "text-gray-500"
+                  privacy === "Public" ? "text-primary" : "text-gray-500"
                 } transition-colors`}
               />
             </button>
