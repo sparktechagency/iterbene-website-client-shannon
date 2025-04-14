@@ -2,17 +2,16 @@
 import React from "react";
 import Image from "next/image";
 
-// Define the type for story data
 interface StoryCardProps {
-  image: string; // URL of the first media item (image or video)
-  mediaType?: "image" | "video"; // Add mediaType to determine if it's a video or image
+  image: string;
+  mediaType?: "image" | "video";
   authorName: string;
   authorImage: string;
 }
 
 const StoryCard: React.FC<StoryCardProps> = ({
   image,
-  mediaType = "image", // Default to image if not specified
+  mediaType = "image",
   authorName,
   authorImage,
 }) => {
@@ -30,8 +29,6 @@ const StoryCard: React.FC<StoryCardProps> = ({
         <video
           src={image}
           className="object-cover w-full h-full rounded-lg"
-          muted
-          playsInline
         />
       )}
       <div className="absolute p-4 rounded-lg top-0 left-0 right-0 bottom-0 bg-gray-950/30">
