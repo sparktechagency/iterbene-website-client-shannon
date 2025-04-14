@@ -104,7 +104,7 @@ const CreateStoryModal: React.FC<CreateStoryModalProps> = ({
 
   return (
     <div
-      className="fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center"
+      className="fixed inset-0 bg-sky-50 bg-opacity-90 z-50 flex items-center justify-center"
     >
       <div
         className="relative w-full max-w-lg bg-white rounded-xl p-6 shadow-2xl"
