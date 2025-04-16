@@ -10,7 +10,6 @@ import {
   CalendarCheck,
   Globe,
 } from "lucide-react";
-import CustomButton from "@/components/custom/custom-button";
 // Define types for itinerary entries
 interface Activity {
   activity: string;
@@ -41,15 +40,6 @@ const CreatePost = () => {
   const [privacy, setPrivacy] = useState<"Public" | "Private">("Public");
   // State for itinerary
   const [itinerary, setItinerary] = useState<ItineraryDay[]>([]);
-  const [showItineraryPopup, setShowItineraryPopup] = useState<boolean>(false);
-  // State for new itinerary day
-  const [newTripTo, setNewTripTo] = useState<string>("");
-  const [newDate, setNewDate] = useState<string>("");
-  const [newTime, setNewTime] = useState<string>("");
-  const [newLink, setNewLink] = useState<string>("");
-  const [newActivities, setNewActivities] = useState<Activity[]>([
-    { activity: "", comments: "", rating: "1", description: "" },
-  ]);
 
   // Refs for file inputs
   const imageInputRef = useRef<HTMLInputElement>(null);
@@ -127,7 +117,7 @@ const CreatePost = () => {
           onChange={postChangeHandler}
           className="w-full bg-transparent border-none focus:outline-none text-gray-800 placeholder-gray-500"
         />
-        <CustomButton>Post It!</CustomButton>
+        <button className={`flex-shrink-0 ${post ? "bg-secondary text-white" : "border border-gray-300 text-gray-700"}  px-6 py-3 rounded-lg`}>Post It!</button>
       </div>
 
       {/* Additional Options Section (Visible when post has text) */}
@@ -341,7 +331,6 @@ const CreatePost = () => {
 
             {/* Itinerary Icon */}
             <button
-              onClick={() => setShowItineraryPopup(true)}
               title="Add Itinerary"
             >
               <CalendarCheck

@@ -14,6 +14,7 @@
     "@hookform/resolvers": "^5.0.1",
     "@reduxjs/toolkit": "^2.6.1",
     "antd": "^5.24.6",
+    "clsx": "^2.1.1",
     "emoji-picker-react": "^4.12.2",
     "framer-motion": "^12.6.5",
     "js-cookie": "^3.0.5",
@@ -36,11 +37,13 @@
     "socket.io-client": "^4.8.1",
     "sonner": "^2.0.3",
     "swiper": "^11.2.6",
+    "tailwind-merge": "^3.2.0",
     "zod": "^3.24.2"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@tailwindcss/postcss": "^4",
+    "@types/js-cookie": "^3.0.6",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-color": "^3.0.13",

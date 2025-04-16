@@ -10,22 +10,15 @@ interface ITextField {
   items: string[];
 }
 
-const CustomSelectField = ({
-  items,
-  name,
-  required,
-}: ITextField) => {
-  const { control, formState } = useFormContext();
+const CustomSelectField = ({ items, name, required }: ITextField) => {
+  const { control } = useFormContext();
 
   return (
     <Controller
       control={control}
       name={name}
       render={({ field }) => (
-        <select
-          {...field}
-          required={required}
-        >
+        <select {...field} required={required}>
           {items.map((name) => (
             <option key={name} value={name}>
               {name}
