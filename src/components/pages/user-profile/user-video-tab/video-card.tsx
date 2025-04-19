@@ -134,7 +134,7 @@ import { FiPlayCircle } from "react-icons/fi";
         <video
           ref={videoRef}
           src={url}
-          className="w-full h-[450px] object-cover rounded-lg"
+          className="w-full h-56 md:h-96 lg:h-[450px] object-cover rounded-lg"
           onClick={togglePlay}
           controls={false}
           controlsList="nodownload"
