@@ -280,11 +280,11 @@ const UserDropdown: React.FC<DropdownProps> = ({ isOpen }) => {
           </div>
           <div className="space-y-3">
             <Link
-              href="/profile"
+              href="/my-profile"
               className="text-gray-800 hover:bg-[#ECFCFA] px-4 py-3 rounded-xl flex items-center gap-4"
             >
               <FaRegUserCircle size={24} />
-              <span>Profile</span>
+              <span>My Profile</span>
             </Link>
             <Link
               href="/timeline"
