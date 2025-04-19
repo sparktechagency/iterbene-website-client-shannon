@@ -1,10 +1,10 @@
 import { Tabs } from "antd";
 import Image from "next/image";
 import React from "react";
-import UserDetailsTab from "./user-details-tab";
+import UserDetailsTab from "./user-details-tab/user-details-tab";
 import UserTimelineTab from "./user-timeline-tab/user-timeline-tab";
-import UserVideoTab from "./user-video.tab";
-import UserPhotosTab from "./user-photos-tab";
+import UserVideoTab from "./user-video-tab/user-video.tab";
+import UserPhotosTab from "./user-photos-tab/user-photos-tab";
 import UserItineraryTab from "./user-itinerary-tab";
 
 const UserProfile = () => {

@@ -1,7 +1,7 @@
 'use client';
 import { IPost } from "@/types/post.types";
 import React from "react";
-import PostCard from "../../home/posts/post-card";
+import UserTimelineCard from "./user-timeline-card";
 
 const UserTimelineTab = () => {
   const demoPosts: IPost[] = [
@@ -171,10 +171,12 @@ const UserTimelineTab = () => {
     },
   ];
   return (
-    <section className="w-full bg-white p-5 rounded-2xl">
-      {demoPosts?.map((post) => (
-        <PostCard key={post.id} post={post} />
-      ))}
+    <section className="w-full space-y-3rounded-2xl">
+      <div className="w-full grid grid-cols-1 md:grid-cols-3 gap-4">
+        {demoPosts?.map((post) => (
+          <UserTimelineCard key={post.id} post={post} />
+        ))}
+      </div>
     </section>
   );
 };
