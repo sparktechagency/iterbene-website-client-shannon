@@ -5,7 +5,7 @@ import UserDetailsTab from "./user-details-tab/user-details-tab";
 import UserTimelineTab from "./user-timeline-tab/user-timeline-tab";
 import UserVideoTab from "./user-video-tab/user-video.tab";
 import UserPhotosTab from "./user-photos-tab/user-photos-tab";
-import UserItineraryTab from "./user-itinerary-tab";
+import UserItineraryTab from "./user-iteinerary-tab/user-itinerary-tab";
 import CustomButton from "@/components/custom/custom-button";
 
 const UserProfile = () => {
