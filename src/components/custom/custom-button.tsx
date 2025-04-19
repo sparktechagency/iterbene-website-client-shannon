@@ -20,12 +20,12 @@ const CustomButton = ({
   disabled,
   fullWidth,
 }: TButtonProps) => {
-  const baseClasses = `py-2 px-4 rounded-md font-medium transition-colors flex items-center justify-center gap-2 ${
+  const baseClasses = `py-2 px-4 rounded-xl font-medium transition-colors flex items-center justify-center gap-2 ${
     fullWidth ? "w-full" : "w-auto"
   }`;
 
   const variantClasses = {
-    default: "bg-secondary hover:bg-secondary text-white ",
+    default: " border border-[#E2AD96] bg-secondary hover:bg-secondary text-white ",
     outline: "border border-[#9194A9] text-gray-950",
   };
 

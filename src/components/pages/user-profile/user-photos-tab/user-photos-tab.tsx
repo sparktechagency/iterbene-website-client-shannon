@@ -57,7 +57,7 @@ const UserPhotosTab = () => {
         {photos.map((photo, index) => (
           <div
             key={index}
-            className="w-full h-64 xl:h-[450px] relative cursor-pointer"
+            className="w-full h-56 md:h-64 lg:h-96 xl:h-[450px] relative cursor-pointer"
             onClick={() => {
               setPhotoIndex(index);
               setOpen(true);
