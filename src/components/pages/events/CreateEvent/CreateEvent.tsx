@@ -13,7 +13,7 @@ import { LocateIcon, Lock } from "lucide-react";
 import CustomButton from "@/components/custom/custom-button";
 import { IoClose } from "react-icons/io5";
 
-const CreateGroup: React.FC = () => {
+const CreateEvent: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [groupImage, setGroupImage] = useState<string | null>(null);
   const openModal = () => setIsModalOpen(true);
@@ -39,16 +39,14 @@ const CreateGroup: React.FC = () => {
         className="w-full bg-[#FEEFE8] text-secondary flex justify-center items-center gap-2 font-semibold px-5 py-3.5 rounded-xl border border-secondary transition cursor-pointer"
       >
         <PiPlus size={24} />
-        <span>Create New Group</span>
+        <span>Create New Event</span>
       </button>
 
       {/* Render the Modal */}
       <CustomModal
         header={
           <div className="flex items-center justify-between p-6 border-b border-gray-200 rounded-t-xl">
-            <h2 className="text-xl font-semibold text-gray-800">
-              Create Group
-            </h2>
+            <h2 className="text-xl font-semibold text-gray-800">Create Event</h2>
             <button
               className="text-gray-600  border-gray-400 cursor-pointer size-12 bg-[#EEFDFB] rounded-full border flex justify-center items-center"
               onClick={closeModal}
@@ -151,7 +149,7 @@ const CreateGroup: React.FC = () => {
               type="submit"
               className="px-5 py-3.5 rounded-xl border  transition cursor-pointer"
             >
-              <span>Create Group</span>
+              <span>Create Event</span>
             </CustomButton>
           </div>
         </CustomForm>
@@ -160,4 +158,4 @@ const CreateGroup: React.FC = () => {
   );
 };
 
-export default CreateGroup;
+export default CreateEvent;

@@ -70,7 +70,6 @@ const CustomModal: React.FC<CustomModalProps> = ({
             ) : (
               showCloseButton && (
                 <div className="flex items-center justify-between p-6 border-b border-gray-200 rounded-t-xl">
-                  <h2 className="text-lg font-semibold">{header}</h2>
                   <button
                     className="text-gray-600 hover:text-gray-800 cursor-pointer"
                     onClick={onClose}
