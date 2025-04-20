@@ -20,10 +20,12 @@ interface IEvent {
 
 interface MyInvitationsCardProps {
   invitation: IEvent;
+  type: string;
 }
 
 const MyInvitationsCard: React.FC<MyInvitationsCardProps> = ({
   invitation,
+  type,
 }) => {
   return (
     <div className="w-full bg-white rounded-2xl  p-6 flex flex-col items-center space-y-4">
@@ -72,15 +74,25 @@ const MyInvitationsCard: React.FC<MyInvitationsCardProps> = ({
           </div>
         </div>
       </div>
-      {/* Buttons */}
-      <div className="flex gap-6 w-full">
-        <button className="w-full bg-secondary  text-white  px-5 py-3 rounded-xl border border-secondary transition cursor-pointer">
-          View
-        </button>
-        <button className="w-full border border-[#9EA1B3] text-gray-900 px-5 py-3   rounded-xl hover:bg-gray-100 transition cursor-pointer">
-          Remove
-        </button>
-      </div>
+      {type === "invitation" ? (
+        <div className="flex gap-6 w-full">
+          <button className="w-full bg-secondary font-medium text-white  px-5 py-3.5 rounded-xl border border-secondary transition cursor-pointer">
+            Accept
+          </button>
+          <button className="w-full border border-[#9EA1B3] font-medium text-gray-900 px-5 py-3.5   rounded-xl hover:bg-gray-100 transition cursor-pointer">
+            Decline
+          </button>
+        </div>
+      ) : (
+        <div className="flex gap-6 w-full">
+          <button className="w-full bg-secondary font-medium  text-white  px-5 py-3.5 rounded-xl border border-secondary transition cursor-pointer">
+            View
+          </button>
+          <button className="w-full border font-medium border-[#9EA1B3] text-gray-900 px-5 py-3.5   rounded-xl hover:bg-gray-100 transition cursor-pointer">
+            Remove
+          </button>
+        </div>
+      )}
     </div>
   );
 };

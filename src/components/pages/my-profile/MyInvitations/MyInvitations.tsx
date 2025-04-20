@@ -69,6 +69,22 @@ const MyInvitations = () => {
       },
       members: "1.1K",
     },
+    {
+      id: 4,
+      title: "Holiday trip to Barcelona Spain",
+      author: {
+        fullName: "John Doe",
+        profileImage: {
+          imageUrl:
+            "https://i.ibb.co.com/hFTPRsW0/0de9d1146da18068833210d399cd593e.jpg",
+        },
+      },
+      image: {
+        imageUrl:
+          "https://i.ibb.co.com/JVfh3WK/36fe2823b98504660e2f44dc3c1ffb97.jpg",
+      },
+      members: "1.1K",
+    },
   ];
   return (
     <section className="w-full ">
@@ -117,9 +133,9 @@ const MyInvitations = () => {
       </div>
 
       {/* Cards Section */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {allMyInvitations.map((invitation) => (
-          <MyInvitationsCard key={invitation.id} invitation={invitation} />
+          <MyInvitationsCard key={invitation.id} invitation={invitation} type={activeTab} />
         ))}
       </div>
     </section>
