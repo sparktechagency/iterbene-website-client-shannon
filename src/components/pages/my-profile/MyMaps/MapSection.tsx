@@ -1,12 +1,12 @@
 "use client";
-import React, { useState, useCallback } from 'react';
-import { GoogleMap, Marker, useJsApiLoader } from '@react-google-maps/api';
-import { Minus, Plus } from 'lucide-react';
+import React, { useState, useCallback } from "react";
+import { GoogleMap, Marker, useJsApiLoader } from "@react-google-maps/api";
+import { Minus, Plus } from "lucide-react";
 
 // Define the map container style
 const mapContainerStyle: React.CSSProperties = {
-  width: '100%',
-  height: '100%',
+  width: "100%",
+  height: "100%",
 };
 
 // Define types for location coordinates
@@ -21,9 +21,17 @@ const defaultCenter: Location = {
   lng: 12.4964,
 };
 
-const MapSection: React.FC = () => {
+const MapSection = ({
+  mapHide,
+  showFullMap,
+  setShowFullMap,
+}: {
+  mapHide: boolean;
+  showFullMap: boolean;
+  setShowFullMap: React.Dispatch<React.SetStateAction<boolean>>;
+}) => {
   // Replace with your actual Google Maps API key
-  const apiKey: string = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || '';
+  const apiKey: string = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "";
 
   // Use useJsApiLoader to ensure the Google Maps API is loaded
   const { isLoaded } = useJsApiLoader({
@@ -50,10 +58,10 @@ const MapSection: React.FC = () => {
 
   // Custom marker icons (replace these URLs with your own custom icons)
   const customIcons = {
-    interested: 'https://i.ibb.co.com/BVgNBSG8/interested.png',
-    visited: 'https://i.ibb.co.com/60gHYs1m/visit.png',       
-    home: 'https://i.ibb.co.com/5xxKK494/home.png',           
-  }
+    interested: "https://i.ibb.co.com/BVgNBSG8/interested.png",
+    visited: "https://i.ibb.co.com/60gHYs1m/visit.png",
+    home: "https://i.ibb.co.com/5xxKK494/home.png",
+  };
   // Handle map load
   const onLoad = useCallback((mapInstance: google.maps.Map) => {
     setMap(mapInstance);
@@ -78,8 +86,12 @@ const MapSection: React.FC = () => {
   }
 
   return (
-    <div className="w-full relative px-2 py-4">
-      <div className="rounded-2xl shadow-md h-full min-h-[600px] overflow-hidden">
+    <div
+      className={`w-full  relative px-1 md:px-2  py-2 md:py-4 ${
+        mapHide ? "hidden" : showFullMap ? "col-span-full" : ""
+      }`}
+    >
+      <div className="rounded-2xl shadow-md h-full min-h-[600px] overflow-hidden z-20">
         <GoogleMap
           mapContainerStyle={mapContainerStyle}
           center={defaultCenter}
@@ -131,6 +143,15 @@ const MapSection: React.FC = () => {
         </GoogleMap>
       </div>
 
+      {/* Full Map Button */}
+      <div className="absolute top-8 left-0 flex  gap-5 items-center">
+        <button
+          onClick={() => setShowFullMap(!showFullMap)}
+          className="bg-[#DEF8F8] text-gray-800 rounded-full size-11 flex items-center justify-center shadow-md hover:bg-gray-100 cursor-pointer z-auto"
+        >
+          <Plus size={24} />
+        </button>
+      </div>
       {/* Custom Zoom Buttons */}
       <div className="absolute bottom-16 right-8 flex  gap-5 items-center">
         <button
