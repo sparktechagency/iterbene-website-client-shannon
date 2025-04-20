@@ -146,7 +146,7 @@ const UserItineraryCard: React.FC<UserTimelineCardProps> = ({ post }) => {
               </svg>
             ))}
           </div>
-          <hr className="border-gray-300 mb-4" />
+          <hr className="border-[#E2E8F0] mb-4" />
 
           {/* Itinerary Days */}
           {itineraryData.days.map((day, index) => (
@@ -173,8 +173,8 @@ const UserItineraryCard: React.FC<UserTimelineCardProps> = ({ post }) => {
                       <svg
                         key={i}
                         className={`w-4 h-4 ${i < activity.rating
-                            ? "text-yellow-400"
-                            : "text-gray-300"
+                          ? "text-yellow-400"
+                          : "text-gray-300"
                           }`}
                         fill="currentColor"
                         viewBox="0 0 20 20"

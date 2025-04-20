@@ -124,7 +124,7 @@ const CreateStoryModal: React.FC<CreateStoryModalProps> = ({
         {/* Dropzone for File Upload */}
         <div
           {...getRootProps()}
-          className={`border-2 border-dashed rounded-xl p-6 text-center mb-4 ${isDragActive ? "border-blue-500 bg-blue-50" : "border-gray-300"
+          className={`border-2 border-dashed rounded-xl p-6 text-center mb-4 ${isDragActive ? "border-blue-500 bg-blue-50" : "border-[#E2E8F0]"
             }`}
         >
           <input {...getInputProps()} />
@@ -296,8 +296,8 @@ const CreateStoryModal: React.FC<CreateStoryModalProps> = ({
           onClick={handleUpload}
           disabled={uploading || files.length === 0}
           className={`w-full py-3 rounded-xl text-white font-semibold ${uploading || files.length === 0
-              ? "bg-gray-400 cursor-not-allowed"
-              : "bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600"
+            ? "bg-gray-400 cursor-not-allowed"
+            : "bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600"
             }`}
         >
           {uploading ? "Uploading..." : "Create Story"}

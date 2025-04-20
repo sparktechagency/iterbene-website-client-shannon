@@ -1,4 +1,3 @@
-import React from "react";
 import InvitedEventCard from "./invited-event-card";
 interface IAuthor {
   fullName: string;
@@ -68,7 +67,7 @@ const invitedEvent: IEvent[] = [
 ];
 const InvitedEvents = () => {
   return (
-    <section className="w-full pt-2 pb-7 border-b border-gray-300">
+    <section className="w-full pt-2 pb-7 border-b border-[#E2E8F0]">
       {/* Header Section */}
       <div className="w-full flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">

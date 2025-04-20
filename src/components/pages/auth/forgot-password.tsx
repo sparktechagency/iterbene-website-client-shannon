@@ -57,7 +57,7 @@ const ForgotPassword = () => {
               name="email"
               label="Email"
               type="email"
-              varient="outline"
+              variant="outline"
               icon={<Mail size={24} className="text-secondary" />}
               size="lg"
               fullWidth

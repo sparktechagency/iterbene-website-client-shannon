@@ -56,7 +56,7 @@ const Register = () => {
               name="fullName"
               label="Full Name"
               type="text"
-              varient="outline"
+              variant="outline"
               size="lg"
               icon={<UserRound size={24} className="text-secondary" />}
               fullWidth
@@ -66,7 +66,7 @@ const Register = () => {
               name="email"
               label="Email"
               type="email"
-              varient="outline"
+              variant="outline"
               icon={<Mail size={24} className="text-secondary" />}
               size="lg"
               fullWidth
@@ -75,7 +75,7 @@ const Register = () => {
             <CustomInput
               name="password"
               label="Password"
-              varient="outline"
+              variant="outline"
               type="password"
               size="lg"
               icon={<Lock size={24} className="text-secondary" />}

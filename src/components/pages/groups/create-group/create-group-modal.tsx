@@ -204,7 +204,7 @@ const CreateGroupModal: React.FC<CreateGroupModalProps> = ({
                 <input
                   type="text"
                   placeholder="Group name"
-                  className={`w-full border border-gray-300 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500 ${errors.groupName ? "border-red-500" : ""
+                  className={`w-full border border-[#E2E8F0] rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500 ${errors.groupName ? "border-red-500" : ""
                     }`}
                   {...register("groupName", {
                     required: "Group name is required",
@@ -225,7 +225,7 @@ const CreateGroupModal: React.FC<CreateGroupModalProps> = ({
                 <input
                   type="text"
                   placeholder="Location"
-                  className={`w-full border border-gray-300 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500 ${errors.location ? "border-red-500" : ""
+                  className={`w-full border border-[#E2E8F0] rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500 ${errors.location ? "border-red-500" : ""
                     }`}
                   {...register("location", {
                     required: "Location is required",
@@ -244,7 +244,7 @@ const CreateGroupModal: React.FC<CreateGroupModalProps> = ({
                   Who can see the event?
                 </label>
                 <select
-                  className="w-full border border-gray-300 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  className="w-full border border-[#E2E8F0] rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500"
                   {...register("visibility", {
                     required: "Visibility is required",
                   })}
@@ -262,7 +262,7 @@ const CreateGroupModal: React.FC<CreateGroupModalProps> = ({
                 </label>
                 <textarea
                   placeholder="What's the interest?"
-                  className={`w-full border border-gray-300 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500 resize-none h-24 ${errors.interest ? "border-red-500" : ""
+                  className={`w-full border border-[#E2E8F0] rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500 resize-none h-24 ${errors.interest ? "border-red-500" : ""
                     }`}
                   {...register("interest", {
                     required: "Interest description is required",
@@ -283,7 +283,7 @@ const CreateGroupModal: React.FC<CreateGroupModalProps> = ({
                 <input
                   type="text"
                   placeholder="Add co-leaders"
-                  className="w-full border border-gray-300 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  className="w-full border border-[#E2E8F0] rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500"
                   {...register("coLeaders")}
                 />
                 <p className="text-gray-500 text-sm mt-1">

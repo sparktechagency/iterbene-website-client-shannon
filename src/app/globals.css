@@ -1,9 +1,11 @@
-@import 'tailwindcss';
+@import "tailwindcss";
 
 @theme {
   /* Colors */
   --color-primary: oklch(80.5% 0.135 192.5); /* #40E0D0 (turquoise) */
-  --color-secondary: oklch(67.85% 0.202 40.38); /* RGB for #40E0D0 to support opacity like #40E0D054 */
+  --color-secondary: oklch(
+    67.85% 0.202 40.38
+  ); /* RGB for #40E0D0 to support opacity like #40E0D054 */
 
   /* Breakpoints for all devices */
   --breakpoint-xs: 480px; /* Extra small devices (small phones) */
@@ -46,7 +48,7 @@
 
 /* OTP Input Styles (using Tailwind utilities where possible) */
 .otp-input {
-  @apply border border-gray-300; /* Default border */
+  @apply border border-[#E2E8F0]; /* Default border */
 }
 
 .otp-input:focus {

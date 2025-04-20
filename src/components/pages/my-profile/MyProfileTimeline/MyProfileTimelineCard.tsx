@@ -20,7 +20,7 @@ const MyProfileTimeLineCard: React.FC<MyProfileTimeLineCardProps> = ({ post }) =
         <MyProfileTimelineHeader post={post} />
         <p className="text-gray-700 mb-4">{post.content.text}</p>
         <MyProfileTimelineContentRender data={post.content.media || []} />
-        <div className="flex gap-7 items-center mt-5 border-b border-gray-500 pt-8 pb-5">
+        <div className="flex gap-7 items-center mt-5 border-b border-[#9194A9] pt-8 pb-5">
           <div className="relative flex items-center">
             <button className="text-gray-600 flex gap-2 items-center cursor-pointer">
               <FaHeart className="size-6 text-primary" />

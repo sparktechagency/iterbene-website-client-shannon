@@ -117,7 +117,7 @@ const CreatePost = () => {
           onChange={postChangeHandler}
           className="w-full bg-transparent border-none focus:outline-none text-gray-800 placeholder-gray-500"
         />
-        <button className={`flex-shrink-0 ${post ? "bg-secondary text-white" : "border border-gray-300 text-gray-700"}  px-6 py-3 rounded-xl`}>Post It!</button>
+        <button className={`flex-shrink-0 ${post ? "bg-secondary text-white" : "border border-[#E2E8F0] text-gray-700"}  px-6 py-3 rounded-xl`}>Post It!</button>
       </div>
 
       {/* Additional Options Section (Visible when post has text) */}

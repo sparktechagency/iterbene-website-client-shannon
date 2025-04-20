@@ -1,17 +1,19 @@
-import { Controller, useFormContext } from "react-hook-form";
-import { useState } from "react";
 import { EyeIcon, EyeOff } from "lucide-react";
+import { useState } from "react";
+import { Controller, useFormContext } from "react-hook-form";
 
 type TInputProps = {
   name: string;
   label?: string;
   type?: string;
-  varient?: "default" | "outline";
+  variant?: "default" | "outline";
   size?: "sm" | "md" | "lg";
+  required?: boolean;
   fullWidth?: boolean;
   placeholder?: string;
   icon?: React.ReactNode;
   onClick?: () => void;
+  onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
 };
 
 const CustomInput = ({
@@ -19,10 +21,12 @@ const CustomInput = ({
   label,
   type = "text",
   size = "md",
-  varient = "default",
+  variant = "default",
+  required = false,
   placeholder = "Enter value",
   icon,
   onClick,
+  onChange,
 }: TInputProps) => {
   const { control } = useFormContext();
   const [showPassword, setShowPassword] = useState(false);
@@ -34,7 +38,7 @@ const CustomInput = ({
   const inputSizeClass = {
     sm: "py-2 px-3 text-sm",
     md: "py-3 px-3 text-base",
-    lg: "py-4  px-3 text-lg",
+    lg: "py-4 px-3 text-lg",
   }[size];
 
   const inputType = type === "password" && showPassword ? "text" : type; // Toggle password type
@@ -42,8 +46,8 @@ const CustomInput = ({
   return (
     <div className={`w-full relative`}>
       {label && (
-        <label htmlFor={name} className="block text-gray-950 mb-2">
-          {label}
+        <label htmlFor={name} className="block text-gray-950 mb-2 font-medium text-[16px]">
+          {label} {required && <span className="text-red-500">*</span>}
         </label>
       )}
       <Controller
@@ -52,19 +56,23 @@ const CustomInput = ({
         render={({ field, fieldState: { error } }) => (
           <div className="relative">
             <div
-              className={`flex items-center ${
-                varient === "outline"
+              className={`flex items-center ${variant === "outline"
                   ? "bg-transparent border-b rounded-none"
                   : "border rounded-xl"
-              } ${error ? "border-red-500" : "border-primary"}`}
+                } ${error ? "border-red-500" : "border-[#9194A9]"}`}
             >
               {/* Icon in front of the input */}
               {icon && <div className="pl-2">{icon}</div>}
               <input
                 {...field}
-                value={field.value || ""} // Ensure the input is always controlled by React
+                value={field.value || ""} // Ensure the input is controlled
                 type={inputType}
                 placeholder={placeholder}
+                required={required}
+                onChange={(e) => {
+                  field.onChange(e); // Call react-hook-form's onChange
+                  if (onChange) onChange(e); // Call custom onChange if provided
+                }}
                 onClick={onClick}
                 className={`w-full ${inputSizeClass} outline-none font-medium text-gray-900`}
               />

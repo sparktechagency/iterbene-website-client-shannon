@@ -1,20 +1,20 @@
 "use client";
 
 import logo from "@/asset/logo/logo.png";
+import { AnimatePresence, motion } from "framer-motion";
+import { LucideCalendarCheck, Search } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import CustomButton from "../custom/custom-button";
-import { LucideCalendarCheck, Search } from "lucide-react";
-import { IoMdNotificationsOutline } from "react-icons/io";
+import { useEffect, useRef, useState } from "react";
+import { BiLogOut } from "react-icons/bi";
 import { BsChatSquareDots } from "react-icons/bs";
-import { useState, useEffect, useRef } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 import { FaRegCalendarAlt, FaRegUserCircle } from "react-icons/fa";
+import { FiMapPin } from "react-icons/fi";
+import { HiOutlineUserGroup } from "react-icons/hi";
+import { IoMdNotificationsOutline } from "react-icons/io";
 import { IoChatboxEllipsesOutline, IoSettingsOutline } from "react-icons/io5";
 import { MdAlternateEmail, MdOutlineNotifications } from "react-icons/md";
-import { HiOutlineUserGroup } from "react-icons/hi";
-import { FiMapPin } from "react-icons/fi";
-import { BiLogOut } from "react-icons/bi";
+import CustomButton from "../custom/custom-button";
 
 // Define types for dropdown props
 interface DropdownProps {
@@ -85,7 +85,7 @@ const MessagesDropdown: React.FC<DropdownProps> = ({ isOpen }) => {
                 </div>
               ))}
           </div>
-          <div className="mt-3 border-t border-gray-300 pt-5 flex justify-center items-center">
+          <div className="mt-3 border-t border-[#E2E8F0] pt-5 flex justify-center items-center">
             <h1 className="text-primary text-sm">View all messages</h1>
           </div>
         </motion.div>
@@ -161,7 +161,7 @@ const NotificationsDropdown: React.FC<DropdownProps> = ({
                 </div>
               ))}
           </div>
-          <div className="mt-3 border-t border-gray-300 pt-5 flex justify-center items-center">
+          <div className="mt-3 border-t border-[#E2E8F0] pt-5 flex justify-center items-center">
             <h1 className="text-primary text-sm">View all notifications</h1>
           </div>
         </motion.div>
@@ -451,12 +451,12 @@ const Header: React.FC = () => {
             <div ref={notificationsRef}>
               <button
                 onClick={toggleNotifications}
-                className="size-10 md:size-14 rounded-full border border-[#40E0D0] bg-white flex justify-center items-center relative cursor-pointer" 
+                className="size-10 md:size-14 rounded-full border border-[#40E0D0] bg-white flex justify-center items-center relative cursor-pointer"
               >
                 <IoMdNotificationsOutline size={28} />
               </button>
               <NotificationsDropdown
-                isOpen={isNotificationsOpen}              />
+                isOpen={isNotificationsOpen} />
             </div>
             <div ref={userRef}>
               <Image

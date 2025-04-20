@@ -52,7 +52,7 @@ const Login = () => {
               name="email"
               label="Email"
               type="email"
-              varient="outline"
+              variant="outline"
               icon={<Mail size={24} className="text-secondary" />}
               size="lg"
               fullWidth
@@ -61,7 +61,7 @@ const Login = () => {
             <CustomInput
               name="password"
               label="Password"
-              varient="outline"
+              variant="outline"
               type="password"
               size="lg"
               icon={<Lock size={24} className="text-secondary" />}

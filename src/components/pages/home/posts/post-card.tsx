@@ -74,7 +74,7 @@ const PostCard: React.FC<PostCardProps> = ({ post }) => {
         setShowDescription={setShowDescription}
         data={post.content.media || []}
       />
-      <div className="flex gap-7 items-center mt-5 border-b border-gray-500 pt-8 pb-5">
+      <div className="flex gap-7 items-center mt-5 border-b border-[#9194A9] pt-8 pb-5">
         <div
           className="relative flex items-center"
           onMouseEnter={() => setShowReactions(true)}
@@ -152,7 +152,7 @@ const PostCard: React.FC<PostCardProps> = ({ post }) => {
               />
             </div>
             <div className="flex flex-col h-full">
-              <div className="flex justify-between items-center border-b border-gray-500">
+              <div className="flex justify-between items-center border-b border-[#9194A9]">
                 <div className="flex gap-7 items-center pt-5 pb-5">
                   <div
                     className="relative flex items-center"

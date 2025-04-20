@@ -1,4 +1,3 @@
-import React from "react";
 import UpcomingEventCard from "./upComing-event-card";
 interface IAuthor {
   fullName: string;
@@ -68,11 +67,11 @@ const upComingEvent: IEvent[] = [
 ];
 const UpcomingEvents = () => {
   return (
-    <section className="w-full pt-2 pb-7 border-b border-gray-300">
+    <section className="w-full pt-2 pb-7 border-b border-[#E2E8F0]">
       {/* Header Section */}
       <div className="w-full flex items-center justify-between mb-6">
         <h1 className="text-xl md:text-2xl font-semibold text-gray-800">
-        Upcoming Tour
+          Upcoming Tour
         </h1>
         <button className="text-primary hover:underline">Show more</button>
       </div>

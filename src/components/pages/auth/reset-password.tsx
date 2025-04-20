@@ -59,7 +59,7 @@ const ResetPassword = () => {
               size="lg"
               icon={<Lock size={24} className="text-secondry" />}
               placeholder="Enter new password"
-              varient="outline"
+              variant="outline"
               type="password"
             />
             <CustomInput
@@ -69,7 +69,7 @@ const ResetPassword = () => {
               size="lg"
               icon={<Lock size={24} className="text-second" />}
               placeholder="Enter confirm password"
-              varient="outline"
+              variant="outline"
               type="password"
             />
             <CustomButton fullWidth className="py-4">
