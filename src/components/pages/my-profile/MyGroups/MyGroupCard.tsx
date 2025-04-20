@@ -1,11 +1,10 @@
 import { Ellipsis } from "lucide-react";
 import Image from "next/image";
-import React from "react";
-import { IGroup } from "./MyGroups";
 import { HiGlobe } from "react-icons/hi";
+import { IGroup } from "./MyGroups";
 const MyGroupCard = ({ group }: { group: IGroup }) => {
   return (
-    <div className="flex items-center justify-between bg-white p-6 rounded-lg">
+    <div className="flex items-center justify-between bg-white p-6 rounded-xl">
       <div className="flex items-center space-x-4">
         <Image
           src={group.image}

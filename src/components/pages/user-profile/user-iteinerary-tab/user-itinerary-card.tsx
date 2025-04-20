@@ -1,12 +1,12 @@
 "use client";
+import CustomModal from "@/components/custom/custom-modal";
+import { IPost } from "@/types/post.types";
+import { Bookmark, Download } from "lucide-react";
 import React, { useState } from "react";
 import { FaCalendarCheck, FaHeart } from "react-icons/fa";
-import { RiMessage2Fill } from "react-icons/ri";
-import { IPost } from "@/types/post.types";
-import UserItineraryHeader from "./user-itinerary-header";
-import CustomModal from "@/components/custom/custom-modal";
-import { Bookmark, Download } from "lucide-react";
 import { IoClose } from "react-icons/io5";
+import { RiMessage2Fill } from "react-icons/ri";
+import UserItineraryHeader from "./user-itinerary-header";
 
 interface UserTimelineCardProps {
   post: IPost;
@@ -75,7 +75,7 @@ const UserItineraryCard: React.FC<UserTimelineCardProps> = ({ post }) => {
 
       {/* Document/Itinerary Section */}
       <div
-        className="w-full bg-[#E6F5FA] rounded-lg p-4 mb-4 cursor-pointer"
+        className="w-full bg-[#E6F5FA] rounded-xl p-4 mb-4 cursor-pointer"
         onClick={() => setIsModalOpen(true)} // Open modal on click
       >
         <p className="text-primary font-semibold">
@@ -89,7 +89,7 @@ const UserItineraryCard: React.FC<UserTimelineCardProps> = ({ post }) => {
             <FaHeart className="size-6 text-primary" />
             {sortedReactions.length > 0
               ? sortedReactions[0][0].charAt(0).toUpperCase() +
-                sortedReactions[0][0].slice(1)
+              sortedReactions[0][0].slice(1)
               : ""}
           </button>
         </div>
@@ -136,9 +136,8 @@ const UserItineraryCard: React.FC<UserTimelineCardProps> = ({ post }) => {
             {[...Array(5)].map((_, i) => (
               <svg
                 key={i}
-                className={`w-4 h-4 ${
-                  i < itineraryData.rating ? "text-yellow-400" : "text-gray-300"
-                }`}
+                className={`w-4 h-4 ${i < itineraryData.rating ? "text-yellow-400" : "text-gray-300"
+                  }`}
                 fill="currentColor"
                 viewBox="0 0 20 20"
                 xmlns="http://www.w3.org/2000/svg"
@@ -173,11 +172,10 @@ const UserItineraryCard: React.FC<UserTimelineCardProps> = ({ post }) => {
                     {[...Array(5)].map((_, i) => (
                       <svg
                         key={i}
-                        className={`w-4 h-4 ${
-                          i < activity.rating
+                        className={`w-4 h-4 ${i < activity.rating
                             ? "text-yellow-400"
                             : "text-gray-300"
-                        }`}
+                          }`}
                         fill="currentColor"
                         viewBox="0 0 20 20"
                         xmlns="http://www.w3.org/2000/svg"

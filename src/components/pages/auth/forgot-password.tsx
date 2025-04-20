@@ -1,21 +1,21 @@
 "use client";
 import authImage from "@/asset/auth/auth.jpg";
 import logo from "@/asset/logo/logo.png";
-import CustomForm from "@/components/custom/custom-form";
-import Image from "next/image";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { forgotPasswordValidationSchema } from "@/validation/auth.validation";
-import { FieldValues } from "react-hook-form";
-import CustomInput from "@/components/custom/custom-input";
-import { Mail } from "lucide-react";
 import CustomButton from "@/components/custom/custom-button";
+import CustomForm from "@/components/custom/custom-form";
+import CustomInput from "@/components/custom/custom-input";
+import { forgotPasswordValidationSchema } from "@/validation/auth.validation";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Mail } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { FieldValues } from "react-hook-form";
 const ForgotPassword = () => {
   const router = useRouter();
   const handleLogin = async (values: FieldValues) => {
     console.log(values);
-    const {email} = values;
+    const { email } = values;
     router.push(`/verify-email?email=${email}`)
   };
   return (
@@ -34,7 +34,7 @@ const ForgotPassword = () => {
       {/* Semi-transparent color overlay */}
       <div className="absolute top-0 left-0 w-full h-full bg-[#40E0D054]"></div>
       {/* Content that remains sharp */}
-      <div className="w-full max-w-[500px] mx-auto px-8 md:px-[65px] py-12 md:py-[56px] bg-[#FFFFFF] z-30 rounded-lg border-2 border-primary shadow-xl shadow-gray-900">
+      <div className="w-full max-w-[500px] mx-auto px-8 md:px-[65px] py-12 md:py-[56px] bg-[#FFFFFF] z-30 rounded-xl border-2 border-primary shadow-xl shadow-gray-900">
         <div className="flex justify-between">
           <h1 className="text-xl lg:text-3xl xl:text-4xl font-semibold">
             Forgot Password

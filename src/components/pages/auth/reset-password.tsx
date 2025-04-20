@@ -1,16 +1,16 @@
 "use client";
 import authImage from "@/asset/auth/auth.jpg";
 import logo from "@/asset/logo/logo.png";
-import CustomForm from "@/components/custom/custom-form";
-import Image from "next/image";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { resetPasswordValidationSchema } from "@/validation/auth.validation";
-import { FieldValues } from "react-hook-form";
-import CustomInput from "@/components/custom/custom-input";
 import CustomButton from "@/components/custom/custom-button";
+import CustomForm from "@/components/custom/custom-form";
+import CustomInput from "@/components/custom/custom-input";
+import { resetPasswordValidationSchema } from "@/validation/auth.validation";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Lock } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Lock } from "lucide-react";
+import { FieldValues } from "react-hook-form";
 const ResetPassword = () => {
   const router = useRouter();
   const handleResetPassword = async (values: FieldValues) => {
@@ -33,7 +33,7 @@ const ResetPassword = () => {
       {/* Semi-transparent color overlay */}
       <div className="absolute top-0 left-0 w-full h-full bg-[#40E0D054]"></div>
       {/* Content that remains sharp */}
-      <div className="w-full max-w-[500px] mx-auto px-8 md:px-[65px] py-12 md:py-[56px] bg-[#FFFFFF] z-30 rounded-lg border-2 border-primary shadow-xl shadow-gray-900">
+      <div className="w-full max-w-[500px] mx-auto px-8 md:px-[65px] py-12 md:py-[56px] bg-[#FFFFFF] z-30 rounded-xl border-2 border-primary shadow-xl shadow-gray-900">
         <div className="flex justify-between">
           <h1 className="text-xl lg:text-3xl xl:text-4xl font-semibold">
             Reset Password
@@ -57,7 +57,7 @@ const ResetPassword = () => {
               label="New Password"
               fullWidth
               size="lg"
-              icon={<Lock size={24} className="text-secondry"/>}
+              icon={<Lock size={24} className="text-secondry" />}
               placeholder="Enter new password"
               varient="outline"
               type="password"
@@ -67,7 +67,7 @@ const ResetPassword = () => {
               label="Confirm Password"
               fullWidth
               size="lg"
-              icon={<Lock size={24} className="text-second"/>}
+              icon={<Lock size={24} className="text-second" />}
               placeholder="Enter confirm password"
               varient="outline"
               type="password"

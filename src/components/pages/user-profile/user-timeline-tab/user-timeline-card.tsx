@@ -1,10 +1,10 @@
+import { IPost } from "@/types/post.types";
+import Link from "next/link";
 import React from "react";
 import { FaCalendarCheck, FaHeart } from "react-icons/fa";
 import { RiMessage2Fill } from "react-icons/ri";
-import {  IPost } from "@/types/post.types";
 import UserTimelineContentRender from "./user-timeline-content-render";
 import UserTimelineHeader from "./user-timeline-header";
-import Link from "next/link";
 interface UserTimelineCardProps {
   post: IPost;
 }
@@ -16,7 +16,7 @@ const UserTimelineCard: React.FC<UserTimelineCardProps> = ({ post }) => {
 
   return (
     <Link href={`/feed/${post?.id}`}>
-      <div className="w-full bg-white rounded-lg p-4 mb-4">
+      <div className="w-full bg-white rounded-xl p-4 mb-4">
         <UserTimelineHeader post={post} />
         <p className="text-gray-700 mb-4">{post.content.text}</p>
         <UserTimelineContentRender data={post.content.media || []} />
@@ -26,7 +26,7 @@ const UserTimelineCard: React.FC<UserTimelineCardProps> = ({ post }) => {
               <FaHeart className="size-6 text-primary" />
               {sortedReactions.length > 0
                 ? sortedReactions[0][0].charAt(0).toUpperCase() +
-                  sortedReactions[0][0].slice(1)
+                sortedReactions[0][0].slice(1)
                 : ""}
             </button>
           </div>

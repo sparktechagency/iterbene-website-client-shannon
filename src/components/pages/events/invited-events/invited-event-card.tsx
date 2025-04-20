@@ -34,7 +34,7 @@ const InvitedEventCard: React.FC<InvitedEventCardProps> = ({ event }) => {
           height={350}
           className="w-full h-full object-cover rounded-2xl mb-4"
         />
-        <div className="absolute px-4 py-5 rounded-lg top-0 left-0 right-0 bottom-0 bg-gray-950/20">
+        <div className="absolute px-4 py-5 rounded-xl top-0 left-0 right-0 bottom-0 bg-gray-950/20">
           <div className="w-full h-full flex flex-col justify-between">
             <div className="flex  justify-between items-center">
               <Image
@@ -59,10 +59,10 @@ const InvitedEventCard: React.FC<InvitedEventCardProps> = ({ event }) => {
       </div>
       {/* Buttons */}
       <div className="flex flex-col gap-3 w-full">
-        <button className="bg-secondary hover:bg-[#FEEFE8] hover:text-secondary text-white  px-5 py-3.5 rounded-lg border border-secondary transition cursor-pointer">
+        <button className="bg-secondary hover:bg-[#FEEFE8] hover:text-secondary text-white  px-5 py-3.5 rounded-xl border border-secondary transition cursor-pointer">
           Accept
         </button>
-        <button className="border border-[#9EA1B3] text-gray-900 px-5 py-3.5   rounded-lg hover:bg-gray-100 transition cursor-pointer">
+        <button className="border border-[#9EA1B3] text-gray-900 px-5 py-3.5   rounded-xl hover:bg-gray-100 transition cursor-pointer">
           Decline
         </button>
       </div>

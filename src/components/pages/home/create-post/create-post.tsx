@@ -1,15 +1,15 @@
 "use client";
-import Image from "next/image";
-import React, { useState, useRef } from "react";
 import {
-  MapPin,
-  Image as ImageIcon,
-  Video,
-  X,
-  Trash2,
   CalendarCheck,
   Globe,
+  Image as ImageIcon,
+  MapPin,
+  Trash2,
+  Video,
+  X,
 } from "lucide-react";
+import Image from "next/image";
+import React, { useRef, useState } from "react";
 // Define types for itinerary entries
 interface Activity {
   activity: string;
@@ -117,7 +117,7 @@ const CreatePost = () => {
           onChange={postChangeHandler}
           className="w-full bg-transparent border-none focus:outline-none text-gray-800 placeholder-gray-500"
         />
-        <button className={`flex-shrink-0 ${post ? "bg-secondary text-white" : "border border-gray-300 text-gray-700"}  px-6 py-3 rounded-lg`}>Post It!</button>
+        <button className={`flex-shrink-0 ${post ? "bg-secondary text-white" : "border border-gray-300 text-gray-700"}  px-6 py-3 rounded-xl`}>Post It!</button>
       </div>
 
       {/* Additional Options Section (Visible when post has text) */}
@@ -247,13 +247,12 @@ const CreatePost = () => {
                 title="Add Location"
               >
                 <MapPin
-                  className={`w-6 h-6 ${
-                    selectedLocation ? "text-primary" : "text-gray-500"
-                  } hover:text-primary transition-colors`}
+                  className={`w-6 h-6 ${selectedLocation ? "text-primary" : "text-gray-500"
+                    } hover:text-primary transition-colors`}
                 />
               </button>
               {showLocationPopup && (
-                <div className="absolute top-8 left-0 bg-white border rounded-lg shadow-lg p-4 w-64 z-10">
+                <div className="absolute top-8 left-0 bg-white border rounded-xl shadow-lg p-4 w-64 z-10">
                   <div className="flex justify-between items-center mb-2">
                     <h4 className="text-sm font-semibold text-gray-700">
                       Add Location
@@ -295,9 +294,8 @@ const CreatePost = () => {
               title="Add Image"
             >
               <ImageIcon
-                className={`w-6 h-6 ${
-                  images.length > 0 ? "text-primary" : "text-gray-500"
-                } hover:text-primary transition-colors`}
+                className={`w-6 h-6 ${images.length > 0 ? "text-primary" : "text-gray-500"
+                  } hover:text-primary transition-colors`}
               />
             </button>
             <input
@@ -315,9 +313,8 @@ const CreatePost = () => {
               title="Add Video"
             >
               <Video
-                className={`w-6 h-6 ${
-                  videos.length > 0 ? "text-primary" : "text-gray-500"
-                } hover:text-primary transition-colors`}
+                className={`w-6 h-6 ${videos.length > 0 ? "text-primary" : "text-gray-500"
+                  } hover:text-primary transition-colors`}
               />
             </button>
             <input
@@ -334,17 +331,15 @@ const CreatePost = () => {
               title="Add Itinerary"
             >
               <CalendarCheck
-                className={`w-6 h-6 ${
-                  itinerary.length > 0 ? "text-primary" : "text-gray-500"
-                } hover:text-primary transition-colors`}
+                className={`w-6 h-6 ${itinerary.length > 0 ? "text-primary" : "text-gray-500"
+                  } hover:text-primary transition-colors`}
               />
             </button>
             {/* Privacy Icon */}
             <button onClick={() => setPrivacy("Public")} title="Set Privacy">
               <Globe
-                className={`w-6 h-6 ${
-                  privacy === "Public" ? "text-primary" : "text-gray-500"
-                } transition-colors`}
+                className={`w-6 h-6 ${privacy === "Public" ? "text-primary" : "text-gray-500"
+                  } transition-colors`}
               />
             </button>
           </div>

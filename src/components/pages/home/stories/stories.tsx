@@ -1,15 +1,15 @@
 "use client";
-import React, { useState } from "react";
-import { Swiper, SwiperSlide } from "swiper/react";
+import { Plus } from "lucide-react";
+import Image from "next/image";
+import { useState } from "react";
 import "swiper/css";
 import "swiper/css/free-mode";
 import "swiper/css/pagination";
 import { FreeMode, Pagination } from "swiper/modules";
-import StoryCard from "./stories.card";
-import Image from "next/image";
-import { Plus } from "lucide-react";
-import StoriesModal from "./stories-modal";
+import { Swiper, SwiperSlide } from "swiper/react";
 import CreateStoryModal from "./create-story-modal";
+import StoriesModal from "./stories-modal";
+import StoryCard from "./stories.card";
 
 interface Media {
   url: string;
@@ -116,16 +116,16 @@ const Stories = () => {
         <SwiperSlide>
           <div
             onClick={() => setIsCreateModalOpen(true)}
-            className="relative w-full h-[250px] rounded-lg overflow-hidden shadow-lg cursor-pointer"
+            className="relative w-full h-[250px] rounded-xl overflow-hidden shadow-lg cursor-pointer"
           >
             <Image
               src="https://i.postimg.cc/dVP9Fh3N/2588a7b47b42d6dddfdfa08bb9300d00.jpg"
               alt="Story Image"
               width={200}
               height={380}
-              className="object-cover w-full h-full rounded-lg"
+              className="object-cover w-full h-full rounded-xl"
             />
-            <div className="absolute p-4 rounded-lg top-0 left-0 right-0 bottom-0 bg-white/30 flex flex-col justify-end">
+            <div className="absolute p-4 rounded-xl top-0 left-0 right-0 bottom-0 bg-white/30 flex flex-col justify-end">
               <div className="flex flex-col items-center gap-5">
                 <div className="size-10 bg-white flex justify-center items-center rounded-2xl">
                   <Plus size={20} className="text-gray-950 font-bold" />

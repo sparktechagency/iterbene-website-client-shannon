@@ -1,8 +1,11 @@
-import React from "react";
+"use client";
+import React, { useState } from "react";
 import ItineraryCard from "./ItineraryCard";
 import { IPost } from "@/types/post.types";
 
 const MyItinerary = () => {
+  const [activeTab, setActiveTab] = useState<string>("My Itinerary");
+  const [sortOption, setSortOption] = useState<string>("Recently Active");
   const demoPosts: IPost[] = [
     {
       id: "1",
@@ -170,7 +173,50 @@ const MyItinerary = () => {
     },
   ];
   return (
-    <section className="w-full space-y-3rounded-2xl">
+    <section className="w-full ">
+      {/* Tabs */}
+      <div className="flex items-center justify-between pb-5">
+        <div className="flex space-x-4 ">
+          <button
+            onClick={() => setActiveTab("My Itinerary")}
+            className={`px-9 py-1.5 rounded-xl font-semibold transition-colors cursor-pointer ${
+              activeTab === "My Itinerary" &&
+              "bg-[#E9F8F9] border border-primary text-primary"
+            }`}
+          >
+            My Itinerary
+          </button>
+          <button
+            onClick={() => setActiveTab("Saved")}
+            className={`px-9 py-1.5 rounded-xl font-semibold transition-colors cursor-pointer ${
+              activeTab === "Saved" &&
+              "bg-[#E9F8F9] border border-primary text-primary"
+            }`}
+          >
+            Saved
+          </button>
+        </div>
+        <div className="relative">
+          <select
+            value={sortOption}
+            onChange={(e) => setSortOption(e.target.value)}
+            className="appearance-none bg-white border border-gray-300 rounded-md py-2 pl-3 pr-8 text-gray-700 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+          >
+            <option value="Alphabetical">Alphabetical</option>
+            <option value="Recently Active">Recently Active</option>
+            <option value="Newest Members">Newest Members</option>
+          </select>
+          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+            <svg
+              className="fill-current h-4 w-4"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 20 20"
+            >
+              <path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
+            </svg>
+          </div>
+        </div>
+      </div>
       <div className="w-full space-y-6">
         {demoPosts?.map((post) => (
           <ItineraryCard key={post.id} post={post} />

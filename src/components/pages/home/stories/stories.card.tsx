@@ -1,6 +1,6 @@
 "use client";
-import React from "react";
 import Image from "next/image";
+import React from "react";
 
 interface StoryCardProps {
   image: string;
@@ -16,22 +16,22 @@ const StoryCard: React.FC<StoryCardProps> = ({
   authorImage,
 }) => {
   return (
-    <div className="relative w-full h-[250px] rounded-lg overflow-hidden shadow-lg cursor-pointer">
+    <div className="relative w-full h-[250px] rounded-xl overflow-hidden shadow-lg cursor-pointer">
       {mediaType === "image" ? (
         <Image
           src={image}
           alt="Story Image"
           width={200}
           height={200}
-          className="object-cover w-full h-full rounded-lg"
+          className="object-cover w-full h-full rounded-xl"
         />
       ) : (
         <video
           src={image}
-          className="object-cover w-full h-full rounded-lg"
+          className="object-cover w-full h-full rounded-xl"
         />
       )}
-      <div className="absolute p-4 rounded-lg top-0 left-0 right-0 bottom-0 bg-gray-950/30">
+      <div className="absolute p-4 rounded-xl top-0 left-0 right-0 bottom-0 bg-gray-950/30">
         <div className="w-full h-full flex flex-col justify-between">
           <Image
             src={authorImage}

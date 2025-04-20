@@ -23,17 +23,17 @@ interface UpcomingEventCardProps {
 
 const UpcomingEventCard: React.FC<UpcomingEventCardProps> = ({ event }) => {
   return (
-    <div className="w-full relative  rounded-lg cursor-pointer">
-      <div className="relative w-full h-[382px] rounded-lg">
+    <div className="w-full relative  rounded-xl cursor-pointer">
+      <div className="relative w-full h-[382px] rounded-xl">
         <Image
           src={event?.image?.imageUrl || ""}
           alt={event.title}
           width={500}
           height={500}
-          className="w-full h-full object-cover rounded-lg"
+          className="w-full h-full object-cover rounded-xl"
         />
       </div>
-      <div className="absolute p-4 rounded-lg top-0 left-0 right-0 bottom-0 bg-gray-950/30 ">
+      <div className="absolute p-4 rounded-xl top-0 left-0 right-0 bottom-0 bg-gray-950/30 ">
         <div className="w-full h-full flex flex-col justify-between">
           <Image
             src={event?.author?.profileImage?.imageUrl || ""}

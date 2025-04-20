@@ -1,13 +1,13 @@
 "use client";
-import React, { useState, useRef, useEffect } from "react";
 import {
-  Play,
-  Pause,
-  Volume2,
-  VolumeX,
   Maximize,
   Minimize,
+  Pause,
+  Play,
+  Volume2,
+  VolumeX,
 } from "lucide-react";
+import React, { useEffect, useRef, useState } from "react";
 
 interface VideoPlayerProps {
   url: string;
@@ -29,12 +29,12 @@ const CustomVideoPlayer: React.FC<VideoPlayerProps> = ({ url }) => {
     const video = videoRef.current;
     console.log("Video element:", video);
     if (!video) return;
-  
+
     const handleTimeUpdate = () => {
       setProgress((video.currentTime / video.duration) * 100);
       setCurrentTime(video.currentTime);
     };
-  
+
     const handleLoadedMetadata = () => {
       console.log("Loaded metadata event fired");
       console.log("Video duration:", video.duration);
@@ -44,7 +44,7 @@ const CustomVideoPlayer: React.FC<VideoPlayerProps> = ({ url }) => {
         console.log("Duration not available yet");
       }
     };
-  
+
     const handleEnded = () => {
       setIsPlaying(false);
       setShowControls(false);
@@ -52,7 +52,7 @@ const CustomVideoPlayer: React.FC<VideoPlayerProps> = ({ url }) => {
       setProgress(0); // Reset progress bar
       setCurrentTime(0); // Reset current time
     };
-  
+
     // Fallback to check duration if loadedmetadata doesn't fire
     const checkDuration = () => {
       if (video.duration && !isNaN(video.duration)) {
@@ -63,22 +63,22 @@ const CustomVideoPlayer: React.FC<VideoPlayerProps> = ({ url }) => {
         setTimeout(checkDuration, 500); // Retry after 500ms
       }
     };
-  
+
     // Disable context menu (three-dot menu)
     video.addEventListener("contextmenu", (e) => e.preventDefault());
     video.addEventListener("timeupdate", handleTimeUpdate);
     video.addEventListener("loadedmetadata", handleLoadedMetadata);
     video.addEventListener("ended", handleEnded);
-  
+
     // Trigger fallback check
     setTimeout(checkDuration, 100);
-  
+
     // Sometimes, the metadata might already be loaded before the event listener is added
     if (video.readyState >= 1) {
       console.log("Metadata already loaded, setting duration directly");
       handleLoadedMetadata();
     }
-  
+
     return () => {
       video.removeEventListener("timeupdate", handleTimeUpdate);
       video.removeEventListener("loadedmetadata", handleLoadedMetadata);
@@ -159,7 +159,7 @@ const CustomVideoPlayer: React.FC<VideoPlayerProps> = ({ url }) => {
       <video
         ref={videoRef}
         src={url}
-        className="w-full rounded-lg"
+        className="w-full rounded-xl"
         onClick={togglePlay}
         controls={false} // Disable default controls
         controlsList="nodownload" // Disable download option
@@ -179,9 +179,8 @@ const CustomVideoPlayer: React.FC<VideoPlayerProps> = ({ url }) => {
 
       {/* Custom Controls (Visible when playing or on hover) */}
       <div
-        className={`absolute bottom-0 left-0 right-0 bg-gradient-to-t rounded-lg from-black/70 to-transparent p-4 transition-opacity duration-300 ${
-          showControls ? "opacity-100" : "opacity-0"
-        }`}
+        className={`absolute bottom-0 left-0 right-0 bg-gradient-to-t rounded-xl from-black/70 to-transparent p-4 transition-opacity duration-300 ${showControls ? "opacity-100" : "opacity-0"
+          }`}
       >
         {/* Progress Bar */}
         <div

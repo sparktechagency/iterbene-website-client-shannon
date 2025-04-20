@@ -16,7 +16,7 @@ const PostCommentSection = ({ comments }: { comments: IComment[] }) => {
               height={48}
               className="size-[48px] ring ring-primary rounded-full"
             />
-            <div className="bg-[#ECFCFA] p-3 rounded-lg flex-1 space-y-2">
+            <div className="bg-[#ECFCFA] p-3 rounded-xl flex-1 space-y-2">
               <p className="font-bold">{comment.username}</p>
               <p className="text-gray-700 text-sm">{comment.text}</p>
               <div className="flex items-center gap-5">
@@ -46,7 +46,7 @@ const PostCommentSection = ({ comments }: { comments: IComment[] }) => {
                           height={28}
                           className="rounded-full"
                         />
-                        <div className="bg-blue-50 p-2 rounded-lg flex-1">
+                        <div className="bg-blue-50 p-2 rounded-xl flex-1">
                           <p className="font-semibold text-sm">{reply.username}</p>
                           <p className="text-gray-700 text-sm">{reply.text}</p>
                           <div className="flex items-center space-x-2 mt-1 text-gray-500 text-xs">

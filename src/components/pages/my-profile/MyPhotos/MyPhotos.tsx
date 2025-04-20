@@ -1,6 +1,6 @@
 "use client";
-import React, { useState } from "react";
 import Image from "next/image";
+import { useState } from "react";
 import Lightbox from "yet-another-react-lightbox";
 import "yet-another-react-lightbox/styles.css";
 
@@ -67,7 +67,7 @@ const MyPhotos = () => {
               src={photo.src}
               alt={photo.alt}
               fill
-              className="object-cover rounded-lg"
+              className="object-cover rounded-xl"
               sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1280px) 25vw, 25vw"
               priority={index < 4} // Prioritize loading for the first row
             />

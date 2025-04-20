@@ -13,7 +13,7 @@ const CreateGroup: React.FC = () => {
     <section className="w-full mb-8">
       <button
         onClick={openModal}
-        className="w-full bg-[#FEEFE8] text-secondary flex justify-center items-center gap-2 font-semibold px-5 py-3.5 rounded-lg border border-secondary transition cursor-pointer"
+        className="w-full bg-[#FEEFE8] text-secondary flex justify-center items-center gap-2 font-semibold px-5 py-3.5 rounded-xl border border-secondary transition cursor-pointer"
       >
         <PiPlus size={24} />
         <span>Create New Group</span>

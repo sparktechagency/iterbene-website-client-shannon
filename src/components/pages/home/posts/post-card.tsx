@@ -1,15 +1,15 @@
-import React, { useState, useEffect } from "react";
-import { MdOutlineLuggage } from "react-icons/md";
-import { FaCalendarCheck, FaHeart } from "react-icons/fa";
-import { Ban, Smile } from "lucide-react";
-import { RiMessage2Fill } from "react-icons/ri";
 import { IComment, IPost } from "@/types/post.types";
-import PostContentRender from "./post.content-render";
-import PostHeader from "./post.header";
+import { motion } from "framer-motion";
+import { Ban, Smile } from "lucide-react";
+import React, { useEffect, useState } from "react";
+import { FaCalendarCheck, FaHeart } from "react-icons/fa";
+import { MdOutlineLuggage } from "react-icons/md";
+import { RiMessage2Fill } from "react-icons/ri";
+import PostDescriptionContentRender from "./post-description-content-render";
 import PostCommentInput from "./post.comment.input";
 import PostCommentSection from "./post.comment.section";
-import { motion } from "framer-motion";
-import PostDescriptionContentRender from "./post-description-content-render";
+import PostContentRender from "./post.content-render";
+import PostHeader from "./post.header";
 interface PostCardProps {
   post: IPost;
 }
@@ -67,7 +67,7 @@ const PostCard: React.FC<PostCardProps> = ({ post }) => {
   };
 
   return (
-    <div className="w-full bg-white rounded-lg p-4 mb-4">
+    <div className="w-full bg-white rounded-xl p-4 mb-4">
       <PostHeader post={post} />
       <p className="text-gray-700 mb-4">{post.content.text}</p>
       <PostContentRender
@@ -84,7 +84,7 @@ const PostCard: React.FC<PostCardProps> = ({ post }) => {
             <FaHeart className="size-6 text-primary" />
             {sortedReactions.length > 0
               ? sortedReactions[0][0].charAt(0).toUpperCase() +
-                sortedReactions[0][0].slice(1)
+              sortedReactions[0][0].slice(1)
               : ""}
           </button>
           {showReactions && (
@@ -163,7 +163,7 @@ const PostCard: React.FC<PostCardProps> = ({ post }) => {
                       <FaHeart className="size-6 text-primary" />
                       {sortedReactions.length > 0
                         ? sortedReactions[0][0].charAt(0).toUpperCase() +
-                          sortedReactions[0][0].slice(1)
+                        sortedReactions[0][0].slice(1)
                         : ""}
                     </button>
                     {showReactions && (

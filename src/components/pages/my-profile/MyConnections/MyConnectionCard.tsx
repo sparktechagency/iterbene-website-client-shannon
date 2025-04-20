@@ -1,15 +1,14 @@
 import { Ellipsis } from "lucide-react";
 import Image from "next/image";
-import React from "react";
 interface Connection {
-    name: string;
-    image: string;
-    isRequest: boolean
+  name: string;
+  image: string;
+  isRequest: boolean
 }
 const MyConnectionCard = ({ connection }: { connection: Connection }) => {
   return (
     <div
-      className="flex items-center justify-between bg-white p-4 rounded-lg"
+      className="flex items-center justify-between bg-white p-4 rounded-xl"
     >
       <div className="flex items-center space-x-4">
         <Image
@@ -22,7 +21,7 @@ const MyConnectionCard = ({ connection }: { connection: Connection }) => {
         <span className="text-gray-800 font-medium">{connection.name}</span>
       </div>
       <button className="text-gray-700">
-        <Ellipsis size={28}/>
+        <Ellipsis size={28} />
       </button>
     </div>
   );

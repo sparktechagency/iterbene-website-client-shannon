@@ -1,9 +1,9 @@
 "use client";
-import React, { useState, useCallback } from "react";
-import { useDropzone } from "react-dropzone";
+import { Minus, Plus, X } from "lucide-react";
 import Image from "next/image";
-import { X, Plus, Minus } from "lucide-react";
+import React, { useCallback, useState } from "react";
 import { SketchPicker } from "react-color";
+import { useDropzone } from "react-dropzone";
 
 interface Media {
   url: string;
@@ -124,9 +124,8 @@ const CreateStoryModal: React.FC<CreateStoryModalProps> = ({
         {/* Dropzone for File Upload */}
         <div
           {...getRootProps()}
-          className={`border-2 border-dashed rounded-lg p-6 text-center mb-4 ${
-            isDragActive ? "border-blue-500 bg-blue-50" : "border-gray-300"
-          }`}
+          className={`border-2 border-dashed rounded-xl p-6 text-center mb-4 ${isDragActive ? "border-blue-500 bg-blue-50" : "border-gray-300"
+            }`}
         >
           <input {...getInputProps()} />
           {isDragActive ? (
@@ -148,7 +147,7 @@ const CreateStoryModal: React.FC<CreateStoryModalProps> = ({
                 Preview
               </h3>
               <div
-                className="relative w-full h-64 rounded-lg overflow-hidden"
+                className="relative w-full h-64 rounded-xl overflow-hidden"
                 style={{ backgroundColor }}
               >
                 {previews.map((preview, index) => (
@@ -221,7 +220,7 @@ const CreateStoryModal: React.FC<CreateStoryModalProps> = ({
             value={text}
             onChange={(e) => setText(e.target.value)}
             placeholder="Type your text here..."
-            className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full p-2 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
 
@@ -232,7 +231,7 @@ const CreateStoryModal: React.FC<CreateStoryModalProps> = ({
           </label>
           <button
             onClick={() => setShowTextColorPicker((prev) => !prev)}
-            className="px-4 py-2 bg-gray-200 rounded-lg"
+            className="px-4 py-2 bg-gray-200 rounded-xl"
           >
             Pick Text Color
           </button>
@@ -258,7 +257,7 @@ const CreateStoryModal: React.FC<CreateStoryModalProps> = ({
           <select
             value={font}
             onChange={(e) => setFont(e.target.value)}
-            className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full p-2 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="Inter">Inter</option>
             <option value="Roboto">Roboto</option>
@@ -274,7 +273,7 @@ const CreateStoryModal: React.FC<CreateStoryModalProps> = ({
           </label>
           <button
             onClick={() => setShowBgColorPicker((prev) => !prev)}
-            className="px-4 py-2 bg-gray-200 rounded-lg"
+            className="px-4 py-2 bg-gray-200 rounded-xl"
           >
             Pick Background Color
           </button>
@@ -296,11 +295,10 @@ const CreateStoryModal: React.FC<CreateStoryModalProps> = ({
         <button
           onClick={handleUpload}
           disabled={uploading || files.length === 0}
-          className={`w-full py-3 rounded-lg text-white font-semibold ${
-            uploading || files.length === 0
+          className={`w-full py-3 rounded-xl text-white font-semibold ${uploading || files.length === 0
               ? "bg-gray-400 cursor-not-allowed"
               : "bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600"
-          }`}
+            }`}
         >
           {uploading ? "Uploading..." : "Create Story"}
         </button>

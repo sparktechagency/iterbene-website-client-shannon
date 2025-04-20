@@ -1,10 +1,10 @@
 "use client";
-import React, { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { IoClose } from "react-icons/io5";
+import { AnimatePresence, motion } from "framer-motion";
 import Image from "next/image";
-import { useForm, SubmitHandler } from "react-hook-form";
+import React, { useEffect, useState } from "react";
+import { SubmitHandler, useForm } from "react-hook-form";
 import { FiUpload } from "react-icons/fi";
+import { IoClose } from "react-icons/io5";
 import { MdChangeCircle } from "react-icons/md";
 
 // Define the TypeScript interface for the form data
@@ -115,7 +115,7 @@ const CreateGroupModal: React.FC<CreateGroupModalProps> = ({
           onClick={onClose}
         >
           <motion.div
-            className="w-full h-[600px] md:h-[800px] bg-white rounded-lg p-6 max-w-2xl relative overflow-y-auto custom-scrollbar"
+            className="w-full h-[600px] md:h-[800px] bg-white rounded-xl p-6 max-w-2xl relative overflow-y-auto custom-scrollbar"
             variants={modalVariants}
             initial="hidden"
             animate="visible"
@@ -136,7 +136,7 @@ const CreateGroupModal: React.FC<CreateGroupModalProps> = ({
             </div>
 
             {/* Group Cover Image */}
-            <div className="w-full h-32 bg-gray-200 rounded-lg mb-4 relative flex items-center justify-center">
+            <div className="w-full h-32 bg-gray-200 rounded-xl mb-4 relative flex items-center justify-center">
               {groupImage ? (
                 <div className="relative w-full h-full">
                   <Image
@@ -144,7 +144,7 @@ const CreateGroupModal: React.FC<CreateGroupModalProps> = ({
                     alt="Group Cover"
                     width={300}
                     height={150}
-                    className="w-full h-full object-cover rounded-lg"
+                    className="w-full h-full object-cover rounded-xl"
                   />
                   {/* Change Image Button */}
                   <label className="absolute top-2 right-2 bg-white rounded-full p-2 cursor-pointer shadow-md">
@@ -204,9 +204,8 @@ const CreateGroupModal: React.FC<CreateGroupModalProps> = ({
                 <input
                   type="text"
                   placeholder="Group name"
-                  className={`w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500 ${
-                    errors.groupName ? "border-red-500" : ""
-                  }`}
+                  className={`w-full border border-gray-300 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500 ${errors.groupName ? "border-red-500" : ""
+                    }`}
                   {...register("groupName", {
                     required: "Group name is required",
                   })}
@@ -226,9 +225,8 @@ const CreateGroupModal: React.FC<CreateGroupModalProps> = ({
                 <input
                   type="text"
                   placeholder="Location"
-                  className={`w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500 ${
-                    errors.location ? "border-red-500" : ""
-                  }`}
+                  className={`w-full border border-gray-300 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500 ${errors.location ? "border-red-500" : ""
+                    }`}
                   {...register("location", {
                     required: "Location is required",
                   })}
@@ -246,7 +244,7 @@ const CreateGroupModal: React.FC<CreateGroupModalProps> = ({
                   Who can see the event?
                 </label>
                 <select
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  className="w-full border border-gray-300 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500"
                   {...register("visibility", {
                     required: "Visibility is required",
                   })}
@@ -264,9 +262,8 @@ const CreateGroupModal: React.FC<CreateGroupModalProps> = ({
                 </label>
                 <textarea
                   placeholder="What's the interest?"
-                  className={`w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500 resize-none h-24 ${
-                    errors.interest ? "border-red-500" : ""
-                  }`}
+                  className={`w-full border border-gray-300 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500 resize-none h-24 ${errors.interest ? "border-red-500" : ""
+                    }`}
                   {...register("interest", {
                     required: "Interest description is required",
                   })}
@@ -286,7 +283,7 @@ const CreateGroupModal: React.FC<CreateGroupModalProps> = ({
                 <input
                   type="text"
                   placeholder="Add co-leaders"
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  className="w-full border border-gray-300 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500"
                   {...register("coLeaders")}
                 />
                 <p className="text-gray-500 text-sm mt-1">
@@ -300,7 +297,7 @@ const CreateGroupModal: React.FC<CreateGroupModalProps> = ({
                 <label className="block text-gray-700 text-sm mb-1">
                   Additional settings
                 </label>
-                <div className="flex items-center justify-between bg-gray-100 rounded-lg px-3 py-2">
+                <div className="flex items-center justify-between bg-gray-100 rounded-xl px-3 py-2">
                   <span className="text-gray-700">Show people list</span>
                   <label className="relative inline-flex items-center cursor-pointer">
                     <input
@@ -309,14 +306,12 @@ const CreateGroupModal: React.FC<CreateGroupModalProps> = ({
                       {...register("showPeopleList")}
                     />
                     <div
-                      className={`w-11 h-6 rounded-full transition-all ${
-                        showPeopleList ? "bg-primary" : "bg-gray-200"
-                      }`}
+                      className={`w-11 h-6 rounded-full transition-all ${showPeopleList ? "bg-primary" : "bg-gray-200"
+                        }`}
                     ></div>
                     <div
-                      className={`absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition-all ${
-                        showPeopleList ? "translate-x-5" : ""
-                      }`}
+                      className={`absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition-all ${showPeopleList ? "translate-x-5" : ""
+                        }`}
                     ></div>
                   </label>
                 </div>
@@ -325,7 +320,7 @@ const CreateGroupModal: React.FC<CreateGroupModalProps> = ({
               {/* Create Group Button */}
               <button
                 type="submit"
-                className="w-full bg-orange-500 text-white py-3 rounded-lg mt-6 hover:bg-orange-600 transition"
+                className="w-full bg-orange-500 text-white py-3 rounded-xl mt-6 hover:bg-orange-600 transition"
               >
                 Create New Group
               </button>

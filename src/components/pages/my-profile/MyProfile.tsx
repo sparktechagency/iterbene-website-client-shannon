@@ -9,6 +9,7 @@ import MyVideos from "./MyVideos/MyVideos";
 import MyPhotos from "./MyPhotos/MyPhotos";
 import MyMaps from "./MyMaps/MyMaps";
 import MyItinerary from "./MyItinerary/MyItinerary";
+import MyInvitations from "./MyInvitations/MyInvitations";
 
 const MyProfile = () => {
   const tabItems = [
@@ -52,22 +53,12 @@ const MyProfile = () => {
       key: "8",
       label: "Itinerary",
       children: <MyItinerary/>,
+    },
+    {
+      key: "9",
+      label: "Invitations",
+      children: <MyInvitations/>,
     }
-    // {
-    //   key: "3",
-    //   label: "Videos",
-    //   children: <UserVideoTab />,
-    // },
-    // {
-    //   key: "4",
-    //   label: "Photos",
-    //   children: <UserPhotosTab />,
-    // },
-    // {
-    //   key: "5",
-    //   label: "Itinerary",
-    //   children: <UserItineraryTab />,
-    // },
   ];
   return (
     <section className="w-full min-h-screen px-5 bg-[#F5F5F5] pb-10">

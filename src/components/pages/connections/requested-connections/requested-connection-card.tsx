@@ -26,10 +26,10 @@ const RequestedConnectionCard: React.FC<RequestedConnectionCardProps> = ({
 
       {/* Buttons */}
       <div className="flex flex-col gap-3 w-full">
-        <button className="bg-secondary text-white px-5 py-3.5 rounded-lg  hover:bg-orange-600 transition cursor-pointer">
+        <button className="bg-secondary text-white px-5 py-3.5 rounded-xl  hover:bg-orange-600 transition cursor-pointer">
           Accept
         </button>
-        <button className="border border-[#9EA1B3] text-gray-900 px-5 py-3.5  rounded-lg  hover:bg-gray-100 transition cursor-pointer">
+        <button className="border border-[#9EA1B3] text-gray-900 px-5 py-3.5  rounded-xl  hover:bg-gray-100 transition cursor-pointer">
           Decline
         </button>
       </div>

@@ -26,10 +26,10 @@ const AddConnectionCard: React.FC<AddConnectionCardProps> = ({
 
       {/* Buttons */}
       <div className="flex flex-col gap-3 w-full">
-        <button className="bg-[#FEEFE8] hover:bg-secondary text-secondary hover:text-white  px-5 py-3.5 rounded-lg border border-secondary transition cursor-pointer">
+        <button className="bg-[#FEEFE8] hover:bg-secondary text-secondary hover:text-white  px-5 py-3.5 rounded-xl border border-secondary transition cursor-pointer">
           Add Connection
         </button>
-        <button className="border border-[#9EA1B3] text-gray-900 px-5 py-3.5   rounded-lg hover:bg-gray-100 transition cursor-pointer">
+        <button className="border border-[#9EA1B3] text-gray-900 px-5 py-3.5   rounded-xl hover:bg-gray-100 transition cursor-pointer">
           Remove
         </button>
       </div>
