@@ -1,3 +1,4 @@
+import { Star } from 'lucide-react';
 import Image from 'next/image';
 import React from 'react';
 
@@ -11,17 +12,17 @@ interface TripCardProps {
 
 const TripCard: React.FC<TripCardProps> = ({ location, image, distance, rating, duration }) => {
   return (
-    <div className="w-full bg-white rounded-xl shadow-md p-4 flex flex-col border border-white">
+      <div className="w-full bg-white rounded-xl p-4 flex flex-col border border-[#E7E8EC] hover:shadow-xl transition-all duration-300 cursor-pointer">
       <Image src={image} alt={location} width={300} height={300} className="w-full h-60 rounded-xl object-cover" />
-      <div className="flex flex-col justify-between">
-        <div>
-          <h3 className="text-lg font-medium text-gray-800">{location}</h3>
-          <p className="text-sm text-gray-500">{distance}</p>
+      <div className="flex gap-3 justify-between items-start pt-3">
+        <div className='space-y-1'>
+          <h3 className="text-xl font-medium text-gray-800">{location}</h3>
+          <p className="text-base text-gray-400">{distance}</p>
+          <span className="text-base text-gray-400">({duration})</span>
         </div>
-        <div className="flex items-center space-x-1">
-          <span className="text-yellow-500">★</span>
-          <span className="text-sm text-gray-600">{rating}</span>
-          <span className="text-sm text-gray-500">({duration})</span>
+        <div className="flex items-center gap-1">
+          <Star size={20} className="text-primary"/> 
+          <span className="text-lg text-gray-600 font-semibold">{rating}</span>
         </div>
       </div>
     </div>

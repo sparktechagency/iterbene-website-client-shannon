@@ -78,7 +78,7 @@ const MapSection: React.FC = () => {
   }
 
   return (
-    <div className="w-full relative py-5">
+    <div className="w-full relative px-2 py-4">
       <div className="rounded-2xl shadow-md h-full min-h-[600px] overflow-hidden">
         <GoogleMap
           mapContainerStyle={mapContainerStyle}
