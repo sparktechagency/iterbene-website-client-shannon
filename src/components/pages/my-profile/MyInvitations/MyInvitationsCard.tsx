@@ -59,7 +59,7 @@ const MyInvitationsCard: React.FC<MyInvitationsCardProps> = ({
               <h2 className="text-xl md:text-2xl lg:text-3xl font-semibold text-white">
                 {invitation.title}
               </h2>
-              <div className="flex flex-col md:flex-row items-start md:items-center gap-2 text-gray-300 font-medium">
+              <div className="flex flex-col md:flex-row items-start md:items-center gap-2 text-gray-200 font-medium">
                 <span>May 15 - May 20, 2023</span>
                 <div className="flex items-center gap-1">
                   <div className="size-2 rounded-full bg-primary flex-shrink-0"></div>

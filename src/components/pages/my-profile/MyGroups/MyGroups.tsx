@@ -1,6 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import MyGroupCard from "./MyGroupCard";
+import { ChevronDown } from "lucide-react";
 
 // Define types for connection data
 export interface IGroup {
@@ -12,7 +13,6 @@ export interface IGroup {
 
 const MyGroups: React.FC = () => {
   const [activeTab, setActiveTab] = useState<string>("myGroups");
-  const [sortOption, setSortOption] = useState<string>("Recently Active");
 
   // Mock data for connections (replace with real data in a real app)
   const groups: IGroup[] = Array(14).fill({
@@ -25,7 +25,7 @@ const MyGroups: React.FC = () => {
   return (
     <div className="w-full mx-auto">
       {/* Tabs */}
-      <div className="flex items-center justify-between pb-5">
+      <div className="flex flex-col md:flex-row items-start md:items-center justify-between pb-5 gap-5">
         <div className="flex space-x-4 ">
           <button
             onClick={() => setActiveTab("myGroups")}
@@ -46,25 +46,9 @@ const MyGroups: React.FC = () => {
             Invitations
           </button>
         </div>
-        <div className="relative">
-          <select
-            value={sortOption}
-            onChange={(e) => setSortOption(e.target.value)}
-            className="appearance-none bg-white border border-gray-300 rounded-md py-2 pl-3 pr-8 text-gray-700 focus:outline-none focus:ring-2 focus:ring-cyan-500"
-          >
-            <option value="Alphabetical">Alphabetical</option>
-            <option value="Recently Active">Recently Active</option>
-            <option value="Newest Members">Newest Members</option>
-          </select>
-          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-            <svg
-              className="fill-current h-4 w-4"
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 20 20"
-            >
-              <path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
-            </svg>
-          </div>
+        <div className="px-4 py-2.5 border border-[#B5B7C5] rounded-xl font-semibold text-sm flex items-center gap-2 text-gray-900">
+          <span className="font-medium">Recently</span>
+          <ChevronDown size={24} />
         </div>
       </div>
       {/* Connections List */}
