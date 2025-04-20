@@ -21,15 +21,16 @@ const CustomModal: React.FC<CustomModalProps> = ({
   children,
   maxWidth = "max-w-2xl",
   maxHeight = "max-h-[80vh]",
+  showCloseButton = true, // Default to true for clarity
   closeOnBackdropClick = true,
 }) => {
   // Prevent background scrolling and apply blur when modal is open
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = "hidden";
-      document.body.style.paddingRight = "15px"
+      document.body.style.paddingRight = "15px";
     } else {
-      document.body.style.overflow = "auto"; 
+      document.body.style.overflow = "auto";
       document.body.style.paddingRight = "0";
     }
     // Cleanup on unmount
@@ -38,6 +39,11 @@ const CustomModal: React.FC<CustomModalProps> = ({
       document.body.style.paddingRight = "0";
     };
   }, [isOpen]);
+
+  // Stop click event propagation to prevent closing when clicking inside the modal
+  const handleModalClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+  };
 
   return (
     <AnimatePresence>
@@ -51,29 +57,32 @@ const CustomModal: React.FC<CustomModalProps> = ({
           onClick={closeOnBackdropClick ? onClose : undefined} // Close on backdrop click if enabled
         >
           <motion.div
-            className={`w-full bg-white rounded-xl shadow-2xl ${maxWidth}  relative`}
+            className={`w-full bg-white rounded-xl shadow-2xl ${maxWidth} relative`}
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
             transition={{ duration: 0.2 }}
+            onClick={handleModalClick} // Stop propagation of clicks inside the modal
           >
             {/* Header */}
             {header ? (
               header
             ) : (
-              <div className="flex items-center justify-between p-6 border-b border-gray-200 rounded-t-xl">
-                <h2 className="text-lg font-semibold">{header}</h2>
-                <button
-                  className="text-gray-600 hover:text-gray-800 cursor-pointer"
-                  onClick={onClose}
-                >
-                  <IoClose size={24} />
-                </button>
-              </div>
+              showCloseButton && (
+                <div className="flex items-center justify-between p-6 border-b border-gray-200 rounded-t-xl">
+                  <h2 className="text-lg font-semibold">{header}</h2>
+                  <button
+                    className="text-gray-600 hover:text-gray-800 cursor-pointer"
+                    onClick={onClose}
+                  >
+                    <IoClose size={24} />
+                  </button>
+                </div>
+              )
             )}
 
             {/* Modal Content */}
-            <div className={`p-6 overflow-y-auto rounded-b-xl  ${maxHeight}`}>
+            <div className={`p-6 overflow-y-auto rounded-b-xl ${maxHeight}`}>
               {children}
             </div>
           </motion.div>

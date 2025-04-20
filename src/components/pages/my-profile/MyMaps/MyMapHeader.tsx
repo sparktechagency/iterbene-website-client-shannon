@@ -1,10 +1,16 @@
-import {  Switch } from "antd";
+import { Switch } from "antd";
 import { ChevronDown } from "lucide-react";
 import React from "react";
 import { BiQuestionMark } from "react-icons/bi";
 import { RiExpandUpDownLine } from "react-icons/ri";
 
-const MyMapHeader = ({ mapHide, handleMapHideToggle } : { mapHide: boolean, handleMapHideToggle: () => void }) => {
+const MyMapHeader = ({
+  mapHide,
+  handleMapHideToggle,
+}: {
+  mapHide: boolean;
+  handleMapHideToggle: () => void;
+}) => {
   return (
     <div className="w-full">
       <div className="w-full flex justify-between items-center border-b border-[#B5B7C5] pb-5">
@@ -22,9 +28,10 @@ const MyMapHeader = ({ mapHide, handleMapHideToggle } : { mapHide: boolean, hand
             <span>Sort By</span> <RiExpandUpDownLine size={24} />{" "}
           </button>
         </div>
-        <button className="px-5 py-2.5 border border-[#B5B7C5] rounded-xl font-semibold text-sm flex items-center gap-2 text-gray-900" >
-          Hide Map <Switch checked={mapHide} onChange={handleMapHideToggle} />
-        </button>
+        <div className="px-5 py-2.5 border border-[#B5B7C5] rounded-xl font-semibold text-sm flex items-center gap-2 text-gray-900">
+          <span>Hide Map</span>{" "}
+          <Switch checked={mapHide} onChange={handleMapHideToggle} />
+        </div>
       </div>
     </div>
   );

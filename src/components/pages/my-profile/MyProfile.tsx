@@ -8,6 +8,7 @@ import MyGroups from "./MyGroups/MyGroups";
 import MyVideos from "./MyVideos/MyVideos";
 import MyPhotos from "./MyPhotos/MyPhotos";
 import MyMaps from "./MyMaps/MyMaps";
+import MyItinerary from "./MyItinerary/MyItinerary";
 
 const MyProfile = () => {
   const tabItems = [
@@ -46,6 +47,11 @@ const MyProfile = () => {
       key: "7",
       label: "Maps",
       children: <MyMaps />,
+    },
+    {
+      key: "8",
+      label: "Itinerary",
+      children: <MyItinerary/>,
     }
     // {
     //   key: "3",

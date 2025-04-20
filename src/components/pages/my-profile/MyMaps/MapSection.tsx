@@ -84,7 +84,7 @@ const MapSection = ({
   if (!isLoaded) {
     return <div>Loading...</div>;
   }
-
+  
   return (
     <div
       className={`w-full  relative px-1 md:px-2  py-2 md:py-4 ${
@@ -144,14 +144,14 @@ const MapSection = ({
       </div>
 
       {/* Full Map Button */}
-      <div className="absolute top-8 left-0 flex  gap-5 items-center">
+      {/* <div className="absolute top-8 left-0 flex  gap-5 items-center">
         <button
           onClick={() => setShowFullMap(!showFullMap)}
           className="bg-[#DEF8F8] text-gray-800 rounded-full size-11 flex items-center justify-center shadow-md hover:bg-gray-100 cursor-pointer z-auto"
         >
           <Plus size={24} />
         </button>
-      </div>
+      </div> */}
       {/* Custom Zoom Buttons */}
       <div className="absolute bottom-16 right-8 flex  gap-5 items-center">
         <button

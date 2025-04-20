@@ -23,6 +23,7 @@ const MyConnections: React.FC = () => {
   return (
     <div className="w-full mx-auto">
       {/* Tabs */}
+      <div className="flex items-center justify-between pb-5">
       <div className="flex space-x-4 ">
         <button
           onClick={() => setActiveTab("My Connections")}
@@ -43,10 +44,7 @@ const MyConnections: React.FC = () => {
           Requests
         </button>
       </div>
-
-      {/* Sort Dropdown */}
-      <div className="flex justify-end mb-4">
-        <div className="relative">
+      <div className="relative">
           <select
             value={sortOption}
             onChange={(e) => setSortOption(e.target.value)}
