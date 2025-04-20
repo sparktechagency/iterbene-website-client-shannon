@@ -6,6 +6,8 @@ import MyProfileTimeline from "./MyProfileTimeline/MyProfileTimeline";
 import MyConnections from "./MyConnections/MyConnections";
 import MyGroups from "./MyGroups/MyGroups";
 import MyVideos from "./MyVideos/MyVideos";
+import MyPhotos from "./MyPhotos/MyPhotos";
+import MyMaps from "./MyMaps/MyMaps";
 
 const MyProfile = () => {
   const tabItems = [
@@ -35,6 +37,16 @@ const MyProfile = () => {
       label: "Videos",
       children: <MyVideos />,
     },
+    {
+      key: "6",
+      label: "Photos",
+      children: <MyPhotos />,
+    },
+    {
+      key: "7",
+      label: "Maps",
+      children: <MyMaps />,
+    }
     // {
     //   key: "3",
     //   label: "Videos",
