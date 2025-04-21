@@ -2,6 +2,7 @@
 
 import CustomButton from "@/components/custom/custom-button";
 import Image from "next/image";
+import Link from "next/link";
 import React from "react";
 
 interface FriendRequestCardProps {
@@ -24,8 +25,14 @@ const FriendRequestCard: React.FC<FriendRequestCardProps> = ({ request }) => {
           className="size-[60px] rounded-full object-cover mr-4 ring ring-primary flex-shrink-0"
         />
         <h1>
-          <span className="text-[18px] font-bold ">{request.name}</span> {" "}
-          <span className="text-[18px] text-gray-500">wants to add you to friends</span>
+          <Link
+            href={`/user-info/${request.name}`}
+          >
+            <span className="text-[18px] font-bold">{request.name}</span>{" "}
+          </Link>
+          <span className="text-[18px] text-gray-500">
+            wants to add you to friends
+          </span>
         </h1>
       </div>
       <div className="mt-5 flex justify-between gap-4 items-center">

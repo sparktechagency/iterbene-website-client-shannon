@@ -36,58 +36,42 @@ const Stories = () => {
       id: 1,
       media: [
         { url: "https://www.w3schools.com/html/mov_bbb.mp4", type: "video" },
-        { url: "https://i.postimg.cc/dVP9Fh3N/2588a7b47b42d6dddfdfa08bb9300d00.jpg", type: "image" },
-        { url: "https://i.postimg.cc/dVP9Fh3N/2588a7b47b42d6dddfdfa08bb9300d00.jpg", type: "image" },
       ],
-      authorName: "Joey Brown",
-      authorImage:
-        "https://i.ibb.co.com/hFTPRsW0/0de9d1146da18068833210d399cd593e.jpg",
+      authorName: "Sophia Martinez",
+      authorImage: "https://randomuser.me/api/portraits/women/10.jpg",
     },
     {
       id: 2,
       media: [
-        { url: "https://i.postimg.cc/dVP9Fh3N/2588a7b47b42d6dddfdfa08bb9300d00.jpg", type: "image" },
+        { url: "https://i.ibb.co.com/Zyy6bvr/post3.jpg", type: "image" },
         { url: "https://www.w3schools.com/html/mov_bbb.mp4", type: "video" },
       ],
-      authorName: "Joey Brown",
-      authorImage:
-        "https://i.ibb.co.com/hFTPRsW0/0de9d1146da18068833210d399cd593e.jpg",
+      authorName: "Ethan Carter",
+      authorImage: "https://randomuser.me/api/portraits/men/11.jpg",
     },
     {
       id: 3,
       media: [
-        { url: "https://i.postimg.cc/dVP9Fh3N/2588a7b47b42d6dddfdfa08bb9300d00.jpg", type: "image" },
+        { url: "https://i.ibb.co.com/Z6792YGV/post2.jpg", type: "image" },
       ],
-      authorName: "Joey Brown",
-      authorImage:
-        "https://i.ibb.co.com/hFTPRsW0/0de9d1146da18068833210d399cd593e.jpg",
+      authorName: "Ava Thompson",
+      authorImage: "https://randomuser.me/api/portraits/women/12.jpg",
     },
     {
       id: 4,
       media: [
-        { url: "https://i.postimg.cc/dVP9Fh3N/2588a7b47b42d6dddfdfa08bb9300d00.jpg", type: "image" },
+        { url: "https://i.ibb.co.com/TBFhZcsc/post1.jpg", type: "image" },
       ],
-      authorName: "Joey Brown",
-      authorImage:
-        "https://i.ibb.co.com/hFTPRsW0/0de9d1146da18068833210d399cd593e.jpg",
+      authorName: "Liam Brooks",
+      authorImage: "https://randomuser.me/api/portraits/men/13.jpg",
     },
     {
       id: 5,
       media: [
         { url: "https://i.postimg.cc/dVP9Fh3N/2588a7b47b42d6dddfdfa08bb9300d00.jpg", type: "image" },
       ],
-      authorName: "Joey Brown",
-      authorImage:
-        "https://i.ibb.co.com/hFTPRsW0/0de9d1146da18068833210d399cd593e.jpg",
-    },
-    {
-      id: 6,
-      media: [
-        { url: "https://i.postimg.cc/dVP9Fh3N/2588a7b47b42d6dddfdfa08bb9300d00.jpg", type: "image" },
-      ],
-      authorName: "Joey Brown",
-      authorImage:
-        "https://i.ibb.co.com/hFTPRsW0/0de9d1146da18068833210d399cd593e.jpg",
+      authorName: "Olivia Hayes",
+      authorImage: "https://randomuser.me/api/portraits/women/14.jpg",
     },
   ]);
 
