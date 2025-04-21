@@ -54,42 +54,6 @@ const WatchVideo = () => {
     },
     {
       id: "3",
-      username: "Sarah Miller",
-      profilePic: "https://randomuser.me/api/portraits/women/2.jpg",
-      timestamp: "2 days ago",
-      location: "New York, USA",
-      content: {
-        text: "Exploring the city that never sleeps! The energy here is unreal.",
-        media: [
-          {
-            type: "video",
-            url: "https://sample-videos.com/video123/mp4/720/big_buck_bunny_720p_1mb.mp4",
-          },
-        ],
-      },
-      reactions: { love: 85, luggage: 25, ban: 10, smile: 12 },
-      comments: [
-        {
-          id: "c2",
-          username: "Mike Johnson",
-          profilePic: "https://randomuser.me/api/portraits/men/2.jpg",
-          text: "Looks like a blast! Did you visit Times Square?",
-          timestamp: "1 day ago",
-          replies: [
-            {
-              id: "r2",
-              username: "Sarah Miller",
-              profilePic: "https://randomuser.me/api/portraits/women/2.jpg",
-              text: "Yes, it was chaotic but so much fun!",
-              timestamp: "20 hours ago",
-            },
-          ],
-        },
-      ],
-      shares: 8,
-    },
-    {
-      id: "4",
       username: "Olivia Green",
       profilePic: "https://randomuser.me/api/portraits/women/4.jpg",
       timestamp: "3 days ago",
