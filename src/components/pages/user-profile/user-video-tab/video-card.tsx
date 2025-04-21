@@ -1,9 +1,6 @@
 "use client";
 import {
-  Maximize,
-  Minimize,
   Pause,
-  Play,
 } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
 import { FiPlayCircle } from "react-icons/fi";
@@ -13,9 +10,6 @@ const VideoCard = ({ url }: { url: string }) => {
   const progressRef = useRef<HTMLDivElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
-  const [volume, setVolume] = useState(1);
-  const [isMuted, setIsMuted] = useState(false);
-  const [isFullscreen, setIsFullscreen] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [showControls, setShowControls] = useState(false);
@@ -80,43 +74,6 @@ const VideoCard = ({ url }: { url: string }) => {
     const pos = (e.clientX - rect.left) / rect.width;
     videoRef.current.currentTime = pos * videoRef.current.duration;
   };
-
-  const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = parseFloat(e.target.value);
-    setVolume(value);
-    if (videoRef.current) {
-      videoRef.current.volume = value;
-    }
-    setIsMuted(value === 0);
-  };
-
-  const toggleMute = () => {
-    if (videoRef.current) {
-      if (isMuted) {
-        videoRef.current.volume = volume;
-        setIsMuted(false);
-      } else {
-        videoRef.current.volume = 0;
-        setIsMuted(true);
-      }
-    }
-  };
-
-  const toggleFullscreen = () => {
-    if (!videoRef.current) return;
-
-    if (!isFullscreen) {
-      if (videoRef.current.requestFullscreen) {
-        videoRef.current.requestFullscreen();
-      }
-    } else {
-      if (document.exitFullscreen) {
-        document.exitFullscreen();
-      }
-    }
-    setIsFullscreen(!isFullscreen);
-  };
-
   const formatTime = (time: number) => {
     const minutes = Math.floor(time / 60);
     const seconds = Math.floor(time % 60);

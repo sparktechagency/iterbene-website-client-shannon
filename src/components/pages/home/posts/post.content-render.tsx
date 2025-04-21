@@ -20,7 +20,6 @@ const PostContentRender = ({
   if (!data || data.length === 0) return null;
 
   const mediaCount = data.length;
-  const mediaToShow = data.slice(0, 4); // Only show first 4 items
 
   // Handle click on the container
   const handleContainerClick = () => {
@@ -33,14 +32,15 @@ const PostContentRender = ({
     return (
       <div className="w-full mt-3" onClick={handleContainerClick}>
         {media.type === "photo" ? (
-          <Image
-            src={media.url}
-            alt="Post media"
-            width={800}
-            height={600}
-            className="w-full h-auto max-h-[600px] object-contain rounded-md cursor-pointer"
-            layout="responsive"
-          />
+          <div className="relative w-full h-56 md:h-[500px] rounded-md overflow-hidden">
+            <Image
+              src={media.url}
+              alt={`Post media`}
+              fill
+              className="object-cover cursor-pointer"
+              sizes="(max-width: 640px) 100vw, 50vw"
+            />
+          </div>
         ) : (
           <VideoCard url={media.url} />
         )}
@@ -51,7 +51,10 @@ const PostContentRender = ({
   // Two media items
   if (mediaCount === 2) {
     return (
-      <div className="grid grid-cols-2 gap-4 mt-3" onClick={handleContainerClick}>
+      <div
+        className="grid grid-cols-2 gap-4 mt-3"
+        onClick={handleContainerClick}
+      >
         {data.map((media, index) => (
           <div key={index} className="aspect-square">
             {media.type === "photo" ? (
@@ -74,7 +77,10 @@ const PostContentRender = ({
   // Three media items
   if (mediaCount === 3) {
     return (
-      <div className="grid grid-cols-2 gap-4 mt-3" onClick={handleContainerClick}>
+      <div
+        className="grid grid-cols-2 gap-4 mt-3"
+        onClick={handleContainerClick}
+      >
         <div className="row-span-2 col-span-1">
           {data[0].type === "photo" ? (
             <Image
@@ -117,27 +123,133 @@ const PostContentRender = ({
       </div>
     );
   }
-
-  // Four or more media items
-  return (
-    <div className="grid grid-cols-2 gap-1 mt-3" onClick={handleContainerClick}>
-      {mediaToShow.map((media, index) => (
-        <div key={index} className="aspect-square relative">
-          {media.type === "photo" ? (
+  // Four media items
+  if (mediaCount === 4) {
+    return (
+      <div
+        className="grid grid-cols-3 gap-4 mt-3"
+        onClick={handleContainerClick}
+      >
+        <div className="row-span-2 col-span-1">
+          {data[0].type === "photo" ? (
             <Image
-              src={media.url}
+              src={data[0].url}
+              alt="Post media"
+              width={400}
+              height={800}
+              className="w-full h-full object-cover rounded-xl cursor-pointer"
+            />
+          ) : (
+            <CustomVideoPlayer url={data[0].url} />
+          )}
+        </div>
+        <div className="row-span-2 col-span-1">
+          {data[1].type === "photo" ? (
+            <Image
+              src={data[1].url}
               alt="Post media"
               width={400}
               height={400}
-              className="w-full h-full object-cover rounded-md cursor-pointer"
+              className="w-full h-full object-cover rounded-xl cursor-pointer"
             />
           ) : (
-            <CustomVideoPlayer url={media.url} />
+            <CustomVideoPlayer url={data[1].url} />
           )}
         </div>
-      ))}
-    </div>
-  );
+        <div className="col-span-1">
+          {data[2].type === "photo" ? (
+            <Image
+              src={data[2].url}
+              alt="Post media"
+              width={400}
+              height={400}
+              className="w-full h-full object-cover rounded-xl cursor-pointer"
+            />
+          ) : (
+            <CustomVideoPlayer url={data[2].url} />
+          )}
+        </div>
+        <div className="col-span-1">
+          {data[3].type === "photo" ? (
+            <Image
+              src={data[2].url}
+              alt="Post media"
+              width={400}
+              height={400}
+              className="w-full h-full object-cover rounded-xl cursor-pointer"
+            />
+          ) : (
+            <CustomVideoPlayer url={data[2].url} />
+          )}
+        </div>
+      </div>
+    );
+  }
+  // Four media items ++
+  if (mediaCount > 4) {
+    return (
+      <div
+        className="grid grid-cols-3 gap-4 mt-3"
+        onClick={handleContainerClick}
+      >
+        <div className="row-span-2 col-span-1">
+          {data[0].type === "photo" ? (
+            <Image
+              src={data[0].url}
+              alt="Post media"
+              width={400}
+              height={400}
+              className="w-full h-full object-cover rounded-xl cursor-pointer"
+            />
+          ) : (
+            <CustomVideoPlayer url={data[0].url} />
+          )}
+        </div>
+        <div className="row-span-2 col-span-1">
+          {data[1].type === "photo" ? (
+            <Image
+              src={data[1].url}
+              alt="Post media"
+              width={400}
+              height={400}
+              className="w-full h-full object-cover rounded-xl cursor-pointer"
+            />
+          ) : (
+            <CustomVideoPlayer url={data[1].url} />
+          )}
+        </div>
+        <div className="col-span-1">
+          {data[2].type === "photo" ? (
+            <Image
+              src={data[2].url}
+              alt="Post media"
+              width={400}
+              height={400}
+              className="w-full h-full object-cover rounded-xl cursor-pointer"
+            />
+          ) : (
+            <CustomVideoPlayer url={data[2].url} />
+          )}
+        </div>
+        <div className="col-span-1 relative">
+          {data[3].type === "photo" ? (
+            <Image
+              src={data[2].url}
+              alt="Post media"
+              width={400}
+              height={400}
+              className="w-full h-full object-cover rounded-xl cursor-pointer"
+            />
+          ) : (
+            <CustomVideoPlayer url={data[2].url} />
+          )}
+          <div className="absolute top-0 left-0 w-full h-full bg-black/30 rounded-xl">
+            <span className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white text-xl md:text-3xl">{mediaCount}+</span>
+          </div>
+        </div>
+      </div>
+    );
+  }
 };
 
 export default PostContentRender;
