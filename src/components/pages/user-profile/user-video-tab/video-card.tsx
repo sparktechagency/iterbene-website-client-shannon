@@ -4,11 +4,10 @@ import {
   Minimize,
   Pause,
   Play,
-  Volume2,
-  VolumeX,
 } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
 import { FiPlayCircle } from "react-icons/fi";
+import { HiChevronDoubleLeft, HiChevronDoubleRight } from "react-icons/hi";
 const VideoCard = ({ url }: { url: string }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const progressRef = useRef<HTMLDivElement>(null);
@@ -125,17 +124,13 @@ const VideoCard = ({ url }: { url: string }) => {
   };
 
   return (
-    <div
-      className="relative w-full rounded-xl group"
-      onClick={togglePlay}
-    >
+    <div className="relative w-full rounded-xl group" onClick={togglePlay}>
       {/* Show thumbnail if the video hasn't started */}
       {/* Video Player */}
       <video
         ref={videoRef}
         src={url}
         className="w-full h-56 md:h-96 lg:h-[450px] object-cover rounded-xl"
-        onClick={togglePlay}
         controls={false}
         controlsList="nodownload"
         playsInline
@@ -144,75 +139,54 @@ const VideoCard = ({ url }: { url: string }) => {
       {/* Centered Play Icon (Visible when paused) */}
       {!isPlaying && (
         <div className="absolute inset-0 flex items-center justify-center">
-          <FiPlayCircle color="#ECFCFA" onClick={togglePlay} size={80} strokeWidth={1.5} className="cursor-pointer" />
+          <FiPlayCircle
+            color="#ECFCFA"
+            onClick={togglePlay}
+            size={80}
+            strokeWidth={1}
+            className="cursor-pointer"
+          />
         </div>
       )}
 
       {/* Custom Controls (Visible after video starts and on hover) */}
       <div
-        className={`absolute bottom-0 left-0 right-0 bg-gradient-to-t rounded-xl from-black/70 to-transparent p-4 transition-opacity duration-300 ${showControls ? "opacity-100" : "opacity-0"
-          }`}
+        className={`absolute bottom-0 left-0 right-0 bg-gradient-to-t rounded-xl from-black/70 to-transparent p-4 transition-opacity duration-380 ${
+          showControls ? "opacity-100" : "opacity-0"
+        }`}
       >
-        {/* Progress Bar */}
-        <div
-          ref={progressRef}
-          className="w-full h-1 bg-[#A4A5AA] rounded-full mb-4 cursor-pointer"
-          onClick={handleProgressClick}
-        >
+        <div className="flex items-center justify-between gap-3 mb-3">
+          <span className="text-white">{formatTime(currentTime)}</span>
           <div
-            className="h-full bg-white rounded-full"
-            style={{ width: `${progress}%` }}
-          />
+            ref={progressRef}
+            className="w-full h-1 bg-[#ECFCFA] rounded  cursor-pointer"
+            onClick={handleProgressClick}
+          >
+            <div
+              className="h-full bg-[#40E0D0] rounded-full"
+              style={{ width: `${progress}%` }}
+            />
+          </div>
+          <span className="text-white">{formatTime(duration || 0)}</span>
         </div>
 
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            {/* Play/Pause */}
-            <button
-              onClick={togglePlay}
-              className="text-white  transition-colors cursor-pointer"
-            >
-              {isPlaying ? <Pause size={24} /> : <Play size={24} />}
-            </button>
-
-            {/* Volume Control */}
-            <div className="flex items-center space-x-2">
-              <button
-                onClick={toggleMute}
-                className="text-white  transition-colors cursor-pointer"
-              >
-                {isMuted ? <VolumeX size={24} /> : <Volume2 size={24} />}
-              </button>
-              <input
-                type="range"
-                min="0"
-                max="1"
-                step="0.1"
-                value={isMuted ? 0 : volume}
-                onChange={handleVolumeChange}
-                className="w-20 accent-white"
-              />
-            </div>
-
-            {/* Time Display */}
-            <div className="text-white text-sm">
-              {formatTime(currentTime)} / {formatTime(duration || 0)}
-            </div>
-          </div>
-
-          <div className="flex items-center space-x-4">
-            {/* Fullscreen Toggle */}
-            <button
-              onClick={toggleFullscreen}
-              className="text-white  transition-colors cursor-pointer"
-            >
-              {isFullscreen ? <Minimize size={24} /> : <Maximize size={24} />}
-            </button>
-          </div>
+        <div className="flex items-center justify-center gap-3">
+          <button>
+            <HiChevronDoubleLeft size={38} className="text-[#ECFCFA]" />
+          </button>
+          <button onClick={togglePlay}>
+            {isPlaying ? (
+              <Pause size={35} className="text-[#ECFCFA]" />
+            ) : (
+              <FiPlayCircle size={38} className="text-[#ECFCFA]" />
+            )}
+          </button>
+          <button>
+            <HiChevronDoubleRight size={38} className="text-white" />
+          </button>
         </div>
       </div>
     </div>
   );
-
 };
-export default VideoCard
+export default VideoCard;

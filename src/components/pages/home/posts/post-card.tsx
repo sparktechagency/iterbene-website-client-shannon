@@ -1,3 +1,4 @@
+'use client';
 import { IComment, IPost } from "@/types/post.types";
 import { motion } from "framer-motion";
 import { Ban, Smile } from "lucide-react";

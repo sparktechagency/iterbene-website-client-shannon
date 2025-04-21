@@ -1,6 +1,7 @@
 "use client";
 import CustomVideoPlayer from "@/components/custom/custom-video-player";
 import Image from "next/image";
+import VideoCard from "../../user-profile/user-video-tab/video-card";
 
 interface Media {
   type: "photo" | "video";
@@ -41,7 +42,7 @@ const PostContentRender = ({
             layout="responsive"
           />
         ) : (
-          <CustomVideoPlayer url={media.url} />
+          <VideoCard url={media.url} />
         )}
       </div>
     );
