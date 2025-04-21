@@ -51,7 +51,7 @@ const MessagesDropdown: React.FC<DropdownProps> = ({ isOpen }) => {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 10 }}
           transition={{ duration: 0.2 }}
-          className="absolute top-24 right-40 bg-white rounded-xl shadow-lg p-6 w-[662px] z-50"
+          className="absolute top-16 right-0 bg-white rounded-xl shadow-lg p-6 w-[662px] z-50"
         >
           <div className="flex justify-between items-center mb-2">
             <h3 className="font-semibold text-lg">Messages</h3>
@@ -126,7 +126,7 @@ const NotificationsDropdown: React.FC<DropdownProps> = ({
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 10 }}
           transition={{ duration: 0.2 }}
-          className="absolute top-24 right-40 bg-white rounded-xl shadow-lg p-6 w-[662px] z-500"
+          className="absolute top-16 right-0 bg-white rounded-xl shadow-lg p-6 w-[662px] z-500"
         >
           <div className="flex justify-between items-center mb-2">
             <h3 className="font-semibold text-lg">Notifications</h3>
@@ -263,7 +263,7 @@ const UserDropdown: React.FC<DropdownProps> = ({ isOpen }) => {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 10 }}
           transition={{ duration: 0.2 }}
-          className="absolute top-24 right-40 bg-white rounded-xl shadow-lg p-6 w-[430px] z-50"
+          className="absolute top-16 right-0 bg-white rounded-xl shadow-md p-6 w-[430px] z-50"
         >
           <div className="flex items-center gap-3 mb-4 bg-[#ECFCFA] p-4 rounded-xl">
             <Image
@@ -287,7 +287,7 @@ const UserDropdown: React.FC<DropdownProps> = ({ isOpen }) => {
               <span>My Profile</span>
             </Link>
             <Link
-              href="/timeline"
+              href="/"
               className="text-gray-800 hover:bg-[#ECFCFA] px-4 py-3 rounded-xl flex items-center gap-4"
             >
               <LucideCalendarCheck size={24} />
@@ -304,7 +304,7 @@ const UserDropdown: React.FC<DropdownProps> = ({ isOpen }) => {
               </span>
             </Link>
             <Link
-              href="/notifications"
+              href="/"
               className="text-gray-800 hover:bg-[#ECFCFA] px-4 py-3 rounded-xl flex items-center gap-4"
             >
               <MdOutlineNotifications size={24} />
@@ -318,7 +318,7 @@ const UserDropdown: React.FC<DropdownProps> = ({ isOpen }) => {
               <span>Groups</span>
             </Link>
             <Link
-              href="/maps"
+              href="/"
               className="text-gray-800 hover:bg-[#ECFCFA] px-4 py-3 rounded-xl flex items-center gap-4"
             >
               <FiMapPin size={24} />
@@ -332,7 +332,7 @@ const UserDropdown: React.FC<DropdownProps> = ({ isOpen }) => {
               <span>Events</span>
             </Link>
             <Link
-              href="/invitations"
+              href="/"
               className="text-gray-800 hover:bg-[#ECFCFA] px-4 py-3 rounded-xl flex items-center gap-4"
             >
               <MdAlternateEmail size={24} />
@@ -350,13 +350,12 @@ const UserDropdown: React.FC<DropdownProps> = ({ isOpen }) => {
                 isOpen={isSettingsOpen}
               />
             </div>
-            <Link
-              href="/logout"
+            <button
               className="flex items-center px-4 py-3 gap-4 text-red-500 hover:bg-gray-100 rounded-xl"
             >
               <BiLogOut size={24} />
               <span>Logout</span>
-            </Link>
+            </button>
           </div>
         </motion.div>
       )}
@@ -436,7 +435,7 @@ const Header: React.FC = () => {
           <Search className="text-gray-500 mr-2" />
         </div>
         {user ? (
-          <div className="flex items-center gap-5">
+          <div className="flex items-center gap-5 relative">
             <div ref={messagesRef}>
               <button
                 onClick={toggleMessages}
