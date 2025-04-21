@@ -1,10 +1,11 @@
 import React from "react";
 import FriendRequestCard from "./friend-request-card";
+
 const FriendRequest: React.FC = () => {
   const requests = [
-    { id: 1, name: "Turel Barrows", profileImage: "https://i.ibb.co.com/hFTPRsW0/0de9d1146da18068833210d399cd593e.jpg" },
-    { id: 2, name: "Jane Doe", profileImage: "https://i.ibb.co.com/hFTPRsW0/0de9d1146da18068833210d399cd593e.jpg" },
-    { id: 3, name: "John Smith", profileImage: "https://i.ibb.co.com/hFTPRsW0/0de9d1146da18068833210d399cd593e.jpg" },
+    { id: 1, name: "Lucas Bennett", profileImage: "https://randomuser.me/api/portraits/men/20.jpg" },
+    { id: 2, name: "Amelia Foster", profileImage: "https://randomuser.me/api/portraits/women/21.jpg" },
+    { id: 3, name: "Henry Nguyen", profileImage: "https://randomuser.me/api/portraits/men/22.jpg" },
   ];
 
   return (

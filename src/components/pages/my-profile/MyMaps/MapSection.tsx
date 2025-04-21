@@ -15,16 +15,15 @@ interface Location {
   lng: number;
 }
 
-// Default center (you can adjust this based on your home location)
+// Default center (adjusted to center around the new locations, roughly central point)
 const defaultCenter: Location = {
-  lat: 41.9028, // Example: Rome, Italy
-  lng: 12.4964,
+  lat: 40.0, // Roughly central latitude for the new locations
+  lng: 30.0, // Roughly central longitude for the new locations
 };
 
 const MapSection = ({
   mapHide,
   showFullMap,
-  setShowFullMap,
 }: {
   mapHide: boolean;
   showFullMap: boolean;
@@ -40,20 +39,21 @@ const MapSection = ({
 
   // State to hold the map instance
   const [map, setMap] = useState<google.maps.Map | null>(null);
-  // Define locations
+
+  // Define locations using TripList locations
   const interestedPlaces: Location[] = [
-    { lat: 48.8566, lng: 2.3522 }, // Paris, France
-    { lat: 40.7128, lng: -74.006 }, // New York, USA
+    { lat: 35.0116, lng: 135.7681 }, // Kyoto, Japan
+    { lat: 36.3932, lng: 25.4615 },  // Santorini, Greece
   ];
 
   const visitedPlaces: Location[] = [
-    { lat: 41.9028, lng: 12.4964 }, // Rome, Italy
-    { lat: 51.5074, lng: -0.1278 }, // London, UK
+    { lat: 51.1784, lng: -115.5708 }, // Banff, Canada
+    { lat: 31.6295, lng: -7.9811 },  // Marrakech, Morocco
   ];
 
   const homeLocation: Location = {
-    lat: 37.7749, // Example: San Francisco, USA (replace with your home coordinates)
-    lng: -122.4194,
+    lat: 34.0522, // Los Angeles, USA (new home location)
+    lng: -118.2437,
   };
 
   // Custom marker icons (replace these URLs with your own custom icons)
@@ -62,6 +62,7 @@ const MapSection = ({
     visited: "https://i.ibb.co.com/60gHYs1m/visit.png",
     home: "https://i.ibb.co.com/5xxKK494/home.png",
   };
+
   // Handle map load
   const onLoad = useCallback((mapInstance: google.maps.Map) => {
     setMap(mapInstance);
@@ -87,7 +88,7 @@ const MapSection = ({
   
   return (
     <div
-      className={`w-full  relative px-1 md:px-2  py-2 md:py-4 ${
+      className={`w-full relative px-1 md:px-2 py-2 md:py-4 ${
         mapHide ? "hidden" : showFullMap ? "col-span-full" : ""
       }`}
     >
@@ -98,7 +99,6 @@ const MapSection = ({
           zoom={2}
           onLoad={onLoad}
           options={{
-            disableDefaultUI: true, // Ensures "Use Ctrl + Scroll to zoom" text is removed
             zoomControl: false,
             streetViewControl: false,
             mapTypeControl: false,
@@ -143,17 +143,8 @@ const MapSection = ({
         </GoogleMap>
       </div>
 
-      {/* Full Map Button */}
-      {/* <div className="absolute top-8 left-0 flex  gap-5 items-center">
-        <button
-          onClick={() => setShowFullMap(!showFullMap)}
-          className="bg-[#DEF8F8] text-gray-800 rounded-full size-11 flex items-center justify-center shadow-md hover:bg-gray-100 cursor-pointer z-auto"
-        >
-          <Plus size={24} />
-        </button>
-      </div> */}
       {/* Custom Zoom Buttons */}
-      <div className="absolute bottom-16 right-8 flex  gap-5 items-center">
+      <div className="absolute bottom-16 right-8 flex gap-5 items-center">
         <button
           onClick={zoomIn}
           className="bg-[#DEF8F8] text-gray-800 rounded-full size-11 flex items-center justify-center shadow-md hover:bg-gray-100 cursor-pointer"

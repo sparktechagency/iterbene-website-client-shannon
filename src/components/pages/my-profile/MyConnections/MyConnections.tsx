@@ -12,12 +12,24 @@ interface Connection {
 
 const MyConnections: React.FC = () => {
   const [activeTab, setActiveTab] = useState<string>("My Connections");
-  // Mock data for connections (replace with real data in a real app)
-  const connections: Connection[] = Array(14).fill({
-    name: "Alexandra Brooke",
-    image: "https://randomuser.me/api/portraits/women/1.jpg", 
-    isRequest: false
-  });
+
+  // Updated connections array with unique names and images
+  const connections: Connection[] = [
+    { name: "Mia Reynolds", image: "https://randomuser.me/api/portraits/women/25.jpg", isRequest: false },
+    { name: "James Carter", image: "https://randomuser.me/api/portraits/men/26.jpg", isRequest: false },
+    { name: "Ella Harper", image: "https://randomuser.me/api/portraits/women/27.jpg", isRequest: false },
+    { name: "Logan Evans", image: "https://randomuser.me/api/portraits/men/28.jpg", isRequest: false },
+    { name: "Chloe Bennett", image: "https://randomuser.me/api/portraits/women/29.jpg", isRequest: false },
+    { name: "Ryan Foster", image: "https://randomuser.me/api/portraits/men/30.jpg", isRequest: false },
+    { name: "Grace Kim", image: "https://randomuser.me/api/portraits/women/31.jpg", isRequest: false },
+    { name: "Mason Lee", image: "https://randomuser.me/api/portraits/men/32.jpg", isRequest: false },
+    { name: "Zoe Patel", image: "https://randomuser.me/api/portraits/women/33.jpg", isRequest: false },
+    { name: "Ethan Brooks", image: "https://randomuser.me/api/portraits/men/34.jpg", isRequest: false },
+    { name: "Lydia Nguyen", image: "https://randomuser.me/api/portraits/women/35.jpg", isRequest: false },
+    { name: "Caleb Hayes", image: "https://randomuser.me/api/portraits/men/36.jpg", isRequest: false },
+    { name: "Aria Sullivan", image: "https://randomuser.me/api/portraits/women/37.jpg", isRequest: false },
+    { name: "Owen Mitchell", image: "https://randomuser.me/api/portraits/men/38.jpg", isRequest: false },
+  ];
 
   return (
     <div className="w-full mx-auto">

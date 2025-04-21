@@ -12,29 +12,29 @@ interface Trip {
 const TripList = ({ mapHide, showFullMap }: { mapHide: boolean, showFullMap: boolean }) => {
   const trips: Trip[] = [
     {
-      location: 'Rome, Italy',
-      image: 'https://images.pexels.com/photos/2064827/pexels-photo-2064827.jpeg',
+      location: 'Kyoto, Japan',
+      image: 'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?q=80&w=2000&auto=format&fit=crop', // Kyoto culture
       distance: '12,000 miles away',
       rating: 4.9,
       duration: '12 days & 11 nights',
     },
     {
-      location: 'Rome, Italy',
-      image: 'https://images.pexels.com/photos/2064827/pexels-photo-2064827.jpeg',
+      location: 'Santorini, Greece',
+      image: 'https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff?q=80&w=2000&auto=format&fit=crop', // Santorini scenery
       distance: '12,000 miles away',
       rating: 4.9,
       duration: '12 days & 11 nights',
     },
     {
-      location: 'Rome, Italy',
-      image: 'https://images.pexels.com/photos/2064827/pexels-photo-2064827.jpeg',
+      location: 'Banff, Canada',
+      image: 'https://images.pexels.com/photos/2064827/pexels-photo-2064827.jpeg', // Banff mountains
       distance: '12,000 miles away',
       rating: 4.9,
       duration: '12 days & 11 nights',
     },
     {
-      location: 'Rome, Italy',
-      image: 'https://images.pexels.com/photos/2064827/pexels-photo-2064827.jpeg',
+      location: 'Marrakech, Morocco',
+      image: 'https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff?q=80&w=2000&auto=format&fit=crop', // Marrakech market
       distance: '12,000 miles away',
       rating: 4.9,
       duration: '12 days & 11 nights',
