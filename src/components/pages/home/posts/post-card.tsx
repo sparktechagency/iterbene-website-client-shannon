@@ -1,7 +1,7 @@
-'use client';
+"use client";
 import { IComment, IPost } from "@/types/post.types";
 import { motion } from "framer-motion";
-import { Ban, Smile } from "lucide-react";
+import { Ban, Heart, Smile } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { FaCalendarCheck, FaHeart } from "react-icons/fa";
 import { MdOutlineLuggage } from "react-icons/md";
@@ -82,35 +82,39 @@ const PostCard: React.FC<PostCardProps> = ({ post }) => {
           onMouseLeave={() => setShowReactions(false)}
         >
           <button className="text-gray-600 flex gap-2 items-center cursor-pointer">
-            <FaHeart className="size-6 text-primary" />
+            <FaHeart className="size-6 text-secondary" />
             {sortedReactions.length > 0
               ? sortedReactions[0][0].charAt(0).toUpperCase() +
-              sortedReactions[0][0].slice(1)
+                sortedReactions[0][0].slice(1)
               : ""}
           </button>
           {showReactions && (
-            <div className="absolute -top-12 -left-2 bg-white border rounded-full shadow-lg px-3 py-2 flex space-x-3">
+            <div className="absolute -top-12 -left-2 bg-white border border-gray-50 rounded-full shadow-lg px-3 py-2 flex space-x-3">
               <button
+                title="Like"
                 onClick={() => handleReaction("love")}
-                className="text-2xl hover:scale-125 transition-transform cursor-pointer"
+                className="text-2xl text-gray-600 hover:scale-125 hover:text-secondary transition-transform cursor-pointer"
               >
-                ❤️
+                <Heart size={28} />
               </button>
               <button
+                title="Luggage"
                 onClick={() => handleReaction("luggage")}
-                className="text-2xl hover:scale-125 transition-transform cursor-pointer"
+                className="text-2xl text-gray-600 hover:scale-125 hover:text-secondary transition-transform cursor-pointer"
               >
                 <MdOutlineLuggage size={28} />
               </button>
               <button
+                title="Ban"
                 onClick={() => handleReaction("ban")}
-                className="text-2xl hover:scale-125 transition-transform cursor-pointer"
+                className="text-2xl text-gray-600 hover:scale-125 hover:text-secondary transition-transform cursor-pointer"
               >
                 <Ban size={24} />
               </button>
               <button
+                title="Smile"
                 onClick={() => handleReaction("smile")}
-                className="text-2xl hover:scale-125 transition-transform cursor-pointer"
+                className="text-2xl text-gray-600 hover:scale-125 hover:text-secondary transition-transform cursor-pointer"
               >
                 <Smile size={24} />
               </button>
@@ -148,9 +152,7 @@ const PostCard: React.FC<PostCardProps> = ({ post }) => {
             <div className="overflow-y-auto">
               <PostHeader post={post} />
               <p className="text-gray-700 mb-4">{post.content.text}</p>
-              <PostDescriptionContentRender
-                data={post.content.media || []}
-              />
+              <PostDescriptionContentRender data={post.content.media || []} />
             </div>
             <div className="flex flex-col h-full">
               <div className="flex justify-between items-center border-b border-[#9194A9]">
@@ -164,7 +166,7 @@ const PostCard: React.FC<PostCardProps> = ({ post }) => {
                       <FaHeart className="size-6 text-primary" />
                       {sortedReactions.length > 0
                         ? sortedReactions[0][0].charAt(0).toUpperCase() +
-                        sortedReactions[0][0].slice(1)
+                          sortedReactions[0][0].slice(1)
                         : ""}
                     </button>
                     {showReactions && (
