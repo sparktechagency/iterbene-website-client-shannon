@@ -46,7 +46,7 @@ const CreatePost = () => {
   const videoInputRef = useRef<HTMLInputElement>(null);
 
   // Handle post input change
-  const postChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const postChangeHandler = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setPost(e.target.value);
   };
 
@@ -110,12 +110,12 @@ const CreatePost = () => {
           height={46}
           className="size-[46px] rounded-full object-cover mr-3 ring ring-primary flex-shrink-0"
         />
-        <input
-          type="text"
+        <textarea
           placeholder="What's new, Alexander?"
           value={post}
+           rows={post ? 2 : 1}
           onChange={postChangeHandler}
-          className="w-full bg-transparent border-none focus:outline-none text-gray-800 placeholder-gray-500"
+          className="w-full h-auto bg-transparent border-none focus:outline-none text-gray-800 placeholder-gray-500 resize-none "
         />
         <button className={`flex-shrink-0 ${post ? "bg-secondary text-white" : "border border-[#9194A9] text-[#9194A9]"}  px-6 py-3 rounded-xl`}>Post It!</button>
       </div>
