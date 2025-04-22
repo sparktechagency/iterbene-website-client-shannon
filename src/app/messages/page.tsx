@@ -1,10 +1,8 @@
+import BlankMessage from "@/components/pages/message-inbox/blank-message/blank-message";
 import React from "react";
+
 const page = () => {
-  return (
-    <div className="w-full">
-    <h1>Messages</h1>
-    </div>
-  );
+  return <BlankMessage />;
 };
 
 export default page;

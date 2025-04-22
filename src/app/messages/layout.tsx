@@ -6,11 +6,13 @@ const layout = ({ children }: { children: React.ReactNode }) => {
   return (
     <>
       <Header />
-      <section className="w-full container bg-[#F5F5F5]">
-      <div className="w-full h-screen py-12  flex">
-      <div className="w-full md:w-[30%]  px-5"><Chats/></div>
-      <div className="w-full md:w-[70%] mx-auto">{children}</div>
-      </div>
+      <section className="w-full container bg-[#F5F5F5] py-12">
+        <div className="w-full p-6 flex flex-col md:flex-row gap-10 bg-white rounded-xl">
+          <div className="w-full md:w-[25%]">
+            <Chats />
+          </div>
+          <div className="w-full md:w-[75%] mx-auto">{children}</div>
+        </div>
       </section>
     </>
   );

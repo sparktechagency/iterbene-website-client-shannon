@@ -1,9 +1,8 @@
-import React from 'react'
+import Messages from "@/components/pages/message-inbox/messages/messages";
+import React from "react";
 
 const page = () => {
-  return (
-    <div>Chat Messages</div>
-  )
-}
+  return <Messages />;
+};
 
-export default page
+export default page;
