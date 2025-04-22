@@ -1,16 +1,17 @@
 import CustomForm from "@/components/custom/custom-form";
 import CustomInput from "@/components/custom/custom-input";
+import CustomSelectField from "@/components/custom/custom-seletectField";
 
 const EditMyProfileDetails = () => {
   const handleEditProfileInformation = () => {};
   return (
-    <section className="w-full grid grid-cols-1 md:grid-cols-3 gap-4 mt-8">
+    <section className="w-full grid grid-cols-1 md:grid-cols-3 gap-4 mt-8 " >
       <div className="w-full col-span-2 border border-[#E2E8F0] shadow p-4">
         <div className="border-b border-[#E2E8F0] pb-4 mb-4">
           <h1 className="text-xl font-semibold">Personal Information</h1>
         </div>
         <CustomForm onSubmit={handleEditProfileInformation}>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <CustomInput
               type="text"
               required
@@ -66,18 +67,40 @@ const EditMyProfileDetails = () => {
               placeholder="Enter your state"
               label="State"
             />
-            <CustomInput
-              type="text"
-              name="referredAs"
-              placeholder="Enter your referred as"
+            {/* Referred as */}
+            <CustomSelectField
+             items={
+              [
+                "Friend",
+                "Family",
+                "Colleague",
+                "Acquaintance",
+                "Other",
+              ]
+             }
+             name="referredAs"
               label="Referred As"
-            />
-            <CustomInput
-              type="text"
-              name="ageRange"
+              size="md"
               required
-              placeholder="Enter your age range"
+              placeholder="How did you know about us"
+            />
+            
+            <CustomSelectField
+             items={
+              [
+                "18-24",
+                "25-34",
+                "35-44",
+                "45-54",
+                "55-64",
+                "65+",
+              ]
+             }
+             name="ageRange"
               label="Age Range"
+              size="md"
+              required
+              placeholder="Select your age range"
             />
             <CustomInput
               type="text"
@@ -85,11 +108,22 @@ const EditMyProfileDetails = () => {
               placeholder="Enter your profession"
               label="Profession"
             />
-            <CustomInput
-              type="text"
-              name="relationshipStatus"
-              placeholder="Enter your relationship status"
+            {/* Relationship status */}
+            <CustomSelectField
+             items={
+              [
+                "Single",
+                "Married",
+                "Divorced",
+                "Separated",
+                "Widowed",
+              ]
+             }
+             name="relationshipStatus"
               label="Relationship Status"
+              size="md"
+              required
+              placeholder="What is your marital status"
             />
           </div>
         </CustomForm>

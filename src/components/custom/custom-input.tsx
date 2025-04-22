@@ -77,7 +77,7 @@ const CustomInput = ({
                 variant === "outline"
                   ? "bg-transparent border-b rounded-none"
                   : "border rounded-xl"
-              } ${error ? "border-red-500" : "border-[#9194A9]"}`}
+              } ${error ? "border-red-500" : "border-[#9EA1B3]"}`}
               whileFocus={{ scale: 1.02 }}
               transition={{ duration: 0.2 }}
             >

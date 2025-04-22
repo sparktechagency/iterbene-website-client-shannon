@@ -23,6 +23,7 @@ const CustomSelectField = ({
   size = "md",
   required = false,
   icon,
+  placeholder,
   items,
   fullWidth,
   onClick,
@@ -83,9 +84,9 @@ const CustomSelectField = ({
               {icon && <div className="pl-2">{icon}</div>}
               <button
                 type="button"
-                className={`w-full text-left outline-none font-medium text-[#9194A9] ${inputSizeClass}`}
+                className={`w-full text-left outline-none font-medium text-[#878B93] ${inputSizeClass}`}
               >
-                {selectedItem || field.value || "Select an option"}
+                {selectedItem || field.value || placeholder}
               </button>
               <div className="pr-2">
                 <svg

@@ -33,7 +33,7 @@ const demoGroups: Group[] = [
 
 const MyGroups: React.FC = () => {
   return (
-    <section className="w-full pt-2 pb-7 border-b-2">
+    <section className="w-full pt-2 pb-7 border-[#9EA1B3] border-b">
       {/* Header Section */}
       <div className="w-full flex items-center justify-between mb-6">
         <h1 className="text-xl md:text-2xl font-semibold text-gray-800">My Groups</h1>

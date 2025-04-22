@@ -200,7 +200,7 @@ const SettingsDropdown: React.FC<DropdownProps> = ({ isOpen }) => {
           animate={{ opacity: 1, x: 0 }}
           exit={{ opacity: 0, x: -10 }}
           transition={{ duration: 0.2 }}
-          className="absolute bottom-1 left-[-228px] bg-white rounded-xl p-6 w-[228px] z-50 shadow-xl"
+          className="absolute bottom-1 left-[-228px] bg-white rounded-xl p-3.5 w-[228px] z-50 shadow-xl"
         >
           <div className="space-y-3">
             <Link
@@ -299,7 +299,7 @@ const UserDropdown: React.FC<DropdownProps> = ({ isOpen }) => {
             >
               <IoChatboxEllipsesOutline size={24} />
               <span>Messages</span>
-              <span className="ml-2 bg-primary text-white rounded-full px-2 py-1 text-xs">
+              <span className="ml-2 size-6 rounded-full bg-primary text-white flex justify-center items-center text-sm">
                 5
               </span>
             </Link>
