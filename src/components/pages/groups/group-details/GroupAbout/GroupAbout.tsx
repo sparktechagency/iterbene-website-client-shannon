@@ -6,7 +6,7 @@ import GroupParticipantsList from "./GroupParticipantsList";
 
 const GroupAbout = () => {
   return (
-    <div className="w-full grid grid-cols-1 md:grid-cols-12 gap-5">
+    <div className="w-full grid grid-cols-1 md:grid-cols-12 gap-4">
       <GroupSummary />
       <GroupLocationMap />
       <GroupAuthorDetails />
