@@ -14,12 +14,6 @@ const groupLocation = {
   lng: 90.4125, // Longitude for Dhaka, Bangladesh
 };
 
-// Custom marker image
-const customMarkerIcon = {
-  url: "https://i.ibb.co.com/BVgNBSG8/interested.png",
-  scaledSize: new window.google.maps.Size(40, 40),
-};
-
 const GroupLocationMap = () => {
   const apiKey: string = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "";
 
@@ -27,6 +21,14 @@ const GroupLocationMap = () => {
   const { isLoaded } = useJsApiLoader({
     googleMapsApiKey: apiKey,
   });
+
+  // Define custom marker icon only after Google Maps is loaded
+  const customMarkerIcon = isLoaded
+    ? {
+        url: "https://i.ibb.co.com/BVgNBSG8/interested.png",
+        scaledSize: new window.google.maps.Size(40, 40),
+      }
+    : null;
 
   if (!isLoaded) {
     return <div>Loading...</div>;
@@ -47,12 +49,14 @@ const GroupLocationMap = () => {
           }}
         >
           {/* Marker for group location (Dhaka, Bangladesh) with custom image */}
-          <Marker
-            key="groupLocation"
-            position={groupLocation}
-            icon={customMarkerIcon}
-            title="Group Location"
-          />
+          {customMarkerIcon && (
+            <Marker
+              key="groupLocation"
+              position={groupLocation}
+              icon={customMarkerIcon}
+              title="Group Location"
+            />
+          )}
         </GoogleMap>
       </div>
       <h1 className="text-xl md:text-[22px] text-gray-900 mt-4 font-medium">

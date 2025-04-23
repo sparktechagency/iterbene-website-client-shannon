@@ -10,7 +10,7 @@ const nextConfig: NextConfig = {
     },
   ],
   images: {
-    domains: ["i.ibb.co.com","images.unsplash.com","randomuser.me","i.postimg.cc","images.pexels.com"],
+    domains: ["i.ibb.co.com","images.unsplash.com","randomuser.me","i.postimg.cc","images.pexels.com","api.dicebear.com"],
   }
 };
 

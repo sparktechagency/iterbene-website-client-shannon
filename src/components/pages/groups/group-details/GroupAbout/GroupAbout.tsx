@@ -1,4 +1,4 @@
-import React from "react";
+
 import GroupSummary from "./GroupSummary";
 import GroupLocationMap from "./GroupLocationMap";
 import GroupAuthorDetails from "./GroupAuthorDetails";
