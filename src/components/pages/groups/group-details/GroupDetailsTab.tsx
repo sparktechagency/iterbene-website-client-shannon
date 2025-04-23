@@ -30,7 +30,7 @@ const GroupDetailsTab = () => {
           Discussion
         </button>
       </div>
-      <div className="w-full py-5 md:py-8">
+      <div className="w-full py-6">
         {activeTab === "about" ? <GroupAbout /> : <GroupDiscussion />}
       </div>
     </section>

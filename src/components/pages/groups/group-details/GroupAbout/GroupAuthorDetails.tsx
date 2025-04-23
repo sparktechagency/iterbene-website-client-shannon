@@ -2,7 +2,7 @@ import React from 'react'
 
 const GroupAuthorDetails = () => {
   return (
-    <div>GroupAuthorDetails</div>
+    <div className='w-full col-span-full md:col-span-7 bg-white p-6 md:p-9 rounded-xl'>GroupAuthorDetails</div>
   )
 }
 
