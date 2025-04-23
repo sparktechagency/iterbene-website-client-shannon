@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import React from "react";
 import { PiUserBold } from "react-icons/pi";
 interface IAuthor {
@@ -59,10 +60,13 @@ const UpcomingEventCard: React.FC<UpcomingEventCardProps> = ({ event }) => {
       </div>
       {/* Buttons */}
       <div className="flex flex-col gap-3 w-full">
-        <button className="bg-secondary hover:bg-[#FEEFE8] hover:text-secondary text-white  px-5 py-3.5 rounded-xl border border-secondary transition cursor-pointer">
-          View
-        </button>
-        <button className="border border-[#9EA1B3] text-gray-900 px-5 py-3.5   rounded-xl hover:bg-gray-100 transition cursor-pointer">
+        <Link href={`/events/1`}>
+          <button className="w-full bg-secondary hover:bg-[#FEEFE8] hover:text-secondary text-white  px-5 py-3.5 rounded-xl border border-secondary transition cursor-pointer">
+            View
+          </button>
+        </Link>
+
+        <button className="w-full border border-[#9EA1B3] text-gray-900 px-5 py-3.5   rounded-xl hover:bg-gray-100 transition cursor-pointer">
           Remove
         </button>
       </div>

@@ -11,6 +11,7 @@ interface InvitedGroupCardProps {
 
 const InvitedGroupCard: React.FC<InvitedGroupCardProps> = ({ image, name, members }) => {
   return (
+ 
     <div className="w-full bg-white rounded-2xl  p-4 flex flex-col items-center">
       {/* Group Image */}
       <div className="w-full h-[350px] bg-gray-200 rounded-xl mb-4 relative">

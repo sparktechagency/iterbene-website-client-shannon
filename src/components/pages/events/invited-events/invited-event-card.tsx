@@ -1,5 +1,4 @@
 import Image from "next/image";
-import React from "react";
 import { PiUserBold } from "react-icons/pi";
 interface IAuthor {
   fullName: string;

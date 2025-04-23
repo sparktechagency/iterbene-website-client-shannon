@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import React from "react";
 import { PiUserBold } from "react-icons/pi";
 
@@ -9,7 +10,11 @@ interface JoinedGroupCardProps {
   members: string;
 }
 
-const JoinedGroupCard: React.FC<JoinedGroupCardProps> = ({ image, name, members }) => {
+const JoinedGroupCard: React.FC<JoinedGroupCardProps> = ({
+  image,
+  name,
+  members,
+}) => {
   return (
     <div className="w-full bg-white rounded-2xl  p-4 flex flex-col items-center">
       {/* Group Image */}
@@ -36,7 +41,7 @@ const JoinedGroupCard: React.FC<JoinedGroupCardProps> = ({ image, name, members 
       {/* Buttons */}
       <div className="flex flex-col gap-3 w-full">
         <button className="hover:bg-secondary bg-[#FEEFE8] text-secondary hover:text-white  px-5 py-3.5 rounded-xl border border-secondary transition cursor-pointer">
-          View
+          <Link href={`/groups/1`}>View</Link>
         </button>
         <button className="border border-[#9EA1B3] text-gray-900 px-5 py-3.5   rounded-xl hover:bg-gray-100 transition cursor-pointer">
           Remove
