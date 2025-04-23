@@ -159,7 +159,7 @@ const CustomVideoPlayer: React.FC<VideoPlayerProps> = ({ url }) => {
       <video
         ref={videoRef}
         src={url}
-        className="w-full rounded-xl"
+        className="w-full h-[500px] rounded-xl"
         onClick={togglePlay}
         controls={false} // Disable default controls
         controlsList="nodownload" // Disable download option

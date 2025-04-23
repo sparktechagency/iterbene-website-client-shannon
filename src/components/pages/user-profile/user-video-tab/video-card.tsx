@@ -1,11 +1,15 @@
 "use client";
-import {
-  Pause,
-} from "lucide-react";
+import { Pause } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
 import { FiPlayCircle } from "react-icons/fi";
 import { HiChevronDoubleLeft, HiChevronDoubleRight } from "react-icons/hi";
-const VideoCard = ({ url }: { url: string }) => {
+const VideoCard = ({
+  url,
+  className = "h-56 md:h-80",
+}: {
+  url: string;
+  className?: string;
+}) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const progressRef = useRef<HTMLDivElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -87,7 +91,7 @@ const VideoCard = ({ url }: { url: string }) => {
       <video
         ref={videoRef}
         src={url}
-        className="w-full h-56 md:h-96 lg:h-[450px] object-cover rounded-xl"
+        className={`w-full ${className} object-cover rounded-xl`}
         controls={false}
         controlsList="nodownload"
         playsInline

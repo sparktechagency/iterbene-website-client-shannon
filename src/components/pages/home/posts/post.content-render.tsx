@@ -1,5 +1,4 @@
 "use client";
-import CustomVideoPlayer from "@/components/custom/custom-video-player";
 import Image from "next/image";
 import VideoCard from "../../user-profile/user-video-tab/video-card";
 
@@ -42,7 +41,7 @@ const PostContentRender = ({
             />
           </div>
         ) : (
-          <VideoCard url={media.url} />
+          <VideoCard url={media.url} className="w-full h-[400px]" />
         )}
       </div>
     );
@@ -66,7 +65,7 @@ const PostContentRender = ({
                 className="w-full h-full object-cover rounded-xl cursor-pointer"
               />
             ) : (
-              <CustomVideoPlayer url={media.url} />
+                <VideoCard url={media.url} className="w-full h-[360px]" />
             )}
           </div>
         ))}
@@ -91,7 +90,7 @@ const PostContentRender = ({
               className="w-full h-full object-cover rounded-xl cursor-pointer"
             />
           ) : (
-            <CustomVideoPlayer url={data[0].url} />
+            <VideoCard url={data[0].url} />
           )}
         </div>
         <div className="col-span-1">
@@ -104,7 +103,7 @@ const PostContentRender = ({
               className="w-full h-full object-cover rounded-xl cursor-pointer"
             />
           ) : (
-            <CustomVideoPlayer url={data[1].url} />
+            <VideoCard url={data[1].url} className="h-[260px]" />
           )}
         </div>
         <div className="col-span-1">
@@ -117,7 +116,7 @@ const PostContentRender = ({
               className="w-full h-full object-cover rounded-xl cursor-pointer"
             />
           ) : (
-            <CustomVideoPlayer url={data[2].url} />
+            <VideoCard url={data[2].url} />
           )}
         </div>
       </div>
@@ -140,7 +139,7 @@ const PostContentRender = ({
               className="w-full h-full object-cover rounded-xl cursor-pointer"
             />
           ) : (
-            <CustomVideoPlayer url={data[0].url} />
+            <VideoCard url={data[0].url} />
           )}
         </div>
         <div className="row-span-2 col-span-1">
@@ -153,7 +152,7 @@ const PostContentRender = ({
               className="w-full h-full object-cover rounded-xl cursor-pointer"
             />
           ) : (
-            <CustomVideoPlayer url={data[1].url} />
+            <VideoCard url={data[1].url} />
           )}
         </div>
         <div className="col-span-1">
@@ -166,7 +165,7 @@ const PostContentRender = ({
               className="w-full h-full object-cover rounded-xl cursor-pointer"
             />
           ) : (
-            <CustomVideoPlayer url={data[2].url} />
+            <VideoCard url={data[2].url} />
           )}
         </div>
         <div className="col-span-1">
@@ -179,7 +178,7 @@ const PostContentRender = ({
               className="w-full h-full object-cover rounded-xl cursor-pointer"
             />
           ) : (
-            <CustomVideoPlayer url={data[2].url} />
+            <VideoCard url={data[2].url} />
           )}
         </div>
       </div>
@@ -202,7 +201,7 @@ const PostContentRender = ({
               className="w-full h-full object-cover rounded-xl cursor-pointer"
             />
           ) : (
-            <CustomVideoPlayer url={data[0].url} />
+            <VideoCard url={data[0].url} />
           )}
         </div>
         <div className="row-span-2 col-span-1">
@@ -215,7 +214,7 @@ const PostContentRender = ({
               className="w-full h-full object-cover rounded-xl cursor-pointer"
             />
           ) : (
-            <CustomVideoPlayer url={data[1].url} />
+            <VideoCard url={data[1].url} />
           )}
         </div>
         <div className="col-span-1">
@@ -228,7 +227,7 @@ const PostContentRender = ({
               className="w-full h-full object-cover rounded-xl cursor-pointer"
             />
           ) : (
-            <CustomVideoPlayer url={data[2].url} />
+            <VideoCard url={data[2].url} />
           )}
         </div>
         <div className="col-span-1 relative">
@@ -241,7 +240,7 @@ const PostContentRender = ({
               className="w-full h-full object-cover rounded-xl cursor-pointer"
             />
           ) : (
-            <CustomVideoPlayer url={data[2].url} />
+            <VideoCard url={data[2].url} />
           )}
           <div className="absolute top-0 left-0 w-full h-full bg-black/30 rounded-xl">
             <span className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white text-xl md:text-3xl">{mediaCount}+</span>
