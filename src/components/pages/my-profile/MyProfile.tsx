@@ -61,7 +61,7 @@ const MyProfile = () => {
     }
   ];
   return (
-    <section className="w-full min-h-screen px-5 bg-[#F5F5F5] pb-10">
+    <section className="w-full min-h-screen px-5 bg-[#F5F5F5] pb-10  pt-[98px]">
       <div className="container mx-auto">
         <div className="w-full bg-white rounded-2xl relative">
           {/* Background Image */}

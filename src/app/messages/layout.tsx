@@ -4,9 +4,9 @@ import React from "react";
 
 const layout = ({ children }: { children: React.ReactNode }) => {
   return (
-    <>
+    <section className="w-full bg-[#F5F5F5]">
       <Header />
-      <section className="w-full container bg-[#F5F5F5] py-12">
+      <section className="w-full container pt-[172px]">
         <div className="w-full p-6 flex flex-col md:flex-row gap-10 bg-white rounded-xl">
           <div className="w-full md:w-[25%]">
             <Chats />
@@ -14,7 +14,7 @@ const layout = ({ children }: { children: React.ReactNode }) => {
           <div className="w-full md:w-[75%] mx-auto">{children}</div>
         </div>
       </section>
-    </>
+    </section>
   );
 };
 

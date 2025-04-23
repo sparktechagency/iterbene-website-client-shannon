@@ -419,7 +419,7 @@ const Header: React.FC = () => {
   };
 
   return (
-    <nav className="w-full bg-[#F0FAF9] p-5 relative">
+    <nav className="w-full bg-[#F0FAF9] h-[112px] fixed top-0 left-0 z-50">
       <div className="container flex justify-between gap-5 items-center">
         <Link href={"/"}>
           <Image src={logo.src} alt="logo" width={80} height={80} />
