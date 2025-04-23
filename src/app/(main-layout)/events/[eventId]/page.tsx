@@ -1,9 +1,7 @@
-import React from 'react'
+import EventDetails from '@/components/pages/events/event-details/EventDetails'
 
 const page = () => {
-  return (
-    <div>Event Id</div>
-  )
+  return  <EventDetails/>
 }
 
 export default page
