@@ -4,19 +4,35 @@ import logo from "@/asset/logo/logo.png";
 import CustomButton from "@/components/custom/custom-button";
 import CustomForm from "@/components/custom/custom-form";
 import CustomInput from "@/components/custom/custom-input";
+import { useForgotPasswordMutation } from "@/redux/features/auth/authApi";
+import { TError } from "@/types/error";
 import { forgotPasswordValidationSchema } from "@/validation/auth.validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Mail } from "lucide-react";
 import Image from "next/image";
+import Cookies from "js-cookie";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FieldValues } from "react-hook-form";
+import toast from "react-hot-toast";
 const ForgotPassword = () => {
   const router = useRouter();
+  const [forgotPassword, { isLoading }] = useForgotPasswordMutation();
   const handleLogin = async (values: FieldValues) => {
-    console.log(values);
-    const { email } = values;
-    router.push(`/verify-email?email=${email}`)
+    try {
+      const res = await forgotPassword(values).unwrap();
+      const accessToken = res?.data?.attributes?.accessToken;
+      //set access token in cookies
+      Cookies.set("accessToken", accessToken, {
+        expires: 7,
+      });
+      //redirect to verify email page
+      toast.success(res?.message);
+      router.push("/verify-email?type=forgot-password");
+    } catch (error) {
+      const err = error as TError;
+      toast.error(err?.data?.message || "Something went wrong!");
+    }
   };
   return (
     <section className="w-full h-screen flex items-center justify-center relative p-5">
@@ -63,7 +79,7 @@ const ForgotPassword = () => {
               fullWidth
               placeholder="Enter your email"
             />
-            <CustomButton fullWidth className="py-4">
+            <CustomButton loading={isLoading} fullWidth className="py-4">
               Send OTP
             </CustomButton>
             <div className="flex gap-1 items-center justify-center">

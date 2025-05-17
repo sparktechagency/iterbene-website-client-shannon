@@ -10,7 +10,7 @@ import { useVerifyEmailMutation } from "@/redux/features/auth/authApi";
 import { TError } from "@/types/error";
 import toast from "react-hot-toast";
 const VerifyEmail = () => {
-   const searchParams = useSearchParams()
+  const searchParams = useSearchParams();
   const type = searchParams.get("type");
   const router = useRouter();
   const [oneTimeCode, setOneTimeCode] = useState<string>("");
@@ -23,10 +23,10 @@ const VerifyEmail = () => {
     try {
       const res = await verifyEmail({ otp: oneTimeCode }).unwrap();
       toast.success(res?.message);
-      if (type == "register") {
-        router.push(`/login`);
-      } else {
+      if (type == "forgot-password") {
         router.push(`/reset-password`);
+      } else {
+        router.push(`/login`);
       }
     } catch (error) {
       const err = error as TError;

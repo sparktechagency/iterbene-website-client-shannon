@@ -4,6 +4,8 @@ import logo from "@/asset/logo/logo.png";
 import CustomButton from "@/components/custom/custom-button";
 import CustomForm from "@/components/custom/custom-form";
 import CustomInput from "@/components/custom/custom-input";
+import { useResetPasswordMutation } from "@/redux/features/auth/authApi";
+import { TError } from "@/types/error";
 import { resetPasswordValidationSchema } from "@/validation/auth.validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Lock } from "lucide-react";
@@ -11,11 +13,19 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FieldValues } from "react-hook-form";
+import toast from "react-hot-toast";
 const ResetPassword = () => {
   const router = useRouter();
+  const [resetPassword, { isLoading }] = useResetPasswordMutation();
   const handleResetPassword = async (values: FieldValues) => {
-    const { email } = values;
-    router.push(`/verify-email?email=${email}`);
+    try {
+      const res = await resetPassword({password:values?.newPassword}).unwrap();
+      toast.success(res?.message);
+      router.push("/login");
+    } catch (error) {
+      const err = error as TError;
+      toast.error(err?.data?.message || "Something went wrong!");
+    }
   };
   return (
     <section className="w-full h-screen flex items-center justify-center relative p-5">
@@ -72,7 +82,7 @@ const ResetPassword = () => {
               variant="outline"
               type="password"
             />
-            <CustomButton fullWidth className="py-4">
+            <CustomButton loading={isLoading} fullWidth className="py-4">
               Send OTP
             </CustomButton>
             <div className="flex gap-1 items-center justify-center">

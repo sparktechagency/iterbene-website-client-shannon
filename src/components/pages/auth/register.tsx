@@ -28,7 +28,7 @@ const Register = () => {
         expires: 7,
       });
       //redirect to verify email page
-      router.push("/verify-email?type=register");
+      router.push("/verify-email");
       toast.success(res?.message);
     } catch (error) {
       const err = error as TError;
