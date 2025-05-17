@@ -25,7 +25,7 @@ const CustomButton = ({
   }`;
 
   const variantClasses = {
-    default: " border border-[#E2AD96] bg-secondary hover:bg-secondary text-white ",
+    default: " border bg-secondary hover:bg-secondary text-white ",
     outline: "border border-[#9EA1B3]  text-gray-950",
   };
 

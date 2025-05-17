@@ -41,9 +41,9 @@ const Register = () => {
           <Image
             src={logo}
             alt="logo"
-            width={128}
-            height={128}
-            className="ml-2 w-[90px] md:w-[128px] md:h-[115px]"
+            width={120}
+            height={120}
+            className="ml-2 size-[90px] md:w-[120px] md:h-[105px]"
           />
         </div>
         {/* Form content */}
@@ -52,6 +52,7 @@ const Register = () => {
           resolver={zodResolver(registerValidationSchema)}
         >
           <div className="space-y-3 md:space-y-6 mt-8">
+          
             <CustomInput
               name="fullName"
               label="Full Name"

@@ -1,41 +1,37 @@
+import {
+  IForgotPassword,
+  ILogin,
+  IRegister,
+  IResetPassword,
+  IVerifyEmail,
+} from "@/types/auth.types";
 import { baseApi } from "../api/baseApi";
-
-type LoginRequest = { email: string; password: string };
-type RegisterRequest = {
-  fullName: string;
-  email: string;
-  password: string;
-  role: string;
-};
-type ForgotPasswordRequest = { email: string };
-type ResetPasswordRequest = { email: string; password: string };
-type ChangePasswordRequest = { currentPassword: string; newPassword: string };
 
 const authApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     login: builder.mutation({
-      query: (loginData: LoginRequest) => ({
+      query: (loginData: ILogin) => ({
         url: "/auth/login",
         method: "POST",
         body: loginData,
       }),
     }),
     register: builder.mutation({
-      query: (registerData: RegisterRequest) => ({
+      query: (registerData: IRegister) => ({
         url: "/auth/register",
         method: "POST",
         body: registerData,
       }),
     }),
     forgotPassword: builder.mutation({
-      query: (forgotPasswordData: ForgotPasswordRequest) => ({
+      query: (forgotPasswordData: IForgotPassword) => ({
         url: "/auth/forgot-password",
         method: "POST",
         body: forgotPasswordData,
       }),
     }),
     verifyEmail: builder.mutation({
-      query: (verifyEmailData) => ({
+      query: (verifyEmailData: IVerifyEmail) => ({
         url: "/auth/verify-email",
         method: "POST",
         body: verifyEmailData,
@@ -51,14 +47,14 @@ const authApi = baseApi.injectEndpoints({
       },
     }),
     resetPassword: builder.mutation({
-      query: (resetPasswordData: ResetPasswordRequest) => ({
+      query: (resetPasswordData: IResetPassword) => ({
         url: "/auth/reset-password",
         method: "POST",
         body: resetPasswordData,
       }),
     }),
     changePassword: builder.mutation({
-      query: (changePasswordData: ChangePasswordRequest) => ({
+      query: (changePasswordData) => ({
         url: "/auth/change-password",
         method: "POST",
         body: changePasswordData,

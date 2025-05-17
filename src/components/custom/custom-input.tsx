@@ -43,15 +43,15 @@ const CustomInput = ({
   // Input/Textarea size class based on the prop
   const inputSizeClass = {
     sm: "py-2 px-3 text-sm",
-    md: "py-3 px-3 text-base",
-    lg: "py-4 px-3 text-lg",
+    md: "py-2.5 px-3 text-base",
+    lg: "py-3 px-3 text-base",
   }[size];
 
   // Textarea-specific styles
   const textareaSizeClass = {
     sm: "py-2 px-3 text-sm min-h-[80px]",
-    md: "py-3 px-3 text-base min-h-[100px]",
-    lg: "py-4 px-3 text-lg min-h-[120px]",
+    md: "py-2.5 px-3 text-base min-h-[100px]",
+    lg: "py-3 px-3 text-lg min-h-[120px]",
   }[size];
 
   // Determine input type for password toggle
@@ -62,7 +62,7 @@ const CustomInput = ({
       {label && (
         <label
           htmlFor={name}
-          className="block text-gray-950 mb-2 font-medium text-[16px]"
+          className="block text-gray-950 mb-2 font-medium text-[15px]"
         >
           {label} {required && <span className="text-red-500">*</span>}
         </label>
@@ -75,7 +75,7 @@ const CustomInput = ({
             <motion.div
               className={`${fullWidth ? "w-full" : "w-auto"} flex items-center ${
                 variant === "outline"
-                  ? "bg-transparent border-b rounded-none"
+                  ? "bg-transparent border-b border-primary rounded-none"
                   : "border rounded-xl"
               } ${error ? "border-red-500" : "border-[#9EA1B3]"}`}
               whileFocus={{ scale: 1.02 }}

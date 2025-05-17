@@ -3,10 +3,10 @@ export interface ILogin {
   password: string;
 }
 export interface IRegister {
-  fullName: string;
+  firstName: string;
+  lastName: string;
   email: string;
-  password: string;
-  role: string;
+  password: string
 }
 export interface IVerifyEmail {
   otp: string;
@@ -16,7 +16,5 @@ export interface IForgotPassword {
   email: string;
 }
 export interface IResetPassword {
-  email: string;
   password: string;
-  confirmPassword: string;
 }
