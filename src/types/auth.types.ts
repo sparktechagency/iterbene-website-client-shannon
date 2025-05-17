@@ -3,10 +3,9 @@ export interface ILogin {
   password: string;
 }
 export interface IRegister {
-  firstName: string;
-  lastName: string;
+  fullName: string;
   email: string;
-  password: string
+  password: string;
 }
 export interface IVerifyEmail {
   otp: string;

@@ -1,37 +1,30 @@
-import {
-  IForgotPassword,
-  ILogin,
-  IRegister,
-  IResetPassword,
-  IVerifyEmail,
-} from "@/types/auth.types";
 import { baseApi } from "../api/baseApi";
 
 const authApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     login: builder.mutation({
-      query: (loginData: ILogin) => ({
+      query: (loginData) => ({
         url: "/auth/login",
         method: "POST",
         body: loginData,
       }),
     }),
     register: builder.mutation({
-      query: (registerData: IRegister) => ({
+      query: (registerData) => ({
         url: "/auth/register",
         method: "POST",
         body: registerData,
       }),
     }),
     forgotPassword: builder.mutation({
-      query: (forgotPasswordData: IForgotPassword) => ({
+      query: (forgotPasswordData) => ({
         url: "/auth/forgot-password",
         method: "POST",
         body: forgotPasswordData,
       }),
     }),
     verifyEmail: builder.mutation({
-      query: (verifyEmailData: IVerifyEmail) => ({
+      query: (verifyEmailData) => ({
         url: "/auth/verify-email",
         method: "POST",
         body: verifyEmailData,
@@ -47,7 +40,7 @@ const authApi = baseApi.injectEndpoints({
       },
     }),
     resetPassword: builder.mutation({
-      query: (resetPasswordData: IResetPassword) => ({
+      query: (resetPasswordData) => ({
         url: "/auth/reset-password",
         method: "POST",
         body: resetPasswordData,

@@ -29,7 +29,7 @@ export default function RootLayout({
           }}
           >
             <Providers>{children}</Providers>
-            <Toaster />
+            <Toaster richColors position="top-right" />
           </ConfigProvider>
         </AntdRegistry>
       </body>

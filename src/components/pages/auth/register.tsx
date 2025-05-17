@@ -4,18 +4,36 @@ import logo from "@/asset/logo/logo.png";
 import CustomButton from "@/components/custom/custom-button";
 import CustomForm from "@/components/custom/custom-form";
 import CustomInput from "@/components/custom/custom-input";
-import {
-  registerValidationSchema,
-} from "@/validation/auth.validation";
+import { useRegisterMutation } from "@/redux/features/auth/authApi";
+import { registerValidationSchema } from "@/validation/auth.validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Checkbox } from "antd";
 import { Lock, Mail, UserRound } from "lucide-react";
 import Image from "next/image";
+import Cookies from "js-cookie";
 import Link from "next/link";
-import { FieldValues } from "react-hook-form";
+import { FieldValues} from "react-hook-form";
+import { TError } from "@/types/error";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 const Register = () => {
+  const [register, { isLoading }] = useRegisterMutation();
+  const router = useRouter();
   const handleRegister = async (values: FieldValues) => {
-    console.log(values);
+    try {
+      const res = await register(values).unwrap();
+      const accessToken = res?.data?.attributes?.accessToken;
+      //set access token in cookies
+      Cookies.set("accessToken", accessToken, {
+        expires: 7,
+      });
+      //redirect to verify email page
+      router.push("/verify-email");
+      toast.success(res?.message);
+    } catch (error) {
+      const err = error as TError;
+      toast.error(err?.data?.message || "Something went wrong!");
+    }
   };
   return (
     <section className="w-full h-screen flex items-center justify-center relative p-5">
@@ -52,7 +70,6 @@ const Register = () => {
           resolver={zodResolver(registerValidationSchema)}
         >
           <div className="space-y-3 md:space-y-6 mt-8">
-          
             <CustomInput
               name="fullName"
               label="Full Name"
@@ -90,13 +107,16 @@ const Register = () => {
                     id="remember"
                     className="border-primary cursor-pointer "
                   />
-                  <label htmlFor="remember" className="ml-2 block text-sm md:text-[16px]">
+                  <label
+                    htmlFor="remember"
+                    className="ml-2 block text-sm md:text-[16px]"
+                  >
                     I agree to all terms & conditions.
                   </label>
                 </div>
               </div>
             </div>
-            <CustomButton fullWidth className="py-4">
+            <CustomButton loading={isLoading} fullWidth className="py-4">
               Register
             </CustomButton>
             <div className="flex gap-1 items-center justify-center">
