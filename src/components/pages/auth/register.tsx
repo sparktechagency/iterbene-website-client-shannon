@@ -12,9 +12,9 @@ import { Lock, Mail, UserRound } from "lucide-react";
 import Image from "next/image";
 import Cookies from "js-cookie";
 import Link from "next/link";
-import { FieldValues} from "react-hook-form";
+import { FieldValues } from "react-hook-form";
 import { TError } from "@/types/error";
-import { toast } from "sonner";
+import { toast } from "react-hot-toast";
 import { useRouter } from "next/navigation";
 const Register = () => {
   const [register, { isLoading }] = useRegisterMutation();
@@ -28,7 +28,7 @@ const Register = () => {
         expires: 7,
       });
       //redirect to verify email page
-      router.push("/verify-email");
+      router.push("/verify-email?type=register");
       toast.success(res?.message);
     } catch (error) {
       const err = error as TError;

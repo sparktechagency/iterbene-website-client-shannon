@@ -10,6 +10,7 @@ interface IDecodeData {
 }
 
 const TOKEN_EXPIRY_DAYS = 7; // Token expires in 7 days
+const REFRESH_TOKEN_EXPIRY_DAYS = 30; 
 
 // Store the access token and refresh token in cookies with 7 days expiry
 export const storeTokens = (accessToken: string, refreshToken: string) => {
@@ -18,7 +19,7 @@ export const storeTokens = (accessToken: string, refreshToken: string) => {
     path: "/",
   });
   Cookies.set("refreshToken", refreshToken, {
-    expires: TOKEN_EXPIRY_DAYS,
+    expires: REFRESH_TOKEN_EXPIRY_DAYS,
     path: "/",
   });
 };

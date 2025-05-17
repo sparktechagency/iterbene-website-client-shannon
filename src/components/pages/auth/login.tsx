@@ -4,16 +4,38 @@ import logo from "@/asset/logo/logo.png";
 import CustomButton from "@/components/custom/custom-button";
 import CustomForm from "@/components/custom/custom-form";
 import CustomInput from "@/components/custom/custom-input";
+import { useLoginMutation } from "@/redux/features/auth/authApi";
+import { storeTokens } from "@/services/auth.services";
+import { TError } from "@/types/error";
 import { loginValidationSchema } from "@/validation/auth.validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Checkbox } from "antd";
 import { Lock, Mail } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { FieldValues } from "react-hook-form";
+import toast from "react-hot-toast";
 const Login = () => {
+  const [login, { isLoading }] = useLoginMutation();
+  const router = useRouter();
   const handleLogin = async (values: FieldValues) => {
-    console.log(values);
+    try {
+      const res = await login(values).unwrap();
+      if (res?.data?.attributes?.user?.role === "admin") {
+        toast.error("You are admin you can't login here!");
+        return;
+      }
+      toast.success(res.message || "Login successful!");
+      storeTokens(
+        res?.data?.attributes?.tokens?.accessToken,
+        res?.data?.attributes?.tokens?.refreshToken
+      );
+      router.push("/");
+    } catch (error) {
+      const err = error as TError;
+      toast.error(err?.data?.message || "Something went wrong!");
+    }
   };
   return (
     <section className="w-full  h-screen flex items-center justify-center relative p-5">
@@ -33,7 +55,9 @@ const Login = () => {
       {/* Content that remains sharp */}
       <div className="w-full max-w-[500px] mx-auto px-8 md:px-[65px] py-12 md:py-[56px] bg-[#FFFFFF] z-30 rounded-xl border-2 border-primary shadow-xl shadow-gray-900">
         <div className="flex justify-between">
-          <h1 className="text-xl lg:text-3xl xl:text-4xl font-semibold">Login</h1>
+          <h1 className="text-xl lg:text-3xl xl:text-4xl font-semibold">
+            Login
+          </h1>
           <Image
             src={logo}
             alt="logo"
@@ -87,7 +111,9 @@ const Login = () => {
                 </Link>
               </div>
             </div>
-            <CustomButton fullWidth className="py-4" >Login</CustomButton>
+            <CustomButton loading={isLoading} fullWidth className="py-4">
+              Login
+            </CustomButton>
             <div className="flex gap-1 items-center justify-center">
               <span className="text-sm md:text-[16px] font-medium">
                 Don&apos;t have an account?

@@ -3,24 +3,38 @@ import authImage from "@/asset/auth/auth.jpg";
 import logo from "@/asset/logo/logo.png";
 import Image from "next/image";
 import { useState } from "react";
-// import Cookies from "js-cookie";
-// import { useAppDispatch } from "@/redux/hooks";
 import CustomButton from "@/components/custom/custom-button";
-import { useParams, useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import OTPInput from "react-otp-input";
+import { useVerifyEmailMutation } from "@/redux/features/auth/authApi";
+import { TError } from "@/types/error";
+import toast from "react-hot-toast";
 const VerifyEmail = () => {
-  const { email } = useParams();
+   const searchParams = useSearchParams()
+  const type = searchParams.get("type");
   const router = useRouter();
   const [oneTimeCode, setOneTimeCode] = useState<string>("");
-  //   const verifyToken = Cookies.get("verify-token");
-  //   const dispatch = useAppDispatch();
+  const [verifyEmail, { isLoading }] = useVerifyEmailMutation();
   // Handle OTP change
   const handleOtpChange = (otpValue: string) => {
     setOneTimeCode(otpValue);
   };
   const handleVerifyEmail = async () => {
-    router.push(`/reset-password?email=${email}`);
+    try {
+      const res = await verifyEmail({ otp: oneTimeCode }).unwrap();
+      toast.success(res?.message);
+      if (type == "register") {
+        router.push(`/login`);
+      } else {
+        router.push(`/reset-password`);
+      }
+    } catch (error) {
+      const err = error as TError;
+      console.log("Error:", error);
+      toast.error(err?.data?.message || "Something went wrong!");
+    }
   };
+  console.log("Type:", type);
   return (
     <section className="w-full h-screen flex items-center justify-center relative p-5">
       {/* Background with blur effect */}
@@ -82,7 +96,12 @@ const VerifyEmail = () => {
               Resend OTP
             </button>
           </div>
-          <CustomButton onClick={handleVerifyEmail} fullWidth className="py-4">
+          <CustomButton
+            loading={isLoading}
+            onClick={handleVerifyEmail}
+            fullWidth
+            className="py-4"
+          >
             Verify
           </CustomButton>
         </div>
