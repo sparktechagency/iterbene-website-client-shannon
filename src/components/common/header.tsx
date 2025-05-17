@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 "use client";
 
 import logo from "@/asset/logo/logo.png";
@@ -351,7 +352,7 @@ const UserDropdown: React.FC<DropdownProps> = ({ isOpen }) => {
               />
             </div>
             <button
-              className="flex items-center px-4 py-3 gap-4 text-red-500 hover:bg-gray-100 rounded-xl"
+              className="w-full cursor-pointer flex items-center px-4 py-3 gap-4 text-red-500 hover:bg-gray-100 rounded-xl"
             >
               <BiLogOut size={24} />
               <span>Logout</span>
