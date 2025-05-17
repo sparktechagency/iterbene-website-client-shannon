@@ -1,9 +1,9 @@
 'use client';
 import { IPost } from "@/types/post.types";
 import React from "react";
-import UserTimelineCard from "./user-timeline-card";
+import UserTimelineCard from "./UserTimelineCard";
 
-const UserTimelineTab = () => {
+const UserTimeline = () => {
   const demoPosts: IPost[] = [
     {
       id: "1",
@@ -181,4 +181,4 @@ const UserTimelineTab = () => {
   );
 };
 
-export default UserTimelineTab;
+export default UserTimeline;

@@ -5,14 +5,14 @@ export const profileApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     getMyProfile: builder.query({
       query: () => ({
-        url: `/user/profile`,
+        url: `/users/profile`,
         method: "GET",
       }),
       providesTags: ["User"],
     }),
     setLatestLocation: builder.mutation({
       query: (data) => ({
-        url: "/user/location",
+        url: "/users/location",
         method: "POST",
         body: data,
       }),
@@ -20,7 +20,7 @@ export const profileApi = baseApi.injectEndpoints({
     }),
     fillUpUserInfo: builder.mutation({
       query: (data) => ({
-        url: "/user/profile",
+        url: "/users/profile",
         method: "POST",
         body: data,
       }),
@@ -28,7 +28,7 @@ export const profileApi = baseApi.injectEndpoints({
     }),
     addOrUpdatePhotoGallery: builder.mutation({
       query: (data) => ({
-        url: "/user/photo-gallery",
+        url: "/users/photo-gallery",
         method: "POST",
         body: data,
       }),
@@ -36,14 +36,14 @@ export const profileApi = baseApi.injectEndpoints({
     }),
     deletePhotoGallery: builder.mutation({
       query: (imageId) => ({
-        url: `/user/photo-gallery/${imageId}`,
+        url: `/users/photo-gallery/${imageId}`,
         method: "DELETE",
       }),
       invalidatesTags: ["User"],
     }),
     updateProfileImage: builder.mutation({
       query: (data) => ({
-        url: "/user/profile-image",
+        url: "/users/profile-image",
         method: "POST",
         body: data,
       }),
@@ -51,7 +51,7 @@ export const profileApi = baseApi.injectEndpoints({
     }),
     updateCoverImage: builder.mutation({
       query: (data) => ({
-        url: "/user/cover-image",
+        url: "/users/cover-image",
         method: "POST",
         body: data,
       }),
@@ -59,7 +59,7 @@ export const profileApi = baseApi.injectEndpoints({
     }),
     updateProfile: builder.mutation({
       query: (data) => ({
-        url: "/user/profile",
+        url: "/users/profile",
         method: "PATCH",
         body: data,
       }),
@@ -67,7 +67,7 @@ export const profileApi = baseApi.injectEndpoints({
     }),
     deleteMyProfile: builder.mutation({
       query: () => ({
-        url: `/user/profile`,
+        url: `/users/profile`,
         method: "DELETE",
       }),
     }),

@@ -1,6 +1,6 @@
 "use client";
 import Image from "next/image";
-import VideoCard from "../../user-profile/user-video-tab/video-card";
+import VideoCard from "../../UserProfilePage/user-profile/user-video-tab/video-card";
 
 interface Media {
   type: "photo" | "video";
@@ -65,7 +65,7 @@ const PostContentRender = ({
                 className="w-full h-full object-cover rounded-xl cursor-pointer"
               />
             ) : (
-                <VideoCard url={media.url} className="w-full h-[360px]" />
+              <VideoCard url={media.url} className="w-full h-[360px]" />
             )}
           </div>
         ))}

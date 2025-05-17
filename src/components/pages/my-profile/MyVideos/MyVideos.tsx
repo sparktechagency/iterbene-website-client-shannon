@@ -1,7 +1,7 @@
 "use client";
 
 import { ChevronDown } from "lucide-react";
-import VideoCard from "../../user-profile/user-video-tab/video-card";
+import VideoCard from "../../UserProfilePage/user-profile/user-video-tab/video-card";
 
 const MyVideos = () => {
   // Sample video URLs and placeholder thumbnails (replace with your actual video URLs and thumbnails)

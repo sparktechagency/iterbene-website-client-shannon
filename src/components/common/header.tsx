@@ -16,10 +16,13 @@ import { IoMdNotificationsOutline } from "react-icons/io";
 import { IoChatboxEllipsesOutline, IoSettingsOutline } from "react-icons/io5";
 import { MdAlternateEmail, MdOutlineNotifications } from "react-icons/md";
 import CustomButton from "../custom/custom-button";
+import useUser from "@/hooks/useUser";
+import { IUser } from "@/types/user.types";
 
 // Define types for dropdown props
 interface DropdownProps {
-  isOpen: boolean
+  user?: IUser;
+  isOpen: boolean;
 }
 
 // Dropdown component for Messages
@@ -96,9 +99,7 @@ const MessagesDropdown: React.FC<DropdownProps> = ({ isOpen }) => {
 };
 
 // Dropdown component for Notifications
-const NotificationsDropdown: React.FC<DropdownProps> = ({
-  isOpen,
-}) => {
+const NotificationsDropdown: React.FC<DropdownProps> = ({ isOpen }) => {
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -230,7 +231,7 @@ const SettingsDropdown: React.FC<DropdownProps> = ({ isOpen }) => {
 };
 
 // Dropdown component for User Profile
-const UserDropdown: React.FC<DropdownProps> = ({ isOpen }) => {
+const UserDropdown: React.FC<DropdownProps> = ({ user, isOpen }) => {
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [isSettingsOpen, setIsSettingsOpen] = useState<boolean>(false);
 
@@ -267,16 +268,19 @@ const UserDropdown: React.FC<DropdownProps> = ({ isOpen }) => {
           className="absolute top-16 right-0 bg-white rounded-xl shadow-md p-6 w-[430px] z-50"
         >
           <div className="flex items-center gap-3 mb-4 bg-[#ECFCFA] p-4 rounded-xl">
-            <Image
-              src="https://i.ibb.co.com/hFTPRsW0/0de9d1146da18068833210d399cd593e.jpg"
-              width={40}
-              height={40}
-              className="size-14 rounded-full"
-              alt="user"
-            />
+            {user?.profileImage && (
+              <Image
+                src={user?.profileImage}
+                width={40}
+                height={40}
+                className="size-14 rounded-full"
+                alt="user"
+              />
+            )}
+
             <div>
-              <p className="font-medium">Alexandra Brooke</p>
-              <p className="text-sm text-gray-500">@alexandrabroke</p>
+              <p className="font-medium">{user?.fullName}</p>
+              <p className="text-sm text-gray-500">@{user?.username}</p>
             </div>
           </div>
           <div className="space-y-3">
@@ -347,13 +351,9 @@ const UserDropdown: React.FC<DropdownProps> = ({ isOpen }) => {
                 <IoSettingsOutline size={24} />
                 <span>Settings</span>
               </button>
-              <SettingsDropdown
-                isOpen={isSettingsOpen}
-              />
+              <SettingsDropdown isOpen={isSettingsOpen} />
             </div>
-            <button
-              className="w-full cursor-pointer flex items-center px-4 py-3 gap-4 text-red-500 hover:bg-gray-100 rounded-xl"
-            >
+            <button className="w-full cursor-pointer flex items-center px-4 py-3 gap-4 text-red-500 hover:bg-gray-100 rounded-xl">
               <BiLogOut size={24} />
               <span>Logout</span>
             </button>
@@ -366,7 +366,7 @@ const UserDropdown: React.FC<DropdownProps> = ({ isOpen }) => {
 
 // Header Component
 const Header: React.FC = () => {
-  const user: boolean = true;
+  const user = useUser();
   const [isMessagesOpen, setIsMessagesOpen] = useState<boolean>(false);
   const [isNotificationsOpen, setIsNotificationsOpen] =
     useState<boolean>(false);
@@ -444,9 +444,7 @@ const Header: React.FC = () => {
               >
                 <BsChatSquareDots size={24} />
               </button>
-              <MessagesDropdown
-                isOpen={isMessagesOpen}
-              />
+              <MessagesDropdown isOpen={isMessagesOpen} />
             </div>
             <div ref={notificationsRef}>
               <button
@@ -455,8 +453,7 @@ const Header: React.FC = () => {
               >
                 <IoMdNotificationsOutline size={28} />
               </button>
-              <NotificationsDropdown
-                isOpen={isNotificationsOpen} />
+              <NotificationsDropdown isOpen={isNotificationsOpen} />
             </div>
             <div ref={userRef}>
               <Image
@@ -467,7 +464,7 @@ const Header: React.FC = () => {
                 className="size-14 ring ring-[#40E0D0] rounded-full cursor-pointer"
                 alt="userImage"
               />
-              <UserDropdown isOpen={isUserOpen} />
+              <UserDropdown user={user} isOpen={isUserOpen} />
             </div>
           </div>
         ) : (

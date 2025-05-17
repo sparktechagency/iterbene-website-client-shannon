@@ -11,7 +11,6 @@ const useUser = () => {
     // Only fetch data if the access token is valid
     skip: !accessToken || isTokenExpired(accessToken),
   });
-
   if (isError || !response?.data?.attributes) {
     return null;
   }

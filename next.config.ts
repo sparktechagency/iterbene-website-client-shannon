@@ -10,8 +10,16 @@ const nextConfig: NextConfig = {
     },
   ],
   images: {
-    domains: ["i.ibb.co.com","images.unsplash.com","randomuser.me","i.postimg.cc","images.pexels.com","api.dicebear.com"],
-  }
+    domains: [
+      "marray-meet.s3.eu-north-1.amazonaws.com",
+      "i.ibb.co.com",
+      "images.unsplash.com",
+      "randomuser.me",
+      "i.postimg.cc",
+      "images.pexels.com",
+      "api.dicebear.com",
+    ],
+  },
 };
 
 export default nextConfig;

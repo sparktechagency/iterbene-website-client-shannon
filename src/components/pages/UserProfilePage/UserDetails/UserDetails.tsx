@@ -1,4 +1,4 @@
-const UserDetailsTab = () => {
+const UserDetails = () => {
   // User details data
   const userDetails = {
     firstName: "Alexandra",
@@ -77,4 +77,4 @@ const UserDetailsTab = () => {
   );
 };
 
-export default UserDetailsTab;
+export default UserDetails;
