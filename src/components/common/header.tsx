@@ -267,22 +267,24 @@ const UserDropdown: React.FC<DropdownProps> = ({ user, isOpen }) => {
           transition={{ duration: 0.2 }}
           className="absolute top-16 right-0 bg-white rounded-xl shadow-md p-6 w-[430px] z-50"
         >
-          <div className="flex items-center gap-3 mb-4 bg-[#ECFCFA] p-4 rounded-xl">
-            {user?.profileImage && (
-              <Image
-                src={user?.profileImage}
-                width={40}
-                height={40}
-                className="size-14 rounded-full"
-                alt="user"
-              />
-            )}
+          <Link href={`/${user?.username}`}>
+            <div className="flex items-center gap-3 mb-4 bg-[#ECFCFA] p-4 rounded-xl">
+              {user?.profileImage && (
+                <Image
+                  src={user?.profileImage}
+                  width={40}
+                  height={40}
+                  className="size-14 rounded-full"
+                  alt="user"
+                />
+              )}
 
-            <div>
-              <p className="font-medium">{user?.fullName}</p>
-              <p className="text-sm text-gray-500">@{user?.username}</p>
+              <div>
+                <p className="font-medium">{user?.fullName}</p>
+                <p className="text-sm text-gray-500">@{user?.username}</p>
+              </div>
             </div>
-          </div>
+          </Link>
           <div className="space-y-3">
             <Link
               href="/my-profile"

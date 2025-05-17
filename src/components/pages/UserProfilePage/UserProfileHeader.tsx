@@ -4,7 +4,7 @@ import React from "react";
 
 const UserProfileHeader = () => {
   return (
-    <div className="w-full bg-white rounded-2xl relative pt-[112px]">
+    <div className="w-full bg-white rounded-2xl relative mt-[100px]">
       {/* Background Image */}
       <Image
         src="https://i.ibb.co.com/VYZRgvqT/background-image.jpg"
