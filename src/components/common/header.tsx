@@ -459,7 +459,7 @@ const Header: React.FC = () => {
             </div>
             <div ref={userRef}>
               <Image
-                src="https://i.ibb.co.com/hFTPRsW0/0de9d1146da18068833210d399cd593e.jpg"
+                src={user?.profileImage}
                 width={56}
                 height={56}
                 onClick={toggleUser}
