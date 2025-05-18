@@ -26,7 +26,7 @@ const MyProfileInfo = ({ userData }: { userData: IUser }) => {
           Joined
         </h1>
         <h1 className="text-[#9194A9]">
-         {userData?.createdAt && moment(userData?.createdAt).fromNow()}
+          {moment(userData?.createdAt).format("DD-MM-YYYY")}
         </h1>
       </div>
       <div className="flex flex-col md:flex-row gap-1 md:gap-5">

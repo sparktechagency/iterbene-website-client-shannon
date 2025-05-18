@@ -33,7 +33,7 @@ const MyProfileDetails = ({userData} : {userData: IUser}) => {
             </button>
           </div>
         )}
-        {editMode ? <EditMyProfileDetails userData={userData} /> : <MyProfileInfo userData={userData} />}
+        {editMode ? <EditMyProfileDetails userData={userData}  setEditMode={setEditMode} /> : <MyProfileInfo userData={userData} />}
       </div>
     </section>
   );

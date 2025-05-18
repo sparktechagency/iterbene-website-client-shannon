@@ -18,29 +18,6 @@ export const profileApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["User"],
     }),
-    fillUpUserInfo: builder.mutation({
-      query: (data) => ({
-        url: "/users/profile",
-        method: "POST",
-        body: data,
-      }),
-      invalidatesTags: ["User"],
-    }),
-    addOrUpdatePhotoGallery: builder.mutation({
-      query: (data) => ({
-        url: "/users/photo-gallery",
-        method: "POST",
-        body: data,
-      }),
-      invalidatesTags: ["User"],
-    }),
-    deletePhotoGallery: builder.mutation({
-      query: (imageId) => ({
-        url: `/users/photo-gallery/${imageId}`,
-        method: "DELETE",
-      }),
-      invalidatesTags: ["User"],
-    }),
     updateProfileImage: builder.mutation({
       query: (data) => ({
         url: "/users/profile-image",
@@ -77,9 +54,6 @@ export const profileApi = baseApi.injectEndpoints({
 export const {
   useGetMyProfileQuery,
   useSetLatestLocationMutation,
-  useFillUpUserInfoMutation,
-  useAddOrUpdatePhotoGalleryMutation,
-  useDeletePhotoGalleryMutation,
   useUpdateProfileImageMutation,
   useUpdateCoverImageMutation,
   useUpdateProfileMutation,

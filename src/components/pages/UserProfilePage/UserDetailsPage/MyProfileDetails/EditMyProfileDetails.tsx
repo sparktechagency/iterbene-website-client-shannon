@@ -2,14 +2,29 @@ import CustomButton from "@/components/custom/custom-button";
 import CustomForm from "@/components/custom/custom-form";
 import CustomInput from "@/components/custom/custom-input";
 import CustomSelectField from "@/components/custom/custom-seletectField";
+import { useUpdateProfileMutation } from "@/redux/features/profile/profileApi";
 import { IUser } from "@/types/user.types";
 import { editProfileValidationSchema } from "@/validation/user.validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FieldValues } from "react-hook-form";
+import toast from "react-hot-toast";
 
-const EditMyProfileDetails = ({ userData }: { userData: IUser }) => {
-  const handleEditProfileInformation = (values: FieldValues) => {
-    console.log(values);
+interface IEditMyProfileDetailsProps {
+  userData: IUser;
+  setEditMode: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+const EditMyProfileDetails = ({ userData, setEditMode }: IEditMyProfileDetailsProps) => {
+  const [updateProfile, { isLoading }] = useUpdateProfileMutation();
+  const handleEditProfileInformation = async (values: FieldValues) => {
+    try {
+      const res = await updateProfile(values).unwrap();
+      toast.success(res?.message);
+      setEditMode(false);
+    } catch (error) {
+      const err = error as Error;
+      toast.error(err?.message || "Something went wrong!");
+    }
   };
   return (
     <section className="w-full grid grid-cols-1 md:grid-cols-3 gap-4 mt-8 ">
@@ -32,7 +47,7 @@ const EditMyProfileDetails = ({ userData }: { userData: IUser }) => {
             />
             <CustomInput
               type="text"
-              name="nickName"
+              name="nickname"
               placeholder="Enter your nick name"
               label="Nick Name"
             />
@@ -89,7 +104,7 @@ const EditMyProfileDetails = ({ userData }: { userData: IUser }) => {
               required
               placeholder="How did you know about us"
             />
-         <CustomSelectField
+            <CustomSelectField
               items={[
                 "13-17",
                 "18-24",
@@ -135,10 +150,22 @@ const EditMyProfileDetails = ({ userData }: { userData: IUser }) => {
             />
           </div>
           <div className="mt-6 flex flex-col md:flex-row gap-4">
-            <CustomButton type="button" variant="outline" className="px-9 py-3" fullWidth>
+            <CustomButton
+              type="button"
+              variant="outline"
+              onClick={() => setEditMode(false)}
+              className="px-9 py-3"
+              fullWidth
+            >
               Cancel
             </CustomButton>
-            <CustomButton type="submit" variant="default" className="px-9 py-3" fullWidth>
+            <CustomButton
+              loading={isLoading}
+              type="submit"
+              variant="default"
+              className="px-9 py-3"
+              fullWidth
+            >
               Save
             </CustomButton>
           </div>

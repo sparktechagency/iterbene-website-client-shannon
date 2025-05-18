@@ -84,7 +84,7 @@ const CustomSelectField = ({
               {icon && <div className="pl-2">{icon}</div>}
               <button
                 type="button"
-                className={`w-full text-left outline-none font-medium text-[#878B93] ${inputSizeClass}`}
+                className={`w-full text-left outline-none font-medium  ${inputSizeClass}`}
               >
                 {selectedItem || field.value || placeholder}
               </button>

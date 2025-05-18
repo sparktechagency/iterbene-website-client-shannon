@@ -8,6 +8,7 @@ export interface IUser {
   email?: string;
   phoneNumber?: string;
   referredAs?: string;
+  address?: string;
   ageRange?: string;
   country?: string;
   city?: string;
