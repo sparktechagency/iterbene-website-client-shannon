@@ -64,15 +64,26 @@ const StoriesModal: React.FC<StoriesModalProps> = ({
             }
           }
         }
-        return prev + (100 / (duration / 100));
+        return prev + 100 / (duration / 100);
       });
     }, 100);
 
     return () => clearInterval(interval);
-  }, [currentImageIndex, totalMedia, isPaused, selectedStoryIndex, stories.length, onClose, setSelectedStoryIndex]);
+  }, [
+    currentImageIndex,
+    totalMedia,
+    isPaused,
+    selectedStoryIndex,
+    stories.length,
+    onClose,
+    setSelectedStoryIndex,
+  ]);
 
   useEffect(() => {
-    if (currentStory.media[currentImageIndex].type === "video" && videoRef.current) {
+    if (
+      currentStory.media[currentImageIndex].type === "video" &&
+      videoRef.current
+    ) {
       setIsPaused(true);
       const video = videoRef.current;
       video.onended = () => {
@@ -120,14 +131,20 @@ const StoriesModal: React.FC<StoriesModalProps> = ({
 
   const handlePause = () => {
     setIsPaused(true);
-    if (currentStory.media[currentImageIndex].type === "video" && videoRef.current) {
+    if (
+      currentStory.media[currentImageIndex].type === "video" &&
+      videoRef.current
+    ) {
       videoRef.current.pause();
     }
   };
 
   const handleResume = () => {
     setIsPaused(false);
-    if (currentStory.media[currentImageIndex].type === "video" && videoRef.current) {
+    if (
+      currentStory.media[currentImageIndex].type === "video" &&
+      videoRef.current
+    ) {
       videoRef.current.play().catch((error) => {
         console.error("Video playback failed:", error);
       });
@@ -146,7 +163,7 @@ const StoriesModal: React.FC<StoriesModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center">
+    <div className="fixed inset-0 bg-[#1A1A1A]  z-50 flex items-center justify-center">
       <div className="relative w-full max-w-md h-[80vh] flex flex-col">
         <button
           onClick={onClose}

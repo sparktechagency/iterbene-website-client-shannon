@@ -3,7 +3,7 @@ import ContactList from "@/components/pages/home/contact-list/contacts-list";
 import CreatePost from "@/components/pages/home/create-post/create-post";
 import FriendRequest from "@/components/pages/home/friend-request/friend-request";
 import Posts from "@/components/pages/home/posts/posts";
-import Stories from "@/components/pages/stories/stories";
+import Stories from "@/components/pages/home/stories/stories";
 
 
 
