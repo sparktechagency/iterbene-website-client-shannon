@@ -3,7 +3,7 @@ import Link from "next/link";
 import React from "react";
 import { FaCalendarCheck, FaHeart } from "react-icons/fa";
 import { RiMessage2Fill } from "react-icons/ri";
-import UserTimelineContentRender from "./user-timeline-content-render";
+import UserTimelineContentRender from "./UserTimelineContentRender";
 import UserTimelineHeader from "./UserTimelineHeader";
 interface UserTimelineCardProps {
   post: IPost;

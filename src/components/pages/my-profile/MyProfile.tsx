@@ -1,7 +1,7 @@
 import { Tabs } from "antd";
 import Image from "next/image";
 import React from "react";
-import MyProfileDetails from "./MyProfileDetails/MyProfileDetails";
+import MyProfileDetails from "../UserProfilePage/UserDetailsPage/MyProfileDetails/MyProfileDetails";
 import MyProfileTimeline from "./MyProfileTimeline/MyProfileTimeline";
 import MyConnections from "./MyConnections/MyConnections";
 import MyGroups from "./MyGroups/MyGroups";

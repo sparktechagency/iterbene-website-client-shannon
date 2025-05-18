@@ -1,5 +1,5 @@
 "use client";
-import VideoCard from "./video-card";
+import VideoCard from "./VideoCard";
 
 const UserVideoTab = () => {
   // Sample video URLs and placeholder thumbnails (replace with your actual video URLs and thumbnails)

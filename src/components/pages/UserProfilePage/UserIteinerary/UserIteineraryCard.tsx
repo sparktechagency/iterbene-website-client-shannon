@@ -6,7 +6,7 @@ import React, { useState } from "react";
 import { FaCalendarCheck, FaHeart } from "react-icons/fa";
 import { IoClose } from "react-icons/io5";
 import { RiMessage2Fill } from "react-icons/ri";
-import UserItineraryHeader from "./user-itinerary-header";
+import UserItineraryHeader from "./UserIteineraryHeader";
 
 interface UserTimelineCardProps {
   post: IPost;

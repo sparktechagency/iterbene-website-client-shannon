@@ -1,6 +1,6 @@
 "use client";
 import Image from "next/image";
-import VideoCard from "../../UserProfilePage/user-profile/user-video-tab/video-card";
+import VideoCard from "../../UserProfilePage/UserVideos/VideoCard";
 
 interface Media {
   type: "photo" | "video";

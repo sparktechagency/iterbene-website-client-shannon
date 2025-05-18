@@ -1,7 +1,7 @@
-import UserDetailsTab from "@/components/pages/UserProfilePage/UserDetails/UserDetails";
+import UserDetailsPage from "@/components/pages/UserProfilePage/UserDetailsPage/UserDetailsPage";
 
 const page = () => {
-  return <UserDetailsTab />;
+  return <UserDetailsPage />;
 };
 
 export default page;

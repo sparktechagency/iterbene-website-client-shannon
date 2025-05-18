@@ -1,7 +1,7 @@
 'use client';
 import { IPost } from "@/types/post.types";
 import React from "react";
-import UserItineraryCard from "./user-itinerary-card";
+import UserItineraryCard from "./UserIteineraryCard";
 
 
 const UserItineraryTab = () => {

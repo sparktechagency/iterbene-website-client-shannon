@@ -4,26 +4,34 @@ import { useParams } from "next/navigation";
 import { useGetSingleUserQuery } from "@/redux/features/users/userApi";
 import NotFoundPage from "../not-found-page/not-found-page";
 import Header from "@/components/common/header";
-import UserProfileHeader from "./UserProfileHeader";
+import UserProfileHeader from "./UserProfileHeader/UserProfileHeader";
+import useUser from "@/hooks/useUser";
+import MyProfileHeader from "./MyProfileHeader/MyProfileHeader";
 
 const UserProfileInformationPage = ({
   children,
 }: {
   children: React.ReactNode;
 }) => {
+  const user = useUser();
   const { userName } = useParams();
   const { data: responseData } = useGetSingleUserQuery(userName, {
     refetchOnMountOrArgChange: true,
     skip: !userName,
   });
   const userData = responseData?.data?.attributes;
+  const isMyProfile = user?._id === userData?._id;
   return (
     <>
       {userData ? (
         <section className="w-full bg-[#F5F5F5]">
           <Header />
           <div className="container mx-auto space-y-8 pb-10">
-            <UserProfileHeader userData={userData} />
+            {isMyProfile ? (
+              <MyProfileHeader userData={userData} />
+            ) : (
+              <UserProfileHeader userData={userData} />
+            )}
             {children}
           </div>
         </section>
