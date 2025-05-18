@@ -10,8 +10,10 @@ export interface IUser {
   referredAs?: string;
   age?: number;
   profession?: string;
-  maritalStatus?: 'single' | 'married' | 'divorced' | 'widowed';
-  role?: 'user' | 'admin' | 'moderator';
+  maritalStatus?: string;
+  role?: string;
+  followersCount?: number;
+  followingCount?: number;
   isOnline?: boolean;
   createdAt?: Date;
 }
