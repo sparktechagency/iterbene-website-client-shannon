@@ -16,7 +16,7 @@ const UserDetailsPage = () => {
   const userData = responseData?.data?.attributes;
   const isMyProfile =
     user?._id === userData?._id || user?.username === userData?.username;
-  return <>{isMyProfile ? <MyProfileDetails /> : <UserDetails />}</>;
+  return <>{isMyProfile ? <MyProfileDetails userData={userData} /> : <UserDetails userData={userData} />}</>;
 };
 
 export default UserDetailsPage;

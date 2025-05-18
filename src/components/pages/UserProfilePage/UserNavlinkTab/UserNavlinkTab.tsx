@@ -33,14 +33,14 @@ const UserNavlinkTab = ({ isMyProfile }: { isMyProfile: boolean }) => {
   const activeTabIndex = tabs.findIndex(tab => tab.path === pathname);
 
   return (
-    <div className="bg-gray-100 border-b border-gray-200 overflow-x-auto">
+    <div className="bg-gray-100  border-gray-200 overflow-x-auto">
       <nav className="flex space-x-6 px-4 py-2">
         {tabs.map((tab, index) => (
           <div key={tab.name} className="relative">
             <Link href={tab.path}>
               <motion.div
                 className={`text-sm font-medium pb-2 transition-colors duration-200 ${
-                  pathname === tab.path ? "text-gray-900" : "text-gray-600 hover:text-gray-900"
+                  pathname === tab.path ? "text-primary" : "text-gray-600 hover:text-primary"
                 }`}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}

@@ -1,16 +1,27 @@
+import CustomButton from "@/components/custom/custom-button";
 import CustomForm from "@/components/custom/custom-form";
 import CustomInput from "@/components/custom/custom-input";
 import CustomSelectField from "@/components/custom/custom-seletectField";
+import { IUser } from "@/types/user.types";
+import { editProfileValidationSchema } from "@/validation/user.validation";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { FieldValues } from "react-hook-form";
 
-const EditMyProfileDetails = () => {
-  const handleEditProfileInformation = () => {};
+const EditMyProfileDetails = ({ userData }: { userData: IUser }) => {
+  const handleEditProfileInformation = (values: FieldValues) => {
+    console.log(values);
+  };
   return (
     <section className="w-full grid grid-cols-1 md:grid-cols-3 gap-4 mt-8 ">
       <div className="w-full col-span-2 border border-[#E2E8F0] shadow p-4">
         <div className="border-b border-[#E2E8F0] pb-4 mb-4">
           <h1 className="text-xl font-semibold">Personal Information</h1>
         </div>
-        <CustomForm onSubmit={handleEditProfileInformation}>
+        <CustomForm
+          onSubmit={handleEditProfileInformation}
+          defaultValues={userData}
+          resolver={zodResolver(editProfileValidationSchema)}
+        >
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <CustomInput
               type="text"
@@ -27,7 +38,7 @@ const EditMyProfileDetails = () => {
             />
             <CustomInput
               type="text"
-              name="userName"
+              name="username"
               required
               placeholder="Enter your username"
               label="Username"
@@ -51,12 +62,14 @@ const EditMyProfileDetails = () => {
             <CustomInput
               type="text"
               name="country"
+              required
               placeholder="Enter your country"
               label="Country"
             />
             <CustomInput
               type="text"
               name="city"
+              required
               placeholder="Enter your city"
               label="City"
             />
@@ -76,8 +89,7 @@ const EditMyProfileDetails = () => {
               required
               placeholder="How did you know about us"
             />
-
-            <CustomSelectField
+         <CustomSelectField
               items={[
                 "13-17",
                 "18-24",
@@ -96,6 +108,7 @@ const EditMyProfileDetails = () => {
             <CustomInput
               type="text"
               name="profession"
+              required
               placeholder="Enter your profession"
               label="Profession"
             />
@@ -114,12 +127,20 @@ const EditMyProfileDetails = () => {
                 "Undisclosed",
                 "Widowed",
               ]}
-              name="relationshipStatus"
+              required
+              name="maritalStatus"
               label="Relationship Status"
               size="md"
-              required
               placeholder="What is your marital status"
             />
+          </div>
+          <div className="mt-6 flex flex-col md:flex-row gap-4">
+            <CustomButton type="button" variant="outline" className="px-9 py-3" fullWidth>
+              Cancel
+            </CustomButton>
+            <CustomButton type="submit" variant="default" className="px-9 py-3" fullWidth>
+              Save
+            </CustomButton>
           </div>
         </CustomForm>
       </div>

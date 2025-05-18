@@ -2,7 +2,8 @@
 import { useState } from "react";
 import MyProfileInfo from "./MyProfileInfo";
 import EditMyProfileDetails from "./EditMyProfileDetails";
-const MyProfileDetails = () => {
+import { IUser } from "@/types/user.types";
+const MyProfileDetails = ({userData} : {userData: IUser}) => {
   const [editMode, setEditMode] = useState<boolean>(false);
 
   return (
@@ -32,7 +33,7 @@ const MyProfileDetails = () => {
             </button>
           </div>
         )}
-        {editMode ? <EditMyProfileDetails /> : <MyProfileInfo />}
+        {editMode ? <EditMyProfileDetails userData={userData} /> : <MyProfileInfo userData={userData} />}
       </div>
     </section>
   );
