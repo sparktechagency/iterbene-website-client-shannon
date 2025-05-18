@@ -5,7 +5,7 @@ import CustomSelectField from "@/components/custom/custom-seletectField";
 const EditMyProfileDetails = () => {
   const handleEditProfileInformation = () => {};
   return (
-    <section className="w-full grid grid-cols-1 md:grid-cols-3 gap-4 mt-8 " >
+    <section className="w-full grid grid-cols-1 md:grid-cols-3 gap-4 mt-8 ">
       <div className="w-full col-span-2 border border-[#E2E8F0] shadow p-4">
         <div className="border-b border-[#E2E8F0] pb-4 mb-4">
           <h1 className="text-xl font-semibold">Personal Information</h1>
@@ -15,16 +15,9 @@ const EditMyProfileDetails = () => {
             <CustomInput
               type="text"
               required
-              name="firstName"
-              placeholder="Enter your first name"
-              label="First Name"
-            />
-            <CustomInput
-              type="text"
-              required
-              name="lastName"
-              placeholder="Enter your last name"
-              label="Last Name"
+              name="fullName"
+              placeholder="Enter your full name"
+              label="Full Name"
             />
             <CustomInput
               type="text"
@@ -54,6 +47,13 @@ const EditMyProfileDetails = () => {
               placeholder="Enter your phone number"
               label="Phone Number"
             />
+            {/* country */}
+            <CustomInput
+              type="text"
+              name="country"
+              placeholder="Enter your country"
+              label="Country"
+            />
             <CustomInput
               type="text"
               name="city"
@@ -69,34 +69,25 @@ const EditMyProfileDetails = () => {
             />
             {/* Referred as */}
             <CustomSelectField
-             items={
-              [
-                "Friend",
-                "Family",
-                "Colleague",
-                "Acquaintance",
-                "Other",
-              ]
-             }
-             name="referredAs"
+              items={["He/Him", "She/Her", "They/Them", "Undisclosed"]}
+              name="referredAs"
               label="Referred As"
               size="md"
               required
               placeholder="How did you know about us"
             />
-            
+
             <CustomSelectField
-             items={
-              [
+              items={[
+                "13-17",
                 "18-24",
                 "25-34",
                 "35-44",
                 "45-54",
                 "55-64",
                 "65+",
-              ]
-             }
-             name="ageRange"
+              ]}
+              name="ageRange"
               label="Age Range"
               size="md"
               required
@@ -110,16 +101,20 @@ const EditMyProfileDetails = () => {
             />
             {/* Relationship status */}
             <CustomSelectField
-             items={
-              [
-                "Single",
-                "Married",
+              items={[
                 "Divorced",
-                "Separated",
+                "Domestic Partnership",
+                "Engaged",
+                "In a Relationship",
+                "It's Complicated",
+                "Looking",
+                "Married",
+                "Married with child/children",
+                "Single",
+                "Undisclosed",
                 "Widowed",
-              ]
-             }
-             name="relationshipStatus"
+              ]}
+              name="relationshipStatus"
               label="Relationship Status"
               size="md"
               required

@@ -7,6 +7,7 @@ import Header from "@/components/common/header";
 import UserProfileHeader from "./UserProfileHeader/UserProfileHeader";
 import useUser from "@/hooks/useUser";
 import MyProfileHeader from "./MyProfileHeader/MyProfileHeader";
+import UserNavlinkTab from "./UserNavlinkTab/UserNavlinkTab";
 
 const UserProfileInformationPage = ({
   children,
@@ -32,8 +33,9 @@ const UserProfileInformationPage = ({
             ) : (
               <UserProfileHeader userData={userData} />
             )}
+            <UserNavlinkTab isMyProfile={isMyProfile} />
             {children}
-          </div>
+          </div>   
         </section>
       ) : (
         <NotFoundPage />
