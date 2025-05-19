@@ -31,6 +31,7 @@ import { useCreateItineraryMutation } from "@/redux/features/itinerary/itinerary
 import toast from "react-hot-toast";
 import { TError } from "@/types/error";
 import { useCreatePostMutation } from "@/redux/features/post/postApi";
+import { useGetHashtagPostsQuery } from "@/redux/features/hashtag/hashtagApi";
 
 export interface FilePreview {
   name: string;
@@ -42,27 +43,41 @@ const CreatePost = () => {
   const user = useUser();
   // State for post content
   const [post, setPost] = useState<string>("");
+  // State for hashtag suggestions
+  const [hashtagQuery, setHashtagQuery] = useState<string>("");
+  const [showHashtagSuggestions, setShowHashtagSuggestions] = useState<boolean>(false);
+  const hashtagPopupRef = useRef<HTMLDivElement>(null);
 
-  // use form
+  // Use form
   const methods = useForm();
   const { reset } = methods;
+
   // State for location
   const [selectedLocation, setSelectedLocation] = useState<string | null>(null);
   const [showLocationPopup, setShowLocationPopup] = useState<boolean>(false);
   const [locationSearch, setLocationSearch] = useState<string>("");
+
   // State for privacy
   const [privacy, setPrivacy] = useState<string>("public");
   const [showPrivacyPopup, setShowPrivacyPopup] = useState<boolean>(false);
+
   // State for media
   const [media, setMedia] = useState<File[]>([]);
   const [mediaPreviews, setMediaPreviews] = useState<FilePreview[]>([]);
+
   // State for itinerary
   const [showItineraryModal, setShowItineraryModal] = useState(false);
   const [itineraryId, setItineraryId] = useState<string>("");
   const [createItinerary, { isLoading }] = useCreateItineraryMutation();
 
-  //post
+  // Post
   const [createPost, { isLoading: isCreatingPost }] = useCreatePostMutation();
+
+  // Hashtag query
+  const { data: hashtagData, isFetching: isHashtagFetching } = useGetHashtagPostsQuery(hashtagQuery, {
+    skip: !hashtagQuery, // Skip query if hashtagQuery is empty
+  });
+
   // Refs
   const mediaInputRef = useRef<HTMLInputElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -70,9 +85,8 @@ const CreatePost = () => {
   const privacyPopupRef = useRef<HTMLDivElement>(null);
   const swiperRef = useRef<SwiperClass>(null);
 
-  // pdf modal
+  // PDF modal
   const [showPdfModal, setShowPdfModal] = useState(false);
-  const [uploadedPdf, setUploadedPdf] = useState<File | null>(null);
   const pdfInputRef = useRef<HTMLInputElement>(null);
 
   // Auto-resize textarea
@@ -99,6 +113,12 @@ const CreatePost = () => {
       ) {
         setShowPrivacyPopup(false);
       }
+      if (
+        hashtagPopupRef.current &&
+        !hashtagPopupRef.current.contains(event.target as Node)
+      ) {
+        setShowHashtagSuggestions(false);
+      }
     };
 
     document.addEventListener("mousedown", handleClickOutside);
@@ -107,9 +127,49 @@ const CreatePost = () => {
     };
   }, []);
 
-  // Handle post input change
+  // Handle post input change and detect hashtags
   const postChangeHandler = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setPost(e.target.value);
+    const value = e.target.value;
+    setPost(value);
+
+    // Detect hashtag input (e.g., #nic)
+    const cursorPosition = e.target.selectionStart || 0;
+    const textBeforeCursor = value.slice(0, cursorPosition);
+    const lastWord = textBeforeCursor.split(/\s+/).pop() || "";
+
+    if (lastWord.startsWith("#") && lastWord.length > 1) {
+      const query = lastWord.slice(1).toLowerCase(); // Remove # and normalize
+      setHashtagQuery(query);
+      setShowHashtagSuggestions(true);
+    } else {
+      setHashtagQuery("");
+      setShowHashtagSuggestions(false);
+    }
+  };
+
+  // Handle hashtag selection
+  const handleHashtagSelect = (hashtag: string) => {
+    const cursorPosition = textareaRef.current?.selectionStart || 0;
+    const textBeforeCursor = post.slice(0, cursorPosition);
+    const textAfterCursor = post.slice(cursorPosition);
+    const lastWord = textBeforeCursor.split(/\s+/).pop() || "";
+    const wordStartIndex = textBeforeCursor.length - lastWord.length;
+
+    // Replace the partial hashtag with the selected one
+    const newPost =
+      post.slice(0, wordStartIndex) + `#${hashtag} ` + textAfterCursor;
+    setPost(newPost);
+    setHashtagQuery("");
+    setShowHashtagSuggestions(false);
+
+    // Refocus textarea and set cursor after the hashtag
+    setTimeout(() => {
+      if (textareaRef.current) {
+        textareaRef.current.focus();
+        const newCursorPos = wordStartIndex + hashtag.length + 2; // +2 for # and space
+        textareaRef.current.setSelectionRange(newCursorPos, newCursorPos);
+      }
+    }, 0);
   };
 
   // Mock location search results (replace with real API in production)
@@ -194,7 +254,6 @@ const CreatePost = () => {
   };
 
   // Create new post
-
   const handleCreatePost = async () => {
     const visitedLocation = {
       latitude: 500000,
@@ -226,6 +285,7 @@ const CreatePost = () => {
 
   // Fallback profile image
   const defaultProfileImage = "/default-profile.png";
+
   return (
     <section className="w-full bg-white rounded-xl">
       {/* Post Input Section */}
@@ -247,13 +307,44 @@ const CreatePost = () => {
             className="size-[50px] rounded-full object-cover flex-shrink-0"
           />
         )}
-        <textarea
-          ref={textareaRef}
-          placeholder={`What's new, ${user?.fullName || "User"}?`}
-          value={post}
-          onChange={postChangeHandler}
-          className="w-full bg-transparent border-none text-justify mt-3 text-base focus:outline-none text-gray-800 placeholder-gray-400 resize-none"
-        />
+        <div className="relative w-full">
+          <textarea
+            ref={textareaRef}
+            placeholder={`What's new, ${user?.fullName || "User"}?`}
+            value={post}
+            onChange={postChangeHandler}
+            className="w-full bg-transparent border-none text-justify mt-3 text-base focus:outline-none text-gray-800 placeholder-gray-400 resize-none"
+          />
+          {/* Hashtag Suggestions Popup */}
+          <AnimatePresence>
+            {showHashtagSuggestions && (
+              <motion.div
+                ref={hashtagPopupRef}
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                className="absolute top-full left-0 bg-white rounded-2xl shadow-xl p-4 border border-gray-200 w-80 z-20 max-h-40 overflow-y-auto"
+              >
+                {isHashtagFetching ? (
+                  <p className="text-sm text-[#9194A9]">Loading hashtags...</p>
+                ) : hashtagData?.data?.attributes?.results?.length > 0 ? (
+                   hashtagData?.data?.attributes?.results?.map((hashtag: { name: string,postCount: number }, index: number) => (
+                    <div
+                      key={index}
+                      onClick={() => handleHashtagSelect(hashtag?.name)}
+                      className="flex flex-col px-3 py-1 hover:bg-gray-50 cursor-pointer rounded-md transition-colors"
+                    >
+                      <span className="text-base text-gray-900 font-semibold">#{hashtag.name}</span>
+                      <p className="text-sm text-[#9194A9]">{hashtag?.postCount} posts</p>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-sm text-[#9194A9]">No hashtags found</p>
+                )}
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
         <button
           onClick={handleCreatePost}
           disabled={!post && media.length === 0}
@@ -298,7 +389,7 @@ const CreatePost = () => {
         {mediaPreviews.length > 0 && (
           <>
             <Swiper
-              modules={[Pagination]} // removed Navigation
+              modules={[Pagination]}
               onSwiper={(swiper) => {
                 swiperRef.current = swiper;
               }}
@@ -361,7 +452,7 @@ const CreatePost = () => {
 
       {/* Additional Options Section */}
       {(post || media.length > 0 || selectedLocation) && (
-        <div className="flex flex-col gap-4 mt-4 ">
+        <div className="flex flex-col gap-4 mt-4">
           {/* Selected Location and Privacy Display */}
           <div className="flex items-center gap-4 px-4">
             <AnimatePresence>
@@ -560,11 +651,6 @@ const CreatePost = () => {
               type="file"
               accept="application/pdf"
               ref={pdfInputRef}
-              onChange={(e) => {
-                if (e.target.files && e.target.files[0]) {
-                  setUploadedPdf(e.target.files[0]);
-                }
-              }}
               className="hidden"
             />
             <BsUpload size={28} className="text-secondary mx-auto my-2" />
@@ -579,11 +665,6 @@ const CreatePost = () => {
               Browse Files
             </button>
           </div>
-          {uploadedPdf && (
-            <div className="mt-4 text-sm text-gray-600">
-              Selected file: {uploadedPdf.name}
-            </div>
-          )}
           <CustomButton
             fullWidth
             className="mt-6 px-5 py-3"

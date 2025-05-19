@@ -6,6 +6,7 @@ import { TiLocation } from "react-icons/ti";
 import { BsThreeDots } from "react-icons/bs";
 import { IPost } from "@/types/post.types";
 import { Lock, Users } from "lucide-react";
+import moment from "moment";
 
 const PostHeader = ({
   post,
@@ -62,6 +63,29 @@ const PostHeader = ({
     };
   }, []);
 
+  const formatTimeAgo = (createdAt: string | Date) => {
+    if (!createdAt) return "";
+    const now = moment();
+    const postTime = moment(
+      typeof createdAt === "string" ? createdAt : createdAt.toISOString()
+    );
+    const diffSeconds = now.diff(postTime, "seconds");
+    const diffMinutes = now.diff(postTime, "minutes");
+    const diffHours = now.diff(postTime, "hours");
+    const diffDays = now.diff(postTime, "days");
+
+    if (diffSeconds < 60) {
+      return diffSeconds === 1 ? "1 sec ago" : `${diffSeconds} secs ago`;
+    } else if (diffMinutes < 60) {
+      return diffMinutes === 1 ? "1 min ago" : `${diffMinutes} mins ago`;
+    } else if (diffHours < 24) {
+      return diffHours === 1 ? "1 hr ago" : `${diffHours} hrs ago`;
+    } else if (diffDays < 7) {
+      return diffDays === 1 ? "1 day ago" : `${diffDays} days ago`;
+    } else {
+      return postTime.format("MMM D, YYYY"); // Fallback to date format for older posts
+    }
+  };
   return (
     <section className="w-full flex justify-between items-center gap-4">
       <div className="flex items-center mb-3">
@@ -78,10 +102,10 @@ const PostHeader = ({
               {post?.userId?.fullName}
             </p>
             <span className="text-sm">
-              {post?.createdAt ? post.createdAt.toLocaleString() : ""}
+              {post?.createdAt && formatTimeAgo(post?.createdAt)}
             </span>
           </div>
-          <div className="text-sm text-gray-900 flex items-center gap-2 mt-1">
+          <div className="text-sm text-gray-900 flex items-center gap-2 -ml-1 mt-1">
             {post?.visitedLocationName && (
               <>
                 <TiLocation size={28} className="text-primary" />

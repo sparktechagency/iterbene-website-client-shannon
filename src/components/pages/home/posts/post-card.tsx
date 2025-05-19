@@ -43,11 +43,6 @@ const PostCard = ({ post }: PostCardProps) => {
   const sortedReactions = Object.entries(reactions);
 
   // Close modal on outside click
-  const handleOutsideClick = (e: React.MouseEvent) => {
-    if (e.target === e.currentTarget) {
-      setShowDescription(false);
-    }
-  };
 
   return (
     <div className="w-full bg-white rounded-xl p-4 mb-4">

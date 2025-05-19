@@ -7,22 +7,14 @@ interface PostContentRenderProps {
   data: IMedia[];
 }
 
-const PostContentRender = ({
-  setShowDescription,
-  data,
-}: PostContentRenderProps) => {
+const PostContentRender = ({ data }: PostContentRenderProps) => {
   const mediaCount = data?.length;
-
-  // Handle click on the container
-  const handleContainerClick = () => {
-    setShowDescription(true);
-  };
 
   // Single media item
   if (mediaCount === 1) {
     const media = data[0];
     return (
-      <div className="w-full mt-3" onClick={handleContainerClick}>
+      <div className="w-full mt-3">
         {media.mediaType === "image" ? (
           <div className="relative w-full h-56 md:h-[500px] rounded-md overflow-hidden">
             <Image
@@ -43,10 +35,7 @@ const PostContentRender = ({
   // Two media items
   if (mediaCount === 2) {
     return (
-      <div
-        className="grid grid-cols-2 gap-4 mt-3"
-        onClick={handleContainerClick}
-      >
+      <div className="grid grid-cols-2 gap-4 mt-3">
         {data.map((media, index) => (
           <div key={index} className="aspect-square">
             {media?.mediaType === "image" ? (
@@ -69,10 +58,7 @@ const PostContentRender = ({
   // Three media items
   if (mediaCount === 3) {
     return (
-      <div
-        className="grid grid-cols-2 gap-4 mt-3"
-        onClick={handleContainerClick}
-      >
+      <div className="grid grid-cols-2 gap-4 mt-3">
         <div className="row-span-2 col-span-1">
           {data[0]?.mediaType === "image" ? (
             <Image
@@ -118,10 +104,7 @@ const PostContentRender = ({
   // Four media items
   if (mediaCount === 4) {
     return (
-      <div
-        className="grid grid-cols-3 gap-4 mt-3"
-        onClick={handleContainerClick}
-      >
+      <div className="grid grid-cols-3 gap-4 mt-3">
         <div className="row-span-2 col-span-1">
           {data[0]?.mediaType === "image" ? (
             <Image
@@ -180,10 +163,7 @@ const PostContentRender = ({
   // Four media items ++
   if (mediaCount > 4) {
     return (
-      <div
-        className="grid grid-cols-3 gap-4 mt-3"
-        onClick={handleContainerClick}
-      >
+      <div className="grid grid-cols-3 gap-4 mt-3">
         <div className="row-span-2 col-span-1">
           {data[0]?.mediaType === "image" ? (
             <Image

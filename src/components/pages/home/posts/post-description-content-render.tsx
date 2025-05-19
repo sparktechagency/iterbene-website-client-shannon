@@ -1,12 +1,9 @@
 "use client";
 import CustomVideoPlayer from "@/components/custom/custom-video-player";
+import { IMedia } from "@/types/post.types";
 import Image from "next/image";
-interface Media {
-  type: "photo" | "video";
-  url: string;
-}
 interface PostContentRenderProps {
-  data: Media[];
+  data: IMedia[];
 }
 
 const PostDescriptionContentRender = ({ data }: PostContentRenderProps) => {
