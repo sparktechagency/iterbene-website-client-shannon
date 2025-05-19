@@ -8,6 +8,7 @@ const hashtagApi = baseApi.injectEndpoints({
         url: `/hashtag?searchTerm=${hashtag}`,
         method: "GET",
       }),
+      providesTags: ["Hashtag"],
     }),
   }),
 });

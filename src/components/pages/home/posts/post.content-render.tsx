@@ -3,7 +3,6 @@ import Image from "next/image";
 import VideoCard from "../../UserProfilePage/UserVideos/VideoCard";
 import { IMedia } from "@/types/post.types";
 interface PostContentRenderProps {
-  setShowDescription: (value: boolean) => void;
   data: IMedia[];
 }
 

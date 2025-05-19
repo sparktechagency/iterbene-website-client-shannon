@@ -80,7 +80,7 @@ const PostCommentInput: React.FC<PostCommentInputProps> = ({
           height={48}
           className="size-[48px] ring ring-primary rounded-full"
         />
-        <div className="w-full relative px-3 py-4 border flex justify-between items-center border-gray-400 rounded text-sm focus:outline-none focus:ring focus:ring-primary">
+        <div className="w-full relative px-3 py-4 border flex justify-between items-center border-[#DDDDDD] rounded-xl text-sm focus:outline-none focus:ring focus:ring-primary">
           <input
             type="text"
             value={newComment}

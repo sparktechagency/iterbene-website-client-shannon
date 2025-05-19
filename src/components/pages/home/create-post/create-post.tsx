@@ -45,7 +45,8 @@ const CreatePost = () => {
   const [post, setPost] = useState<string>("");
   // State for hashtag suggestions
   const [hashtagQuery, setHashtagQuery] = useState<string>("");
-  const [showHashtagSuggestions, setShowHashtagSuggestions] = useState<boolean>(false);
+  const [showHashtagSuggestions, setShowHashtagSuggestions] =
+    useState<boolean>(false);
   const hashtagPopupRef = useRef<HTMLDivElement>(null);
 
   // Use form
@@ -74,7 +75,7 @@ const CreatePost = () => {
   const [createPost, { isLoading: isCreatingPost }] = useCreatePostMutation();
 
   // Hashtag query
-  const { data: hashtagData, isFetching: isHashtagFetching } = useGetHashtagPostsQuery(hashtagQuery, {
+  const { data: hashtagData } = useGetHashtagPostsQuery(hashtagQuery, {
     skip: !hashtagQuery, // Skip query if hashtagQuery is empty
   });
 
@@ -285,7 +286,6 @@ const CreatePost = () => {
 
   // Fallback profile image
   const defaultProfileImage = "/default-profile.png";
-
   return (
     <section className="w-full bg-white rounded-xl">
       {/* Post Input Section */}
@@ -313,36 +313,43 @@ const CreatePost = () => {
             placeholder={`What's new, ${user?.fullName || "User"}?`}
             value={post}
             onChange={postChangeHandler}
-            className="w-full bg-transparent border-none text-justify mt-3 text-base focus:outline-none text-gray-800 placeholder-gray-400 resize-none"
+            className={`w-full bg-transparent border-none text-justify mt-3 text-base focus:outline-none ${
+              post.includes("#") ? "color-[#3B82F6]" : ""
+            } placeholder-gray-400 resize-none`}
           />
           {/* Hashtag Suggestions Popup */}
           <AnimatePresence>
-            {showHashtagSuggestions && (
-              <motion.div
-                ref={hashtagPopupRef}
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                className="absolute top-full left-0 bg-white rounded-2xl shadow-xl p-4 border border-gray-200 w-80 z-20 max-h-40 overflow-y-auto"
-              >
-                {isHashtagFetching ? (
-                  <p className="text-sm text-[#9194A9]">Loading hashtags...</p>
-                ) : hashtagData?.data?.attributes?.results?.length > 0 ? (
-                   hashtagData?.data?.attributes?.results?.map((hashtag: { name: string,postCount: number }, index: number) => (
-                    <div
-                      key={index}
-                      onClick={() => handleHashtagSelect(hashtag?.name)}
-                      className="flex flex-col px-3 py-1 hover:bg-gray-50 cursor-pointer rounded-md transition-colors"
-                    >
-                      <span className="text-base text-gray-900 font-semibold">#{hashtag.name}</span>
-                      <p className="text-sm text-[#9194A9]">{hashtag?.postCount} posts</p>
-                    </div>
-                  ))
-                ) : (
-                  <p className="text-sm text-[#9194A9]">No hashtags found</p>
-                )}
-              </motion.div>
-            )}
+            {showHashtagSuggestions &&
+              hashtagData?.data?.attributes?.results?.length > 0 && (
+                <motion.div
+                  ref={hashtagPopupRef}
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  className="absolute top-full left-0 bg-white rounded-2xl shadow-xl p-4 border border-gray-200 w-80 z-20 max-h-40 overflow-y-auto"
+                >
+                  {hashtagData?.data?.attributes?.results?.length > 0 &&
+                    hashtagData?.data?.attributes?.results?.map(
+                      (
+                        hashtag: { name: string; postCount: number },
+                        index: number
+                      ) => (
+                        <div
+                          key={index}
+                          onClick={() => handleHashtagSelect(hashtag?.name)}
+                          className="flex flex-col px-3 py-1 hover:bg-gray-50 cursor-pointer rounded-md transition-colors"
+                        >
+                          <span className="text-base text-gray-900 font-semibold">
+                            #{hashtag?.name}
+                          </span>
+                          <p className="text-sm text-[#9194A9]">
+                            {hashtag?.postCount} posts
+                          </p>
+                        </div>
+                      )
+                    )}
+                </motion.div>
+              )}
           </AnimatePresence>
         </div>
         <button

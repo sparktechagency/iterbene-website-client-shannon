@@ -14,23 +14,11 @@ interface PostCardProps {
 }
 
 const PostCard = ({ post }: PostCardProps) => {
-  const [reactions, setReactions] = useState(post.reactions);
+  const [reactions, setReactions] = useState(post.sortedReactions);
   const [newComment, setNewComment] = useState<string>("");
   const [comments, setComments] = useState<IComment[]>(post.comments);
   const [showReactions, setShowReactions] = useState<boolean>(false);
-  const [showDescription, setShowDescription] = useState<boolean>(false);
 
-  // Prevent background scrolling when modal is open
-  useEffect(() => {
-    if (showDescription) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "auto";
-    }
-    return () => {
-      document.body.style.overflow = "auto";
-    };
-  }, [showDescription]);
 
   const handleAddComment = () => {
     if (!newComment.trim()) return;
@@ -47,9 +35,20 @@ const PostCard = ({ post }: PostCardProps) => {
   return (
     <div className="w-full bg-white rounded-xl p-4 mb-4">
       <PostHeader post={post} />
-      <p className="text-gray-700 mb-4">{post?.content}</p>
+      <p className="text-gray-700 mb-4">
+        {post?.content?.split(/(\s+)/).map((word, index) => {
+          const isHashtag = word.match(/^#\w+/);
+          return (
+            <span
+              key={index}
+              className={isHashtag ? "text-blue-500 font-bold" : ""}
+            >
+              {word}
+            </span>
+          );
+        })}
+      </p>
       <PostContentRender
-        setShowDescription={setShowDescription}
         data={post.media || []}
       />
       <div className="flex gap-7 items-center mt-5 border-b border-[#9194A9] pt-8 pb-5">
@@ -114,7 +113,6 @@ const PostCard = ({ post }: PostCardProps) => {
         handleAddComment={handleAddComment}
       />
       <PostCommentSection comments={comments} />
-
     </div>
   );
 };
