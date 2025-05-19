@@ -34,9 +34,9 @@ const CustomSelectField = ({
   const [selectedItem, setSelectedItem] = useState<string | null>(null);
 
   const inputSizeClass = {
-    sm: "py-1 px-3 text-sm",
-    md: "py-1.5 px-3 text-base",
-    lg: "py-2 px-3 text-lg",
+    sm: "py-1 px-1.5 text-sm",
+    md: "py-[5px] px-1.5 text-base",
+    lg: "py-2 px-1.5 text-lg",
   }[size];
 
   const toggleDropdown = () => {
@@ -44,7 +44,10 @@ const CustomSelectField = ({
     if (onClick) onClick();
   };
 
-  const handleSelect = (item: string, fieldOnChange: (value: string) => void) => {
+  const handleSelect = (
+    item: string,
+    fieldOnChange: (value: string) => void
+  ) => {
     setSelectedItem(item);
     fieldOnChange(item);
     setIsOpen(false);
@@ -60,10 +63,7 @@ const CustomSelectField = ({
   return (
     <div className={`w-full relative`}>
       {label && (
-        <label
-          htmlFor={name}
-          className="block text-gray-950 mb-2 font-medium text-[16px]"
-        >
+        <label htmlFor={name} className="block text-gray-950 mb-2 ">
           {label} {required && <span className="text-red-500">*</span>}
         </label>
       )}
@@ -74,17 +74,23 @@ const CustomSelectField = ({
           <div className="relative">
             {/* Dropdown Trigger */}
             <div
-              className={`${fullWidth ? "w-full" : "w-auto"} flex items-center ${
+              className={`${
+                fullWidth ? "w-full" : "w-auto"
+              } flex items-center ${
                 variant === "outline"
                   ? "bg-transparent border-b rounded-none"
-                  : "border rounded-xl"
-              } ${error ? "border-red-500" : "border-[#9194A9]"} ${inputSizeClass}`}
+                  : "border rounded-lg"
+              } ${
+                error ? "border-red-500" : "border-[#DDDDDD]"
+              } ${inputSizeClass}`}
               onClick={toggleDropdown}
             >
               {icon && <div className="pl-2">{icon}</div>}
               <button
                 type="button"
-                className={`w-full text-left outline-none font-medium  ${inputSizeClass}`}
+                className={`w-full text-left outline-none cursor-pointer   ${
+                  placeholder && !field.value ? "text-gray-500" : "text-gray-900"
+                } ${inputSizeClass}`}
               >
                 {selectedItem || field.value || placeholder}
               </button>
@@ -115,7 +121,7 @@ const CustomSelectField = ({
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
                   transition={{ duration: 0.2 }}
-                  className={`absolute z-10 w-full mt-1 bg-white border border-[#9194A9] rounded-xl shadow-lg max-h-60 overflow-auto ${
+                  className={`absolute z-10 w-full mt-1 bg-white border border-[#DDDDDD] rounded-xl shadow-lg max-h-60 overflow-auto ${
                     variant === "outline" ? "border-b" : ""
                   }`}
                 >

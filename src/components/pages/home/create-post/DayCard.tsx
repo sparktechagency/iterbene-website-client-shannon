@@ -1,92 +1,101 @@
 "use client";
-
-import { Input, Button } from "antd";
-import { motion } from "framer-motion";
-import { PlusCircleOutlined } from "@ant-design/icons";
+import { Button } from "antd";
+import { DeleteOutlined, PlusCircleOutlined } from "@ant-design/icons";
 import ActivityCard from "./ActivityCard";
-import { Day } from "./create-post";
-import CustomButton from "@/components/custom/custom-button";
+import CustomInput from "@/components/custom/custom-input";
+import { Control, useFieldArray } from "react-hook-form";
 
 interface DayCardProps {
-  day: Day;
-  dayIndex: number;
-  setDays: React.Dispatch<React.SetStateAction<Day[]>>;
-  onRemove: () => void;
+  control: Control;
 }
 
-export default function DayCard({
-  day,
-  dayIndex,
-  setDays,
-  onRemove,
-}: DayCardProps) {
-  const addActivity = () => {
-    setDays((prev) => {
-      const newDays = [...prev];
-      newDays[dayIndex].activities.push({
-        time: "",
-        description: "",
-        cost: 0,
-        rating: 0,
-      });
-      return newDays;
+export default function DayCard({ control }: DayCardProps) {
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: "days",
+  });
+
+  const addDay = () => {
+    append({
+      dayNumber: fields.length + 1,
+      location: { latitude: 0, longitude: 0 },
+      locationName: "",
+      activities: [
+        {
+          time: "",
+          description: "",
+          link: "",
+          duration: "",
+          cost: 0,
+          rating: 0,
+        },
+      ],
+      comment: "",
+      weather: "",
     });
   };
 
-  const removeActivity = (activityIndex: number) => {
-    setDays((prev) => {
-      const newDays = [...prev];
-      newDays[dayIndex].activities = newDays[dayIndex].activities.filter(
-        (_, i) => i !== activityIndex
-      );
-      return newDays;
-    });
-  };
+  //   one day automatic active
+  if (fields.length === 0) {
+    addDay();
+  }
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="mb-4 p-3 bg-gray-50 rounded-lg border"
-    >
-      <div className="flex justify-between items-center mb-3">
-        <h5 className="font-medium">Day {day.dayNumber}</h5>
-        <CustomButton onClick={onRemove}>Remove Day</CustomButton>
+    <div>
+      <div className="flex justify-between items-center mb-2">
+        <h4 className="font-medium">Itinerary Days</h4>
+        <Button type="link" onClick={addDay} icon={<PlusCircleOutlined />}>
+          Add Day
+        </Button>
       </div>
-      <Input
-        placeholder="Location (e.g., City, Country)"
-        value={day.locationName}
-        onChange={(e) =>
-          setDays((prev) => {
-            const newDays = [...prev];
-            newDays[dayIndex].locationName = e.target.value;
-            return newDays;
-          })
-        }
-        className="mb-3"
-      />
-      <div className="mb-3">
-        <div className="flex justify-between items-center mb-2">
-          <h6 className="text-sm font-medium">Activities</h6>
-          <Button
-            type="link"
-            onClick={addActivity}
-            icon={<PlusCircleOutlined />}
-          >
-            Add Activity
-          </Button>
-        </div>
-        {day.activities.map((activity, actIndex) => (
-          <ActivityCard
-            key={actIndex}
-            activity={activity}
-            dayIndex={dayIndex}
-            activityIndex={actIndex}
-            setDays={setDays}
-            onRemove={() => removeActivity(actIndex)}
+      {fields.map((day, dayIndex) => (
+        <div
+          key={day.id}
+          className="mb-4 p-3 bg-gray-50 rounded-lg border border-[#DDDDDD]"
+        >
+          <div className="flex justify-between items-center mb-3">
+            <h5 className="font-medium">Day {dayIndex + 1}</h5>
+            {fields.length > 1 && (
+              <Button
+                type="link"
+                danger
+                onClick={() => remove(dayIndex)}
+                icon={<DeleteOutlined />}
+              >
+                Remove Day
+              </Button>
+            )}
+          </div>
+          <CustomInput
+            name="location"
+            label="Location"
+            placeholder="Where are you exploring? (e.g., Rome, Italy)"
+            fullWidth
+            size="md"
+            required
           />
-        ))}
-      </div>
-    </motion.div>
+          <div className="grid grid-cols-2 gap-4 mt-2">
+            {/* add comment and weather */}
+            <CustomInput
+              name="comment"
+              label="Comment"
+              placeholder="Any notes for this day? (e.g., Pack sunscreen)"
+              fullWidth
+              size="md"
+            />
+            <CustomInput
+              name="weather"
+              label="Weather"
+              placeholder="Expected weather? (e.g., Sunny, 25°C)"
+              fullWidth
+              size="md"
+            />
+          </div>
+          <div className="my-3">
+            <ActivityCard control={control} dayIndex={dayIndex} />
+          </div>
+        </div>
+      ))}
+    </div>
   );
 }

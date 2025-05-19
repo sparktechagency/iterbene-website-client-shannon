@@ -1,157 +1,110 @@
-'use client';
-
-import { useState } from 'react';
-import { Modal, Input, Select, message, Button } from 'antd';
-import { motion } from 'framer-motion';
-import { PlusCircleOutlined, SendOutlined } from '@ant-design/icons';
-import DayCard from './DayCard';
-import { Day } from './create-post';
-
-const { Option } = Select;
+"use client";
+import DayCard from "./DayCard";
+import CustomModal from "@/components/custom/custom-modal";
+import { IoClose } from "react-icons/io5";
+import CustomForm from "@/components/custom/custom-form";
+import CustomInput from "@/components/custom/custom-input";
+import CustomSelectField from "@/components/custom/custom-seletectField";
+import CustomButton from "@/components/custom/custom-button";
+import { FieldValues, useForm } from "react-hook-form";
 
 interface ItineraryModalProps {
   visible: boolean;
   onClose: () => void;
 }
 
-export default function ItineraryModal({ visible, onClose }: ItineraryModalProps) {
-  const [tripName, setTripName] = useState('');
-  const [travelMode, setTravelMode] = useState('');
-  const [departure, setDeparture] = useState('');
-  const [arrival, setArrival] = useState('');
-  const [days, setDays] = useState<Day[]>([
-    {
-      dayNumber: 1,
-      locationName: '',
-      location: { latitude: 0, longitude: 0 },
-      activities: [{ time: '', description: '', cost: 0, rating: 0 }],
-    },
-  ]);
+const ItineraryModal = ({ visible, onClose }: ItineraryModalProps) => {
+  const methods = useForm();
 
-  const addDay = () => {
-    setDays([
-      ...days,
-      {
-        dayNumber: days.length + 1,
-        locationName: '',
-        location: { latitude: 0, longitude: 0 },
-        activities: [{ time: '', description: '', cost: 0, rating: 0 }],
-      },
-    ]);
-  };
+  const { control, reset } = methods;
 
-  const removeDay = (dayIndex: number) => {
-    if (days.length === 1) {
-      message.warning('At least one day is required.');
-      return;
-    }
-    setDays(
-      days
-        .filter((_, index) => index !== dayIndex)
-        .map((day, index) => ({
-          ...day,
-          dayNumber: index + 1,
-        }))
-    );
-  };
-
-  const handleCreateItinerary = () => {
-    if (!tripName.trim()) {
-      message.error('Please enter a trip name.');
-      return;
-    }
-    console.log({ tripName, travelMode, departure, arrival, days });
-    message.success('Itinerary created!');
-    setTripName('');
-    setTravelMode('');
-    setDeparture('');
-    setArrival('');
-    setDays([
-      {
-        dayNumber: 1,
-        locationName: '',
-        location: { latitude: 0, longitude: 0 },
-        activities: [{ time: '', description: '', cost: 0, rating: 0 }],
-      },
-    ]);
+  const handleCreateItinerary = async (values: FieldValues) => {
+    const payload = {
+      ...values,
+      days: values.days.map((day: any, index: number) => ({
+        ...day,
+        dayNumber: index + 1,
+        location: { latitude: day.latitude, longitude: day.longitude },
+      })),
+    };
+    console.log("Itinerary Payload:", payload);
+    reset();
     onClose();
   };
 
   return (
-    <Modal
-      open={visible}
-      onCancel={onClose}
-      footer={null}
-      title="Create Itinerary"
-      className="max-w-lg max-h-screen overflow-y-auto"
+    <CustomModal
+      header={
+        <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 rounded-t-xl">
+          <h2 className="text-xl font-semibold text-gray-800">Create Itinerary</h2>
+          <button
+            className="text-gray-600 border-gray-400 cursor-pointer size-10 bg-[#EEFDFB] rounded-full border flex justify-center items-center"
+            onClick={onClose}
+          >
+            <IoClose size={18} />
+          </button>
+        </div>
+      }
+      isOpen={visible}
+      onClose={onClose}
     >
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        className="p-4"
-      >
-        <Input
-          placeholder="Trip Name (e.g., Summer Vacation 2025)"
-          value={tripName}
-          onChange={(e) => setTripName(e.target.value)}
-          className="mb-4"
-        />
-        <Select
-          placeholder="Select travel mode"
-          value={travelMode || undefined}
-          onChange={setTravelMode}
-          className="w-full mb-4"
-          allowClear
-        >
-          <Option value="CAR">Car</Option>
-          <Option value="PLANE">Plane</Option>
-          <Option value="TRAIN">Train</Option>
-          <Option value="BUS">Bus</Option>
-          <Option value="BOAT">Boat</Option>
-        </Select>
-        <div className="grid grid-cols-2 gap-4 mb-4">
-          <Input
-            placeholder="Departure (e.g., New York)"
-            value={departure}
-            onChange={(e) => setDeparture(e.target.value)}
+      <CustomForm onSubmit={handleCreateItinerary}>
+        <div className="w-full space-y-2">
+          <CustomInput
+            name="tripName"
+            label="Trip Name"
+            type="text"
+            variant="default"
+            size="md"
+            fullWidth
+            placeholder="Name your adventure (e.g., European Escape)"
+            required
           />
-          <Input
-            placeholder="Arrival (e.g., Los Angeles)"
-            value={arrival}
-            onChange={(e) => setArrival(e.target.value)}
+          <CustomSelectField
+            name="travelMode"
+            label="Travel Mode"
+            size="md"
+            placeholder="How will you travel? (e.g., Plane)"
+            items={["Car", "Plane", "Train", "Bus", "Bicycle", "Walk", "Boat", "Motorcycle"]}
+            required
           />
-        </div>
-        <div className="mb-4">
-          <div className="flex justify-between items-center mb-2">
-            <h4 className="font-medium">Itinerary Days</h4>
-            <Button
-              type="link"
-              onClick={addDay}
-              icon={<PlusCircleOutlined />}
-            >
-              Add Day
-            </Button>
-          </div>
-          {days.map((day, index) => (
-            <DayCard
-              key={index}
-              day={day}
-              dayIndex={index}
-              setDays={setDays}
-              onRemove={() => removeDay(index)}
+          <div className="grid grid-cols-2 gap-4 mb-4">
+            <CustomInput
+              name="departure"
+              label="Departure"
+              type="text"
+              variant="default"
+              size="md"
+              fullWidth
+              placeholder="Where are you starting? (e.g., New York)"
+              required
             />
-          ))}
+            <CustomInput
+              name="arrival"
+              label="Arrival"
+              type="text"
+              variant="default"
+              size="md"
+              fullWidth
+              placeholder="Where are you headed? (e.g., Paris)"
+              required
+            />
+          </div>
+          <div className="mb-4">
+            <DayCard control={control} />
+          </div>
+          <CustomButton
+            variant="default"
+            fullWidth
+            type="submit"
+            className="px-5 py-3"
+          >
+            Create Itinerary
+          </CustomButton>
         </div>
-        <Button
-          type="primary"
-          block
-          onClick={handleCreateItinerary}
-          icon={<SendOutlined />}
-          className="bg-blue-500"
-        >
-          Create Itinerary
-        </Button>
-      </motion.div>
-    </Modal>
+      </CustomForm>
+    </CustomModal>
   );
-}
+};
+
+export default ItineraryModal;

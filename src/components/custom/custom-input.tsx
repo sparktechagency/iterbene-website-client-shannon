@@ -62,7 +62,7 @@ const CustomInput = ({
       {label && (
         <label
           htmlFor={name}
-          className="block text-gray-950 mb-2 font-medium text-[15px]"
+          className="block text-gray-950 mb-2  text-[15px]"
         >
           {label} {required && <span className="text-red-500">*</span>}
         </label>
@@ -76,8 +76,8 @@ const CustomInput = ({
               className={`${fullWidth ? "w-full" : "w-auto"} flex items-center ${
                 variant === "outline"
                   ? "bg-transparent border-b border-primary rounded-none"
-                  : "border rounded-xl"
-              } ${error ? "border-red-500" : "border-[#9EA1B3]"}`}
+                  : "border rounded-lg"
+              } ${error ? "border-red-500" : "border-[#DDDDDD]"}`}
               whileFocus={{ scale: 1.02 }}
               transition={{ duration: 0.2 }}
             >
@@ -94,7 +94,7 @@ const CustomInput = ({
                     if (onChange) onChange(e);
                   }}
                   onClick={onClick}
-                  className={`w-full ${textareaSizeClass} outline-none font-medium text-gray-900 resize-y`}
+                  className={`w-full ${textareaSizeClass} outline-none  text-gray-900 resize-y`}
                 />
               ) : (
                 <input
@@ -107,7 +107,7 @@ const CustomInput = ({
                     if (onChange) onChange(e);
                   }}
                   onClick={onClick}
-                  className={`w-full ${inputSizeClass} outline-none font-medium text-gray-900`}
+                  className={`w-full ${inputSizeClass} outline-none  text-gray-900`}
                 />
               )}
               {/* Password visibility toggle icon (only for input with type="password") */}
