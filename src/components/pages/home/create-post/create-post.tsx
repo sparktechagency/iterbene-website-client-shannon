@@ -27,6 +27,10 @@ import { IoMdClose } from "react-icons/io";
 import { BsUpload } from "react-icons/bs";
 import { FieldValues, useForm } from "react-hook-form";
 import { IActivity, IDay } from "@/types/itinerary.types";
+import { useCreateItineraryMutation } from "@/redux/features/itinerary/itineraryApi";
+import toast from "react-hot-toast";
+import { TError } from "@/types/error";
+import { useCreatePostMutation } from "@/redux/features/post/postApi";
 
 export interface FilePreview {
   name: string;
@@ -54,6 +58,11 @@ const CreatePost = () => {
   const [mediaPreviews, setMediaPreviews] = useState<FilePreview[]>([]);
   // State for itinerary
   const [showItineraryModal, setShowItineraryModal] = useState(false);
+  const [itineraryId, setItineraryId] = useState<string>("");
+  const [createItinerary, { isLoading }] = useCreateItineraryMutation();
+
+  //post
+  const [createPost, { isLoading: isCreatingPost }] = useCreatePostMutation();
   // Refs
   const mediaInputRef = useRef<HTMLInputElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -151,29 +160,69 @@ const CreatePost = () => {
     setMediaPreviews((prev) => prev.filter((_, i) => i !== index));
   };
 
-  // Handle itinerary
+  // Create new itinerary
   const handleCreateItinerary = async (values: FieldValues) => {
-  const payload = {
-    ...values,
-    days: values.days.map((day: IDay, index: number) => ({
-      ...day,
-      dayNumber: index + 1,
-      location: {
-        latitude: day.location.latitude,
-        longitude: day.location.longitude,
-      },
-      locationName: day.locationName,
-      comment: day.comment,
-      weather: day.weather,
-      activities: day.activities.map((activity: IActivity) => ({
-        ...activity,
-        rating: activity.rating || 0, // Ensure rating is included
-      })),
-    })),
+    try {
+      const payload = {
+        ...values,
+        days: values.days.map((day: IDay, index: number) => ({
+          ...day,
+          dayNumber: index + 1,
+          location: {
+            latitude: day?.location?.latitude,
+            longitude: day?.location?.longitude,
+          },
+          locationName: day?.locationName,
+          comment: day?.comment,
+          weather: day?.weather,
+          activities: day?.activities?.map((activity: IActivity) => ({
+            ...activity,
+            rating: activity?.rating || 0,
+          })),
+        })),
+      };
+      const response = await createItinerary(payload).unwrap();
+      const itineraryId = response?.data?.attributes?._id;
+      setItineraryId(itineraryId);
+      setShowItineraryModal(false);
+      toast.success("Itinerary created successfully!");
+      reset();
+    } catch (error) {
+      const err = error as TError;
+      toast.error(err?.data?.message || "Something went wrong!");
+    }
   };
-  console.log("Itinerary Payload:", JSON.stringify(payload, null, 2));
-  // Add your API call or further processing here
-};
+
+  // Create new post
+
+  const handleCreatePost = async () => {
+    const visitedLocation = {
+      latitude: 500000,
+      longitude: 870022,
+    };
+    try {
+      const formData = new FormData();
+      formData.append("content", post);
+      formData.append("visitedLocation", JSON.stringify(visitedLocation));
+      formData.append("sourceId", user?._id || "");
+      formData.append("itineraryId", itineraryId || "");
+      formData.append("postType", "User");
+      formData.append("visitedLocationName", selectedLocation || "");
+      formData.append("privacy", privacy || "");
+      media?.forEach((file) => {
+        formData.append("postFiles", file);
+      });
+      await createPost(formData).unwrap();
+      toast.success("Post created successfully!");
+      setMedia([]);
+      setMediaPreviews([]);
+      setPost("");
+      setSelectedLocation(null);
+    } catch (error) {
+      const err = error as TError;
+      toast.error(err?.data?.message || "Something went wrong!");
+    }
+  };
 
   // Fallback profile image
   const defaultProfileImage = "/default-profile.png";
@@ -206,13 +255,41 @@ const CreatePost = () => {
           className="w-full bg-transparent border-none text-justify mt-3 text-base focus:outline-none text-gray-800 placeholder-gray-400 resize-none"
         />
         <button
-          className={`w-[120px] h-[50px] ${
+          onClick={handleCreatePost}
+          disabled={!post && media.length === 0}
+          className={`w-[140px] cursor-pointer flex justify-center items-center h-[50px] ${
             post || media.length > 0
               ? "bg-secondary text-white"
               : "border border-[#9194A9] text-[#9194A9]"
           } rounded-xl`}
         >
-          Post It!
+          {isCreatingPost ? (
+            <>
+              <svg
+                className="animate-spin h-5 w-5 text-current"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                ></circle>
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                ></path>
+              </svg>
+              Loading...
+            </>
+          ) : (
+            "Post It!"
+          )}
         </button>
       </div>
 
@@ -442,7 +519,7 @@ const CreatePost = () => {
                     {[
                       { value: "public", icon: Globe, label: "Public" },
                       { value: "friends", icon: Users, label: "Friends" },
-                      { value: "Only me", icon: Lock, label: "Only me" },
+                      { value: "private", icon: Lock, label: "Private" },
                     ].map((option) => (
                       <div
                         key={option.value}
@@ -478,7 +555,6 @@ const CreatePost = () => {
         }
       >
         <div className="w-full bg-white rounded-xl p-5 max-w-2xl">
-          <h2 className="text-xl font-semibold mb-4">Itinerary</h2>
           <div className="border-2 border-dashed border-gray-300 p-6 text-center">
             <input
               type="file"
@@ -528,6 +604,7 @@ const CreatePost = () => {
         visible={showItineraryModal}
         onClose={() => setShowItineraryModal(false)}
         handleCreateItinerary={handleCreateItinerary}
+        isLoading={isLoading}
       />
     </section>
   );

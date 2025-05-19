@@ -1,6 +1,4 @@
-import {
-  getAccessToken,
-} from "@/services/auth.services"; // Assuming you have methods to get and set tokens
+import { getAccessToken } from "@/services/auth.services"; // Assuming you have methods to get and set tokens
 import {
   createApi,
   fetchBaseQuery,
@@ -30,7 +28,6 @@ const baseQueryWithRefreshToken: BaseQueryFn<
 
   if (result?.error?.status === 401) {
     // const refreshToken = getRefreshToken();
-
     // if (refreshToken) {
     //   try {
     //     const refreshResult = await fetch(
@@ -43,15 +40,12 @@ const baseQueryWithRefreshToken: BaseQueryFn<
     //         body: JSON.stringify({ refreshToken }),
     //       }
     //     );
-
     //     const res = await refreshResult.json();
-
     //     if (res.ok && res?.accessToken) {
     //       storeTokens(
     //         res?.data?.attributes?.tokens?.accessToken,
     //         res?.data?.attributes?.tokens?.refreshToken
     //       );
-
     //       // Retry the original request with the new access token
     //       const retryResult = await baseQuery(args, api, extraOptions);
     //       return retryResult;
@@ -74,6 +68,15 @@ const baseQueryWithRefreshToken: BaseQueryFn<
 export const baseApi = createApi({
   reducerPath: "baseApi",
   baseQuery: baseQueryWithRefreshToken,
-  tagTypes: ["User","Flower","Chat","Message","Stories","Stories", "Story"],
+  tagTypes: [
+    "User",
+    "Flower",
+    "Chat",
+    "Message",
+    "Stories",
+    "Stories",
+    "Story",
+    "Post",
+  ],
   endpoints: () => ({}),
 });

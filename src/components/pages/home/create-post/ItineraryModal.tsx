@@ -12,9 +12,10 @@ interface ItineraryModalProps {
   visible: boolean;
   onClose: () => void;
   handleCreateItinerary: (values: FieldValues) => void;
+  isLoading: boolean;
 }
 
-const ItineraryModal = ({ visible, onClose, handleCreateItinerary }: ItineraryModalProps) => {
+const ItineraryModal = ({ visible, onClose, handleCreateItinerary,isLoading }: ItineraryModalProps) => {
   const methods = useForm();
  const { control } = methods;
   return (
@@ -81,6 +82,7 @@ const ItineraryModal = ({ visible, onClose, handleCreateItinerary }: ItineraryMo
           <CustomButton
             variant="default"
             fullWidth
+            loading={isLoading}
             type="submit"
             className="px-5 py-3"
           >
