@@ -1,30 +1,72 @@
+export interface ISortedReaction {
+  type: string;
+  count: number;
+}
+
+export interface IReaction {
+  userId: string;
+  postId: string;
+  reactionType: ReactionType;
+  createdAt: Date;
+}
+
 export interface IComment {
-    id: string;
-    username: string;
-    profilePic: string;
-    text: string;
-    timestamp: string;
-    replies?: IComment[];
-  }
+  _id: string;
+  userId: string;
+  postId: string;
+  replyTo?: string;
+  parentCommentId?: string;
+  comment: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface IMedia {
+  _id: string;
+  mediaType: string;
+  mediaUrl: string;
+}
+
 export interface IPost {
-  id: string;
-  username: string;
-  profilePic: string;
-  timestamp: string;
-  location?: string;
-  content: {
-    text: string;
-    media?: Array<{
-      type: "photo" | "video";
-      url: string;
-    }>;
+  _id: string;
+  userId: {
+    _id: string;
+    fullName: string;
+    username: string;
+    profileImage: string;
+    id: string;
   };
-  reactions: {
-    love: number;
-    luggage: number;
-    ban: number;
-    smile: number;
-  };
-  comments: IComment[];
-  shares: number;
+  sourceId: string;
+  postType: string;
+  content: string;
+  media: IMedia[];
+  sortedReactions: ISortedReaction[]; 
+  visitedLocationName: string;
+  privacy: string;
+  hashtags: string[];
+  shareCount: number;
+  isShared: boolean;
+  itineraryViewCount: number;
+  reactions: IReaction[];
+  comments: IComment[]; 
+  createdAt: Date;
+}
+
+export enum ReactionType {
+  LOVE = "love",
+  LUGGAGE = "luggage",
+  BAN = "ban",
+  SMILE = "smile",
+}
+
+export enum PostPrivacy {
+  PUBLIC = "public",
+  FRIENDS = "friends",
+  PRIVATE = "private",
+}
+
+export enum PostType {
+  USER = "User",
+  GROUP = "Group",
+  EVENT = "Event",
 }

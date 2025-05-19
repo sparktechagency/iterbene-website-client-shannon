@@ -1,24 +1,17 @@
 "use client";
 import Image from "next/image";
 import VideoCard from "../../UserProfilePage/UserVideos/VideoCard";
-
-interface Media {
-  type: "photo" | "video";
-  url: string;
-}
-
+import { IMedia } from "@/types/post.types";
 interface PostContentRenderProps {
   setShowDescription: (value: boolean) => void;
-  data: Media[];
+  data: IMedia[];
 }
 
 const PostContentRender = ({
   setShowDescription,
   data,
 }: PostContentRenderProps) => {
-  if (!data || data.length === 0) return null;
-
-  const mediaCount = data.length;
+  const mediaCount = data?.length;
 
   // Handle click on the container
   const handleContainerClick = () => {
@@ -30,10 +23,10 @@ const PostContentRender = ({
     const media = data[0];
     return (
       <div className="w-full mt-3" onClick={handleContainerClick}>
-        {media.type === "photo" ? (
+        {media.mediaType === "image" ? (
           <div className="relative w-full h-56 md:h-[500px] rounded-md overflow-hidden">
             <Image
-              src={media.url}
+              src={media?.mediaUrl}
               alt={`Post media`}
               fill
               className="object-cover cursor-pointer"
@@ -41,7 +34,7 @@ const PostContentRender = ({
             />
           </div>
         ) : (
-          <VideoCard url={media.url} className="w-full h-[400px]" />
+          <VideoCard url={media?.mediaUrl} className="w-full h-[400px]" />
         )}
       </div>
     );
@@ -56,16 +49,16 @@ const PostContentRender = ({
       >
         {data.map((media, index) => (
           <div key={index} className="aspect-square">
-            {media.type === "photo" ? (
+            {media?.mediaType === "image" ? (
               <Image
-                src={media.url}
+                src={media?.mediaUrl}
                 alt="Post media"
                 width={400}
                 height={400}
                 className="w-full h-full object-cover rounded-xl cursor-pointer"
               />
             ) : (
-              <VideoCard url={media.url} className="w-full h-[360px]" />
+              <VideoCard url={media?.mediaUrl} className="w-full h-[360px]" />
             )}
           </div>
         ))}
@@ -81,42 +74,42 @@ const PostContentRender = ({
         onClick={handleContainerClick}
       >
         <div className="row-span-2 col-span-1">
-          {data[0].type === "photo" ? (
+          {data[0]?.mediaType === "image" ? (
             <Image
-              src={data[0].url}
+              src={data[0]?.mediaUrl}
               alt="Post media"
               width={400}
               height={800}
               className="w-full h-full object-cover rounded-xl cursor-pointer"
             />
           ) : (
-            <VideoCard url={data[0].url} />
+            <VideoCard url={data[0]?.mediaUrl} />
           )}
         </div>
         <div className="col-span-1">
-          {data[1].type === "photo" ? (
+          {data[1]?.mediaType === "image" ? (
             <Image
-              src={data[1].url}
+              src={data[1]?.mediaUrl}
               alt="Post media"
               width={400}
               height={400}
               className="w-full h-full object-cover rounded-xl cursor-pointer"
             />
           ) : (
-            <VideoCard url={data[1].url} className="h-[260px]" />
+            <VideoCard url={data[1]?.mediaUrl} className="h-[260px]" />
           )}
         </div>
         <div className="col-span-1">
-          {data[2].type === "photo" ? (
+          {data[2]?.mediaType === "image" ? (
             <Image
-              src={data[2].url}
+              src={data[2]?.mediaUrl}
               alt="Post media"
               width={400}
               height={400}
               className="w-full h-full object-cover rounded-xl cursor-pointer"
             />
           ) : (
-            <VideoCard url={data[2].url} />
+            <VideoCard url={data[2]?.mediaUrl} />
           )}
         </div>
       </div>
@@ -130,55 +123,55 @@ const PostContentRender = ({
         onClick={handleContainerClick}
       >
         <div className="row-span-2 col-span-1">
-          {data[0].type === "photo" ? (
+          {data[0]?.mediaType === "image" ? (
             <Image
-              src={data[0].url}
+              src={data[0]?.mediaUrl}
               alt="Post media"
               width={400}
               height={800}
               className="w-full h-full object-cover rounded-xl cursor-pointer"
             />
           ) : (
-            <VideoCard url={data[0].url} />
+            <VideoCard url={data[0]?.mediaUrl} />
           )}
         </div>
         <div className="row-span-2 col-span-1">
-          {data[1].type === "photo" ? (
+          {data[1]?.mediaType === "image" ? (
             <Image
-              src={data[1].url}
+              src={data[1]?.mediaUrl}
               alt="Post media"
               width={400}
               height={400}
               className="w-full h-full object-cover rounded-xl cursor-pointer"
             />
           ) : (
-            <VideoCard url={data[1].url} />
+            <VideoCard url={data[1]?.mediaUrl} />
           )}
         </div>
         <div className="col-span-1">
-          {data[2].type === "photo" ? (
+          {data[2]?.mediaType === "image" ? (
             <Image
-              src={data[2].url}
+              src={data[2]?.mediaUrl}
               alt="Post media"
               width={400}
               height={400}
               className="w-full h-full object-cover rounded-xl cursor-pointer"
             />
           ) : (
-            <VideoCard url={data[2].url} />
+            <VideoCard url={data[2]?.mediaUrl} />
           )}
         </div>
         <div className="col-span-1">
-          {data[3].type === "photo" ? (
+          {data[3]?.mediaType === "image" ? (
             <Image
-              src={data[2].url}
+              src={data[2]?.mediaUrl}
               alt="Post media"
               width={400}
               height={400}
               className="w-full h-full object-cover rounded-xl cursor-pointer"
             />
           ) : (
-            <VideoCard url={data[2].url} />
+            <VideoCard url={data[2]?.mediaUrl} />
           )}
         </div>
       </div>
@@ -192,58 +185,60 @@ const PostContentRender = ({
         onClick={handleContainerClick}
       >
         <div className="row-span-2 col-span-1">
-          {data[0].type === "photo" ? (
+          {data[0]?.mediaType === "image" ? (
             <Image
-              src={data[0].url}
+              src={data[0]?.mediaUrl}
               alt="Post media"
               width={400}
               height={400}
               className="w-full h-full object-cover rounded-xl cursor-pointer"
             />
           ) : (
-            <VideoCard url={data[0].url} />
+            <VideoCard url={data[0]?.mediaUrl} />
           )}
         </div>
         <div className="row-span-2 col-span-1">
-          {data[1].type === "photo" ? (
+          {data[1]?.mediaType === "image" ? (
             <Image
-              src={data[1].url}
+              src={data[1]?.mediaUrl}
               alt="Post media"
               width={400}
               height={400}
               className="w-full h-full object-cover rounded-xl cursor-pointer"
             />
           ) : (
-            <VideoCard url={data[1].url} />
+            <VideoCard url={data[1]?.mediaUrl} />
           )}
         </div>
         <div className="col-span-1">
-          {data[2].type === "photo" ? (
+          {data[2]?.mediaType === "image" ? (
             <Image
-              src={data[2].url}
+              src={data[2]?.mediaUrl}
               alt="Post media"
               width={400}
               height={400}
               className="w-full h-full object-cover rounded-xl cursor-pointer"
             />
           ) : (
-            <VideoCard url={data[2].url} />
+            <VideoCard url={data[2]?.mediaUrl} />
           )}
         </div>
         <div className="col-span-1 relative">
-          {data[3].type === "photo" ? (
+          {data[3]?.mediaType === "image" ? (
             <Image
-              src={data[2].url}
+              src={data[2]?.mediaUrl}
               alt="Post media"
               width={400}
               height={400}
               className="w-full h-full object-cover rounded-xl cursor-pointer"
             />
           ) : (
-            <VideoCard url={data[2].url} />
+            <VideoCard url={data[2]?.mediaUrl} />
           )}
           <div className="absolute top-0 left-0 w-full h-full bg-black/30 rounded-xl">
-            <span className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white text-xl md:text-3xl">{mediaCount}+</span>
+            <span className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white text-xl md:text-3xl">
+              {mediaCount}+
+            </span>
           </div>
         </div>
       </div>

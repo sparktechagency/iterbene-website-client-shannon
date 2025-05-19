@@ -5,6 +5,7 @@ import { HiGlobe } from "react-icons/hi";
 import { TiLocation } from "react-icons/ti";
 import { BsThreeDots } from "react-icons/bs";
 import { IPost } from "@/types/post.types";
+import { Lock, Users } from "lucide-react";
 
 const PostHeader = ({
   post,
@@ -20,27 +21,27 @@ const PostHeader = ({
   const toggleDropdown = () => setIsOpen(!isOpen);
 
   const handleEdit = () => {
-    console.log("Edit post:", post.id);
+    console.log("Edit post:", post?._id);
     setIsOpen(false);
   };
 
   const handleDelete = () => {
-    console.log("Delete post:", post.id);
+    console.log("Delete post:", post?._id);
     setIsOpen(false);
   };
 
   const handleSave = () => {
-    console.log("Save post:", post.id);
+    console.log("Save post:", post?._id);
     setIsOpen(false);
   };
 
   const handleHide = () => {
-    console.log("Hide post:", post.id);
+    console.log("Hide post:", post?._id);
     setIsOpen(false);
   };
 
   const handleReport = () => {
-    console.log("Report post:", post.id);
+    console.log("Report post:", post?._id);
     setIsOpen(false);
   };
 
@@ -65,25 +66,37 @@ const PostHeader = ({
     <section className="w-full flex justify-between items-center gap-4">
       <div className="flex items-center mb-3">
         <Image
-          src={post.profilePic}
-          alt={post.username}
+          src={post?.userId?.profileImage}
+          alt={post?.userId?.fullName}
           width={60}
           height={60}
           className="size-[60px] object-cover rounded-full mr-3 ring-2 ring-gray-200"
         />
         <div>
           <div className="flex items-center gap-2">
-            <p className="font-bold text-gray-800 text-lg">{post.username}</p>
-            <span className="text-sm">{post.timestamp}</span>
+            <p className="font-bold text-gray-800 text-lg">
+              {post?.userId?.fullName}
+            </p>
+            <span className="text-sm">
+              {post?.createdAt ? post.createdAt.toLocaleString() : ""}
+            </span>
           </div>
           <div className="text-sm text-gray-900 flex items-center gap-2 mt-1">
-            {post.location && (
+            {post?.visitedLocationName && (
               <>
                 <TiLocation size={28} className="text-primary" />
-                <span className="flex items-center">{post.location}</span>
+                <span className="flex items-center">
+                  {post?.visitedLocationName}
+                </span>
               </>
             )}
-            <HiGlobe size={28} className="text-primary" />
+            {post?.privacy === "public" ? (
+              <HiGlobe size={25} className="text-primary" />
+            ) : post?.privacy === "friends" ? (
+              <Users size={28} className="text-primary" />
+            ) : (
+              <Lock size={28} className="text-primary" />
+            )}
           </div>
         </div>
       </div>

@@ -18,6 +18,7 @@ const nextConfig: NextConfig = {
       "i.postimg.cc",
       "images.pexels.com",
       "api.dicebear.com",
+      "iter-bene.s3.eu-north-1.amazonaws.com"
     ],
   },
 };
