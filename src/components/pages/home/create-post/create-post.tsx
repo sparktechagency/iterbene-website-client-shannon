@@ -21,26 +21,12 @@ import { Swiper, SwiperClass, SwiperSlide } from "swiper/react";
 import ItineraryModal from "./ItineraryModal";
 import { motion, AnimatePresence } from "framer-motion";
 import { Tooltip } from "antd";
-
-// Interfaces
-export interface Location {
-  latitude: number;
-  longitude: number;
-}
-
-export interface Activity {
-  time: string;
-  description: string;
-  cost: number;
-  rating: number;
-}
-
-export interface Day {
-  dayNumber: number;
-  locationName: string;
-  location: Location;
-  activities: Activity[];
-}
+import CustomButton from "@/components/custom/custom-button";
+import CustomModal from "@/components/custom/custom-modal";
+import { IoMdClose } from "react-icons/io";
+import { BsUpload } from "react-icons/bs";
+import { FieldValues, useForm } from "react-hook-form";
+import { IActivity, IDay } from "@/types/itinerary.types";
 
 export interface FilePreview {
   name: string;
@@ -52,6 +38,10 @@ const CreatePost = () => {
   const user = useUser();
   // State for post content
   const [post, setPost] = useState<string>("");
+
+  // use form
+  const methods = useForm();
+  const { reset } = methods;
   // State for location
   const [selectedLocation, setSelectedLocation] = useState<string | null>(null);
   const [showLocationPopup, setShowLocationPopup] = useState<boolean>(false);
@@ -70,6 +60,11 @@ const CreatePost = () => {
   const locationPopupRef = useRef<HTMLDivElement>(null);
   const privacyPopupRef = useRef<HTMLDivElement>(null);
   const swiperRef = useRef<SwiperClass>(null);
+
+  // pdf modal
+  const [showPdfModal, setShowPdfModal] = useState(false);
+  const [uploadedPdf, setUploadedPdf] = useState<File | null>(null);
+  const pdfInputRef = useRef<HTMLInputElement>(null);
 
   // Auto-resize textarea
   useEffect(() => {
@@ -155,6 +150,30 @@ const CreatePost = () => {
     setMedia((prev) => prev.filter((_, i) => i !== index));
     setMediaPreviews((prev) => prev.filter((_, i) => i !== index));
   };
+
+  // Handle itinerary
+  const handleCreateItinerary = async (values: FieldValues) => {
+  const payload = {
+    ...values,
+    days: values.days.map((day: IDay, index: number) => ({
+      ...day,
+      dayNumber: index + 1,
+      location: {
+        latitude: day.location.latitude,
+        longitude: day.location.longitude,
+      },
+      locationName: day.locationName,
+      comment: day.comment,
+      weather: day.weather,
+      activities: day.activities.map((activity: IActivity) => ({
+        ...activity,
+        rating: activity.rating || 0, // Ensure rating is included
+      })),
+    })),
+  };
+  console.log("Itinerary Payload:", JSON.stringify(payload, null, 2));
+  // Add your API call or further processing here
+};
 
   // Fallback profile image
   const defaultProfileImage = "/default-profile.png";
@@ -381,7 +400,7 @@ const CreatePost = () => {
             {/* Itinerary Icon */}
             <Tooltip title="Add Itinerary" placement="bottom">
               <button
-                onClick={() => setShowItineraryModal(true)}
+                onClick={() => setShowPdfModal(true)}
                 className="cursor-pointer"
               >
                 <CalendarCheck className="w-6 h-6 text-[#9194A9] hover:text-primary transition-colors" />
@@ -443,10 +462,72 @@ const CreatePost = () => {
           </div>
         </div>
       )}
-
+      <CustomModal
+        isOpen={showPdfModal}
+        onClose={() => setShowPdfModal(false)}
+        header={
+          <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 rounded-t-xl">
+            <h2 className="text-xl font-semibold text-gray-800">Itinerary</h2>
+            <button
+              className="text-gray-600 border-gray-400 cursor-pointer size-10 bg-[#EEFDFB] rounded-full border flex justify-center items-center"
+              onClick={() => setShowPdfModal(false)}
+            >
+              <IoMdClose size={18} />
+            </button>
+          </div>
+        }
+      >
+        <div className="w-full bg-white rounded-xl p-5 max-w-2xl">
+          <h2 className="text-xl font-semibold mb-4">Itinerary</h2>
+          <div className="border-2 border-dashed border-gray-300 p-6 text-center">
+            <input
+              type="file"
+              accept="application/pdf"
+              ref={pdfInputRef}
+              onChange={(e) => {
+                if (e.target.files && e.target.files[0]) {
+                  setUploadedPdf(e.target.files[0]);
+                }
+              }}
+              className="hidden"
+            />
+            <BsUpload size={28} className="text-secondary mx-auto my-2" />
+            <p className="text-gray-500 mb-2">
+              Click to upload or drag and drop
+            </p>
+            <p className="text-gray-400 text-sm">(PDF, max 1mb)</p>
+            <button
+              onClick={() => pdfInputRef.current?.click()}
+              className="mt-4 text-primary underline"
+            >
+              Browse Files
+            </button>
+          </div>
+          {uploadedPdf && (
+            <div className="mt-4 text-sm text-gray-600">
+              Selected file: {uploadedPdf.name}
+            </div>
+          )}
+          <CustomButton
+            fullWidth
+            className="mt-6 px-5 py-3"
+            variant="default"
+            onClick={() => {
+              setShowPdfModal(false);
+              setShowItineraryModal(true);
+            }}
+          >
+            Create One
+          </CustomButton>
+          <CustomButton fullWidth className="mt-7 px-5 py-3" variant="outline">
+            Save
+          </CustomButton>
+        </div>
+      </CustomModal>
       <ItineraryModal
         visible={showItineraryModal}
         onClose={() => setShowItineraryModal(false)}
+        handleCreateItinerary={handleCreateItinerary}
       />
     </section>
   );

@@ -54,16 +54,17 @@ export default function ActivityCard({ control, dayIndex }: ActivityCardProps) {
           </div>
           <div className="grid grid-cols-2 gap-2 mb-2">
             <CustomInput
-              name="time"
+              name={`days.${dayIndex}.activities.${activityIndex}.time`}
               label="Time"
               type="time"
               size="md"
+              onChange={(e) => console.log(e.target.value)}
               fullWidth
               placeholder="When does this start? (e.g., 9:00 AM)"
               required
             />
             <CustomInput
-              name="duration"
+              name={`days.${dayIndex}.activities.${activityIndex}.duration`}
               label="Duration"
               type="text"
               size="md"
@@ -72,7 +73,7 @@ export default function ActivityCard({ control, dayIndex }: ActivityCardProps) {
               required
             />
             <CustomInput
-              name="link"
+              name={`days.${dayIndex}.activities.${activityIndex}.link`}
               label="Link"
               type="url"
               size="md"
@@ -80,7 +81,7 @@ export default function ActivityCard({ control, dayIndex }: ActivityCardProps) {
               placeholder="Add a hotel/booking link (optional)"
             />
             <CustomInput
-              name="cost"
+              name={`days.${dayIndex}.activities.${activityIndex}.cost`}
               label="Cost ($)"
               type="number"
               size="md"
@@ -89,7 +90,7 @@ export default function ActivityCard({ control, dayIndex }: ActivityCardProps) {
             />
           </div>
           <CustomInput
-            name="description"
+            name={`days.${dayIndex}.activities.${activityIndex}.description`}
             label="Description"
             isTextarea
             fullWidth
@@ -105,8 +106,8 @@ export default function ActivityCard({ control, dayIndex }: ActivityCardProps) {
               name={`days.${dayIndex}.activities.${activityIndex}.rating`}
               render={({ field }) => (
                 <Rate
-                  value={field.value}
-                  onChange={(value) => field.onChange(value)}
+                  value={field.value || 0} // Ensure default value is 0 if undefined
+                  onChange={(value) => field.onChange(value)} // Update form state
                 />
               )}
             />

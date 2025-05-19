@@ -11,27 +11,12 @@ import { FieldValues, useForm } from "react-hook-form";
 interface ItineraryModalProps {
   visible: boolean;
   onClose: () => void;
+  handleCreateItinerary: (values: FieldValues) => void;
 }
 
-const ItineraryModal = ({ visible, onClose }: ItineraryModalProps) => {
+const ItineraryModal = ({ visible, onClose, handleCreateItinerary }: ItineraryModalProps) => {
   const methods = useForm();
-
-  const { control, reset } = methods;
-
-  const handleCreateItinerary = async (values: FieldValues) => {
-    const payload = {
-      ...values,
-      days: values.days.map((day: any, index: number) => ({
-        ...day,
-        dayNumber: index + 1,
-        location: { latitude: day.latitude, longitude: day.longitude },
-      })),
-    };
-    console.log("Itinerary Payload:", payload);
-    reset();
-    onClose();
-  };
-
+ const { control } = methods;
   return (
     <CustomModal
       header={
@@ -91,7 +76,7 @@ const ItineraryModal = ({ visible, onClose }: ItineraryModalProps) => {
             />
           </div>
           <div className="mb-4">
-            <DayCard control={control} />
+            <DayCard control={control}/>
           </div>
           <CustomButton
             variant="default"

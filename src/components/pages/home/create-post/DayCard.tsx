@@ -3,17 +3,26 @@ import { Button } from "antd";
 import { DeleteOutlined, PlusCircleOutlined } from "@ant-design/icons";
 import ActivityCard from "./ActivityCard";
 import CustomInput from "@/components/custom/custom-input";
-import { Control, useFieldArray } from "react-hook-form";
+import { Control, useFieldArray, useFormContext } from "react-hook-form";
+import { useEffect, useRef } from "react";
+import { useGoogleMaps } from "@/hooks/useGoogleMaps";
 
 interface DayCardProps {
   control: Control;
 }
 
-export default function DayCard({ control }: DayCardProps) {
+const DayCard = ({ control }: DayCardProps)  => {
   const { fields, append, remove } = useFieldArray({
     control,
     name: "days",
   });
+
+  const { setValue } = useFormContext();
+
+  // Load Google Maps API
+  const { isLoaded, error } = useGoogleMaps(
+    process.env.NEXT_PUBLIC_GOOGLE_MAP_API_KEY || ""
+  );
 
   const addDay = () => {
     append({
@@ -35,10 +44,59 @@ export default function DayCard({ control }: DayCardProps) {
     });
   };
 
-  //   one day automatic active
+  // One day automatically active
   if (fields.length === 0) {
     addDay();
   }
+
+  // Google Maps Autocomplete setup
+  const autocompleteRefs = useRef<(google.maps.places.Autocomplete | null)[]>([]);
+
+  useEffect(() => {
+    if (!isLoaded || error) {
+      if (error) console.error(error);
+      return;
+    }
+
+    autocompleteRefs.current = fields.map((_, index) => {
+      const input = document.getElementById(`location-input-${index}`) as HTMLInputElement;
+      if (input) {
+        const autocomplete = new google.maps.places.Autocomplete(input, {
+          types: ["geocode"],
+          fields: ["address_components", "geometry", "name"],
+        });
+
+        autocomplete.addListener("place_changed", () => {
+          const place = autocomplete.getPlace();
+          if (place?.geometry && place?.geometry?.location) {
+            console.log("Selected place:", place);
+            const locationName = place?.address_components
+              ? place?.address_components[0]?.long_name || place?.name
+              : place?.name || "";
+            setValue(`days.${index}.locationName`, locationName);
+            setValue(`days.${index}.location`, {
+              latitude: place.geometry.location.lat(),
+              longitude: place.geometry.location.lng(),
+            });
+          } else {
+            console.warn("No geometry data available for selected place");
+          }
+        });
+
+        return autocomplete;
+      }
+      return null;
+    });
+
+    return () => {
+      autocompleteRefs.current.forEach((autocomplete) => {
+        if (autocomplete) {
+          google.maps.event.clearInstanceListeners(autocomplete);
+        }
+      });
+      autocompleteRefs.current = [];
+    };
+  }, [fields, isLoaded, error, setValue]);
 
   return (
     <div>
@@ -48,6 +106,10 @@ export default function DayCard({ control }: DayCardProps) {
           Add Day
         </Button>
       </div>
+      {error && <p className="text-red-500 text-sm mb-2">{error}</p>}
+      {!isLoaded && !error && (
+        <p className="text-gray-500 text-sm mb-2">Loading Google Maps...</p>
+      )}
       {fields.map((day, dayIndex) => (
         <div
           key={day.id}
@@ -66,25 +128,29 @@ export default function DayCard({ control }: DayCardProps) {
               </Button>
             )}
           </div>
-          <CustomInput
-            name="location"
-            label="Location"
-            placeholder="Where are you exploring? (e.g., Rome, Italy)"
-            fullWidth
-            size="md"
-            required
-          />
+          <div className="mb-2">
+            <label className="block text-gray-700 text-sm font-medium mb-1">
+              Location
+            </label>
+            <input
+              id={`location-input-${dayIndex}`}
+              name={`days.${dayIndex}.locationName`}
+              placeholder="Where are you exploring? (e.g., Rome, Italy)"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none"
+              required
+              disabled={!isLoaded || !!error}
+            />
+          </div>
           <div className="grid grid-cols-2 gap-4 mt-2">
-            {/* add comment and weather */}
             <CustomInput
-              name="comment"
+              name={`days.${dayIndex}.comment`}
               label="Comment"
               placeholder="Any notes for this day? (e.g., Pack sunscreen)"
               fullWidth
               size="md"
             />
             <CustomInput
-              name="weather"
+              name={`days.${dayIndex}.weather`}
               label="Weather"
               placeholder="Expected weather? (e.g., Sunny, 25°C)"
               fullWidth
@@ -99,3 +165,5 @@ export default function DayCard({ control }: DayCardProps) {
     </div>
   );
 }
+
+export default DayCard;

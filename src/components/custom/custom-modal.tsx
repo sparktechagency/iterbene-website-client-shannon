@@ -49,36 +49,33 @@ const CustomModal: React.FC<CustomModalProps> = ({
     <AnimatePresence>
       {isOpen && (
         <motion.div
-          className="w-full h-screen bg-black/70 fixed inset-0 flex items-center justify-center z-50 p-5"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.2 }}
+          className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
           onClick={closeOnBackdropClick ? onClose : undefined} // Close on backdrop click if enabled
         >
           <motion.div
             className={`w-full bg-white rounded-xl shadow-2xl ${maxWidth} relative`}
-            initial={{ opacity: 0, scale: 0.95, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: 20 }}
+            initial={{ opacity: 0, scale: 0.95}}
+            animate={{ opacity: 1, scale: 1}}
+            exit={{ opacity: 0, scale: 0.95 }}
             transition={{ duration: 0.2 }}
-            onClick={handleModalClick} // Stop propagation of clicks inside the modal
+            onClick={handleModalClick}
           >
             {/* Header */}
-            {header ? (
-              header
-            ) : (
-              showCloseButton && (
-                <div className="flex items-center justify-between p-6 border-b border-gray-200 rounded-t-xl">
-                  <button
-                    className="text-gray-600 hover:text-gray-800 cursor-pointer"
-                    onClick={onClose}
-                  >
-                    <IoClose size={24} />
-                  </button>
-                </div>
-              )
-            )}
+            {header
+              ? header
+              : showCloseButton && (
+                  <div className="flex items-center justify-between p-6 border-b border-gray-200 rounded-t-xl">
+                    <button
+                      className="text-gray-600 hover:text-gray-800 cursor-pointer"
+                      onClick={onClose}
+                    >
+                      <IoClose size={24} />
+                    </button>
+                  </div>
+                )}
 
             {/* Modal Content */}
             <div className={`p-6 overflow-y-auto rounded-b-xl ${maxHeight}`}>
