@@ -5,17 +5,8 @@ import Image from "next/image";
 import { IoMdSend } from "react-icons/io";
 import EmojiPicker, { EmojiClickData, Theme } from "emoji-picker-react";
 
-interface PostCommentInputProps {
-  newComment: string;
-  setNewComment: (value: string) => void;
-  handleAddComment: () => void;
-}
-
-const PostCommentInput: React.FC<PostCommentInputProps> = ({
-  newComment,
-  setNewComment,
-  handleAddComment,
-}) => {
+const PostCommentInput = () => {
+  const [newComment, setNewComment] = useState("");
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -123,7 +114,6 @@ const PostCommentInput: React.FC<PostCommentInputProps> = ({
           )}
         </div>
         <button
-          onClick={handleAddComment}
           className="text-white size-10 rounded-full bg-primary px-3 py-1 text-sm cursor-pointer"
         >
           <IoMdSend size={20} />

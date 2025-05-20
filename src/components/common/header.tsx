@@ -18,6 +18,7 @@ import { MdAlternateEmail, MdOutlineNotifications } from "react-icons/md";
 import CustomButton from "../custom/custom-button";
 import useUser from "@/hooks/useUser";
 import { IUser } from "@/types/user.types";
+import { useRouter } from "next/navigation";
 
 // Define types for dropdown props
 interface DropdownProps {
@@ -232,6 +233,7 @@ const SettingsDropdown: React.FC<DropdownProps> = ({ isOpen }) => {
 
 // Dropdown component for User Profile
 const UserDropdown: React.FC<DropdownProps> = ({ user, isOpen }) => {
+  const router = useRouter();
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [isSettingsOpen, setIsSettingsOpen] = useState<boolean>(false);
 
@@ -254,6 +256,16 @@ const UserDropdown: React.FC<DropdownProps> = ({ user, isOpen }) => {
 
   const toggleSettings = () => {
     setIsSettingsOpen((prev) => !prev);
+  };
+  const handleLogout = () => {
+    //remove accessToken and refreshToken from cookies
+    document.cookie =
+      "accessToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+    document.cookie =
+      "refreshToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+    window.location.reload();
+    ///reload
+    router.push("/");
   };
 
   return (
@@ -355,7 +367,7 @@ const UserDropdown: React.FC<DropdownProps> = ({ user, isOpen }) => {
               </button>
               <SettingsDropdown isOpen={isSettingsOpen} />
             </div>
-            <button className="w-full cursor-pointer flex items-center px-4 py-3 gap-4 text-red-500 hover:bg-gray-100 rounded-xl">
+            <button onClick={handleLogout} className="w-full cursor-pointer flex items-center px-4 py-3 gap-4 text-red-500 hover:bg-gray-100 rounded-xl">
               <BiLogOut size={24} />
               <span>Logout</span>
             </button>

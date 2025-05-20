@@ -313,9 +313,8 @@ const CreatePost = () => {
             placeholder={`What's new, ${user?.fullName || "User"}?`}
             value={post}
             onChange={postChangeHandler}
-            className={`w-full bg-transparent border-none text-justify mt-3 text-base focus:outline-none ${
-              post.includes("#") ? "color-[#3B82F6]" : ""
-            } placeholder-gray-400 resize-none`}
+            className={`w-full bg-transparent border-none text-justify mt-3 text-base focus:outline-none ${post.includes("#") ? "color-[#3B82F6]" : ""
+              } placeholder-gray-400 resize-none`}
           />
           {/* Hashtag Suggestions Popup */}
           <AnimatePresence>
@@ -355,11 +354,10 @@ const CreatePost = () => {
         <button
           onClick={handleCreatePost}
           disabled={!post && media.length === 0}
-          className={`w-[140px] cursor-pointer flex justify-center items-center h-[50px] ${
-            post || media.length > 0
+          className={`w-[140px] cursor-pointer flex justify-center items-center h-[50px] ${post || media.length > 0
               ? "bg-secondary text-white"
               : "border border-[#9194A9] text-[#9194A9]"
-          } rounded-xl`}
+            } rounded-xl`}
         >
           {isCreatingPost ? (
             <>
@@ -502,9 +500,8 @@ const CreatePost = () => {
                   className="cursor-pointer"
                 >
                   <MapPin
-                    className={`w-6 h-6 mt-2 ${
-                      selectedLocation ? "text-primary" : "text-[#9194A9]"
-                    } hover:text-primary transition-colors`}
+                    className={`w-6 h-6 mt-2 ${selectedLocation ? "text-primary" : "text-[#9194A9]"
+                      } hover:text-primary transition-colors`}
                   />
                 </button>
               </Tooltip>
@@ -557,9 +554,8 @@ const CreatePost = () => {
                 className="cursor-pointer"
               >
                 <ImageIcon
-                  className={`w-6 h-6 ${
-                    media.length > 0 ? "text-primary" : "text-[#9194A9]"
-                  } hover:text-primary transition-colors`}
+                  className={`w-6 h-6 ${media.length > 0 ? "text-primary" : "text-[#9194A9]"
+                    } hover:text-primary transition-colors`}
                 />
               </button>
             </Tooltip>
@@ -590,9 +586,8 @@ const CreatePost = () => {
                   className="cursor-pointer"
                 >
                   <Globe
-                    className={`w-6 h-6 mt-2 ${
-                      privacy !== "public" ? "text-primary" : "text-[#9194A9]"
-                    } hover:text-primary transition-colors`}
+                    className={`w-6 h-6 mt-2 ${privacy !== "public" ? "text-primary" : "text-[#9194A9]"
+                      } hover:text-primary transition-colors`}
                   />
                 </button>
               </Tooltip>

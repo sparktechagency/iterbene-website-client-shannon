@@ -78,7 +78,7 @@ const CustomModal: React.FC<CustomModalProps> = ({
                 )}
 
             {/* Modal Content */}
-            <div className={`p-6 overflow-y-auto rounded-b-xl ${maxHeight}`}>
+            <div className={`p-4 overflow-y-auto rounded-b-xl ${maxHeight}`}>
               {children}
             </div>
           </motion.div>

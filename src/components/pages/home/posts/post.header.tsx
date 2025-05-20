@@ -98,7 +98,7 @@ const PostHeader = ({
         />
         <div>
           <div className="flex items-center gap-2">
-            <p className="font-bold text-gray-800 text-lg">
+            <p className="font-medium text-gray-800 text-lg">
               {post?.userId?.fullName}
             </p>
             <span className="text-sm">

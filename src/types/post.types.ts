@@ -4,7 +4,13 @@ export interface ISortedReaction {
 }
 
 export interface IReaction {
-  userId: string;
+  userId: {
+    _id: string;
+    fullName: string;
+    username: string;
+    profileImage: string;
+    id: string;
+  };
   postId: string;
   reactionType: ReactionType;
   createdAt: Date;
@@ -40,7 +46,8 @@ export interface IPost {
   postType: string;
   content: string;
   media: IMedia[];
-  sortedReactions: ISortedReaction[]; 
+  itinerary: string;
+  sortedReactions: ISortedReaction[];
   visitedLocationName: string;
   privacy: string;
   hashtags: string[];
@@ -48,7 +55,7 @@ export interface IPost {
   isShared: boolean;
   itineraryViewCount: number;
   reactions: IReaction[];
-  comments: IComment[]; 
+  comments: IComment[];
   createdAt: Date;
 }
 
