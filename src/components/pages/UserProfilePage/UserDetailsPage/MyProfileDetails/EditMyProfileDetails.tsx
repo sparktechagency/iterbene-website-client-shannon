@@ -266,7 +266,7 @@ const EditMyProfileDetails = ({
             />
             <h1 className="text-lg">Edit Your Profile Photo</h1>
           </div>
-          <div className="w-full border-2 p-6 border-dashed border-gray-600 text-center relative">
+          <div className="w-full border-2 p-6 border-dashed border-gray-400 rounded text-center relative">
             {profileImagePreview ? (
               <div className="relative">
                 <Image
@@ -358,7 +358,7 @@ const EditMyProfileDetails = ({
             />
             <h1 className="text-lg">Edit Your Cover Photo</h1>
           </div>
-          <div className="w-full border-2 p-6 border-dashed border-gray-600 text-center relative">
+          <div className="w-full border-2 p-6 border-dashed border-gray-400 rounded text-center relative">
             {coverImagePreview ? (
               <div className="relative">
                 <Image

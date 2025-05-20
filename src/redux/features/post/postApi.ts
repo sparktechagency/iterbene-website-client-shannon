@@ -29,7 +29,6 @@ const postApi = baseApi.injectEndpoints({
       }),
       providesTags: ["Post"],
     }),
-
     getTimelinePosts: builder.query({
       query: () => ({
         url: "/posts/timeline",
@@ -37,7 +36,6 @@ const postApi = baseApi.injectEndpoints({
       }),
       providesTags: ["Post"],
     }),
-
     getGroupPosts: builder.query({
       query: (groupId) => ({
         url: `/posts/group/${groupId}`,
@@ -45,7 +43,6 @@ const postApi = baseApi.injectEndpoints({
       }),
       providesTags: ["Post"],
     }),
-
     getEventPosts: builder.query({
       query: (eventId) => ({
         url: `/posts/event/${eventId}`,
@@ -53,13 +50,13 @@ const postApi = baseApi.injectEndpoints({
       }),
       providesTags: ["Post"],
     }),
-
     addOrRemoveReaction: builder.mutation({
       query: (data) => ({
         url: "/posts/reaction",
         method: "POST",
         body: data,
       }),
+      invalidatesTags: ["Post"],
     }),
     createComment: builder.mutation({
       query: (data) => ({
@@ -68,7 +65,6 @@ const postApi = baseApi.injectEndpoints({
         body: data,
       }),
     }),
-
     updateComment: builder.mutation({
       query: ({ commentId, comment }) => ({
         url: `/posts/comment/${commentId}`,
@@ -76,7 +72,6 @@ const postApi = baseApi.injectEndpoints({
         body: { comment },
       }),
     }),
-
     deleteComment: builder.mutation({
       query: (commentId) => ({
         url: `/posts/comment/${commentId}`,

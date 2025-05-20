@@ -1,37 +1,63 @@
 "use client";
+import { useAddOrRemoveReactionMutation } from "@/redux/features/post/postApi";
+import { TError } from "@/types/error";
 import { IComment, IPost } from "@/types/post.types";
-import { Ban, Heart, Smile } from "lucide-react";
-import React, { useEffect, useState } from "react";
-import { FaCalendarCheck, FaHeart } from "react-icons/fa";
+import { FaFaceSmile } from "react-icons/fa6";
+import { JSX, useState } from "react";
+import toast from "react-hot-toast";
+import { FaBan, FaCalendarCheck, FaHeart } from "react-icons/fa";
 import { MdOutlineLuggage } from "react-icons/md";
 import { RiMessage2Fill } from "react-icons/ri";
+import { motion, AnimatePresence } from "framer-motion";
 import PostCommentInput from "./post.comment.input";
 import PostCommentSection from "./post.comment.section";
 import PostContentRender from "./post.content-render";
 import PostHeader from "./post.header";
+
 interface PostCardProps {
   post: IPost;
 }
 
 const PostCard = ({ post }: PostCardProps) => {
-  const [reactions, setReactions] = useState(post.sortedReactions);
   const [newComment, setNewComment] = useState<string>("");
   const [comments, setComments] = useState<IComment[]>(post.comments);
   const [showReactions, setShowReactions] = useState<boolean>(false);
 
+  // Sort reactions to get the one with the highest count
+  const topReaction = post.sortedReactions?.length
+    ? post.sortedReactions.reduce((prev, current) =>
+        prev.count > current.count ? prev : current
+      )
+    : null;
+
+  // Add or remove reactions
+  const [addOrRemoveReaction] = useAddOrRemoveReactionMutation();
 
   const handleAddComment = () => {
     if (!newComment.trim()) return;
-    setComments([...comments, comment]);
+    setComments([...comments, { comment: newComment } as IComment]);
     setNewComment("");
   };
 
-  const handleReaction = (reactionType: keyof typeof reactions) => {};
+  const handleReaction = async (reactionType: string) => {
+    try {
+      await addOrRemoveReaction({ postId: post._id, reactionType }).unwrap();
+      setShowReactions(false);
+    } catch (error) {
+      const err = error as TError;
+      toast.error(err?.data?.message || "Something went wrong!");
+    }
+  };
 
-  const sortedReactions = Object.entries(reactions);
+  // Reaction icon mapping
+  const reactionIcons: { [key: string]: JSX.Element } = {
+    love: <FaHeart size={24}/>,
+    luggage: <MdOutlineLuggage size={28} />,
+    ban: <FaBan size={24} />,
+    smile: <FaFaceSmile size={24} />,
+  };
 
-  // Close modal on outside click
-
+  console.log(topReaction)
   return (
     <div className="w-full bg-white rounded-xl p-4 mb-4">
       <PostHeader post={post} />
@@ -48,9 +74,7 @@ const PostCard = ({ post }: PostCardProps) => {
           );
         })}
       </p>
-      <PostContentRender
-        data={post.media || []}
-      />
+      <PostContentRender data={post.media || []} />
       <div className="flex gap-7 items-center mt-5 border-b border-[#9194A9] pt-8 pb-5">
         <div
           className="relative flex items-center"
@@ -58,44 +82,42 @@ const PostCard = ({ post }: PostCardProps) => {
           onMouseLeave={() => setShowReactions(false)}
         >
           <button className="text-gray-600 flex gap-2 items-center cursor-pointer">
-            <FaHeart className="size-6 text-secondary" />
-            {sortedReactions.length > 0
-              ? sortedReactions[0][0].charAt(0).toUpperCase() +
-                sortedReactions[0][0].slice(1)
-              : ""}
+            { post?.reactions?.length > 0 && topReaction ? (
+              <>
+                <span className="text-secondary">{reactionIcons[topReaction.type]}</span>
+                <span className="font-semibold">{topReaction?.count}</span>
+              </>
+            ) : (
+              <>
+                <FaHeart className="size-6 text-secondary" />
+                <span className="font-semibold">{post?.reactions?.length}</span>
+              </>
+            )}
           </button>
-          {showReactions && (
-            <div className="absolute -top-12 -left-2 bg-white border border-gray-50 rounded-full shadow-lg px-3 py-2 flex space-x-3">
-              <button
-                title="Like"
-                onClick={() => handleReaction("love")}
-                className="text-2xl text-gray-600 hover:scale-125 hover:text-secondary transition-transform cursor-pointer"
+          <AnimatePresence>
+            {showReactions && (
+              <motion.div
+                initial={{ opacity: 0, y: 0 }}
+                animate={{ opacity: 1, y: -10 }}
+                exit={{ opacity: 0, y: 0 }}
+                transition={{ duration: 0.2 }}
+                className="absolute -top-12 -left-2 bg-white border border-gray-50 rounded-full shadow-lg px-3 py-2 flex space-x-3 z-10"
               >
-                <Heart size={28} />
-              </button>
-              <button
-                title="Luggage"
-                onClick={() => handleReaction("luggage")}
-                className="text-2xl text-gray-600 hover:scale-125 hover:text-secondary transition-transform cursor-pointer"
-              >
-                <MdOutlineLuggage size={28} />
-              </button>
-              <button
-                title="Ban"
-                onClick={() => handleReaction("ban")}
-                className="text-2xl text-gray-600 hover:scale-125 hover:text-secondary transition-transform cursor-pointer"
-              >
-                <Ban size={24} />
-              </button>
-              <button
-                title="Smile"
-                onClick={() => handleReaction("smile")}
-                className="text-2xl text-gray-600 hover:scale-125 hover:text-secondary transition-transform cursor-pointer"
-              >
-                <Smile size={24} />
-              </button>
-            </div>
-          )}
+                {["love", "luggage", "ban", "smile"].map((reaction) => (
+                  <motion.button
+                    key={reaction}
+                    title={reaction.charAt(0).toUpperCase() + reaction.slice(1)}
+                    onClick={() => handleReaction(reaction)}
+                    whileHover={{ scale: 1.25 }}
+                    whileTap={{ scale: 0.9 }}
+                    className="text-2xl text-gray-500 hover:text-secondary cursor-pointer"
+                  >
+                    {reactionIcons[reaction]}
+                  </motion.button>
+                ))}
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
         <div className="flex items-center space-x-2 cursor-pointer">
           <RiMessage2Fill className="size-6 text-primary" />
