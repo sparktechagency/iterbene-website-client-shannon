@@ -64,8 +64,8 @@ const PostContentRender = ({ data }: PostContentRenderProps) => {
               src={data[0]?.mediaUrl}
               alt="Post media"
               width={400}
-              height={800}
-              className="w-full h-full object-cover rounded-xl cursor-pointer"
+              height={600}
+              className="w-full h-[600px] object-cover rounded-xl cursor-pointer"
             />
           ) : (
             <VideoCard url={data[0]?.mediaUrl} />
@@ -77,8 +77,8 @@ const PostContentRender = ({ data }: PostContentRenderProps) => {
               src={data[1]?.mediaUrl}
               alt="Post media"
               width={400}
-              height={400}
-              className="w-full h-full object-cover rounded-xl cursor-pointer"
+              height={300}
+              className="w-full h-[300px] object-cover rounded-xl cursor-pointer"
             />
           ) : (
             <VideoCard url={data[1]?.mediaUrl} className="h-[260px]" />
@@ -90,8 +90,8 @@ const PostContentRender = ({ data }: PostContentRenderProps) => {
               src={data[2]?.mediaUrl}
               alt="Post media"
               width={400}
-              height={400}
-              className="w-full h-full object-cover rounded-xl cursor-pointer"
+              height={300}
+              className="w-full h-[280px] object-cover rounded-xl cursor-pointer"
             />
           ) : (
             <VideoCard url={data[2]?.mediaUrl} />
