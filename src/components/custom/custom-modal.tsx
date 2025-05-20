@@ -21,22 +21,19 @@ const CustomModal: React.FC<CustomModalProps> = ({
   children,
   maxWidth = "max-w-2xl",
   maxHeight = "max-h-[80vh]",
-  showCloseButton = true, // Default to true for clarity
+  showCloseButton = true,
   closeOnBackdropClick = true,
 }) => {
-  // Prevent background scrolling and apply blur when modal is open
+  // Prevent background scrolling when modal is open
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = "hidden";
-      document.body.style.paddingRight = "15px";
     } else {
       document.body.style.overflow = "auto";
-      document.body.style.paddingRight = "0";
     }
     // Cleanup on unmount
     return () => {
       document.body.style.overflow = "auto";
-      document.body.style.paddingRight = "0";
     };
   }, [isOpen]);
 
@@ -52,30 +49,38 @@ const CustomModal: React.FC<CustomModalProps> = ({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
+          transition={{ duration: 0.3, ease: "easeInOut" }}
           className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
-          onClick={closeOnBackdropClick ? onClose : undefined} // Close on backdrop click if enabled
+          onClick={closeOnBackdropClick ? onClose : undefined}
         >
           <motion.div
             className={`w-full bg-white rounded-xl shadow-2xl ${maxWidth} relative`}
-            initial={{ opacity: 0, scale: 0.95}}
-            animate={{ opacity: 1, scale: 1}}
-            exit={{ opacity: 0, scale: 0.95 }}
-            transition={{ duration: 0.2 }}
+            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.9, y: 20 }}
+            transition={{
+              type: "spring",
+              stiffness: 300,
+              damping: 25,
+              duration: 0.3,
+            }}
             onClick={handleModalClick}
           >
             {/* Header */}
-            {header
-              ? header
-              : showCloseButton && (
-                  <div className="flex items-center justify-between p-6 border-b border-gray-200 rounded-t-xl">
-                    <button
-                      className="text-gray-600 hover:text-gray-800 cursor-pointer"
-                      onClick={onClose}
-                    >
-                      <IoClose size={24} />
-                    </button>
-                  </div>
-                )}
+            {header ? (
+              header
+            ) : (
+              showCloseButton && (
+                <div className="flex items-center justify-between p-6 border-b border-gray-200 rounded-t-xl">
+                  <button
+                    className="text-gray-600 hover:text-gray-800 cursor-pointer"
+                    onClick={onClose}
+                  >
+                    <IoClose size={24} />
+                  </button>
+                </div>
+              )
+            )}
 
             {/* Modal Content */}
             <div className={`p-4 overflow-y-auto rounded-b-xl ${maxHeight}`}>

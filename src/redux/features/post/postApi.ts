@@ -12,7 +12,7 @@ const postApi = baseApi.injectEndpoints({
           body: formData,
         };
       },
-      invalidatesTags: ["Post","Hashtag"],
+      invalidatesTags: ["Post", "Hashtag"],
     }),
     sharePost: builder.mutation({
       query: (data) => ({
@@ -64,6 +64,7 @@ const postApi = baseApi.injectEndpoints({
         method: "POST",
         body: data,
       }),
+      invalidatesTags: ["Post"],
     }),
     updateComment: builder.mutation({
       query: ({ commentId, comment }) => ({

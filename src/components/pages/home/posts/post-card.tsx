@@ -117,9 +117,8 @@ const PostCard = ({ post }: PostCardProps) => {
       {/* Show reactions summary */}
       {nonZeroReactions?.length > 0 && (
         <div className="relative mb-2 mt-2">
-          <div className="flex items-center gap-1">
+          <div  onClick={() => setShowReactionDetails(true)} className="w-fit flex items-center gap-1 cursor-pointer">
             <div
-              onClick={() => setShowReactionDetails(true)}
               className="flex -space-x-1 cursor-pointer "
             >
               {/* Show up to 3 reaction types */}
@@ -294,7 +293,7 @@ const PostCard = ({ post }: PostCardProps) => {
         )}
       </div>
 
-      <PostCommentInput />
+      <PostCommentInput  post={post} />
       <PostCommentSection comments={post?.comments} />
     </div>
   );

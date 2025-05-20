@@ -18,7 +18,13 @@ export interface IReaction {
 
 export interface IComment {
   _id: string;
-  userId: string;
+  userId: {
+    _id: string;
+    fullName: string;
+    username: string;
+    profileImage: string;
+    id: string;
+  };
   postId: string;
   replyTo?: string;
   parentCommentId?: string;
