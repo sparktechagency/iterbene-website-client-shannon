@@ -1,11 +1,38 @@
+import {
+  useAcceptConnectionMutation,
+  useDeclineConnectionMutation,
+} from "@/redux/features/connections/connectionsApi";
 import { IConnectionRequest } from "@/types/connection.types";
+import { TError } from "@/types/error";
 import Image from "next/image";
 import Link from "next/link";
+import toast from "react-hot-toast";
 const RequestedConnectionCard = ({
   request,
 }: {
   request: IConnectionRequest;
 }) => {
+  const [acceptConnection] = useAcceptConnectionMutation();
+  const [declineConnection] = useDeclineConnectionMutation();
+
+  const handleAcceptConnection = async () => {
+    try {
+      await acceptConnection(request?._id).unwrap();
+      toast.success("Connection accepted successfully!");
+    } catch (error) {
+      const err = error as TError;
+      toast.error(err?.data?.message || "Something went wrong!");
+    }
+  };
+  const handleDeclineConnection = async () => {
+    try {
+      await declineConnection(request?._id).unwrap();
+      toast.success("Connection declined successfully!");
+    } catch (error) {
+      const err = error as TError;
+      toast.error(err?.data?.message || "Something went wrong!");
+    }
+  };
   return (
     <div className="w-full bg-white rounded-2xl  p-4 flex flex-col items-center">
       {/* Profile Image */}
@@ -25,10 +52,16 @@ const RequestedConnectionCard = ({
 
       {/* Buttons */}
       <div className="flex flex-col gap-4 w-full">
-        <button className="bg-secondary text-white px-5 py-3  rounded-xl cursor-pointer">
+        <button
+          onClick={handleAcceptConnection}
+          className="bg-secondary text-white px-5 py-3  rounded-xl cursor-pointer"
+        >
           Accept
         </button>
-        <button className="border border-[#9EA1B3] text-gray-900 px-5 py-3  rounded-xl  hover:bg-gray-100 transition cursor-pointer">
+        <button
+          onClick={handleDeclineConnection}
+          className="border border-[#9EA1B3] text-gray-900 px-5 py-3  rounded-xl  hover:bg-gray-100 transition cursor-pointer"
+        >
           Decline
         </button>
       </div>

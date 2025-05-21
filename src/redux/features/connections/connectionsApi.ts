@@ -38,9 +38,9 @@ const connectionsApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["Connections"],
     }),
-    deleteConnection: builder.mutation({
+    declineConnection: builder.mutation({
       query: (connectionId) => ({
-        url: `/connections/${connectionId}`,
+        url: `/connections/decline/${connectionId}`,
         method: "DELETE",
       }),
       invalidatesTags: ["Connections"],
@@ -82,7 +82,7 @@ export const {
   useCancelConnectionMutation,
   useCheckIsSentConnectionExistsQuery,
   useRemoveSuggestionConnectionMutation,
-  useDeleteConnectionMutation,
+  useDeclineConnectionMutation,
   useGetMyConnectionsQuery,
   useGetConnectionRequestsQuery,
   useGetSentConnectionRequestsQuery,
