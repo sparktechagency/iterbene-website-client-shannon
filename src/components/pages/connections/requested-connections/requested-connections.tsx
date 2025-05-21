@@ -2,7 +2,7 @@
 import React from "react";
 import RequestedConnectionCard from "./requested-connection-card";
 import { useGetConnectionRequestsQuery } from "@/redux/features/connections/connectionsApi";
-import { IConnection } from "@/types/connection.types";
+import { IConnectionRequest } from "@/types/connection.types";
 
 const RequestedConnections: React.FC = () => {
   const { data: responseData, isLoading } = useGetConnectionRequestsQuery(undefined);
@@ -16,10 +16,10 @@ const RequestedConnections: React.FC = () => {
   }else if(!isLoading && connectionsRequestData?.length > 0){
     content = (
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
-        {connectionsRequestData?.slice(0, 4)?.map((connection: IConnection) => (
+        {connectionsRequestData?.map((request: IConnectionRequest) => (
           <RequestedConnectionCard
-            key={connection.id}
-            connection={connection}
+            key={request?._id}
+            request={request}
           />
         ))}
       </div>

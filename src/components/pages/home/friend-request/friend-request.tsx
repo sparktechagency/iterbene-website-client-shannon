@@ -1,7 +1,7 @@
 "use client";
 import { useGetConnectionRequestsQuery } from "@/redux/features/connections/connectionsApi";
 import FriendRequestCard from "./friend-request-card";
-import { IConnection } from "@/types/connection.types";
+import { IConnectionRequest } from "@/types/connection.types";
 const FriendRequest = () => {
   const { data: responseData, isLoading } =
     useGetConnectionRequestsQuery(undefined);
@@ -15,8 +15,8 @@ const FriendRequest = () => {
   } else if (!isLoading && connectionsRequestData?.length > 0) {
     content = (
       <div className="w-full space-y-6">
-        {connectionsRequestData?.slice(0, 4)?.map((request: IConnection) => (
-          <FriendRequestCard key={request.id} request={request} />
+        {connectionsRequestData?.slice(0, 4)?.map((request: IConnectionRequest) => (
+          <FriendRequestCard key={request._id} request={request} />
         ))}
       </div>
     );

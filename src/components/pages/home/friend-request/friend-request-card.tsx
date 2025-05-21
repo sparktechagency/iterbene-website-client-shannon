@@ -1,24 +1,24 @@
 import CustomButton from "@/components/custom/custom-button";
-import { IConnection } from "@/types/connection.types";
+import { IConnectionRequest } from "@/types/connection.types";
 import Image from "next/image";
 import Link from "next/link";
 
-const FriendRequestCard= ({ request } : { request: IConnection }) => {
+const FriendRequestCard = ({ request }: { request: IConnectionRequest }) => {
   return (
     <div className="w-full bg-white p-6  rounded-2xl">
       <div className="flex items-center">
         <Image
-          src={request?.profileImage}
+          src={request?.sentBy?.profileImage}
           alt="Profile"
           width={60}
           height={60}
           className="size-[60px] rounded-full object-cover mr-4 ring ring-primary flex-shrink-0"
         />
         <h1>
-          <Link
-            href={`/${request?.username}`}
-          >
-            <span className="text-[18px] font-bold">{request?.fullName}</span>{" "}
+          <Link href={`/${request?.sentBy?.username}`}>
+            <span className="text-[18px] font-bold">
+              {request?.sentBy?.fullName}
+            </span>{" "}
           </Link>
           <span className="text-[18px] text-gray-500">
             wants to add you to friends

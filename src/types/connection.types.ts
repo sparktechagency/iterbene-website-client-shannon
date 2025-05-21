@@ -1,6 +1,26 @@
-export interface IConnection {
-    id: string;
+export interface ISuggestionUser {
+  id: string;
+  fullName: string;
+  username: string;
+  profileImage: string;
+}
+
+export interface IConnectionRequest {
+  _id: string;
+  sentBy: {
+    _id: string;
     fullName: string;
     username: string;
     profileImage: string;
+  };
+  status: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface IConnection {
+  id: string;
+  fullName: string;
+  username: string;
+  profileImage: string;
 }
