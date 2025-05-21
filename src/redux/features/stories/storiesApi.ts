@@ -4,7 +4,7 @@ const storiesApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     getStoryFeed: builder.query({
       query: () => "/stories/feed",
-      providesTags: ["Stories"],
+      providesTags: ["Story"],
     }),
     getStory: builder.query({
       query: (id) => `/stories/${id}`,
@@ -16,7 +16,7 @@ const storiesApi = baseApi.injectEndpoints({
         method: "POST",
         body: formData,
       }),
-      invalidatesTags: ["Stories"],
+      invalidatesTags: ["Story"],
     }),
     viewStory: builder.mutation({
       query: (storyId) => ({

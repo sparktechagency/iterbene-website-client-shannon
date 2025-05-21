@@ -1,28 +1,20 @@
+import { IConnection } from "@/types/connection.types";
 import Image from "next/image";
-import React from "react";
-
-// Define the TypeScript interface for the card props
-interface AddConnectionCardProps {
-  image: string;
-  name: string;
-}
-
-const AddConnectionCard: React.FC<AddConnectionCardProps> = ({
-  image,
-  name,
-}) => {
+const AddConnectionCard = ({ connection }: { connection: IConnection }) => {
   return (
     <div className="w-full bg-white rounded-2xl  p-4 flex flex-col items-center">
       {/* Profile Image */}
       <Image
-        src={image}
-        alt={name}
+        src={connection?.profileImage}
+        alt={connection?.username}
         width={248}
         height={248}
-        className="w-full h-full object-cover rounded-2xl mb-4"
+        className="w-full h-56 md:h-60 lg:h-[248px] object-cover rounded-2xl mb-4"
       />
       {/* Name */}
-      <h2 className="text-lg font-semibold text-gray-800 mb-4">{name}</h2>
+      <h2 className="text-lg font-semibold text-gray-800 mb-4">
+        {connection?.fullName}
+      </h2>
 
       {/* Buttons */}
       <div className="flex flex-col gap-4 w-full">

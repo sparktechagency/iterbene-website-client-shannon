@@ -70,14 +70,12 @@ export const baseApi = createApi({
   baseQuery: baseQueryWithRefreshToken,
   tagTypes: [
     "User",
-    "Flower",
     "Chat",
     "Message",
-    "Stories",
-    "Stories",
     "Story",
     "Post",
-    "Hashtag"
+    "Hashtag",
+    "Connections",
   ],
   endpoints: () => ({}),
 });

@@ -13,17 +13,6 @@ export const loginValidationSchema = z.object({
     .string({
       required_error: "Password is required",
     })
-    .min(8, { message: "Password must be at least 8 characters long" })
-    .regex(/[A-Z]/, {
-      message: "Password must contain at least one uppercase letter",
-    }) // At least one uppercase letter
-    .regex(/[a-z]/, {
-      message: "Password must contain at least one lowercase letter",
-    }) // At least one lowercase letter
-    .regex(/[0-9]/, { message: "Password must contain at least one number" }) // At least one number
-    .regex(/[\W_]/, {
-      message: "Password must contain at least one special character",
-    }), // At least one special character (e.g., !@#$%^&*)
 }) as z.ZodType<FieldValues>;
 
 export const registerValidationSchema = z.object({
