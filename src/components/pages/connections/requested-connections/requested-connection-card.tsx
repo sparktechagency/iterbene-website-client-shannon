@@ -12,13 +12,13 @@ const RequestedConnectionCard = ({ connection }: { connection: IConnection }) =>
         className="w-full h-56 md:h-60 lg:h-[248px] object-cover rounded-2xl mb-4"
       />
       {/* Name */}
-      <h2 className="text-lg font-semibold text-gray-800 mb-4">
+      <h2 className="text-base font-semibold text-gray-800 mb-4">
         {connection?.fullName}
       </h2>
 
       {/* Buttons */}
       <div className="flex flex-col gap-4 w-full">
-        <button className="bg-secondary text-white px-5 py-3 rounded-xl cursor-pointer">
+        <button className="bg-secondary text-white px-5 py-3  rounded-xl cursor-pointer">
           Accept
         </button>
         <button className="border border-[#9EA1B3] text-gray-900 px-5 py-3  rounded-xl  hover:bg-gray-100 transition cursor-pointer">
