@@ -7,6 +7,7 @@ import {
 import { IConnection } from "@/types/connection.types";
 import { TError } from "@/types/error";
 import Image from "next/image";
+import Link from "next/link";
 import toast from "react-hot-toast";
 const AddConnectionCard = ({ connection }: { connection: IConnection }) => {
   const { data: responseData } = useCheckIsSentConnectionExistsQuery(
@@ -52,13 +53,15 @@ const AddConnectionCard = ({ connection }: { connection: IConnection }) => {
   return (
     <div className="w-full h-fit bg-white rounded-2xl  p-4 flex flex-col items-center">
       {/* Profile Image */}
-      <Image
-        src={connection?.profileImage}
-        alt={connection?.username}
-        width={248}
-        height={248}
-        className="w-full h-56 md:h-60 lg:h-[248px] object-cover rounded-2xl mb-4"
-      />
+      <Link className="w-full" href={`/${connection?.username}`}>
+        <Image
+          src={connection?.profileImage}
+          alt={connection?.username}
+          width={248}
+          height={248}
+          className="w-full h-56 md:h-60 lg:h-[248px] object-cover rounded-2xl mb-4"
+        />
+      </Link>
       {/* Name */}
       <h2 className="text-lg font-semibold text-gray-800 mb-4">
         {connection?.fullName}

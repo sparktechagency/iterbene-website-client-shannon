@@ -9,7 +9,7 @@ const AddConnections = () => {
   if (isLoading) {
     content = <p>Loading...</p>;
   } else if (!isLoading && suggestionsConnections?.length === 0) {
-    content = <p>No requests found</p>;
+    content = <p>No suggestions users found</p>;
   } else if (!isLoading && suggestionsConnections?.length > 0) {
     content = (
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
