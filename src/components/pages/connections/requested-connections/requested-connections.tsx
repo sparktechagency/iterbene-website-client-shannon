@@ -1,18 +1,17 @@
 "use client";
 import React from "react";
 import RequestedConnectionCard from "./requested-connection-card";
-import { useGetSuggestionsConnectionsQuery } from "@/redux/features/connections/connectionsApi";
+import { useGetConnectionRequestsQuery } from "@/redux/features/connections/connectionsApi";
 import { IConnection } from "@/types/connection.types";
 
 const RequestedConnections: React.FC = () => {
-  // const { data: responseData, isLoading } = useGetConnectionRequestsQuery(undefined);
-   const { data: responseData,isLoading } = useGetSuggestionsConnectionsQuery(undefined)
+  const { data: responseData, isLoading } = useGetConnectionRequestsQuery(undefined);
   const connectionsRequestData = responseData?.data?.attributes?.results;
   let content = null;
   if(isLoading){
     content = <p>Loading...</p>;
   }else if(!isLoading && connectionsRequestData?.length === 0){
-    content = <p>No requests found</p>;
+    content = <p className="text-xl">No requests found</p>;
   }else if(!isLoading && connectionsRequestData?.length > 0){
     content = (
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">

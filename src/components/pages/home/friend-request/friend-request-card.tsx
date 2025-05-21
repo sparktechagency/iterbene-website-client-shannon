@@ -1,24 +1,14 @@
-// components/FriendRequestCard.tsx
-
 import CustomButton from "@/components/custom/custom-button";
+import { IConnection } from "@/types/connection.types";
 import Image from "next/image";
 import Link from "next/link";
-import React from "react";
 
-interface FriendRequestCardProps {
-  request: {
-    id: number;
-    name: string;
-    profileImage: string;
-  };
-}
-
-const FriendRequestCard: React.FC<FriendRequestCardProps> = ({ request }) => {
+const FriendRequestCard= ({ request } : { request: IConnection }) => {
   return (
     <div className="w-full bg-white p-6  rounded-2xl">
       <div className="flex items-center">
         <Image
-          src={request.profileImage}
+          src={request?.profileImage}
           alt="Profile"
           width={60}
           height={60}
@@ -26,9 +16,9 @@ const FriendRequestCard: React.FC<FriendRequestCardProps> = ({ request }) => {
         />
         <h1>
           <Link
-            href={`/user-info/${request.name}`}
+            href={`/${request?.username}`}
           >
-            <span className="text-[18px] font-bold">{request.name}</span>{" "}
+            <span className="text-[18px] font-bold">{request?.fullName}</span>{" "}
           </Link>
           <span className="text-[18px] text-gray-500">
             wants to add you to friends

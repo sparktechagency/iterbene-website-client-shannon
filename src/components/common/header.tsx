@@ -299,7 +299,7 @@ const UserDropdown: React.FC<DropdownProps> = ({ user, isOpen }) => {
           </Link>
           <div className="space-y-3">
             <Link
-              href="/my-profile"
+              href={`/${user?.username}`}
               className="text-gray-800 hover:bg-[#ECFCFA] px-4 py-3 rounded-xl flex items-center gap-4"
             >
               <FaRegUserCircle size={24} />
@@ -337,7 +337,7 @@ const UserDropdown: React.FC<DropdownProps> = ({ user, isOpen }) => {
               <span>Groups</span>
             </Link>
             <Link
-              href="/"
+              href={`/${user?.username}/maps`}
               className="text-gray-800 hover:bg-[#ECFCFA] px-4 py-3 rounded-xl flex items-center gap-4"
             >
               <FiMapPin size={24} />
@@ -351,7 +351,7 @@ const UserDropdown: React.FC<DropdownProps> = ({ user, isOpen }) => {
               <span>Events</span>
             </Link>
             <Link
-              href="/"
+              href={`/${user?.username}/invitations`}
               className="text-gray-800 hover:bg-[#ECFCFA] px-4 py-3 rounded-xl flex items-center gap-4"
             >
               <MdAlternateEmail size={24} />
@@ -367,7 +367,10 @@ const UserDropdown: React.FC<DropdownProps> = ({ user, isOpen }) => {
               </button>
               <SettingsDropdown isOpen={isSettingsOpen} />
             </div>
-            <button onClick={handleLogout} className="w-full cursor-pointer flex items-center px-4 py-3 gap-4 text-red-500 hover:bg-gray-100 rounded-xl">
+            <button
+              onClick={handleLogout}
+              className="w-full cursor-pointer flex items-center px-4 py-3 gap-4 text-red-500 hover:bg-gray-100 rounded-xl"
+            >
               <BiLogOut size={24} />
               <span>Logout</span>
             </button>
