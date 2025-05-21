@@ -1,5 +1,6 @@
 "use client";
 import { motion, AnimatePresence } from "framer-motion";
+import { useEffect } from "react";
 import { IoClose } from "react-icons/io5";
 
 interface CustomModalProps {
@@ -24,17 +25,17 @@ const CustomModal: React.FC<CustomModalProps> = ({
   closeOnBackdropClick = true,
 }) => {
   // Prevent background scrolling when modal is open
-  // useEffect(() => {
-  //   if (isOpen) {
-  //     document.body.style.overflow = "hidden";
-  //   } else {
-  //     document.body.style.overflow = "auto";
-  //   }
-  //   // Cleanup on unmount
-  //   return () => {
-  //     document.body.style.overflow = "auto";
-  //   };
-  // }, [isOpen]);
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "auto";
+    }
+    // Cleanup on unmount
+    return () => {
+      document.body.style.overflow = "auto";
+    };
+  }, [isOpen]);
 
   // Stop click event propagation to prevent closing when clicking inside the modal
   const handleModalClick = (e: React.MouseEvent) => {

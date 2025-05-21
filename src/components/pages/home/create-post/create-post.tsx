@@ -32,11 +32,23 @@ import toast from "react-hot-toast";
 import { TError } from "@/types/error";
 import { useCreatePostMutation } from "@/redux/features/post/postApi";
 import { useGetHashtagPostsQuery } from "@/redux/features/hashtag/hashtagApi";
+import { useLoadScript } from "@react-google-maps/api";
 
+// Google Maps libraries
+const libraries: ("places" | "drawing" | "geometry" | "visualization")[] = [
+  "places",
+  "drawing",
+  "geometry",
+  "visualization",
+];
 export interface FilePreview {
   name: string;
   preview: string;
   type: string;
+}
+interface Location {
+  latitude: number;
+  longitude: number;
 }
 
 const CreatePost = () => {
@@ -48,15 +60,22 @@ const CreatePost = () => {
   const [showHashtagSuggestions, setShowHashtagSuggestions] =
     useState<boolean>(false);
   const hashtagPopupRef = useRef<HTMLDivElement>(null);
-
+  const { isLoaded } = useLoadScript({
+    googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAP_API_KEY as string,
+    libraries,
+  });
   // Use form
   const methods = useForm();
   const { reset } = methods;
 
   // State for location
   const [selectedLocation, setSelectedLocation] = useState<string | null>(null);
+  const [visitedLocationName, setVisitedLocationName] = useState<string>("");
+  const [visitedLocation, setVisitedLocation] = useState<Location>({
+    latitude: 0,
+    longitude: 0,
+  });
   const [showLocationPopup, setShowLocationPopup] = useState<boolean>(false);
-  const [locationSearch, setLocationSearch] = useState<string>("");
 
   // State for privacy
   const [privacy, setPrivacy] = useState<string>("public");
@@ -173,23 +192,6 @@ const CreatePost = () => {
     }, 0);
   };
 
-  // Mock location search results (replace with real API in production)
-  const mockLocations = [
-    "Rome, Italy",
-    "Colosseum, Rome, Italy",
-    "Pantheon, Rome, Italy",
-    "Piazza Navona, Rome, Italy",
-  ].filter((location) =>
-    location.toLowerCase().includes(locationSearch.toLowerCase())
-  );
-
-  // Handle location selection
-  const handleLocationSelect = (location: string) => {
-    setSelectedLocation(location);
-    setShowLocationPopup(false);
-    setLocationSearch("");
-  };
-
   // Remove location
   const handleRemoveLocation = () => {
     setSelectedLocation(null);
@@ -254,6 +256,28 @@ const CreatePost = () => {
     }
   };
 
+  const handlePlaceSelect = (
+    autocomplete: google.maps.places.Autocomplete
+  ): void => {
+    const place = autocomplete.getPlace();
+    console.log(place)
+  };
+
+  const handleLoadAutocomplete = (
+    autocomplete: google.maps.places.Autocomplete
+  ): void => {
+    if (autocomplete) {
+      autocomplete.addListener("place_changed", () =>
+        handlePlaceSelect(autocomplete)
+      );
+      console.log("Autocomplete loaded", autocomplete);
+    }
+  };
+
+  if (!isLoaded) {
+    return <div>Loading...</div>;
+  }
+
   // Create new post
   const handleCreatePost = async () => {
     const visitedLocation = {
@@ -286,23 +310,14 @@ const CreatePost = () => {
   };
 
   // Fallback profile image
-  const defaultProfileImage = "/default-profile.png";
   return (
     <section className="w-full bg-white rounded-xl">
       {/* Post Input Section */}
       <div className="w-full flex px-4 pt-4 pb-2 gap-3">
-        {user?.profileImage ? (
+        {user && (
           <Image
             src={user.profileImage}
             alt="User Profile"
-            width={50}
-            height={50}
-            className="size-[50px] rounded-full object-cover flex-shrink-0"
-          />
-        ) : (
-          <Image
-            src={defaultProfileImage}
-            alt="Default Profile"
             width={50}
             height={50}
             className="size-[50px] rounded-full object-cover flex-shrink-0"
@@ -496,6 +511,7 @@ const CreatePost = () => {
           {/* Icons for Additional Functionalities */}
           <div className="flex items-center gap-5 bg-[#E7E8EC] px-4 py-1.5 rounded-b-xl">
             {/* Location Icon with Popup */}
+            {/* Location Icon with Popup */}
             <div className="relative" ref={locationPopupRef}>
               <Tooltip title="Add a location" placement="bottom">
                 <button
@@ -520,33 +536,19 @@ const CreatePost = () => {
                     <div className="relative">
                       <input
                         type="text"
-                        value={locationSearch}
-                        onChange={(e) => setLocationSearch(e.target.value)}
+                        onFocus={(e) => {
+                          const autocomplete =
+                            new window.google.maps.places.Autocomplete(
+                              e.target
+                            );
+                          handleLoadAutocomplete(autocomplete); // Load Autocomplete when focused
+                        }}
                         placeholder="Search location..."
                         className="w-full px-4 py-2 border rounded-full border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary"
                       />
                       <Search className="w-5 h-5 text-[#9194A9] absolute top-3 right-4" />
                     </div>
-                    <div className="mt-4 max-h-40 overflow-y-auto">
-                      {mockLocations.length > 0 ? (
-                        mockLocations.map((location, index) => (
-                          <div
-                            key={index}
-                            onClick={() => handleLocationSelect(location)}
-                            className="flex items-center gap-3 p-3 hover:bg-gray-50 cursor-pointer rounded-md transition-colors"
-                          >
-                            <MapPin className="size-5 text-[#9194A9]" />
-                            <span className="text-sm text-gray-900">
-                              {location}
-                            </span>
-                          </div>
-                        ))
-                      ) : (
-                        <p className="text-sm text-[#9194A9]">
-                          No locations found
-                        </p>
-                      )}
-                    </div>
+                    {/* Remove mock locations section since we're using Google Places API now */}
                   </motion.div>
                 )}
               </AnimatePresence>

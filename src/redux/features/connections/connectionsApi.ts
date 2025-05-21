@@ -10,6 +10,13 @@ const connectionsApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["Connections"],
     }),
+    checkIsSentConnectionExists: builder.query({
+      query: (friendId) => ({
+        url: `/connections/check-sent-connection/${friendId}`,
+        method: "GET",
+      }),
+      providesTags: ["Connections"],
+    }),
     acceptConnection: builder.mutation({
       query: (connectionId) => ({
         url: `/connections/accept/${connectionId}`,
@@ -18,17 +25,16 @@ const connectionsApi = baseApi.injectEndpoints({
       invalidatesTags: ["Connections"],
     }),
     cancelConnection: builder.mutation({
-      query: (connectionId) => ({
-        url: `/connections/cancel/${connectionId}`,
+      query: (friendId) => ({
+        url: `/connections/cancel/${friendId}`,
         method: "DELETE",
       }),
       invalidatesTags: ["Connections"],
     }),
     removeSuggestionConnection: builder.mutation({
       query: (removedByUserId) => ({
-        url: `/connections/remove`,
-        method: "DELETE",
-        body: { removedByUserId },
+        url: `/connections/remove/${removedByUserId}`,
+        method: "DELETE"
       }),
       invalidatesTags: ["Connections"],
     }),
@@ -74,6 +80,7 @@ export const {
   useAddConnectionMutation,
   useAcceptConnectionMutation,
   useCancelConnectionMutation,
+  useCheckIsSentConnectionExistsQuery,
   useRemoveSuggestionConnectionMutation,
   useDeleteConnectionMutation,
   useGetMyConnectionsQuery,

@@ -1,8 +1,56 @@
+import {
+  useAddConnectionMutation,
+  useCancelConnectionMutation,
+  useCheckIsSentConnectionExistsQuery,
+  useRemoveSuggestionConnectionMutation,
+} from "@/redux/features/connections/connectionsApi";
 import { IConnection } from "@/types/connection.types";
+import { TError } from "@/types/error";
 import Image from "next/image";
+import toast from "react-hot-toast";
 const AddConnectionCard = ({ connection }: { connection: IConnection }) => {
+  const { data: responseData } = useCheckIsSentConnectionExistsQuery(
+    connection?.id,
+    {
+      skip: !connection?.id,
+    }
+  );
+  const [addConnection] = useAddConnectionMutation();
+  const [removeConnection] = useRemoveSuggestionConnectionMutation();
+  const [cancelRequest] = useCancelConnectionMutation();
+  const checkSentConnectionExist = responseData?.data?.attributes;
+
+  const handleAddConnection = async () => {
+    try {
+      const payload = { receivedBy: connection?.id };
+      await addConnection(payload).unwrap();
+      toast.success("Connection sent successfully!");
+    } catch (error) {
+      const err = error as TError;
+      toast.error(err?.data?.message || "Something went wrong!");
+    }
+  };
+  const handleCancelRequest = async () => {
+    try {
+      await cancelRequest(connection?.id).unwrap();
+      toast.success("Request canceled successfully!");
+    } catch (error) {
+      const err = error as TError;
+      toast.error(err?.data?.message || "Something went wrong!");
+    }
+  };
+
+  const handleRemoveConnection = async () => {
+    try {
+      await removeConnection(connection?.id).unwrap();
+      toast.success("Connection removed successfully!");
+    } catch (error) {
+      const err = error as TError;
+      toast.error(err?.data?.message || "Something went wrong!");
+    }
+  };
   return (
-    <div className="w-full bg-white rounded-2xl  p-4 flex flex-col items-center">
+    <div className="w-full h-fit bg-white rounded-2xl  p-4 flex flex-col items-center">
       {/* Profile Image */}
       <Image
         src={connection?.profileImage}
@@ -15,15 +63,31 @@ const AddConnectionCard = ({ connection }: { connection: IConnection }) => {
       <h2 className="text-lg font-semibold text-gray-800 mb-4">
         {connection?.fullName}
       </h2>
-
       {/* Buttons */}
       <div className="flex flex-col gap-4 w-full">
-        <button className="bg-[#FEEFE8] text-secondary px-5 py-3 rounded-xl border border-secondary transition cursor-pointer">
-          Add Connection
-        </button>
-        <button className="border border-[#9EA1B3] text-gray-900 px-5 py-3   rounded-xl hover:bg-gray-100 transition cursor-pointer">
-          Remove
-        </button>
+        {checkSentConnectionExist ? (
+          <button
+            onClick={handleCancelRequest}
+            className="border border-[#9EA1B3] text-gray-900 px-5 py-3   rounded-xl hover:bg-gray-100 transition cursor-pointer"
+          >
+            Cancel Request
+          </button>
+        ) : (
+          <>
+            <button
+              onClick={handleAddConnection}
+              className="bg-[#FEEFE8] text-secondary px-5 py-3 rounded-xl border border-secondary transition cursor-pointer"
+            >
+              Add Connection
+            </button>
+            <button
+              onClick={handleRemoveConnection}
+              className="border border-[#9EA1B3] text-gray-900 px-5 py-3   rounded-xl hover:bg-gray-100 transition cursor-pointer"
+            >
+              Remove
+            </button>
+          </>
+        )}
       </div>
     </div>
   );

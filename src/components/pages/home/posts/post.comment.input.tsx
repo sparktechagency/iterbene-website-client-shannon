@@ -78,13 +78,15 @@ const PostCommentInput = ({ post }: { post: IPost }) => {
   return (
     <section className="mt-3 flex flex-col space-y-2 pt-5">
       <div className="flex space-x-2">
-        <Image
-          src={user?.profileImage}
-          alt={user?.username}
-          width={48}
-          height={48}
-          className="size-[48px] ring ring-primary rounded-full"
-        />
+        {user && (
+          <Image
+            src={user?.profileImage}
+            alt={user?.username}
+            width={48}
+            height={48}
+            className="size-[48px] ring ring-primary rounded-full"
+          />
+        )}
         <div className="w-full relative border flex justify-between items-center border-[#DDDDDD] rounded-xl text-base focus:outline-none focus:ring focus:ring-primary resize-none">
           <textarea
             ref={textareaRef}

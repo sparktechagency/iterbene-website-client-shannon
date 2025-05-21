@@ -7,13 +7,16 @@ const AuthorBio = () => {
   return (
     <section className="w-full max-h-[108px] bg-white p-6 rounded-2xl">
       <div className="w-full h-full gap-3 flex items-center">
-        <Image
-          src={user?.profileImage}
-          alt={user?.fullName}
-          width={60}
-          height={60}
-          className="size-[60px] rounded-full object-cover mr-3 ring-2 ring-primary"
-        />
+        {user && (
+          <Image
+            src={user?.profileImage}
+            alt={user?.fullName}
+            width={60}
+            height={60}
+            className="size-[60px] rounded-full object-cover mr-3 ring-2 ring-primary"
+          />
+        )}
+
         <div>
           <h2 className="text-lg md:text-xl font-bold text-gray-900">
             {user?.fullName}
