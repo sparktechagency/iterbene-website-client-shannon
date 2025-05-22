@@ -71,6 +71,7 @@ export const baseApi = createApi({
   tagTypes: [
     "User",
     "Chat",
+    "Groups",
     "Message",
     "Story",
     "Post",

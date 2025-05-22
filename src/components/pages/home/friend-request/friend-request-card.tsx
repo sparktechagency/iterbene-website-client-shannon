@@ -1,9 +1,33 @@
 import CustomButton from "@/components/custom/custom-button";
+import { useAcceptConnectionMutation, useDeclineConnectionMutation } from "@/redux/features/connections/connectionsApi";
 import { IConnectionRequest } from "@/types/connection.types";
+import { TError } from "@/types/error";
 import Image from "next/image";
 import Link from "next/link";
+import toast from "react-hot-toast";
 
 const FriendRequestCard = ({ request }: { request: IConnectionRequest }) => {
+    const [acceptConnection] = useAcceptConnectionMutation();
+    const [declineConnection] = useDeclineConnectionMutation();
+  
+    const handleAcceptConnection = async () => {
+      try {
+        await acceptConnection(request?._id).unwrap();
+        toast.success("Connection accepted successfully!");
+      } catch (error) {
+        const err = error as TError;
+        toast.error(err?.data?.message || "Something went wrong!");
+      }
+    };
+    const handleDeclineConnection = async () => {
+      try {
+        await declineConnection(request?._id).unwrap();
+        toast.success("Connection declined successfully!");
+      } catch (error) {
+        const err = error as TError;
+        toast.error(err?.data?.message || "Something went wrong!");
+      }
+    };
   return (
     <div className="w-full bg-white p-6  rounded-2xl">
       <div className="flex items-center">
@@ -26,10 +50,10 @@ const FriendRequestCard = ({ request }: { request: IConnectionRequest }) => {
         </h1>
       </div>
       <div className="mt-5 flex justify-between gap-4 items-center">
-        <CustomButton variant="default" className="px-5 py-3" fullWidth>
+        <CustomButton onClick={handleAcceptConnection} variant="default" className="px-5 py-3" fullWidth>
           Accept
         </CustomButton>
-        <CustomButton variant="outline" className="px-5 py-3" fullWidth>
+        <CustomButton onClick={handleDeclineConnection} variant="outline" className="px-5 py-3" fullWidth>
           Decline
         </CustomButton>
       </div>

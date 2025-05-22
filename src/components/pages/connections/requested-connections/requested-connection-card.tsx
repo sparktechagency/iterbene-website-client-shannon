@@ -12,27 +12,7 @@ const RequestedConnectionCard = ({
 }: {
   request: IConnectionRequest;
 }) => {
-  const [acceptConnection] = useAcceptConnectionMutation();
-  const [declineConnection] = useDeclineConnectionMutation();
 
-  const handleAcceptConnection = async () => {
-    try {
-      await acceptConnection(request?._id).unwrap();
-      toast.success("Connection accepted successfully!");
-    } catch (error) {
-      const err = error as TError;
-      toast.error(err?.data?.message || "Something went wrong!");
-    }
-  };
-  const handleDeclineConnection = async () => {
-    try {
-      await declineConnection(request?._id).unwrap();
-      toast.success("Connection declined successfully!");
-    } catch (error) {
-      const err = error as TError;
-      toast.error(err?.data?.message || "Something went wrong!");
-    }
-  };
   return (
     <div className="w-full bg-white rounded-2xl  p-4 flex flex-col items-center">
       {/* Profile Image */}
