@@ -204,6 +204,7 @@ const CreateGroup: React.FC = () => {
               placeholder="Search for a location..."
               required
               onLocationSelect={handleLocationSelect}
+              showSelectedInfo = {false}
             />
 
             {/* Who can see the group? */}

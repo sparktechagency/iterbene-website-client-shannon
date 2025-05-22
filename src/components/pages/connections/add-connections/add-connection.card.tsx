@@ -79,7 +79,7 @@ const AddConnectionCard = ({ connection }: { connection: IConnection }) => {
             </button>
           </div>
         ) : (
-          <div className="flex flex-col justify-between gap-4 w-full">
+          <div className="flex flex-col justify-between gap-5 w-full">
             <button
               onClick={handleAddConnection}
               className="bg-[#FEEFE8] text-secondary px-5 py-3  border border-secondary  rounded-xl transition cursor-pointer"

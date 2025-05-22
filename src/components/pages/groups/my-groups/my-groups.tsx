@@ -14,7 +14,7 @@ const MyGroups: React.FC = () => {
     content = <p className="text-xl">No groups found</p>;
   } else if (groupsData?.length > 0) {
     content = (
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         {groupsData?.map((group: IGroup) => (
           <MyGroupCard key={group.name} group={group} />
         ))}
