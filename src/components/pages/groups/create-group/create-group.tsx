@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState } from "react";
 import { PiPlus } from "react-icons/pi";
 import CustomModal from "@/components/custom/custom-modal";
 import Image from "next/image";
@@ -9,7 +9,7 @@ import CustomForm from "@/components/custom/custom-form";
 import CustomInput from "@/components/custom/custom-input";
 import CustomSelectField from "@/components/custom/custom-seletectField";
 import { FieldValues } from "react-hook-form";
-import { LocateIcon, Lock, MapPin } from "lucide-react";
+import { Lock } from "lucide-react";
 import CustomButton from "@/components/custom/custom-button";
 import { IoClose } from "react-icons/io5";
 import useUser from "@/hooks/useUser";
@@ -19,28 +19,10 @@ import { useCreateGroupMutation } from "@/redux/features/group/groupApi";
 import { TError } from "@/types/error";
 import toast from "react-hot-toast";
 import { IMyConnections } from "@/types/connection.types";
+import { LocationDetails } from "@/hooks/useGoogleLocationSearch";
+import LocationSearchInput from "@/components/custom/LocationSearchInput";
 
 const { Option } = Select;
-
-// Add your Google Maps API key here
-const GOOGLE_MAPS_API_KEY =
-  process.env.NEXT_PUBLIC_GOOGLE_MAP_API_KEY || "YOUR_API_KEY_HERE";
-
-// Types for Google Places API response
-interface GooglePlacePrediction {
-  description: string;
-  place_id: string;
-  structured_formatting: {
-    main_text: string;
-    secondary_text: string;
-  };
-}
-
-interface SelectedLocation {
-  name: string;
-  latitude: number;
-  longitude: number;
-}
 
 const CreateGroup: React.FC = () => {
   const user = useUser();
@@ -48,182 +30,25 @@ const CreateGroup: React.FC = () => {
   const [groupImage, setGroupImage] = useState<string | null>(null);
   const [groupFile, setGroupFile] = useState<File | null>(null);
   const [coLeaders, setCoLeaders] = useState<string[]>([]);
-
-  // Location search states
-  const [locationQuery, setLocationQuery] = useState("");
-  const [locationResults, setLocationResults] = useState<
-    GooglePlacePrediction[]
-  >([]);
   const [selectedLocation, setSelectedLocation] =
-    useState<SelectedLocation | null>(null);
-  const [showLocationDropdown, setShowLocationDropdown] = useState(false);
-  const [isSearchingLocation, setIsSearchingLocation] = useState(false);
-
-  const locationInputRef = useRef<HTMLInputElement>(null);
-  const dropdownRef = useRef<HTMLDivElement>(null);
-  const autocompleteServiceRef =
-    useRef<google.maps.places.AutocompleteService | null>(null);
-  const placesServiceRef = useRef<google.maps.places.PlacesService | null>(
-    null
-  );
+    useState<LocationDetails | null>(null);
 
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => {
     setIsModalOpen(false);
-    // Reset location states when modal closes
-    setLocationQuery("");
-    setLocationResults([]);
+    // Reset states when modal closes
     setSelectedLocation(null);
-    setShowLocationDropdown(false);
     setGroupFile(null);
+    setGroupImage(null);
+    setCoLeaders([]);
   };
 
-  //get my all connections list
+  // Get my all connections list
   const { data: responseData } = useGetMyConnectionsQuery(undefined);
   const myConnections = responseData?.data?.attributes?.results;
 
-  //create group mutation
+  // Create group mutation
   const [createGroup, { isLoading }] = useCreateGroupMutation();
-
-  // Initialize Google Places API
-  useEffect(() => {
-    const initializeGooglePlaces = () => {
-      if (window.google && window.google.maps && window.google.maps.places) {
-        autocompleteServiceRef.current =
-          new window.google.maps.places.AutocompleteService();
-
-        // Create a dummy div for PlacesService (required by Google)
-        const dummyDiv = document.createElement("div");
-        placesServiceRef.current = new window.google.maps.places.PlacesService(
-          dummyDiv
-        );
-      }
-    };
-
-    // Load Google Maps API if not already loaded
-    if (!window.google) {
-      const script = document.createElement("script");
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_API_KEY}&libraries=places`;
-      script.async = true;
-      script.defer = true;
-      script.onload = initializeGooglePlaces;
-      document.head.appendChild(script);
-    } else {
-      initializeGooglePlaces();
-    }
-  }, []);
-
-  // Search locations using Google Places API
-  const searchLocations = async (query: string) => {
-    if (query?.length < 3 || !autocompleteServiceRef.current) {
-      setLocationResults([]);
-      return;
-    }
-
-    setIsSearchingLocation(true);
-    try {
-      const request = {
-        input: query,
-        types: ["establishment", "geocode"], // Include businesses and addresses
-      };
-
-      autocompleteServiceRef.current.getPlacePredictions(
-        request,
-        (predictions, status) => {
-          setIsSearchingLocation(false);
-          if (
-            status === google.maps.places.PlacesServiceStatus.OK &&
-            predictions
-          ) {
-            console.log("Predictions:", predictions);
-            setLocationResults(predictions);
-            setShowLocationDropdown(true);
-          } else {
-            setLocationResults([]);
-            setShowLocationDropdown(false);
-          }
-        }
-      );
-    } catch (error) {
-      console.error("Error searching locations:", error);
-      toast.error("Failed to search locations");
-      setIsSearchingLocation(false);
-    }
-  };
-
-  // Get place details from place_id
-  const getPlaceDetails = (placeId: string, description: string) => {
-    if (!placesServiceRef.current) return;
-
-    const request = {
-      placeId: placeId,
-      fields: ["geometry", "formatted_address", "name"],
-    };
-
-    placesServiceRef.current.getDetails(request, (place, status) => {
-      if (status === google.maps.places.PlacesServiceStatus.OK && place) {
-        console.log(place);
-        const selected: SelectedLocation = {
-          name: place.formatted_address || description,
-          latitude: place.geometry?.location?.lat() || 0,
-          longitude: place.geometry?.location?.lng() || 0,
-        };
-
-        setSelectedLocation(selected);
-        setLocationQuery(description);
-        setShowLocationDropdown(false);
-        setLocationResults([]);
-      } else {
-        toast.error("Failed to get location details");
-      }
-    });
-  };
-
-  // Debounce location search
-  useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      if (locationQuery && !selectedLocation) {
-        searchLocations(locationQuery);
-      }
-    }, 300);
-
-    return () => clearTimeout(timeoutId);
-  }, [locationQuery, selectedLocation]);
-
-  // Handle location input change
-  const handleLocationInputChange = (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    const value = e.target.value;
-    setLocationQuery(value);
-    setSelectedLocation(null);
-
-    if (value.length === 0) {
-      setLocationResults([]);
-      setShowLocationDropdown(false);
-    }
-  };
-
-  // Handle location selection
-  const handleLocationSelect = (prediction: GooglePlacePrediction) => {
-    getPlaceDetails(prediction.place_id, prediction.description);
-  };
-
-  // Handle clicks outside dropdown
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node) &&
-        !locationInputRef.current?.contains(event.target as Node)
-      ) {
-        setShowLocationDropdown(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -236,6 +61,10 @@ const CreateGroup: React.FC = () => {
       setGroupImage(imageUrl);
       setGroupFile(file);
     }
+  };
+
+  const handleLocationSelect = (location: LocationDetails) => {
+    setSelectedLocation(location);
   };
 
   const handleFormSubmit = async (values: FieldValues) => {
@@ -270,9 +99,11 @@ const CreateGroup: React.FC = () => {
       toast.error(err?.data?.message || "Something went wrong!");
     }
   };
+
   const handleCoLeaderChange = (value: string[]) => {
     setCoLeaders(value);
   };
+
   return (
     <section className="w-full mb-8">
       <button
@@ -282,6 +113,7 @@ const CreateGroup: React.FC = () => {
         <PiPlus size={24} />
         <span>Create New Group</span>
       </button>
+
       {/* Render the Modal */}
       <CustomModal
         header={
@@ -300,7 +132,7 @@ const CreateGroup: React.FC = () => {
         isOpen={isModalOpen}
         onClose={closeModal}
       >
-        {/* Group Group Image */}
+        {/* Group Image */}
         <div className="w-full h-44 bg-[#DDDDDD] rounded-xl mb-4 relative flex items-center justify-center">
           {groupImage ? (
             <div className="relative w-full h-full">
@@ -366,67 +198,13 @@ const CreateGroup: React.FC = () => {
               placeholder="Group name"
             />
 
-            {/* Custom Google Places Location Search Input */}
-            <div className="flex flex-col gap-2">
-              <label className="text-sm font-medium text-gray-700">
-                Location <span className="text-red-500">*</span>
-              </label>
-              <div className="relative">
-                <div className="relative">
-                  <input
-                    ref={locationInputRef}
-                    type="text"
-                    value={locationQuery}
-                    onChange={handleLocationInputChange}
-                    placeholder="Search for a location..."
-                    className="w-full px-4 py-3 pl-12 border border-gray-300 rounded-lg  outline-none"
-                    onFocus={() => {
-                      if (locationResults.length > 0) {
-                        setShowLocationDropdown(true);
-                      }
-                    }}
-                  />
-                  <LocateIcon
-                    size={20}
-                    className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"
-                  />
-                  {isSearchingLocation && (
-                    <div className="absolute right-4 top-1/2 transform -translate-y-1/2">
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500"></div>
-                    </div>
-                  )}
-                </div>
-
-                {/* Google Places Location Dropdown */}
-                {showLocationDropdown && locationResults.length > 0 && (
-                  <div
-                    ref={dropdownRef}
-                    className="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto"
-                  >
-                    {locationResults?.map((prediction) => (
-                      <div
-                        key={prediction.place_id}
-                        onClick={() => handleLocationSelect(prediction)}
-                        className="px-4 py-3 hover:bg-blue-50 cursor-pointer border-b border-gray-100 last:border-b-0 flex items-start gap-3 transition-colors"
-                      >
-                        <MapPin
-                          size={16}
-                          className="text-blue-500 mt-1 flex-shrink-0"
-                        />
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-gray-900 truncate">
-                            {prediction.structured_formatting.main_text}
-                          </p>
-                          <p className="text-xs text-gray-500 truncate">
-                            {prediction.structured_formatting.secondary_text}
-                          </p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
+            {/* Reusable Location Search Component */}
+            <LocationSearchInput
+              label="Location"
+              placeholder="Search for a location..."
+              required
+              onLocationSelect={handleLocationSelect}
+            />
 
             {/* Who can see the group? */}
             <CustomSelectField
@@ -472,7 +250,10 @@ const CreateGroup: React.FC = () => {
                   className="text-gray-900"
                 >
                   {myConnections?.map((connection: IMyConnections) => (
-                    <Option key={connection?.sentBy?._id} value={connection?.sentBy?._id}>
+                    <Option
+                      key={connection?.sentBy?._id}
+                      value={connection?.sentBy?._id}
+                    >
                       {connection?.sentBy?.fullName}
                     </Option>
                   ))}

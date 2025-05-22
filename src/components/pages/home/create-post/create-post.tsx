@@ -32,23 +32,15 @@ import toast from "react-hot-toast";
 import { TError } from "@/types/error";
 import { useCreatePostMutation } from "@/redux/features/post/postApi";
 import { useGetHashtagPostsQuery } from "@/redux/features/hashtag/hashtagApi";
-import { useLoadScript } from "@react-google-maps/api";
-
-// Google Maps libraries
-const libraries: ("places" | "drawing" | "geometry" | "visualization")[] = [
-  "places",
-  "drawing",
-  "geometry",
-  "visualization",
-];
+import {
+  LocationDetails,
+  LocationPrediction,
+  useGoogleLocationSearch,
+} from "@/hooks/useGoogleLocationSearch";
 export interface FilePreview {
   name: string;
   preview: string;
   type: string;
-}
-interface Location {
-  latitude: number;
-  longitude: number;
 }
 
 const CreatePost = () => {
@@ -60,20 +52,32 @@ const CreatePost = () => {
   const [showHashtagSuggestions, setShowHashtagSuggestions] =
     useState<boolean>(false);
   const hashtagPopupRef = useRef<HTMLDivElement>(null);
-  const { isLoaded } = useLoadScript({
-    googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAP_API_KEY as string,
-    libraries,
-  });
   // Use form
   const methods = useForm();
   const { reset } = methods;
 
+  const defaultLocation = user?.locationName;
+
   // State for location
-  const [selectedLocation, setSelectedLocation] = useState<string | null>(null);
-  const [visitedLocationName, setVisitedLocationName] = useState<string>("");
-  const [visitedLocation, setVisitedLocation] = useState<Location>({
-    latitude: 0,
-    longitude: 0,
+  const [selectedLocation, setSelectedLocation] =
+    useState<LocationDetails | null>(null);
+  // Location search states
+  const [locationQuery, setLocationQuery] = useState<string>("");
+  const locationInputRef = useRef<HTMLInputElement>(null);
+
+  // Use the reusable Google location search hook
+  const {
+    predictions,
+    isLoading: isSearchingLocation,
+    isInitialized,
+    searchLocations,
+    getLocationDetails,
+    clearPredictions,
+  } = useGoogleLocationSearch({
+    debounceMs: 300,
+    minQueryLength: 1,
+    maxResults: 5,
+    defaultQuery: defaultLocation,
   });
   const [showLocationPopup, setShowLocationPopup] = useState<boolean>(false);
 
@@ -256,42 +260,47 @@ const CreatePost = () => {
     }
   };
 
-  const handlePlaceSelect = (
-    autocomplete: google.maps.places.Autocomplete
-  ): void => {
-    const place = autocomplete.getPlace();
-    console.log(place)
-  };
+  const handleLocationInputChange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const value = e.target.value;
+    setLocationQuery(value);
+    setSelectedLocation(null);
 
-  const handleLoadAutocomplete = (
-    autocomplete: google.maps.places.Autocomplete
-  ): void => {
-    if (autocomplete) {
-      autocomplete.addListener("place_changed", () =>
-        handlePlaceSelect(autocomplete)
-      );
-      console.log("Autocomplete loaded", autocomplete);
+    if (value.length === 0) {
+      clearPredictions();
+    } else {
+      searchLocations(value);
     }
   };
 
-  if (!isLoaded) {
-    return <div>Loading...</div>;
-  }
+  // Handle location selection
+  const handleLocationSelect = async (prediction: LocationPrediction) => {
+    const locationDetails = await getLocationDetails(prediction.place_id);
+    if (locationDetails) {
+      setSelectedLocation(locationDetails);
+      setLocationQuery("");
+      setShowLocationPopup(false);
+      clearPredictions();
+    }
+  };
 
   // Create new post
   const handleCreatePost = async () => {
-    const visitedLocation = {
-      latitude: 500000,
-      longitude: 870022,
-    };
     try {
       const formData = new FormData();
       formData.append("content", post);
-      formData.append("visitedLocation", JSON.stringify(visitedLocation));
+      formData.append(
+        "visitedLocation",
+        JSON.stringify({
+          latitude: selectedLocation?.latitude,
+          longitude: selectedLocation?.longitude,
+        })
+      );
       formData.append("sourceId", user?._id || "");
       formData.append("itineraryId", itineraryId || "");
       formData.append("postType", "User");
-      formData.append("visitedLocationName", selectedLocation || "");
+      formData.append("visitedLocationName", selectedLocation?.name || "");
       formData.append("privacy", privacy || "");
       media?.forEach((file) => {
         formData.append("postFiles", file);
@@ -309,6 +318,11 @@ const CreatePost = () => {
     }
   };
 
+  const handleMapIconClick = () => {
+    setShowLocationPopup(true);
+    setLocationQuery(defaultLocation);
+    searchLocations(defaultLocation); // Trigger search with default value
+  };
   // Fallback profile image
   return (
     <section className="w-full bg-white rounded-xl">
@@ -488,7 +502,7 @@ const CreatePost = () => {
                 >
                   <MapPin className="w-5 h-5 text-primary" />
                   <span className="text-sm text-gray-700">
-                    {selectedLocation}
+                    {selectedLocation?.formatted_address}
                   </span>
                   <button
                     onClick={handleRemoveLocation}
@@ -511,13 +525,9 @@ const CreatePost = () => {
           {/* Icons for Additional Functionalities */}
           <div className="flex items-center gap-5 bg-[#E7E8EC] px-4 py-1.5 rounded-b-xl">
             {/* Location Icon with Popup */}
-            {/* Location Icon with Popup */}
             <div className="relative" ref={locationPopupRef}>
               <Tooltip title="Add a location" placement="bottom">
-                <button
-                  onClick={() => setShowLocationPopup(true)}
-                  className="cursor-pointer"
-                >
+                <button onClick={handleMapIconClick} className="cursor-pointer">
                   <MapPin
                     className={`w-6 h-6 mt-2 ${
                       selectedLocation ? "text-primary" : "text-[#9194A9]"
@@ -535,20 +545,49 @@ const CreatePost = () => {
                   >
                     <div className="relative">
                       <input
+                        ref={locationInputRef}
                         type="text"
-                        onFocus={(e) => {
-                          const autocomplete =
-                            new window.google.maps.places.Autocomplete(
-                              e.target
-                            );
-                          handleLoadAutocomplete(autocomplete); // Load Autocomplete when focused
+                        value={locationQuery}
+                        onChange={handleLocationInputChange}
+                        placeholder={
+                          !isInitialized
+                            ? "Loading location services..."
+                            : "Search for a location..."
+                        }
+                        disabled={!isInitialized}
+                        className="w-full px-4 py-2 border rounded-full border-gray-200 focus:outline-none "
+                        onFocus={() => {
+                          if (predictions.length > 0) {
+                            setShowLocationPopup(true);
+                          }
                         }}
-                        placeholder="Search location..."
-                        className="w-full px-4 py-2 border rounded-full border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary"
                       />
                       <Search className="w-5 h-5 text-[#9194A9] absolute top-3 right-4" />
+                      {isSearchingLocation && (
+                        <div className="absolute right-4 top-1/2 transform -translate-y-1/2">
+                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500"></div>
+                        </div>
+                      )}
                     </div>
-                    {/* Remove mock locations section since we're using Google Places API now */}
+                    <div className="mt-4 max-h-56 overflow-y-auto">
+                      {predictions?.map((prediction) => (
+                        <div
+                          key={prediction?.place_id}
+                          onClick={() => handleLocationSelect(prediction)}
+                          className="flex items-center gap-3 p-3 hover:bg-gray-50 cursor-pointer rounded-md transition-colors"
+                        >
+                          <MapPin className="size-5 text-[#9194A9]" />
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium text-gray-900 truncate">
+                              {prediction.structured_formatting.main_text}
+                            </p>
+                            <p className="text-xs text-gray-500 truncate">
+                              {prediction.structured_formatting.secondary_text}
+                            </p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
                   </motion.div>
                 )}
               </AnimatePresence>
