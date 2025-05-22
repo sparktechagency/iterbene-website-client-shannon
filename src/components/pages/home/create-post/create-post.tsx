@@ -506,7 +506,7 @@ const CreatePost = () => {
                   </span>
                   <button
                     onClick={handleRemoveLocation}
-                    className="text-[#9194A9] hover:text-red-500"
+                    className="text-[#9194A9] hover:text-red-500 cursor-pointer"
                     aria-label="Remove location"
                   >
                     <X className="size-4" />

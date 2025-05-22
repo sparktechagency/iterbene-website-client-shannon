@@ -81,6 +81,7 @@ const DayCard = ({ control }: DayCardProps) => {
             <LocationSearchInput
               label="Location"
               required
+              showSelectedInfo={false}
               onLocationSelect={handleLocationSelect}
               placeholder="Where are you exploring? (e.g., Rome, Italy)"
             />
