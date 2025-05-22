@@ -178,7 +178,24 @@ const EditMyProfileDetails = ({
               label="State"
             />
             <CustomSelectField
-              items={["He/Him", "She/Her", "They/Them", "Undisclosed"]}
+              items={[
+                {
+                  label: "He/Him",
+                  value: "He/Him",
+                },
+                {
+                  label: "She/Her",
+                  value: "She/Her",
+                },
+                {
+                  label: "They/Them",
+                  value: "They/Them",
+                },
+                {
+                  label: "Undisclosed",
+                  value: "Undisclosed",
+                },
+              ]}
               name="referredAs"
               label="Referred As"
               size="md"
@@ -187,13 +204,34 @@ const EditMyProfileDetails = ({
             />
             <CustomSelectField
               items={[
-                "13-17",
-                "18-24",
-                "25-34",
-                "35-44",
-                "45-54",
-                "55-64",
-                "65+",
+                {
+                  label: "13-17",
+                  value: "13-17",
+                },
+                {
+                  label: "18-24",
+                  value: "18-24",
+                },
+                {
+                  label: "25-34",
+                  value: "25-34",
+                },
+                {
+                  label: "35-44",
+                  value: "35-44",
+                },
+                {
+                  label: "45-54",
+                  value: "45-54",
+                },
+                {
+                  label: "55-64",
+                  value: "55-64",
+                },
+                {
+                  label: "65+",
+                  value: "65+",
+                },
               ]}
               name="ageRange"
               label="Age Range"
@@ -210,17 +248,11 @@ const EditMyProfileDetails = ({
             />
             <CustomSelectField
               items={[
-                "Divorced",
-                "Domestic Partnership",
-                "Engaged",
-                "In a Relationship",
-                "It's Complicated",
-                "Looking",
-                "Married",
-                "Married with child/children",
-                "Single",
-                "Undisclosed",
-                "Widowed",
+                { label: "Single", value: "Single" },
+                { label: "Married", value: "Married" },
+                { label: "Divorced", value: "Divorced" },
+                { label: "Separated", value: "Separated" },
+                { label: "Widowed", value: "Widowed" },
               ]}
               required
               name="maritalStatus"

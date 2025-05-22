@@ -131,7 +131,7 @@ const CreateEvent: React.FC = () => {
             />
             {/* Who can see the event? */}
             <CustomSelectField
-              items={["Public", "Private", "Friends"]}
+              items={[{ label: "Public", value: "public" },{ label: "Private", value: "private" }]}
               icon={<Lock size={22} className="text-[#9194A9]" />}
               name="visibility"
               required

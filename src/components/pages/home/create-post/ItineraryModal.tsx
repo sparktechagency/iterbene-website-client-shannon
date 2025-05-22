@@ -15,14 +15,21 @@ interface ItineraryModalProps {
   isLoading: boolean;
 }
 
-const ItineraryModal = ({ visible, onClose, handleCreateItinerary,isLoading }: ItineraryModalProps) => {
+const ItineraryModal = ({
+  visible,
+  onClose,
+  handleCreateItinerary,
+  isLoading,
+}: ItineraryModalProps) => {
   const methods = useForm();
- const { control } = methods;
+  const { control } = methods;
   return (
     <CustomModal
       header={
         <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 rounded-t-xl">
-          <h2 className="text-xl font-semibold text-gray-800">Create Itinerary</h2>
+          <h2 className="text-xl font-semibold text-gray-800">
+            Create Itinerary
+          </h2>
           <button
             className="text-gray-600 border-gray-400 cursor-pointer size-10 bg-[#EEFDFB] rounded-full border flex justify-center items-center"
             onClick={onClose}
@@ -51,7 +58,40 @@ const ItineraryModal = ({ visible, onClose, handleCreateItinerary,isLoading }: I
             label="Travel Mode"
             size="md"
             placeholder="How will you travel? (e.g., Plane)"
-            items={["Car", "Plane", "Train", "Bus", "Bicycle", "Walk", "Boat", "Motorcycle"]}
+            items={[
+              {
+                value: "plane",
+                label: "Plane",
+              },
+              {
+                value: "train",
+                label: "Train",
+              },
+              {
+                value: "bus",
+                label: "Bus",
+              },
+              {
+                value: "car",
+                label: "Car",
+              },
+              {
+                value: "bicycle",
+                label: "Bicycle",
+              },
+              {
+                value: "walk",
+                label: "Walk",
+              },
+              {
+                value: "boat",
+                label: "Boat",
+              },
+              {
+                value: "motorcycle",
+                label: "Motorcycle",
+              },
+            ]}
             required
           />
           <div className="grid grid-cols-2 gap-4 mb-4">
@@ -77,7 +117,7 @@ const ItineraryModal = ({ visible, onClose, handleCreateItinerary,isLoading }: I
             />
           </div>
           <div className="mb-4">
-            <DayCard control={control}/>
+            <DayCard control={control} />
           </div>
           <CustomButton
             variant="default"
