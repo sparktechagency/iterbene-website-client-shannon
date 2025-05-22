@@ -3,8 +3,9 @@
 import { useState } from "react";
 import GroupAbout from "./GroupAbout/GroupAbout";
 import GroupDiscussion from "./GroupDiscussion/GroupDiscussion";
+import { IGroup } from "@/types/group";
 
-const GroupDetailsTab = () => {
+const GroupDetailsTab = ({groupDetailsData}: {groupDetailsData: IGroup}) => {
   const [activeTab, setActiveTab] = useState("about");
   return (
     <section className="w-full px-3 py-8 ">
@@ -31,7 +32,7 @@ const GroupDetailsTab = () => {
         </button>
       </div>
       <div className="w-full py-6">
-        {activeTab === "about" ? <GroupAbout /> : <GroupDiscussion />}
+        {activeTab === "about" ? <GroupAbout groupDetailsData={groupDetailsData} /> : <GroupDiscussion />}
       </div>
     </section>
   );

@@ -42,8 +42,6 @@
 
 // export default MyGroupCard;
 
-
-
 import { IGroup } from "@/types/group";
 import Image from "next/image";
 import Link from "next/link";
@@ -77,9 +75,11 @@ const MyGroupCard = ({ group }: { group: IGroup }) => {
 
       {/* Buttons */}
       <div className="flex flex-col gap-5 w-full">
-        <button className="bg-secondary  text-white  px-5 py-3 rounded-xl border border-secondary cursor-pointer">
-          <Link href={`/groups/1`}>View</Link>
+        <Link className="w-full block" href={`/groups/${group?._id}`}>
+        <button className="w-full bg-secondary  text-white  px-5 py-3 rounded-xl border border-secondary cursor-pointer">
+          View
         </button>
+        </Link>
         <button className="border border-[#9EA1B3] text-gray-900 px-5 py-3   rounded-xl cursor-pointer">
           Remove
         </button>

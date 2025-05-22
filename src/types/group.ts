@@ -22,6 +22,8 @@ export interface IGroup {
     fullName: string;
     username: string;
     profileImage: string;
+    description: string;
+    createdAt: Date;
   };
   location: {
     latitude: number;
