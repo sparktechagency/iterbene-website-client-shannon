@@ -152,6 +152,7 @@ const PostCard = ({ post }: PostCardProps) => {
               }
               isOpen={showReactionDetails}
               onClose={() => setShowReactionDetails(false)}
+              maxHeight="h-[50vh]"
             >
               {post?.reactions?.length > 0 && (
                 <div className="w-full space-y-2 ">

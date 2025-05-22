@@ -131,10 +131,11 @@ const CreateGroup: React.FC = () => {
               icon={<LocateIcon size={24} className="text-[#9194A9]" />}
               placeholder="Location"
             />
-            {/* Who can see the event? */}
+            {/* Who can see the group? */}
             <CustomSelectField
               items={["Public", "Private", "Friends"]}
               icon={<Lock size={22} className="text-[#9194A9]" />}
+              placeholder="Who can see the group?"
               name="visibility"
               required
             />

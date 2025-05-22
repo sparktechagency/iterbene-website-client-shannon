@@ -2,15 +2,11 @@ import logo from "@/asset/not-found/not-found.png";
 import CustomButton from "@/components/custom/custom-button";
 import Image from "next/image";
 import Link from "next/link";
-import { motion } from "framer-motion";
 
 const NotFoundPage = () => {
   return (
     <section className="w-full min-h-screen  flex flex-col justify-center items-center p-4">
-      <motion.div
-        initial={{ opacity: 0, y: -50 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, ease: "easeOut" }}
+      <div
         className="text-center"
       >
         <Image
@@ -35,7 +31,7 @@ const NotFoundPage = () => {
             Back to Home
           </CustomButton>
         </Link>
-      </motion.div>
+      </div>
     </section>
   );
 };

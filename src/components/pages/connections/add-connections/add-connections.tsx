@@ -13,7 +13,7 @@ const AddConnections = () => {
   } else if (!isLoading && suggestionsConnections?.length > 0) {
     content = (
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
-        {suggestionsConnections?.slice(0, 4)?.map((connection: IConnection) => (
+        {suggestionsConnections?.map((connection: IConnection) => (
           <AddConnectionCard
             key={connection?.id}
             connection={connection}
