@@ -21,6 +21,22 @@ export interface IGroup {
   createdAt: string;
   updatedAt: string;
 }
+export interface IGroupInvite {
+  _id: string;
+  from:string;
+  to:string;
+  groupId: {
+    _id: string;
+    name: string;
+    groupImage: string;
+    privacy: string;
+    participantCount: number;
+    createdAt: string;
+    updatedAt: string;
+  };
+  createdAt: string;
+  updatedAt: string;
+}
 export interface IGroupDetails {
   _id: string;
   name: string;

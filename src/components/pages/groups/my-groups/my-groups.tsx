@@ -31,7 +31,7 @@ const MyGroups: React.FC = () => {
         <button className="text-primary hover:underline">Show more</button>
       </div>
 
-      {/* Cards Section */}
+      {/* Content Section */}
       {content}
     </section>
   );

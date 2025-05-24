@@ -1,37 +1,26 @@
-import React from "react";
+'use client';
 import InvitedGroupCard from "./invited-group-card";
-interface Group {
-  id: number;
-  name: string;
-  image: string;
-  members: string;
-}
-
-// Demo data with Unsplash images
-const demoGroups: Group[] = [
-  {
-    id: 1,
-    name: "World Trip Community",
-    image:
-      "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=500&auto=format&fit=crop&q=60", // Beach landscape
-    members: "1.1K",
-  },
-  {
-    id: 2,
-    name: "World Trip Community",
-    image:
-      "https://images.unsplash.com/photo-1519681393784-d120267933ba?w=500&auto=format&fit=crop&q=60", // Mountain landscape
-    members: "1.1K",
-  },
-  {
-    id: 3,
-    name: "World Trip Community",
-    image:
-      "https://images.unsplash.com/photo-1506748686214-e9df14d4d9d0?w=500&auto=format&fit=crop&q=60", // Ocean landscape
-    members: "1.1K",
-  },
-];
+import { useGetMyInvitedGroupsQuery } from "@/redux/features/group/groupApi";
+import {IGroupInvite } from "@/types/group.types";
 const InvitedGroups = () => {
+  const { data: responseData, isLoading } =
+    useGetMyInvitedGroupsQuery(undefined);
+  const groupsData = responseData?.data?.attributes?.results;
+  let content = null;
+  if (isLoading) {
+    content = <p>Loading...</p>;
+  }
+  if (groupsData?.length === 0) {
+    content = <p className="text-xl">No invited groups found</p>;
+  } else if (groupsData?.length > 0) {
+    content = (
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        {groupsData?.map((group: IGroupInvite) => (
+          <InvitedGroupCard key={group?._id} group={group} />
+        ))}
+      </div>
+    );
+  }
   return (
     <section className="w-full pt-2 pb-7 mt-7 border-[#9EA1B3] border-b">
       {/* Header Section */}
@@ -42,17 +31,8 @@ const InvitedGroups = () => {
         <button className="text-primary hover:underline">Show more</button>
       </div>
 
-      {/* Cards Section */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-        {demoGroups.map((group) => (
-          <InvitedGroupCard
-            key={group.id}
-            name={group.name}
-            image={group.image}
-            members={group.members}
-          />
-        ))}
-      </div>
+      {/* Content Section */}
+      {content}
     </section>
   );
 };

@@ -35,7 +35,7 @@ const groupApi = baseApi.injectEndpoints({
     }),
     acceptGroupInvite: builder.mutation({
       query: (data) => ({
-        url: "/groups/invite/accept",
+        url: "/groups/invites/accept",
         method: "POST",
         body: data,
       }),
