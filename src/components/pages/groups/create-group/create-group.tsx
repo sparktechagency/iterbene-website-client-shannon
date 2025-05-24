@@ -44,7 +44,10 @@ const CreateGroup: React.FC = () => {
   };
 
   // Get my all connections list
-  const { data: responseData } = useGetMyConnectionsQuery(undefined);
+  const { data: responseData } = useGetMyConnectionsQuery({
+    page: 1,
+    limit: 10,
+  });
   const myConnections = responseData?.data?.attributes?.results;
 
   // Create group mutation

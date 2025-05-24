@@ -41,6 +41,7 @@ export interface IGroupDetails {
   locationName: string;
   members: IGroupMember[];
   coLeaders: ICoLeader[];
+  pendingMembers: IGroupMember[];
   admin: string[];
   privacy: string;
   participantCount: number;

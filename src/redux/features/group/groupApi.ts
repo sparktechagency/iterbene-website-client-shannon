@@ -25,6 +25,14 @@ const groupApi = baseApi.injectEndpoints({
       }),
       providesTags: ["Groups"],
     }),
+    sendGroupInvite: builder.mutation({
+      query: (data) => ({
+        url: "/groups/invites/send",
+        method: "POST",
+        body: data,
+      }),
+      invalidatesTags: ["Groups"],
+    }),
     acceptGroupInvite: builder.mutation({
       query: (data) => ({
         url: "/groups/invite/accept",
@@ -80,6 +88,7 @@ export const {
   useDeclineGroupInviteMutation,
   useLeaveGroupMutation,
   useGetGroupQuery,
+  useSendGroupInviteMutation,
   useGetMyJoinedGroupsQuery,
   useGetSuggestionsGroupsQuery,
   useGetMyInvitedGroupsQuery,

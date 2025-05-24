@@ -34,7 +34,7 @@ const connectionsApi = baseApi.injectEndpoints({
     removeSuggestionConnection: builder.mutation({
       query: (removedByUserId) => ({
         url: `/connections/remove/${removedByUserId}`,
-        method: "DELETE"
+        method: "DELETE",
       }),
       invalidatesTags: ["Connections"],
     }),
@@ -46,10 +46,16 @@ const connectionsApi = baseApi.injectEndpoints({
       invalidatesTags: ["Connections"],
     }),
     getMyConnections: builder.query({
-      query: () => ({
-        url: "/connections",
-        method: "GET",
-      }),
+      query: ({ page, limit }) => {
+        const params = new URLSearchParams();
+        if (page) params.append("page", page);
+        if (limit) params.append("limit", limit);
+        return {
+          url: `/connections`,
+          method: "GET",
+          params,
+        };
+      },
       providesTags: ["Connections"],
     }),
     getConnectionRequests: builder.query({
