@@ -2,7 +2,7 @@ import UserProfileInformationPage from "@/components/pages/UserProfilePage/UserP
 import React from "react";
 
 const layout = ({ children }: { children: React.ReactNode }) => {
-    return <UserProfileInformationPage>{children}</UserProfileInformationPage>;
+  return <UserProfileInformationPage>{children}</UserProfileInformationPage>;
 };
 
 export default layout;

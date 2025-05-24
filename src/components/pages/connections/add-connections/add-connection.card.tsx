@@ -51,7 +51,7 @@ const AddConnectionCard = ({ connection }: { connection: IConnection }) => {
     }
   };
   return (
-    <div className="w-full bg-white rounded-2xl  p-4 flex flex-col">
+    <div className="w-full h-fit bg-white rounded-2xl  p-4 flex flex-col items-center">
       {/* Profile Image */}
       <Link className="w-full" href={`/${connection?.username}`}>
         <Image
@@ -63,26 +63,23 @@ const AddConnectionCard = ({ connection }: { connection: IConnection }) => {
         />
       </Link>
       {/* Name */}
-      <h2 className="text-xl font-semibold text-gray-800 mb-4">
+      <h2 className="text-lg font-semibold text-gray-800 mb-4">
         {connection?.fullName}
       </h2>
       {/* Buttons */}
-      <>
+      <div className="flex flex-col gap-4 w-full">
         {checkSentConnectionExist ? (
-          <div className="flex flex-col justify-between gap-4 w-full">
-           <h1 className="text-lg py-3 text-gray-700">Request Sent</h1>
-            <button
-              onClick={handleCancelRequest}
-              className="border border-[#9EA1B3] text-gray-900 px-5 py-3   rounded-xl hover:bg-gray-100 transition cursor-pointer"
-            >
-              Cancel Request
-            </button>
-          </div>
+          <button
+            onClick={handleCancelRequest}
+            className="border border-[#9EA1B3] text-gray-900 px-5 py-3   rounded-xl hover:bg-gray-100 transition cursor-pointer"
+          >
+            Cancel Request
+          </button>
         ) : (
-          <div className="flex flex-col justify-between gap-5 w-full">
+          <>
             <button
               onClick={handleAddConnection}
-              className="bg-[#FEEFE8] text-secondary px-5 py-3  border border-secondary  rounded-xl transition cursor-pointer"
+              className="bg-[#FEEFE8] text-secondary px-5 py-3 rounded-xl border border-secondary transition cursor-pointer"
             >
               Add Connection
             </button>
@@ -92,9 +89,9 @@ const AddConnectionCard = ({ connection }: { connection: IConnection }) => {
             >
               Remove
             </button>
-          </div>
+          </>
         )}
-      </>
+      </div>
     </div>
   );
 };
