@@ -57,6 +57,13 @@ const groupApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["Groups"],
     }),
+    removeGroup: builder.mutation({
+      query: (groupId) => ({
+        url: `/groups/${groupId}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["Groups"],
+    }),
     getMyJoinedGroups: builder.query({
       query: () => ({
         url: "/groups/my-join-groups",
@@ -90,6 +97,7 @@ export const {
   useGetGroupQuery,
   useSendGroupInviteMutation,
   useGetMyJoinedGroupsQuery,
+  useRemoveGroupMutation,
   useGetSuggestionsGroupsQuery,
   useGetMyInvitedGroupsQuery,
 } = groupApi;

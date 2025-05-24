@@ -1,7 +1,9 @@
 import CustomButton from "@/components/custom/custom-button";
 import CustomModal from "@/components/custom/custom-modal";
 import { useGetMyConnectionsQuery } from "@/redux/features/connections/connectionsApi";
-import { useSendGroupInviteMutation } from "@/redux/features/group/groupApi";
+import {
+  useSendGroupInviteMutation,
+} from "@/redux/features/group/groupApi";
 import { IMyConnections } from "@/types/connection.types";
 import { TError } from "@/types/error";
 import { IGroupDetails } from "@/types/group.types";
@@ -30,10 +32,13 @@ const GroupInviteModal = ({
   const [page, setPage] = useState<number>(1);
   const [allConnections, setAllConnections] = useState<IMyConnections[]>([]);
   const [hasMore, setHasMore] = useState(true);
+  //owner of the group
 
   //send invite
   const [inviteGroup, { isLoading: isInviteLoading }] =
     useSendGroupInviteMutation();
+
+
 
   // Get connections with pagination
   const {
@@ -45,6 +50,7 @@ const GroupInviteModal = ({
     limit: 10,
   });
 
+  // Extract connections from the response
   const connections = useMemo(
     () => responseData?.data?.attributes?.results || [],
     [responseData]
@@ -209,7 +215,7 @@ const GroupInviteModal = ({
               // Check if the connection is already a member
               const isAlreadyMember = groupDetailsData?.members.some(
                 (member) => member._id === connection._id
-              )
+              );
               return (
                 <>
                   {isAlreadyInvited ? (
@@ -243,7 +249,8 @@ const GroupInviteModal = ({
                         Already invited
                       </div>
                     </div>
-                  ) : isAlreadyMember ? <div
+                  ) : isAlreadyMember ? (
+                    <div
                       key={connection?._id}
                       className="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg transition-colors"
                     >
@@ -272,7 +279,8 @@ const GroupInviteModal = ({
                       <div className="text-sm text-gray-500">
                         Already a member
                       </div>
-                    </div> : (
+                    </div>
+                  ) : (
                     <div
                       key={connection?._id}
                       className="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg transition-colors"
