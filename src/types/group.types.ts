@@ -15,6 +15,15 @@ export interface ICoLeader {
 export interface IGroup {
   _id: string;
   name: string;
+  groupImage: string;
+  privacy: string;
+  participantCount: number;
+  createdAt: string;
+  updatedAt: string;
+}
+export interface IGroupDetails {
+  _id: string;
+  name: string;
   description: string;
   groupImage: string;
   creatorId: {

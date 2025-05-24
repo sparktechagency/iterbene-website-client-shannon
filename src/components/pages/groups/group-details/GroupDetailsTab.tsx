@@ -1,32 +1,29 @@
 "use client";
-
+import { IGroupDetails } from "@/types/group.types";
 import { useState } from "react";
 import GroupAbout from "./GroupAbout/GroupAbout";
 import GroupDiscussion from "./GroupDiscussion/GroupDiscussion";
-import { IGroup } from "@/types/group";
 
-const GroupDetailsTab = ({groupDetailsData}: {groupDetailsData: IGroup}) => {
+const GroupDetailsTab = ({ groupDetailsData }: { groupDetailsData: IGroupDetails }) => {
   const [activeTab, setActiveTab] = useState("about");
   return (
     <section className="w-full px-3 py-8 ">
       <div className="w-full flex items-center gap-5 ">
         <button
           onClick={() => setActiveTab("about")}
-          className={`px-8 py-2  rounded-xl ${
-            activeTab === "about"
+          className={`px-8 py-2  rounded-xl ${activeTab === "about"
               ? "text-primary bg-[#E9F8F9] border border-primary"
               : "text-black "
-          } text-[16px] font-semibold cursor-pointer`}
+            } text-[16px] font-semibold cursor-pointer`}
         >
           About
         </button>
         <button
           onClick={() => setActiveTab("discussion")}
-          className={`px-8 py-2  rounded-xl ${
-            activeTab === "discussion"
+          className={`px-8 py-2  rounded-xl ${activeTab === "discussion"
               ? "text-primary bg-[#E9F8F9] border border-primary"
               : "text-black "
-          } text-[16px] font-semibold cursor-pointer`}
+            } text-[16px] font-semibold cursor-pointer`}
         >
           Discussion
         </button>

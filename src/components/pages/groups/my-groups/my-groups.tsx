@@ -1,8 +1,8 @@
 "use client";
+import { useGetMyGroupsQuery } from "@/redux/features/group/groupApi";
+import { IGroup } from "@/types/group.types";
 import React from "react";
 import MyGroupCard from "./my-group-card";
-import { IGroup } from "@/types/group";
-import { useGetMyGroupsQuery } from "@/redux/features/group/groupApi";
 const MyGroups: React.FC = () => {
   const { data: responseData, isLoading } = useGetMyGroupsQuery(undefined);
   const groupsData = responseData?.data?.attributes?.results;
@@ -16,7 +16,7 @@ const MyGroups: React.FC = () => {
     content = (
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         {groupsData?.map((group: IGroup) => (
-          <MyGroupCard key={group.name} group={group} />
+          <MyGroupCard key={group?.name} group={group} />
         ))}
       </div>
     );

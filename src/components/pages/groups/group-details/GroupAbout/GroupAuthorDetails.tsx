@@ -1,10 +1,10 @@
-import { IGroup } from "@/types/group";
+import {IGroupDetails } from "@/types/group.types";
 import moment from "moment";
 import Image from "next/image";
 const GroupAuthorDetails = ({
   groupDetailsData,
 }: {
-  groupDetailsData: IGroup;
+  groupDetailsData: IGroupDetails;
 }) => {
   return (
     <div className="w-full col-span-full md:col-span-7 bg-white p-6 md:p-9 rounded-xl">

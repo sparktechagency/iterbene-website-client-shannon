@@ -1,7 +1,6 @@
-import { IGroup } from "@/types/group";
+import { IGroup } from "@/types/group.types";
 import { Globe } from "lucide-react";
 import Image from "next/image";
-import React from "react";
 
 const GroupDetailsHeader = ({
   groupDetailsData,

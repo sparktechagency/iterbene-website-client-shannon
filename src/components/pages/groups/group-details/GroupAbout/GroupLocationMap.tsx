@@ -1,5 +1,5 @@
 "use client";
-import { IGroup } from "@/types/group";
+import {IGroupDetails } from "@/types/group.types";
 import { GoogleMap, Marker, useJsApiLoader } from "@react-google-maps/api";
 import React from "react";
 
@@ -18,7 +18,7 @@ const defaultLocation = {
 const GroupLocationMap = ({
   groupDetailsData,
 }: {
-  groupDetailsData: IGroup;
+  groupDetailsData: IGroupDetails;
 }) => {
   const apiKey: string = process.env.NEXT_PUBLIC_GOOGLE_MAP_API_KEY || "";
 
@@ -26,12 +26,12 @@ const GroupLocationMap = ({
   const groupLocation = {
     lat:
       typeof groupDetailsData?.location?.latitude === "number" &&
-      isFinite(groupDetailsData.location.latitude)
+        isFinite(groupDetailsData.location.latitude)
         ? groupDetailsData.location.latitude
         : defaultLocation.lat,
     lng:
       typeof groupDetailsData?.location?.longitude === "number" &&
-      isFinite(groupDetailsData.location.longitude)
+        isFinite(groupDetailsData.location.longitude)
         ? groupDetailsData.location.longitude
         : defaultLocation.lng,
   };
@@ -44,9 +44,9 @@ const GroupLocationMap = ({
   // Define custom marker icon only after Google Maps is loaded
   const customMarkerIcon = isLoaded
     ? {
-        url: "https://i.ibb.co/BVgNBSG8/interested.png",
-        scaledSize: new window.google.maps.Size(40, 40),
-      }
+      url: "https://i.ibb.co/BVgNBSG8/interested.png",
+      scaledSize: new window.google.maps.Size(40, 40),
+    }
     : null;
 
   if (!isLoaded) {

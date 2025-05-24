@@ -1,11 +1,10 @@
-import { IGroup } from "@/types/group";
+import { IGroupDetails } from "@/types/group.types";
 import Image from "next/image";
-import React from "react";
 
 const GroupParticipantsList = ({
   groupDetailsData,
 }: {
-  groupDetailsData: IGroup;
+  groupDetailsData: IGroupDetails;
 }) => {
   return (
     <div className="w-full col-span-full md:col-span-5 bg-white p-6 md:p-9 rounded-xl">

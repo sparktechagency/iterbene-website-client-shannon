@@ -1,10 +1,9 @@
-import React from "react";
+import {IGroupDetails } from "@/types/group.types";
+import { LucideUserRound } from "lucide-react";
 import { BsPeople } from "react-icons/bs";
 import { HiOutlineLocationMarker } from "react-icons/hi";
-import { LucideUserRound } from "lucide-react";
-import { IGroup } from "@/types/group";
 
-const GroupSummary = ({ groupDetailsData }: { groupDetailsData: IGroup }) => {
+const GroupSummary = ({ groupDetailsData }: { groupDetailsData: IGroupDetails }) => {
   return (
     <div className="w-full col-span-full md:col-span-7 bg-white p-8 rounded-xl">
       <div className="w-full space-y-5 pt-14">
