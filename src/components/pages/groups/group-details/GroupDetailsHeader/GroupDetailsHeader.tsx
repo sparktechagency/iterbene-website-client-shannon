@@ -1,5 +1,5 @@
 import { IGroupDetails } from "@/types/group.types";
-import { Globe } from "lucide-react";
+import { Globe, Lock } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
 import GroupInviteModal from "./GroupInviteModal";
@@ -11,7 +11,7 @@ import useUser from "@/hooks/useUser";
 import toast from "react-hot-toast";
 import { TError } from "@/types/error";
 import { useRouter } from "next/navigation";
-import CustomModal from "@/components/custom/custom-modal"; // Import your CustomModal
+import CustomModal from "@/components/custom/custom-modal";
 import { IoCloseSharp } from "react-icons/io5";
 
 const GroupDetailsHeader = ({
@@ -22,8 +22,8 @@ const GroupDetailsHeader = ({
   const user = useUser();
   const owner = groupDetailsData?.creatorId?._id === user?._id;
   const [isInviteModalOpen, setIsInviteModalOpen] = useState<boolean>(false);
-  const [isLeaveModalOpen, setIsLeaveModalOpen] = useState<boolean>(false); // State for leave confirmation modal
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false); // State for delete confirmation modal
+  const [isLeaveModalOpen, setIsLeaveModalOpen] = useState<boolean>(false); 
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
   const router = useRouter();
   // Remove Group
   const [removeGroup, { isLoading: isRemoveLoading }] =
@@ -98,7 +98,11 @@ const GroupDetailsHeader = ({
               {groupDetailsData?.name}
             </h1>
             <div className="flex flex-wrap gap-2 sm:gap-3 text-gray-600 text-sm sm:text-lg items-center">
-              <Globe className="text-primary" size={20} />
+              {groupDetailsData?.privacy === "public" ? (
+                <Globe className="text-primary" size={20} />
+              ) : (
+                <Lock className="text-primary" size={20} />
+              )}
               <p className="text-gray-600">
                 {groupDetailsData?.privacy === "public" ? "Public" : "Private"}{" "}
                 group
