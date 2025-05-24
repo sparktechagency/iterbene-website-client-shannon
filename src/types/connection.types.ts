@@ -20,16 +20,9 @@ export interface IConnectionRequest {
 
 export interface IMyConnections {
   _id: string;
-  receivedBy:string;
-  sentBy:{
-    _id: string;
-    fullName: string;
-    username: string;
-    profileImage: string;
-  }
-  status: string;
-  createdAt: Date;
-  updatedAt: Date;
+  fullName: string;
+  username: string;
+  profileImage: string;
 }
 
 export interface IConnection {

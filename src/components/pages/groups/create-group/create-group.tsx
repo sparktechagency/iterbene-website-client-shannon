@@ -104,6 +104,7 @@ const CreateGroup: React.FC = () => {
     setCoLeaders(value);
   };
 
+  console.log(myConnections);
   return (
     <section className="w-full mb-8">
       <button
@@ -204,7 +205,7 @@ const CreateGroup: React.FC = () => {
               placeholder="Search for a location..."
               required
               onLocationSelect={handleLocationSelect}
-              showSelectedInfo = {false}
+              showSelectedInfo={false}
             />
 
             {/* Who can see the group? */}
@@ -251,11 +252,8 @@ const CreateGroup: React.FC = () => {
                   className="text-gray-900"
                 >
                   {myConnections?.map((connection: IMyConnections) => (
-                    <Option
-                      key={connection?.sentBy?._id}
-                      value={connection?.sentBy?._id}
-                    >
-                      {connection?.sentBy?.fullName}
+                    <Option key={connection?._id} value={connection?._id}>
+                      {connection?.fullName}
                     </Option>
                   ))}
                 </Select>
