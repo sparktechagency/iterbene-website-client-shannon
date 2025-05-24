@@ -26,7 +26,7 @@ interface UseGoogleLocationSearchOptions {
   maxResults?: number;
   types?: string[];
   autoInitialize?: boolean;
-  defaultQuery?: string; // Added option for default query
+  defaultQuery?: string;
 }
 
 interface UseGoogleLocationSearchReturn {
@@ -49,7 +49,7 @@ export const useGoogleLocationSearch = (
     maxResults = 20,
     types = ['establishment', 'geocode'],
     autoInitialize = true,
-    defaultQuery = '', // Default to empty string
+    defaultQuery = '',
   } = options;
 
   // States
@@ -66,17 +66,13 @@ export const useGoogleLocationSearch = (
   const initializeGoogleMaps = useCallback(() => {
     if (window.google?.maps?.places) {
       autocompleteService.current = new window.google.maps.places.AutocompleteService();
-      
-      // Create a dummy div for PlacesService
       const dummyDiv = document.createElement('div');
       placesService.current = new window.google.maps.places.PlacesService(dummyDiv);
-      
       setIsInitialized(true);
       return;
     }
 
-    // Load Google Maps API if not loaded
-    if (!window.google && !document.querySelector(`script[src*="maps.googleapis.com"]`)) {
+    if (!document.querySelector(`script[src*="maps.googleapis.com"]`)) {
       const script = document.createElement('script');
       script.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_API_KEY}&libraries=places`;
       script.async = true;
@@ -84,20 +80,23 @@ export const useGoogleLocationSearch = (
       script.onload = () => {
         if (window.google?.maps?.places) {
           autocompleteService.current = new window.google.maps.places.AutocompleteService();
-          
           const dummyDiv = document.createElement('div');
           placesService.current = new window.google.maps.places.PlacesService(dummyDiv);
-          
           setIsInitialized(true);
+          // Trigger search with defaultQuery after initialization
+          if (defaultQuery) {
+            searchLocations(defaultQuery);
+          }
         }
       };
       script.onerror = () => {
         console.error('Failed to load Google Maps API');
         toast.error('Failed to load location services');
+        setIsInitialized(false);
       };
       document.head.appendChild(script);
     }
-  }, []);
+  }, [defaultQuery]);
 
   // Auto-initialize on mount
   useEffect(() => {
@@ -108,26 +107,24 @@ export const useGoogleLocationSearch = (
 
   // Search locations function
   const searchLocations = useCallback(async (query: string) => {
-    const effectiveQuery = query || defaultQuery; // Use defaultQuery if query is empty
+    // Use defaultQuery only if query is empty and API is initialized
+    const effectiveQuery = query || (isInitialized && defaultQuery) || '';
     if (!effectiveQuery || effectiveQuery.length < minQueryLength) {
       setPredictions([]);
       return;
     }
 
-    if (!autocompleteService.current) {
+    if (!isInitialized || !autocompleteService.current) {
       console.warn('Google Maps AutocompleteService not initialized');
       return;
     }
 
-    // Clear existing timer
     if (debounceTimer.current) {
       clearTimeout(debounceTimer.current);
     }
 
-    // Debounce the search
+    setIsLoading(true);
     debounceTimer.current = setTimeout(() => {
-      setIsLoading(true);
-      
       const request = {
         input: effectiveQuery,
         types: types,
@@ -137,7 +134,6 @@ export const useGoogleLocationSearch = (
         request,
         (predictions, status) => {
           setIsLoading(false);
-          
           if (status === google.maps.places.PlacesServiceStatus.OK && predictions) {
             const limitedPredictions = predictions.slice(0, maxResults);
             setPredictions(limitedPredictions);
@@ -150,11 +146,11 @@ export const useGoogleLocationSearch = (
         }
       );
     }, debounceMs);
-  }, [debounceMs, minQueryLength, maxResults, types, defaultQuery]);
+  }, [debounceMs, minQueryLength, maxResults, types, isInitialized, defaultQuery]);
 
   // Get detailed location information
   const getLocationDetails = useCallback(async (placeId: string): Promise<LocationDetails | null> => {
-    if (!placesService.current) {
+    if (!isInitialized || !placesService.current) {
       console.warn('Google Maps PlacesService not initialized');
       return null;
     }
@@ -162,7 +158,7 @@ export const useGoogleLocationSearch = (
     return new Promise((resolve) => {
       const request = {
         placeId: placeId,
-        fields: ['geometry', 'formatted_address', 'name', 'place_id']
+        fields: ['geometry', 'formatted_address', 'name', 'place_id'],
       };
 
       placesService.current!.getDetails(request, (place, status) => {
@@ -181,7 +177,7 @@ export const useGoogleLocationSearch = (
         }
       });
     });
-  }, []);
+  }, [isInitialized]);
 
   // Clear predictions
   const clearPredictions = useCallback(() => {

@@ -4,7 +4,7 @@ import { useGetMyConnectionsQuery } from "@/redux/features/connections/connectio
 import { useSendGroupInviteMutation } from "@/redux/features/group/groupApi";
 import { IMyConnections } from "@/types/connection.types";
 import { TError } from "@/types/error";
-import { IGroupDetails, IGroupMember } from "@/types/group.types";
+import { IGroupDetails } from "@/types/group.types";
 import { Checkbox } from "antd";
 import { Search, Users } from "lucide-react";
 import Image from "next/image";
@@ -80,22 +80,8 @@ const GroupInviteModal = ({
 
   // Filter connections to show only those not already members or pending members
   const filteredConnections = useMemo(() => {
-    const memberIds =
-      groupDetailsData?.members?.map((member: IGroupMember) => member._id) ||
-      [];
-
-    // Exclude members and pending members
-    const eligibleConnections = allConnections.filter(
-      (conn) => !memberIds.includes(conn._id)
-    );
-
-    if (!searchTerm.trim()) {
-      return eligibleConnections;
-    }
-
     const lowercaseSearchTerm = searchTerm.toLowerCase().trim();
-
-    return eligibleConnections.filter((connection) => {
+    return allConnections?.filter((connection) => {
       const fullNameMatch = connection.fullName
         ?.toLowerCase()
         .includes(lowercaseSearchTerm);
@@ -105,7 +91,7 @@ const GroupInviteModal = ({
 
       return fullNameMatch || usernameMatch;
     });
-  }, [allConnections, searchTerm, groupDetailsData?.members]);
+  }, [allConnections, searchTerm]);
 
   // Infinite scroll handler
   const handleScroll = useCallback(
@@ -216,9 +202,14 @@ const GroupInviteModal = ({
             onScroll={handleScroll}
           >
             {filteredConnections?.map((connection) => {
+              // Check if the connection is already invited
               const isAlreadyInvited = groupDetailsData?.pendingMembers.some(
                 (member) => member._id === connection._id
               );
+              // Check if the connection is already a member
+              const isAlreadyMember = groupDetailsData?.members.some(
+                (member) => member._id === connection._id
+              )
               return (
                 <>
                   {isAlreadyInvited ? (
@@ -252,7 +243,36 @@ const GroupInviteModal = ({
                         Already invited
                       </div>
                     </div>
-                  ) : (
+                  ) : isAlreadyMember ? <div
+                      key={connection?._id}
+                      className="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg transition-colors"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="relative">
+                          <Image
+                            src={
+                              connection?.profileImage || "/default-avatar.png"
+                            }
+                            alt={connection?.fullName}
+                            width={40}
+                            height={40}
+                            className="w-10 h-10 rounded-full object-cover"
+                          />
+                        </div>
+                        <div>
+                          <h4 className="font-medium text-gray-800">
+                            {connection?.fullName}
+                          </h4>
+                          <p className="text-sm text-gray-500">
+                            @{connection?.username}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="text-sm text-gray-500">
+                        Already a member
+                      </div>
+                    </div> : (
                     <div
                       key={connection?._id}
                       className="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg transition-colors"
