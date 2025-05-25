@@ -1,9 +1,21 @@
-
+import { useJoinGroupMutation } from "@/redux/features/group/groupApi";
+import { TError } from "@/types/error";
 import { IGroup } from "@/types/group.types";
 import Image from "next/image";
-import Link from "next/link";
+import toast from "react-hot-toast";
 import { PiUserBold } from "react-icons/pi";
 const SuggestionGroupCard = ({ group }: { group: IGroup }) => {
+  const [joinGroup, { isLoading }] = useJoinGroupMutation();
+  const handleJoinGroup = async () => {
+    try {
+      const payload = { groupId: group?._id };
+      await joinGroup(payload).unwrap();
+      toast.success("Successfully joined the group!");
+    } catch (error) {
+      const err = error as TError;
+      toast.error(err?.data?.message || "Something went wrong!");
+    }
+  };
   return (
     <>
       <div className="w-full bg-white rounded-2xl  p-4 flex flex-col items-center">
@@ -32,11 +44,13 @@ const SuggestionGroupCard = ({ group }: { group: IGroup }) => {
 
         {/* Buttons */}
         <div className="flex flex-col gap-5 w-full">
-          <Link className="w-full block" href={`/groups/${group?._id}`}>
-            <button className="w-full bg-secondary  text-white  px-5 py-3 rounded-xl border border-secondary cursor-pointer">
-              Join Group
-            </button>
-          </Link>
+          <button
+            onClick={handleJoinGroup}
+            disabled={isLoading}
+            className="w-full border border-[#9EA1B3] text-gray-900 px-5 py-3   rounded-xl cursor-pointer"
+          >
+            {isLoading ? "Joining..." : "Join Group"}
+          </button>
         </div>
       </div>
     </>

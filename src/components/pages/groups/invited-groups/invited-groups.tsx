@@ -21,6 +21,7 @@ const InvitedGroups = () => {
       </div>
     );
   }
+  console.log("Groups Data", groupsData);
   return (
     <section className="w-full pt-2 pb-7 mt-7 border-[#9EA1B3] border-b">
       {/* Header Section */}
