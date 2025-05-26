@@ -7,17 +7,16 @@ import { BsThreeDots } from "react-icons/bs";
 import { IPost } from "@/types/post.types";
 import { Lock, Users } from "lucide-react";
 import moment from "moment";
+import useUser from "@/hooks/useUser";
+import { motion, AnimatePresence } from "framer-motion"; // Import Framer Motion
 
-const PostHeader = ({
-  post,
-  isOwnPost = false,
-}: {
-  post: IPost;
-  isOwnPost?: boolean;
-}) => {
+const PostHeader = ({ post }: { post: IPost }) => {
+  const user = useUser();
   const [isOpen, setIsOpen] = useState(false);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  const isOwnPost = post?.userId?._id == user?._id;
 
   const toggleDropdown = () => setIsOpen(!isOpen);
 
@@ -83,9 +82,37 @@ const PostHeader = ({
     } else if (diffDays < 7) {
       return diffDays === 1 ? "1 day ago" : `${diffDays} days ago`;
     } else {
-      return postTime.format("MMM D, YYYY"); // Fallback to date format for older posts
+      return postTime.format("MMM D, YYYY");
     }
   };
+
+  // Define animation variants for the dropdown
+  const dropdownVariants = {
+    hidden: {
+      opacity: 0,
+      y: -10,
+      scale: 0.95,
+    },
+    visible: {
+      opacity: 1,
+      y: 0,
+      scale: 1,
+      transition: {
+        duration: 0.2,
+        ease: "easeOut",
+      },
+    },
+    exit: {
+      opacity: 0,
+      y: -10,
+      scale: 0.95,
+      transition: {
+        duration: 0.15,
+        ease: "easeIn",
+      },
+    },
+  };
+
   return (
     <section className="w-full flex justify-between items-center gap-4">
       <div className="flex items-center mb-3">
@@ -133,50 +160,56 @@ const PostHeader = ({
         >
           <BsThreeDots size={28} />
         </button>
-        {isOpen && (
-          <div
-            ref={dropdownRef}
-            className="absolute right-0 mt-1 w-48 bg-white rounded-md border py-1 z-50"
-          >
-            {isOwnPost ? (
-              <>
-                <button
-                  onClick={handleEdit}
-                  className="block w-full text-left px-4 py-2 text-gray-800 hover:bg-gray-100"
-                >
-                  Edit
-                </button>
-                <button
-                  onClick={handleDelete}
-                  className="block w-full text-left px-4 py-2 text-gray-800 hover:bg-gray-100"
-                >
-                  Delete
-                </button>
-              </>
-            ) : (
-              <>
-                <button
-                  onClick={handleSave}
-                  className="block w-full text-left px-4 py-2 text-gray-800 hover:bg-gray-100"
-                >
-                  Save
-                </button>
-                <button
-                  onClick={handleHide}
-                  className="block w-full text-left px-4 py-2 text-gray-800 hover:bg-gray-100"
-                >
-                  Hide
-                </button>
-                <button
-                  onClick={handleReport}
-                  className="block w-full text-left px-4 py-2 text-gray-800 hover:bg-gray-100"
-                >
-                  Report
-                </button>
-              </>
-            )}
-          </div>
-        )}
+        <AnimatePresence>
+          {isOpen && (
+            <motion.div
+              ref={dropdownRef}
+              className="absolute right-0 mt-1 w-48 bg-white rounded-xl border border-gray-50 shadow-md z-50"
+              variants={dropdownVariants}
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+            >
+              {isOwnPost ? (
+                <>
+                  <button
+                    onClick={handleEdit}
+                    className="block w-full text-left px-4 py-2 text-gray-800 hover:bg-gray-100 rounded-t-xl"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    onClick={handleDelete}
+                    className="block w-full text-left px-4 py-2 text-gray-800 hover:bg-gray-100"
+                  >
+                    Delete
+                  </button>
+                </>
+              ) : (
+                <>
+                  <button
+                    onClick={handleSave}
+                    className="block w-full text-left px-4 py-2 text-gray-800 hover:bg-gray-100"
+                  >
+                    Save
+                  </button>
+                  <button
+                    onClick={handleHide}
+                    className="block w-full text-left px-4 py-2 text-gray-800 hover:bg-gray-100"
+                  >
+                    Hide
+                  </button>
+                  <button
+                    onClick={handleReport}
+                    className="block w-full text-left px-4 py-2 text-gray-800 hover:bg-gray-100"
+                  >
+                    Report
+                  </button>
+                </>
+              )}
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </section>
   );

@@ -50,7 +50,7 @@ const CustomModal: React.FC<CustomModalProps> = ({
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.3, ease: "easeInOut" }}
-          className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
+          className="fixed inset-0 bg-black/50 flex items-center p-3 justify-center z-50"
           onClick={closeOnBackdropClick ? onClose : undefined}
         >
           <motion.div
