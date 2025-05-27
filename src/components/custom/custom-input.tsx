@@ -88,7 +88,6 @@ const CustomInput = ({
                   {...field}
                   value={field.value || ""}
                   placeholder={placeholder}
-                  required={required}
                   onChange={(e) => {
                     field.onChange(e);
                     if (onChange) onChange(e);

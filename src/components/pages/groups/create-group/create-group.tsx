@@ -107,7 +107,6 @@ const CreateGroup: React.FC = () => {
     setCoLeaders(value);
   };
 
-  console.log(myConnections);
   return (
     <section className="w-full mb-8">
       <button
