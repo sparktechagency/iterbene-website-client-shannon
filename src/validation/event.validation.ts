@@ -18,6 +18,12 @@ const eventValidationSchema = z.object({
     required_error: "Privacy is required",
     invalid_type_error: "Privacy must be either 'public' or 'private'",
   }),
+  eventCost: z.string({
+    required_error: "Event cost is required",
+    invalid_type_error: "Event cost must be a number",
+  }).min(0, {
+    message: "Event cost must be a non-negative number",
+  }),
   description: z.string({
     required_error: "Description is required",
     invalid_type_error: "Description must be a string",

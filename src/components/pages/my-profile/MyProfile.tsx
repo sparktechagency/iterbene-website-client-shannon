@@ -1,15 +1,14 @@
 import { Tabs } from "antd";
 import Image from "next/image";
-import React from "react";
+import MyConnections from "../UserProfilePage/MyConnectionsPage/MyConnections/MyConnections";
 import MyProfileDetails from "../UserProfilePage/UserDetailsPage/MyProfileDetails/MyProfileDetails";
-import MyProfileTimeline from "./MyProfileTimeline/MyProfileTimeline";
-import MyConnections from "./MyConnections/MyConnections";
 import MyGroups from "./MyGroups/MyGroups";
-import MyVideos from "./MyVideos/MyVideos";
-import MyPhotos from "./MyPhotos/MyPhotos";
-import MyMaps from "./MyMaps/MyMaps";
-import MyItinerary from "./MyItinerary/MyItinerary";
 import MyInvitations from "./MyInvitations/MyInvitations";
+import MyItinerary from "./MyItinerary/MyItinerary";
+import MyMaps from "./MyMaps/MyMaps";
+import MyPhotos from "./MyPhotos/MyPhotos";
+import MyProfileTimeline from "./MyProfileTimeline/MyProfileTimeline";
+import MyVideos from "./MyVideos/MyVideos";
 
 const MyProfile = () => {
   const tabItems = [
@@ -18,7 +17,7 @@ const MyProfile = () => {
       label: "Profile",
       children: <MyProfileDetails />,
     },
-    
+
     {
       key: "2",
       label: "Timeline",
@@ -52,12 +51,12 @@ const MyProfile = () => {
     {
       key: "8",
       label: "Itinerary",
-      children: <MyItinerary/>,
+      children: <MyItinerary />,
     },
     {
       key: "9",
       label: "Invitations",
-      children: <MyInvitations/>,
+      children: <MyInvitations />,
     }
   ];
   return (

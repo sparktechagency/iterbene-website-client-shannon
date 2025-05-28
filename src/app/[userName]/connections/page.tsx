@@ -1,9 +1,8 @@
-import React from 'react'
+
+import MyConnectionsPage from '@/components/pages/UserProfilePage/MyConnectionsPage/MyConnectionsPage'
 
 const ConnectionsPage = () => {
-  return (
-    <div>ConnectionsPage</div>
-  )
+  return <MyConnectionsPage />
 }
 
 export default ConnectionsPage

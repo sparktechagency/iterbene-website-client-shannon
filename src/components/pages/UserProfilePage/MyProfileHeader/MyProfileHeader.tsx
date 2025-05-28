@@ -4,7 +4,7 @@ import React from "react";
 
 const MyProfileHeader = ({userData} : {userData: IUser}) => {
   return (
-    <div className="w-full bg-white rounded-2xl relative mt-[100px]">
+    <div className="w-full bg-white rounded-2xl relative mt-[112px]">
       {/* Background Image */}
       {userData?.coverImage && (
         <Image
@@ -32,7 +32,7 @@ const MyProfileHeader = ({userData} : {userData: IUser}) => {
           <h1 className="text-center md:text-left text-lg sm:text-xl md:text-2xl font-bold text-gray-800">
             {userData?.fullName}
           </h1>
-          <div className="flex flex-wrap gap-2 sm:gap-3 text-gray-600 text-xs sm:text-sm">
+          <div className="flex flex-wrap gap-2 sm:gap-3 text-gray-600 text-sm md:text-base font-medium">
             <span>@{userData?.username}</span>
             <span>· {userData?.followersCount} followers</span>
             <span>· {userData?.followingCount} following</span>

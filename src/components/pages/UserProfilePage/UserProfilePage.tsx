@@ -31,7 +31,7 @@ const UserProfileInformationPage = ({
     content = (
       <section className="w-full bg-[#F5F5F5]">
         <Header />
-        <div className="container mx-auto space-y-8 pb-10">
+        <div className="container mx-auto space-y-8 px-4 pb-10">
           {isMyProfile ? (
             <MyProfileHeader userData={userData} />
           ) : (

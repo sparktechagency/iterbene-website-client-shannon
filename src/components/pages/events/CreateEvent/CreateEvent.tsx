@@ -77,6 +77,7 @@ const CreateEvent: React.FC = () => {
   };
 
   const handleFormSubmit = async (values: FieldValues) => {
+
     // Validate location selection
     if (!selectedLocation) {
       toast.error("Please select a valid location");
