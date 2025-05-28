@@ -2,7 +2,7 @@
 import { ChevronDown } from "lucide-react";
 import React, { useState } from "react";
 import MyConnections from "./MyConnections/MyConnections";
-import RequestConnections from "./RequestConnections/RequestConnections";
+import MyRequestConnections from "./MyRequestConnections/MyRequestConnections";
 const MyConnectionsPage = () => {
   const [activeTab, setActiveTab] = useState<string>("My Connections");
   return (
@@ -38,7 +38,7 @@ const MyConnectionsPage = () => {
       {activeTab === "My Connections" ? (
         <MyConnections />
       ) : (
-        <RequestConnections />
+        <MyRequestConnections />
       )}
     </section>
   );
