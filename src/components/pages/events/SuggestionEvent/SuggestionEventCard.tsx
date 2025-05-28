@@ -9,7 +9,7 @@ interface UpcomingEventCardProps {
   event: IEvent;
 }
 
-const UpcomingEventCard = ({ event }: UpcomingEventCardProps) => {
+const SuggestionEventCard = ({ event }: UpcomingEventCardProps) => {
   return (
     <div className="w-full bg-white rounded-2xl  p-4 flex flex-col items-center">
       {/* Group Image */}
@@ -60,4 +60,4 @@ const UpcomingEventCard = ({ event }: UpcomingEventCardProps) => {
   );
 };
 
-export default UpcomingEventCard;
+export default SuggestionEventCard;

@@ -1,18 +1,20 @@
-import React from 'react'
-import InvitedEvents from './invited-events/invited-events'
-import InterestedEventCard from './interested-events/interested-events-card'
-import UpcomingEvents from './upComingEvents/upComing-events'
-import CreateEvent from './CreateEvent/CreateEvent'
+import React from "react";
+import InvitedEvents from "./invited-events/invited-events";
+import UpcomingEvents from "./upComingEvents/upComing-events";
+import CreateEvent from "./CreateEvent/CreateEvent";
+import InterestedEvents from "./interested-events/interested-events";
+import SuggestionEvent from "./SuggestionEvent/SuggestionEvent";
 
 const Events = () => {
   return (
     <>
-    <CreateEvent/>
-    <UpcomingEvents/>
-    <InvitedEvents/>
-    <InterestedEventCard/>
+      <CreateEvent />
+      <UpcomingEvents />
+      <InvitedEvents />
+      <InterestedEvents />
+      <SuggestionEvent />
     </>
-  )
-}
+  );
+};
 
-export default Events
+export default Events;
