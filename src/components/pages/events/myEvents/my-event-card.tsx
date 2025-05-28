@@ -1,15 +1,29 @@
 import CustomButton from "@/components/custom/custom-button";
+import { useRemoveEventMutation } from "@/redux/features/event/eventApi";
+import { TError } from "@/types/error";
 import { IEvent } from "@/types/event.types";
 import Image from "next/image";
 import Link from "next/link";
-import React from "react";
+import toast from "react-hot-toast";
 import { PiUserBold } from "react-icons/pi";
 
 interface UpcomingEventCardProps {
   event: IEvent;
 }
 
-const UpcomingEventCard = ({ event }: UpcomingEventCardProps) => {
+const MyEventCard = ({ event }: UpcomingEventCardProps) => {
+  const [removeEvent, { isLoading: isRemoving }] = useRemoveEventMutation();
+  const handleRemoveEvent = async () => {
+    try {
+      await removeEvent(event?._id).unwrap();
+      toast.success("Event removed successfully.");
+    } catch (error) {
+      const err = error as TError;
+      toast.error(
+        err?.data?.message || "Failed to remove event. Please try again."
+      );
+    }
+  };
   return (
     <div className="w-full bg-white rounded-2xl  p-4 flex flex-col items-center">
       {/* Group Image */}
@@ -52,7 +66,13 @@ const UpcomingEventCard = ({ event }: UpcomingEventCardProps) => {
           </CustomButton>
         </Link>
 
-        <CustomButton variant="outline" fullWidth className="px-5 py-3">
+        <CustomButton
+          onClick={handleRemoveEvent}
+          loading={isRemoving}
+          variant="outline"
+          fullWidth
+          className="px-5 py-3"
+        >
           Remove
         </CustomButton>
       </div>
@@ -60,4 +80,4 @@ const UpcomingEventCard = ({ event }: UpcomingEventCardProps) => {
   );
 };
 
-export default UpcomingEventCard;
+export default MyEventCard;

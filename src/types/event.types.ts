@@ -23,7 +23,7 @@ export interface IEventDetails {
     fullName: string;
     username: string;
     profileImage: string;
-        description: string;
+    description: string;
   };
   interestCount: number;
   startDate: string;
@@ -51,4 +51,31 @@ export interface IEventDetails {
     username: string;
     profileImage: string;
   }[];
+}
+
+export interface IEventInvitation {
+  _id: string;
+  from: string;
+  to: string;
+  eventId: {
+    _id: string;
+    eventName: string;
+    eventImage: string;
+    startDate: string;
+    endDate: string;
+    creatorId: {
+      _id: string;
+      fullName: string;
+      username: string;
+      profileImage: string;
+    };
+    duration: {
+    days: number;
+    nights: number;
+    };
+    privacy: string;
+    interestCount: number;
+  };
+  createdAt: string;
+  updatedAt: string;
 }

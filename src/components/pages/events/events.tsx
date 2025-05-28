@@ -1,15 +1,14 @@
-import React from "react";
-import InvitedEvents from "./invited-events/invited-events";
-import UpcomingEvents from "./upComingEvents/upComing-events";
 import CreateEvent from "./CreateEvent/CreateEvent";
 import InterestedEvents from "./interested-events/interested-events";
+import InvitedEvents from "./invited-events/invited-events";
+import MyEvents from "./myEvents/my-events";
 import SuggestionEvent from "./SuggestionEvent/SuggestionEvent";
 
 const Events = () => {
   return (
     <>
       <CreateEvent />
-      <UpcomingEvents />
+      <MyEvents />
       <InvitedEvents />
       <InterestedEvents />
       <SuggestionEvent />

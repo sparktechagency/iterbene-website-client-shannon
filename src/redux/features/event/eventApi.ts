@@ -11,11 +11,24 @@ const eventApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["Events"],
     }),
-    joinEvent: builder.mutation({
-      query: (data) => ({
-        url: `/events/join`,
+    interestEvent: builder.mutation({
+      query: (eventId) => ({
+        url: `/events/interest/${eventId}`,
         method: "POST",
-        body: data,
+      }),
+      invalidatesTags: ["Events"],
+    }),
+    notInterestEvent: builder.mutation({
+      query: (eventId) => ({
+        url: `/events/not-interest/${eventId}`,
+        method: "POST",
+      }),
+      invalidatesTags: ["Events"],
+    }),
+    removeEvent: builder.mutation({
+      query: (eventId) => ({
+        url: `/events/${eventId}`,
+        method: "DELETE",
       }),
       invalidatesTags: ["Events"],
     }),
@@ -83,7 +96,9 @@ const eventApi = baseApi.injectEndpoints({
 
 export const {
   useCreateEventMutation,
-  useJoinEventMutation,
+  useInterestEventMutation,
+  useNotInterestEventMutation,
+  useRemoveEventMutation,
   useGetMyEventsQuery,
   useGetMyInvitesQuery,
   useGetEventQuery,

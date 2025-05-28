@@ -1,8 +1,11 @@
 import CustomButton from "@/components/custom/custom-button";
+import { useInterestEventMutation } from "@/redux/features/event/eventApi";
+import { TError } from "@/types/error";
 import { IEvent } from "@/types/event.types";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
+import toast from "react-hot-toast";
 import { PiUserBold } from "react-icons/pi";
 
 interface UpcomingEventCardProps {
@@ -10,6 +13,21 @@ interface UpcomingEventCardProps {
 }
 
 const SuggestionEventCard = ({ event }: UpcomingEventCardProps) => {
+  const [interestEvent, { isLoading: isInterestLoading }] =
+    useInterestEventMutation();
+
+  const handleInterest = async () => {
+    try {
+      await interestEvent(event?._id).unwrap();
+      toast.success("Marked as interested successfully.");
+    } catch (error) {
+      const err = error as TError;
+      toast.error(
+        err?.data?.message || "Failed to mark as interested. Please try again."
+      );
+      console.error("Failed to mark as interested:", error);
+    }
+  };
   return (
     <div className="w-full bg-white rounded-2xl  p-4 flex flex-col items-center">
       {/* Group Image */}
@@ -47,13 +65,18 @@ const SuggestionEventCard = ({ event }: UpcomingEventCardProps) => {
       {/* Buttons */}
       <div className="flex flex-col gap-4 w-full">
         <Link href={`/events/${event?._id}`}>
-          <CustomButton variant="default" fullWidth className="px-5 py-3">
+          <CustomButton variant="default" className="py-3" fullWidth>
             View
           </CustomButton>
         </Link>
-
-        <CustomButton variant="outline" fullWidth className="px-5 py-3">
-          Remove
+        <CustomButton
+          loading={isInterestLoading}
+          onClick={handleInterest}
+          variant="outline"
+          fullWidth
+          className="px-5 py-3"
+        >
+          Interest
         </CustomButton>
       </div>
     </div>

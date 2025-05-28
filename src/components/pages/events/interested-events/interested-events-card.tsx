@@ -1,8 +1,11 @@
 import CustomButton from "@/components/custom/custom-button";
+import { useNotInterestEventMutation } from "@/redux/features/event/eventApi";
+import { TError } from "@/types/error";
 import { IEvent } from "@/types/event.types";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
+import toast from "react-hot-toast";
 import { PiUserBold } from "react-icons/pi";
 
 interface UpcomingEventCardProps {
@@ -10,6 +13,21 @@ interface UpcomingEventCardProps {
 }
 
 const InterestedEventCard = ({ event }: UpcomingEventCardProps) => {
+  const [notInterest, { isLoading: isNotInterestLoading }] =
+    useNotInterestEventMutation();
+  const handleNotInterest = async () => {
+    try {
+      await notInterest(event?._id).unwrap();
+      toast.success("Marked as not interested successfully.");
+    } catch (error) {
+      const err = error as TError;
+      toast.error(
+        err?.data?.message ||
+          "Failed to mark as not interested. Please try again."
+      );
+      console.error("Failed to mark as not interested:", error);
+    }
+  };
   return (
     <div className="w-full bg-white rounded-2xl  p-4 flex flex-col items-center">
       {/* Group Image */}
@@ -51,7 +69,13 @@ const InterestedEventCard = ({ event }: UpcomingEventCardProps) => {
             View
           </CustomButton>
         </Link>
-        <CustomButton variant="outline" className="py-3" fullWidth>
+        <CustomButton
+          loading={isNotInterestLoading}
+          onClick={handleNotInterest}
+          variant="outline"
+          className="py-3"
+          fullWidth
+        >
           Not Interest
         </CustomButton>
       </div>
