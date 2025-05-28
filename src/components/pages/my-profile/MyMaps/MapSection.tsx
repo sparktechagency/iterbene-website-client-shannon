@@ -30,7 +30,7 @@ const MapSection = ({
   setShowFullMap: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
   // Replace with your actual Google Maps API key
-  const apiKey: string = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "";
+  const apiKey: string = process.env.NEXT_PUBLIC_GOOGLE_MAP_API_KEY || "";
 
   // Use useJsApiLoader to ensure the Google Maps API is loaded
   const { isLoaded } = useJsApiLoader({
