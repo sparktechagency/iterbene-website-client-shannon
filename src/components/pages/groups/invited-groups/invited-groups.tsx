@@ -14,14 +14,14 @@ const InvitedGroups = () => {
     content = <p className="text-xl">No invited groups found</p>;
   } else if (groupsData?.length > 0) {
     content = (
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
         {groupsData?.map((group: IGroupInvite) => (
           <InvitedGroupCard key={group?._id} group={group} />
         ))}
       </div>
     );
   }
-  console.log("Groups Data", groupsData);
+
   return (
     <section className="w-full pt-2 pb-7 mt-7 border-[#9EA1B3] border-b">
       {/* Header Section */}

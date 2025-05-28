@@ -9,7 +9,7 @@ import CustomForm from "@/components/custom/custom-form";
 import CustomInput from "@/components/custom/custom-input";
 import CustomSelectField from "@/components/custom/custom-seletectField";
 import { FieldValues } from "react-hook-form";
-import { Lock } from "lucide-react";
+import {DollarSignIcon, Lock } from "lucide-react";
 import CustomButton from "@/components/custom/custom-button";
 import { IoClose } from "react-icons/io5";
 import useUser from "@/hooks/useUser";
@@ -87,7 +87,6 @@ const CreateEvent: React.FC = () => {
       return;
     }
     // Validate duration
-    
 
     try {
       const formData = new FormData();
@@ -112,6 +111,7 @@ const CreateEvent: React.FC = () => {
       );
       formData.append("locationName", selectedLocation.name);
       formData.append("eventImage", eventFile || "");
+      formData.append("eventCost", values.eventCost);
       await createEvent(formData).unwrap();
       toast.success("Event created successfully!");
       closeModal();
@@ -353,6 +353,15 @@ const CreateEvent: React.FC = () => {
                 </div>
               </div>
             </div>
+            {/* Event Cost */}
+            <CustomInput
+              type="number"
+              icon={<DollarSignIcon size={22} className="text-[#9194A9]" />}
+              label="Event Cost($)"
+              name="eventCost"
+              placeholder="Enter event cost (200$)"
+              required
+            />
 
             {/* Reusable Location Search Component */}
             <LocationSearchInput
