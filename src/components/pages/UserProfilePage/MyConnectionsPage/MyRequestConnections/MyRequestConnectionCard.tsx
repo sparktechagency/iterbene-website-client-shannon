@@ -39,7 +39,7 @@ const MyRequestConnectionCard = ({
     }
   };
   return (
-    <div className="flex items-center justify-between bg-white p-4 rounded-xl">
+    <div className="w-full flex items-center justify-between bg-white p-4 rounded-xl">
       <Link href={`/${connection?.sentBy?.username}`}>
         <div className="flex items-center space-x-4">
           <Image
@@ -59,18 +59,20 @@ const MyRequestConnectionCard = ({
           </div>
         </div>
       </Link>
-      <div className="flex items-center space-x-2">
+      <div className="flex items-center gap-4">
         <CustomButton
-          onClick={handleDeclineConnection}
+          onClick={handleAcceptConnection}
           loading={acceptLoading}
           variant="default"
+          className="px-8 py-2.5"
         >
           Accept
         </CustomButton>
         <CustomButton
-          onClick={handleAcceptConnection}
+          onClick={handleDeclineConnection}
           loading={declineLoading}
           variant="outline"
+          className="px-8 py-2.5"
         >
           Decline
         </CustomButton>

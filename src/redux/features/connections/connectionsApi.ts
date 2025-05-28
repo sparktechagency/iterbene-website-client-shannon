@@ -41,7 +41,7 @@ const connectionsApi = baseApi.injectEndpoints({
     declineConnection: builder.mutation({
       query: (connectionId) => ({
         url: `/connections/decline/${connectionId}`,
-        method: "DELETE",
+        method: "PATCH",
       }),
       invalidatesTags: ["Connections"],
     }),

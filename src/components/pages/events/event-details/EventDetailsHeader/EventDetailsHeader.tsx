@@ -20,8 +20,8 @@ const EventDetailsHeader = ({
 }) => {
   const user = useUser();
   const owner = eventDetailsData?.creatorId?._id === user?._id;
-  const isInterested = eventDetailsData?.interestedUsers?.some(
-    (user) => user?._id === user?._id
+  const isInterested = eventDetailsData?.interestedUsers?.find(
+    (interestedUser) => interestedUser?._id === user?._id
   );
   const [isInviteModalOpen, setIsInviteModalOpen] = useState<boolean>(false);
   const router = useRouter();
@@ -66,6 +66,8 @@ const EventDetailsHeader = ({
   const closeInviteModal = () => {
     setIsInviteModalOpen(false);
   };
+
+  console.log("isInterested Users:", isInterested);
   return (
     <>
       <div className="w-full bg-white rounded-xl relative">

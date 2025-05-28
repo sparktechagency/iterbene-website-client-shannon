@@ -14,7 +14,7 @@ const RequestConnections = () => {
     content = <p className="text-xl">No requests found</p>;
   } else if (!isLoading && connectionsRequestData?.length > 0) {
     content = (
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+      <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-7">
         {connectionsRequestData?.map((request: IConnectionRequest) => (
           <MyRequestConnectionCard key={request?._id} connection={request} />
         ))}
