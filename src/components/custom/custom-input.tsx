@@ -93,7 +93,7 @@ const CustomInput = ({
                     if (onChange) onChange(e);
                   }}
                   onClick={onClick}
-                  className={`w-full ${textareaSizeClass} outline-none  text-gray-900 resize-y`}
+                  className={`w-full ${textareaSizeClass} outline-none  text-gray-900 resize-nonee`}
                 />
               ) : (
                 <input

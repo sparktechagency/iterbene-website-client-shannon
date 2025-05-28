@@ -12,7 +12,6 @@ const GroupDetails = () => {
     skip: !groupId,
   });
   const groupDetailsData = responseData?.data?.attributes;
-  console.log(groupDetailsData);
   return (
     <>
       <GroupDetailsHeader groupDetailsData={groupDetailsData} />

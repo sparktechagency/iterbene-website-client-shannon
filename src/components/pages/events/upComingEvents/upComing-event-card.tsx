@@ -8,7 +8,7 @@ interface UpcomingEventCardProps {
   event: IEvent;
 }
 
-const UpcomingEventCard: React.FC<UpcomingEventCardProps> = ({ event }) => {
+const UpcomingEventCard = ({ event } : UpcomingEventCardProps) => {
   return (
     <div className="w-full bg-white rounded-2xl  p-4 flex flex-col items-center">
       {/* Group Image */}
@@ -45,8 +45,8 @@ const UpcomingEventCard: React.FC<UpcomingEventCardProps> = ({ event }) => {
       </div>
       {/* Buttons */}
       <div className="flex flex-col gap-3 w-full">
-        <Link href={`/events/1`}>
-          <button className="w-full bg-secondary hover:bg-[#FEEFE8] hover:text-secondary text-white  px-5 py-3.5 rounded-xl border border-secondary transition cursor-pointer">
+        <Link href={`/events/${event?._id}`}>
+          <button className="w-full bg-secondary  text-white  px-5 py-3.5 rounded-xl border border-secondary transition cursor-pointer">
             View
           </button>
         </Link>
