@@ -1,8 +1,8 @@
 import { Tabs } from "antd";
 import Image from "next/image";
 import MyConnections from "../UserProfilePage/MyConnectionsPage/MyConnections/MyConnections";
+import MyJoinedGroups from "../UserProfilePage/MyGroupsPage/MyJoinedGroups/MyJoinedGroups";
 import MyProfileDetails from "../UserProfilePage/UserDetailsPage/MyProfileDetails/MyProfileDetails";
-import MyGroups from "./MyGroups/MyGroups";
 import MyInvitations from "./MyInvitations/MyInvitations";
 import MyItinerary from "./MyItinerary/MyItinerary";
 import MyMaps from "./MyMaps/MyMaps";
@@ -31,7 +31,7 @@ const MyProfile = () => {
     {
       key: "4",
       label: "Groups",
-      children: <MyGroups />,
+      children: <MyJoinedGroups />,
     },
     {
       key: "5",

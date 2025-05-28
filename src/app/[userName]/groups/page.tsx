@@ -1,9 +1,8 @@
+import MyGroupsPage from '@/components/pages/UserProfilePage/MyGroupsPage/MyGroupsPage'
 import React from 'react'
 
 const GroupsPage = () => {
-  return (
-    <div>GroupsPage</div>
-  )
+  return <MyGroupsPage/>
 }
 
 export default GroupsPage
