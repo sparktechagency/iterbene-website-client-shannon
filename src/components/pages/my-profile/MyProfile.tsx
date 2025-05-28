@@ -3,7 +3,7 @@ import Image from "next/image";
 import MyConnections from "../UserProfilePage/MyConnectionsPage/MyConnections/MyConnections";
 import MyJoinedGroups from "../UserProfilePage/MyGroupsPage/MyJoinedGroups/MyJoinedGroups";
 import MyProfileDetails from "../UserProfilePage/UserDetailsPage/MyProfileDetails/MyProfileDetails";
-import MyInvitations from "./MyInvitations/MyInvitations";
+import MyInvitations from "../UserProfilePage/MyInvitationsPage/MyInvitations/MyInvitations";
 import MyItinerary from "./MyItinerary/MyItinerary";
 import MyMaps from "./MyMaps/MyMaps";
 import MyPhotos from "./MyPhotos/MyPhotos";

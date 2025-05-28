@@ -3,6 +3,7 @@
 import { ChevronDown } from "lucide-react";
 import { useState } from "react";
 import MyJoinedGroups from "./MyJoinedGroups/MyJoinedGroups";
+import MyInvitationsGroups from "./MyInvitationsGroup/MyInvitationsGroups";
 
 const MyGroupsPage = () => {
   const [activeTab, setActiveTab] = useState<string>("myGroups");
@@ -36,12 +37,14 @@ const MyGroupsPage = () => {
           <ChevronDown size={24} />
         </div>
       </div>
-        {/* Content */}
-        <div className="w-full">
-            {activeTab === "myGroups" ? <MyJoinedGroups/>: (
-                <p className="text-xl">Invitations Content</p>
-            )}
-        </div>
+      {/* Content */}
+      <div className="w-full">
+        {activeTab === "myGroups" ? (
+          <MyJoinedGroups />
+        ) : (
+          <MyInvitationsGroups />
+        )}
+      </div>
     </div>
   );
 };

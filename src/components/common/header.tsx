@@ -448,13 +448,6 @@ const UserDropdown: React.FC<DropdownProps> = ({ user, isOpen }) => {
                 5
               </span>
             </Link>
-            <Link
-              href="/"
-              className="text-gray-800 hover:bg-[#ECFCFA] px-4 py-3 rounded-xl flex items-center gap-4"
-            >
-              <MdOutlineNotifications size={24} />
-              <span>Notifications</span>
-            </Link>
             <Link href="/groups" className="block text-black">
               <button className="text-gray-800 hover:bg-[#ECFCFA] px-4 py-3 rounded-xl flex items-center gap-4">
                 <HiOutlineUserGroup size={24} />
