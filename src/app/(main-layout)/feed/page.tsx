@@ -15,7 +15,7 @@ const Feed = () => {
         <CreatePost />
         <Posts />
       </div>
-      <div className="w-full hidden xl:block max-w-[382px] mx-auto col-span-full md:col-span-4 space-y-5 md:space-y-8">
+      <div className="w-full hidden xl:block max-w-[382px] mx-auto col-span-full md:col-span-4 ">
         <FriendRequest />
         <ContactList />
       </div>

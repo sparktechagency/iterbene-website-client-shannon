@@ -20,7 +20,6 @@ const InvitedEvents = () => {
       </div>
     );
   }
-  console.log(invitationCount);
   return (
     <section className="w-full pt-5 pb-7 border-[#9EA1B3] border-b">
       {/* Header Section */}

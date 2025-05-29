@@ -15,7 +15,7 @@ const PostContentRender = ({ data }: PostContentRenderProps) => {
     return (
       <div className="w-full mt-3">
         {media.mediaType === "image" ? (
-          <div className="relative w-full h-56 md:h-[300px] rounded-md overflow-hidden">
+          <div className="relative w-full h-56 md:h-[350px] rounded-md overflow-hidden">
             <Image
               src={media?.mediaUrl}
               alt={`Post media`}
@@ -25,7 +25,7 @@ const PostContentRender = ({ data }: PostContentRenderProps) => {
             />
           </div>
         ) : (
-          <VideoCard url={media?.mediaUrl} className="w-full h-[300px]" />
+          <VideoCard url={media?.mediaUrl} className="w-full h-[350px]" />
         )}
       </div>
     );
@@ -42,11 +42,11 @@ const PostContentRender = ({ data }: PostContentRenderProps) => {
                 src={media?.mediaUrl}
                 alt="Post media"
                 width={400}
-                height={300}
-                className="w-full h-[300px]  rounded-xl cursor-pointer"
+                height={350}
+                className="w-full h-[350px]  rounded-xl cursor-pointer"
               />
             ) : (
-              <VideoCard url={media?.mediaUrl} className="w-full h-[300px]" />
+              <VideoCard url={media?.mediaUrl} className="w-full h-[350px]" />
             )}
           </div>
         ))}
@@ -64,11 +64,11 @@ const PostContentRender = ({ data }: PostContentRenderProps) => {
               src={data[0]?.mediaUrl}
               alt="Post media"
               width={400}
-              height={300}
-              className="w-full h-[300px] object-cover rounded-xl cursor-pointer"
+              height={350}
+              className="w-full h-[350px] object-cover rounded-xl cursor-pointer"
             />
           ) : (
-            <VideoCard url={data[0]?.mediaUrl} />
+            <VideoCard url={data[0]?.mediaUrl} className="h-[350px]" />
           )}
         </div>
         <div className="col-span-1">
@@ -77,8 +77,8 @@ const PostContentRender = ({ data }: PostContentRenderProps) => {
               src={data[1]?.mediaUrl}
               alt="Post media"
               width={400}
-              height={200}
-              className="w-full h-[200px] object-cover rounded-xl cursor-pointer"
+              height={260}
+              className="w-full h-[260px] object-cover rounded-xl cursor-pointer"
             />
           ) : (
             <VideoCard url={data[1]?.mediaUrl} className="h-[260px]" />
@@ -90,8 +90,8 @@ const PostContentRender = ({ data }: PostContentRenderProps) => {
               src={data[2]?.mediaUrl}
               alt="Post media"
               width={400}
-              height={200}
-              className="w-full h-[200px] object-cover rounded-xl cursor-pointer"
+              height={260}
+              className="w-full h-[260px] object-cover rounded-xl cursor-pointer"
             />
           ) : (
             <VideoCard url={data[2]?.mediaUrl} />
