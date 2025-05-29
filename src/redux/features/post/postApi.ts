@@ -30,8 +30,8 @@ const postApi = baseApi.injectEndpoints({
       providesTags: ["Post"],
     }),
     getUserTimelinePosts: builder.query({
-      query: ({ username, filters }) => {
-        const params = new URLSearchParams(filters);
+      query: ({ username,filters }) => {
+        const params = new URLSearchParams();
         if (filters?.length > 0) {
           filters?.forEach((filter: { key: string; value: string }) =>
             params.append(filter.key, filter.value)

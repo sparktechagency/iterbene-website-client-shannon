@@ -1,9 +1,8 @@
-import React from 'react'
+import UserPhotos from "@/components/pages/UserProfilePage/UserPhotos/UserPhotos";
+import React from "react";
 
 const Photos = () => {
-  return (
-    <div>Photos</div>
-  )
-}
+  return <UserPhotos />;
+};
 
-export default Photos
+export default Photos;

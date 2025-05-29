@@ -90,7 +90,7 @@ const Stories = () => {
   return (
     <section className="w-full">
       <Swiper
-        slidesPerView={5}
+        slidesPerView={4}
         spaceBetween={16}
         freeMode={true}
         pagination={{

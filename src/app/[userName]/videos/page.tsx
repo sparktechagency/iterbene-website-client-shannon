@@ -1,9 +1,8 @@
+import UserVideos from '@/components/pages/UserProfilePage/UserVideos/UserVideos'
 import React from 'react'
 
 const VideosPage = () => {
-  return (
-    <div>Videos</div>
-  )
+  return <UserVideos/>
 }
 
 export default VideosPage

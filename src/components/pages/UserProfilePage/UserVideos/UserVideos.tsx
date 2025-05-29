@@ -1,35 +1,23 @@
 "use client";
+import { useParams } from "next/navigation";
 import VideoCard from "./VideoCard";
-
-const UserVideoTab = () => {
-  // Sample video URLs and placeholder thumbnails (replace with your actual video URLs and thumbnails)
-  const videos = [
+import { useGetUserTimelinePostsQuery } from "@/redux/features/post/postApi";
+import { IPost } from "@/types/post.types";
+const UserVideos = () => {
+  const { userName } = useParams();
+  const { data: responseData } = useGetUserTimelinePostsQuery(
     {
-      url: "https://www.w3schools.com/html/mov_bbb.mp4",
+      username: userName,
+      filters: [
+        {
+          key: "mediaType",
+          value: "video",
+        },
+      ],
     },
-    {
-      url: "https://www.w3schools.com/html/mov_bbb.mp4",
-    },
-    {
-      url: "https://www.w3schools.com/html/mov_bbb.mp4",
-    },
-    {
-      url: "https://www.w3schools.com/html/mov_bbb.mp4",
-    },
-    {
-      url: "https://www.w3schools.com/html/mov_bbb.mp4",
-    },
-    {
-      url: "https://www.w3schools.com/html/mov_bbb.mp4",
-    },
-    {
-      url: "https://www.w3schools.com/html/mov_bbb.mp4",
-    },
-    {
-      url: "https://www.w3schools.com/html/mov_bbb.mp4",
-    },
-  ];
-
+    { refetchOnMountOrArgChange: true, skip: !userName }
+  );
+  const userTimelineVideoData = responseData?.data?.attributes?.results;
   return (
     <div className="w-full bg-white p-5 rounded-2xl">
       {/* Header with Title and Edit Button */}
@@ -37,12 +25,14 @@ const UserVideoTab = () => {
         <h2 className="text-lg font-semibold text-gray-800">Videos</h2>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-        {videos.map((video, index) => (
-          <VideoCard key={index} url={video.url} />
-        ))}
+        {userTimelineVideoData?.map((video: IPost, index: number) =>
+          video.media?.map((media) => {
+            return <VideoCard key={index} url={media?.mediaUrl} />;
+          })
+        )}
       </div>
     </div>
   );
 };
 
-export default UserVideoTab;
+export default UserVideos;

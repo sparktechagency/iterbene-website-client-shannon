@@ -43,7 +43,7 @@ const UserTimelineContentRender = ({
   // Two media items
   if (mediaCount === 2) {
     return (
-      <div className="grid grid-cols-2 gap-4 mt-3">
+      <div className="grid grid-cols-2 gap-3 mt-3">
         {data.map((media, index) => (
           <div key={index} className="aspect-square">
             {media.type === "photo" ? (
@@ -66,7 +66,7 @@ const UserTimelineContentRender = ({
   // Three media items
   if (mediaCount === 3) {
     return (
-      <div className="grid grid-cols-2 gap-4 mt-3">
+      <div className="grid grid-cols-2 gap-3 mt-3">
         <div className="row-span-2 col-span-1">
           {data[0].type === "photo" ? (
             <Image
