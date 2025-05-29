@@ -1,7 +1,5 @@
 "use client";
-import React, { useState, useCallback } from "react";
 import { GoogleMap, Marker, useJsApiLoader } from "@react-google-maps/api";
-import { Minus, Plus } from "lucide-react";
 
 // Define the map container style
 const mapContainerStyle: React.CSSProperties = {
@@ -15,10 +13,10 @@ interface Location {
   lng: number;
 }
 
-// Default center (adjusted to center around the new locations, roughly central point)
+// Default center (Dhaka, Bangladesh as shown in your screenshot)
 const defaultCenter: Location = {
-  lat: 40.0, // Roughly central latitude for the new locations
-  lng: 30.0, // Roughly central longitude for the new locations
+  lat: 23.8103, // Dhaka latitude
+  lng: 90.4125, // Dhaka longitude
 };
 
 const MapSection = ({
@@ -33,59 +31,58 @@ const MapSection = ({
   const apiKey: string = process.env.NEXT_PUBLIC_GOOGLE_MAP_API_KEY || "";
 
   // Use useJsApiLoader to ensure the Google Maps API is loaded
+  // Only load the libraries you actually need
   const { isLoaded } = useJsApiLoader({
     googleMapsApiKey: apiKey,
+    libraries: [], // Empty array since you're not using places, geometry, etc.
   });
 
-  // State to hold the map instance
-  const [map, setMap] = useState<google.maps.Map | null>(null);
-
   // Define locations using TripList locations
-  const interestedPlaces: Location[] = [
-    { lat: 35.0116, lng: 135.7681 }, // Kyoto, Japan
-    { lat: 36.3932, lng: 25.4615 },  // Santorini, Greece
-  ];
+  const interestedPlaces: Location[] = [{ lat: 35.0116, lng: 135.7681 }];
 
   const visitedPlaces: Location[] = [
-    { lat: 51.1784, lng: -115.5708 }, // Banff, Canada
-    { lat: 31.6295, lng: -7.9811 },  // Marrakech, Morocco
+    { lat: 32.219042, lng: 76.3234037 },
+    { lat: 23.7329724, lng: 90.417231 },
   ];
 
   const homeLocation: Location = {
-    lat: 34.0522, // Los Angeles, USA (new home location)
-    lng: -118.2437,
+    lat: 23.8103, // Dhaka, Bangladesh (your current location)
+    lng: 90.4125,
   };
 
-  // Custom marker icons (replace these URLs with your own custom icons)
-  const customIcons = {
-    interested: "https://i.ibb.co.com/BVgNBSG8/interested.png",
-    visited: "https://i.ibb.co.com/60gHYs1m/visit.png",
-    home: "https://i.ibb.co.com/5xxKK494/home.png",
-  };
+  // Custom marker icons - create them only when Google Maps is loaded
+  const getCustomIcons = () => {
+    if (!window.google || !window.google.maps) return null;
 
-  // Handle map load
-  const onLoad = useCallback((mapInstance: google.maps.Map) => {
-    setMap(mapInstance);
-  }, []);
-
-  // Zoom in function
-  const zoomIn = () => {
-    if (map) {
-      map.setZoom(map.getZoom()! + 1);
-    }
-  };
-
-  // Zoom out function
-  const zoomOut = () => {
-    if (map) {
-      map.setZoom(map.getZoom()! - 1);
-    }
+    return {
+      interested: {
+        url: "https://i.ibb.co.com/BVgNBSG8/interested.png",
+        scaledSize: new window.google.maps.Size(40, 40),
+      },
+      visited: {
+        url: "https://i.ibb.co.com/60gHYs1m/visit.png",
+        scaledSize: new window.google.maps.Size(40, 40),
+      },
+      home: {
+        url: "https://i.ibb.co.com/5xxKK494/home.png",
+        scaledSize: new window.google.maps.Size(40, 40),
+      },
+    };
   };
 
   if (!isLoaded) {
-    return <div>Loading...</div>;
+    return (
+      <div className="w-full h-[600px] flex items-center justify-center bg-gray-100 rounded-2xl">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading Map...</p>
+        </div>
+      </div>
+    );
   }
-  
+
+  const customIcons = getCustomIcons();
+
   return (
     <div
       className={`w-full relative px-1 md:px-2 py-2 md:py-4 ${
@@ -96,67 +93,58 @@ const MapSection = ({
         <GoogleMap
           mapContainerStyle={mapContainerStyle}
           center={defaultCenter}
-          zoom={2}
-          onLoad={onLoad}
+          zoom={3}
           options={{
             zoomControl: false,
             streetViewControl: false,
             mapTypeControl: false,
             fullscreenControl: false,
+            scrollwheel: true,
+            disableDoubleClickZoom: false,
+            keyboardShortcuts: false,
+            draggable: true,
+            clickableIcons: true,
+            gestureHandling: "greedy",
+            styles: [
+              {
+                featureType: "poi",
+                elementType: "labels",
+                stylers: [{ visibility: "on" }],
+              },
+            ],
           }}
         >
           {/* Markers for places you're interested in */}
-          {interestedPlaces.map((place, index) => (
-            <Marker
-              key={`interested-${index}`}
-              position={place}
-              icon={{
-                url: customIcons.interested,
-                scaledSize: new window.google.maps.Size(40, 40), // Use window.google.maps.Size to ensure the API is loaded
-              }}
-              title="Interested Place"
-            />
-          ))}
+          {customIcons &&
+            interestedPlaces.map((place, index) => (
+              <Marker
+                key={`interested-${index}`}
+                position={place}
+                icon={customIcons.interested}
+                title={`Interested Place ${index + 1}`}
+              />
+            ))}
 
           {/* Markers for places you've visited */}
-          {visitedPlaces.map((place, index) => (
-            <Marker
-              key={`visited-${index}`}
-              position={place}
-              icon={{
-                url: customIcons.visited,
-                scaledSize: new window.google.maps.Size(40, 40),
-              }}
-              title="Visited Place"
-            />
-          ))}
+          {customIcons &&
+            visitedPlaces.map((place, index) => (
+              <Marker
+                key={`visited-${index}`}
+                position={place}
+                icon={customIcons.visited}
+                title={`Visited Place ${index + 1}`}
+              />
+            ))}
 
           {/* Marker for home location */}
-          <Marker
-            position={homeLocation}
-            icon={{
-              url: customIcons.home,
-              scaledSize: new window.google.maps.Size(40, 40),
-            }}
-            title="Home"
-          />
+          {customIcons && (
+            <Marker
+              position={homeLocation}
+              icon={customIcons.home}
+              title="Home - Dhaka, Bangladesh"
+            />
+          )}
         </GoogleMap>
-      </div>
-
-      {/* Custom Zoom Buttons */}
-      <div className="absolute bottom-16 right-8 flex gap-5 items-center">
-        <button
-          onClick={zoomIn}
-          className="bg-[#DEF8F8] text-gray-800 rounded-full size-11 flex items-center justify-center shadow-md hover:bg-gray-100 cursor-pointer"
-        >
-          <Plus size={24} />
-        </button>
-        <button
-          onClick={zoomOut}
-          className="bg-[#DEF8F8] text-gray-800 rounded-full size-11 flex items-center justify-center shadow-md hover:bg-gray-100 cursor-pointer"
-        >
-          <Minus size={24} />
-        </button>
       </div>
     </div>
   );

@@ -301,6 +301,8 @@ const NotificationsDropdown: React.FC<DropdownProps> = ({ isOpen }) => {
 
 // Dropdown component for Settings (Desktop only)
 const SettingsDropdown: React.FC<DropdownProps> = ({ isOpen }) => {
+
+  console.log("Setting Open", isOpen);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -329,7 +331,7 @@ const SettingsDropdown: React.FC<DropdownProps> = ({ isOpen }) => {
           animate={{ opacity: 1, x: 0 }}
           exit={{ opacity: 0, x: -10 }}
           transition={{ duration: 0.2 }}
-          className="absolute bottom-1 left-[-228px] bg-white rounded-xl p-3.5 w-[228px] z-50 shadow-xl"
+          className="absolute bottom-1 left-[-228px] rounded-xl p-3.5 w-[228px] z-50"
         >
           <div className="space-y-3">
             <Link
@@ -432,7 +434,7 @@ const UserDropdown: React.FC<DropdownProps> = ({ user, isOpen }) => {
               <span>My Profile</span>
             </Link>
             <Link
-              href="/"
+              href={`/${user?.username}/timeline`}
               className="text-gray-800 hover:bg-[#ECFCFA] px-4 py-3 rounded-xl flex items-center gap-4"
             >
               <LucideCalendarCheck size={24} />
@@ -448,11 +450,12 @@ const UserDropdown: React.FC<DropdownProps> = ({ user, isOpen }) => {
                 5
               </span>
             </Link>
-            <Link href="/groups" className="block text-black">
-              <button className="text-gray-800 hover:bg-[#ECFCFA] px-4 py-3 rounded-xl flex items-center gap-4">
-                <HiOutlineUserGroup size={24} />
-                <span>Groups</span>
-              </button>
+            <Link
+              href="/groups"
+              className="text-gray-800 hover:bg-[#ECFCFA] px-4 py-3 rounded-xl flex items-center gap-4"
+            >
+              <HiOutlineUserGroup size={24} />
+              <span>Groups</span>
             </Link>
             <Link
               href={`/${user?.username}/maps`}
@@ -601,13 +604,7 @@ const Header: React.FC = () => {
       <div className="w-full container mx-auto flex justify-between items-center h-full px-4  md:px-5 gap-3 md:gap-5">
         {/* Logo */}
         <Link href={"/"} className="flex-shrink-0">
-          <Image
-            src={logo.src}
-            alt="logo"
-            width={75}
-            height={75}
-           
-          />
+          <Image src={logo.src} alt="logo" width={75} height={75} />
         </Link>
 
         {/* Search Bar - Always visible on Desktop, conditional on Tablet/Mobile */}
