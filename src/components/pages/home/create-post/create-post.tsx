@@ -250,6 +250,7 @@ const CreatePost = () => {
       };
       const response = await createItinerary(payload).unwrap();
       const itineraryId = response?.data?.attributes?._id;
+      console.log("Here is itineraryId", itineraryId);
       setItineraryId(itineraryId);
       setShowItineraryModal(false);
       toast.success("Itinerary created successfully!");
@@ -677,6 +678,11 @@ const CreatePost = () => {
               </AnimatePresence>
             </div>
           </div>
+          {
+            itineraryId && (
+             <button>View Itinerary</button>
+            )
+          }
         </div>
       )}
       <CustomModal

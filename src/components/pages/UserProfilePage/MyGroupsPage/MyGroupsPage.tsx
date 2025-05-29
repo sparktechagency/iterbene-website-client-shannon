@@ -15,7 +15,7 @@ const MyGroupsPage = () => {
         <div className="flex space-x-4 ">
           <button
             onClick={() => setActiveTab("myGroups")}
-            className={`px-9 py-1.5 rounded-xl font-semibold transition-colors cursor-pointer ${
+            className={`px-9 py-1.5 rounded-xl font-medium transition-colors cursor-pointer ${
               activeTab === "myGroups" &&
               "bg-[#E9F8F9] border border-primary text-primary"
             }`}
@@ -24,7 +24,7 @@ const MyGroupsPage = () => {
           </button>
           <button
             onClick={() => setActiveTab("invitations")}
-            className={`px-9 py-1.5 rounded-xl font-semibold transition-colors cursor-pointer ${
+            className={`px-9 py-1.5 rounded-xl font-medium transition-colors cursor-pointer ${
               activeTab === "invitations" &&
               "bg-[#E9F8F9] border border-primary text-primary"
             }`}
