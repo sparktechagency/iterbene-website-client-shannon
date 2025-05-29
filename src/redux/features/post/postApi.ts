@@ -29,11 +29,20 @@ const postApi = baseApi.injectEndpoints({
       }),
       providesTags: ["Post"],
     }),
-    getTimelinePosts: builder.query({
-      query: () => ({
-        url: "/posts/timeline",
-        method: "GET",
-      }),
+    getUserTimelinePosts: builder.query({
+      query: ({ username, filters }) => {
+        const params = new URLSearchParams(filters);
+        if (filters?.length > 0) {
+          filters?.forEach((filter: { key: string; value: string }) =>
+            params.append(filter.key, filter.value)
+          );
+        }
+        return {
+          url: `/posts/user-timeline/${username}`,
+          method: "GET",
+          params,
+        };
+      },
       providesTags: ["Post"],
     }),
     getGroupPosts: builder.query({
@@ -86,7 +95,7 @@ export const {
   useCreatePostMutation,
   useSharePostMutation,
   useFeedPostsQuery,
-  useGetTimelinePostsQuery,
+  useGetUserTimelinePostsQuery,
   useGetGroupPostsQuery,
   useGetEventPostsQuery,
   useAddOrRemoveReactionMutation,

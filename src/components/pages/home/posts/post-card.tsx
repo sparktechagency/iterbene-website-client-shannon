@@ -97,7 +97,7 @@ const PostCard = ({ post }: PostCardProps) => {
   //     : null;
 
   return (
-    <div className="w-full bg-white rounded-xl p-4 mb-4 relative">
+    <div className="w-full  bg-white rounded-xl p-4 mb-4 relative">
       <PostHeader post={post} />
       <p className="text-gray-700 mb-4">
         {post?.content?.split(/(\s+)/).map((word, index) => {

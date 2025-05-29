@@ -27,7 +27,6 @@ const CustomVideoPlayer: React.FC<VideoPlayerProps> = ({ url }) => {
 
   useEffect(() => {
     const video = videoRef.current;
-    console.log("Video element:", video);
     if (!video) return;
 
     const handleTimeUpdate = () => {
@@ -36,12 +35,9 @@ const CustomVideoPlayer: React.FC<VideoPlayerProps> = ({ url }) => {
     };
 
     const handleLoadedMetadata = () => {
-      console.log("Loaded metadata event fired");
-      console.log("Video duration:", video.duration);
       if (video.duration && !isNaN(video.duration)) {
         setDuration(video.duration);
       } else {
-        console.log("Duration not available yet");
       }
     };
 
@@ -56,10 +52,8 @@ const CustomVideoPlayer: React.FC<VideoPlayerProps> = ({ url }) => {
     // Fallback to check duration if loadedmetadata doesn't fire
     const checkDuration = () => {
       if (video.duration && !isNaN(video.duration)) {
-        console.log("Duration from fallback:", video.duration);
         setDuration(video.duration);
       } else {
-        console.log("Duration still not available, retrying...");
         setTimeout(checkDuration, 500); // Retry after 500ms
       }
     };

@@ -24,7 +24,7 @@ body{
 /* Container matching Tailwind v3 */
 @utility container {
   width: 100%;
-  max-width: 1520px;
+  max-width: 1320px;
   margin-left: auto;
   margin-right: auto;
 }

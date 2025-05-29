@@ -29,7 +29,7 @@ const UserProfileInformationPage = ({
     content = <NotFoundPage />;
   } else if (!isLoading && userData) {
     content = (
-      <section className="w-full bg-[#F5F5F5]">
+      <section className="w-full max-w-5xl mx-auto bg-[#F5F5F5]">
         <Header />
         <div className="container mx-auto space-y-8 px-4 pb-10">
           {isMyProfile ? (
