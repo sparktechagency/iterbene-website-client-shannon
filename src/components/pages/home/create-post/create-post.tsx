@@ -428,10 +428,10 @@ const CreatePost = () => {
           <>
             <Swiper
               modules={[Pagination]}
+              pagination={{ clickable: false }}
               onSwiper={(swiper) => {
                 swiperRef.current = swiper;
               }}
-              pagination={{ clickable: false }}
               spaceBetween={10}
               slidesPerView={mediaPreviews.length === 1 ? 1 : 2}
               className="w-full"
@@ -678,11 +678,7 @@ const CreatePost = () => {
               </AnimatePresence>
             </div>
           </div>
-          {
-            itineraryId && (
-             <button>View Itinerary</button>
-            )
-          }
+          {itineraryId && <button>View Itinerary</button>}
         </div>
       )}
       <CustomModal
