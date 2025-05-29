@@ -1,4 +1,4 @@
-import MyMaps from '@/components/pages/my-profile/MyMaps/MyMaps'
+import MyMaps from '@/components/pages/UserProfilePage/MyMaps/MyMaps'
 import React from 'react'
 
 const MapsPage = () => {
