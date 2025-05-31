@@ -103,7 +103,7 @@ const Stories = () => {
         <SwiperSlide>
           <div
             onClick={() => setIsCreateModalOpen(true)}
-            className="relative w-full h-[250px] rounded-xl overflow-hidden shadow-lg cursor-pointer"
+            className="relative w-full h-[300px] rounded-xl overflow-hidden shadow-lg cursor-pointer"
           >
             <Image
               src="https://i.postimg.cc/dVP9Fh3N/2588a7b47b42d6dddfdfa08bb9300d00.jpg"

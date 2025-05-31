@@ -4,7 +4,6 @@ import {
   CalendarCheck,
   ChevronLeft,
   ChevronRight,
-  Clock,
   Globe,
   Image as ImageIcon,
   Lock,
@@ -26,7 +25,7 @@ import CustomButton from "@/components/custom/custom-button";
 import CustomModal from "@/components/custom/custom-modal";
 import { IoMdClose } from "react-icons/io";
 import { BsUpload } from "react-icons/bs";
-import { FieldValues, set, useForm } from "react-hook-form";
+import { FieldValues, useForm } from "react-hook-form";
 import { IActivity, IDay, IItinerary } from "@/types/itinerary.types";
 import { useCreateItineraryMutation } from "@/redux/features/itinerary/itineraryApi";
 import toast from "react-hot-toast";
@@ -251,7 +250,6 @@ const CreatePost = () => {
           })),
         })),
       };
-      return console.log("payload", payload);
       const response = await createItinerary(payload).unwrap();
       const itinerary = response?.data?.attributes;
       setItinerary(itinerary);
@@ -525,10 +523,15 @@ const CreatePost = () => {
                 {privacy}
               </span>
             </div>
-            <div onClick={()=>setShowItineraryModal(true)} className="flex items-center gap-2">
-              <Clock className="w-5 h-5 text-primary" />
-              <span className="text-sm text-gray-700">Now</span>
-            </div>
+            {itinerary && (
+              <div
+                onClick={() => setShowItineraryModal(true)}
+                className="flex items-center gap-2 cursor-pointer"
+              >
+                <CalendarCheck className="w-5 h-5 text-primary" />
+                <span className="text-sm text-gray-700">View Itinerary</span>
+              </div>
+            )}
           </div>
           {/* Icons for Additional Functionalities */}
           <div className="flex items-center gap-5 bg-[#E7E8EC] px-4 py-1.5 rounded-b-xl">
