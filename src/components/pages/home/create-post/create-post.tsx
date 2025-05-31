@@ -4,6 +4,7 @@ import {
   CalendarCheck,
   ChevronLeft,
   ChevronRight,
+  Clock,
   Globe,
   Image as ImageIcon,
   Lock,
@@ -25,8 +26,8 @@ import CustomButton from "@/components/custom/custom-button";
 import CustomModal from "@/components/custom/custom-modal";
 import { IoMdClose } from "react-icons/io";
 import { BsUpload } from "react-icons/bs";
-import { FieldValues, useForm } from "react-hook-form";
-import { IActivity, IDay } from "@/types/itinerary.types";
+import { FieldValues, set, useForm } from "react-hook-form";
+import { IActivity, IDay, IItinerary } from "@/types/itinerary.types";
 import { useCreateItineraryMutation } from "@/redux/features/itinerary/itineraryApi";
 import toast from "react-hot-toast";
 import { TError } from "@/types/error";
@@ -37,6 +38,7 @@ import {
   LocationPrediction,
   useGoogleLocationSearch,
 } from "@/hooks/useGoogleLocationSearch";
+import ShowItineraryModal from "./ShowItineraryModal";
 export interface FilePreview {
   name: string;
   preview: string;
@@ -91,7 +93,8 @@ const CreatePost = () => {
 
   // State for itinerary
   const [showItineraryModal, setShowItineraryModal] = useState(false);
-  const [itineraryId, setItineraryId] = useState<string>("");
+  const [itineraryModalOpen, setItineraryModalOpen] = useState<boolean>(false);
+  const [itinerary, setItinerary] = useState<IItinerary | null>(null);
   const [createItinerary, { isLoading }] = useCreateItineraryMutation();
 
   // Post
@@ -248,11 +251,11 @@ const CreatePost = () => {
           })),
         })),
       };
+      return console.log("payload", payload);
       const response = await createItinerary(payload).unwrap();
-      const itineraryId = response?.data?.attributes?._id;
-      console.log("Here is itineraryId", itineraryId);
-      setItineraryId(itineraryId);
-      setShowItineraryModal(false);
+      const itinerary = response?.data?.attributes;
+      setItinerary(itinerary);
+      setItineraryModalOpen(false);
       toast.success("Itinerary created successfully!");
       reset();
     } catch (error) {
@@ -299,7 +302,7 @@ const CreatePost = () => {
         })
       );
       formData.append("sourceId", user?._id || "");
-      formData.append("itineraryId", itineraryId || "");
+      formData.append("itineraryId", itinerary?._id || "");
       formData.append("postType", "User");
       formData.append("visitedLocationName", selectedLocation?.name || "");
       formData.append("privacy", privacy || "");
@@ -324,7 +327,8 @@ const CreatePost = () => {
     setLocationQuery(defaultLocation);
     searchLocations(defaultLocation); // Trigger search with default value
   };
-  // Fallback profile image
+
+  console.log("Itinerary:", itinerary);
   return (
     <section className="w-full bg-white rounded-xl">
       {/* Post Input Section */}
@@ -521,8 +525,11 @@ const CreatePost = () => {
                 {privacy}
               </span>
             </div>
+            <div onClick={()=>setShowItineraryModal(true)} className="flex items-center gap-2">
+              <Clock className="w-5 h-5 text-primary" />
+              <span className="text-sm text-gray-700">Now</span>
+            </div>
           </div>
-
           {/* Icons for Additional Functionalities */}
           <div className="flex items-center gap-5 bg-[#E7E8EC] px-4 py-1.5 rounded-b-xl">
             {/* Location Icon with Popup */}
@@ -678,7 +685,6 @@ const CreatePost = () => {
               </AnimatePresence>
             </div>
           </div>
-          {itineraryId && <button>View Itinerary</button>}
         </div>
       )}
       <CustomModal
@@ -722,7 +728,7 @@ const CreatePost = () => {
             variant="default"
             onClick={() => {
               setShowPdfModal(false);
-              setShowItineraryModal(true);
+              setItineraryModalOpen(true);
             }}
           >
             Create One
@@ -733,10 +739,15 @@ const CreatePost = () => {
         </div>
       </CustomModal>
       <ItineraryModal
-        visible={showItineraryModal}
-        onClose={() => setShowItineraryModal(false)}
+        visible={itineraryModalOpen}
+        onClose={() => setItineraryModalOpen(false)}
         handleCreateItinerary={handleCreateItinerary}
         isLoading={isLoading}
+      />
+      <ShowItineraryModal
+        visible={showItineraryModal}
+        onClose={() => setShowItineraryModal(false)}
+        itinerary={itinerary as IItinerary}
       />
     </section>
   );

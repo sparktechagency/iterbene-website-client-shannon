@@ -1,8 +1,9 @@
 "use client";
-import { Button, Rate } from "antd";
+import { Button } from "antd";
 import { DeleteOutlined, PlusCircleOutlined } from "@ant-design/icons";
 import CustomInput from "@/components/custom/custom-input";
-import { Control, Controller, useFieldArray } from "react-hook-form";
+import { Control, useFieldArray } from "react-hook-form";
+import CustomRating from "@/components/custom/CustomRating";
 
 interface ActivityCardProps {
   control: Control;
@@ -22,7 +23,7 @@ export default function ActivityCard({ control, dayIndex }: ActivityCardProps) {
       link: "",
       duration: "",
       cost: 0,
-      rating: 0,
+      rating: 0, // Initial value, will be validated
     });
   };
 
@@ -58,7 +59,6 @@ export default function ActivityCard({ control, dayIndex }: ActivityCardProps) {
               label="Time"
               type="time"
               size="md"
-              onChange={(e) => console.log(e.target.value)}
               fullWidth
               placeholder="When does this start? (e.g., 9:00 AM)"
               required
@@ -98,18 +98,10 @@ export default function ActivityCard({ control, dayIndex }: ActivityCardProps) {
             required
           />
           <div className="mt-3">
-            <label className="block text-gray-950 mb-1 text-[15px]">
-              Rating <span className="text-red-500">*</span>
-            </label>
-            <Controller
-              control={control}
+            <CustomRating
               name={`days.${dayIndex}.activities.${activityIndex}.rating`}
-              render={({ field }) => (
-                <Rate
-                  value={field.value || 0} // Ensure default value is 0 if undefined
-                  onChange={(value) => field.onChange(value)} // Update form state
-                />
-              )}
+              label="Rating"
+              required
             />
           </div>
         </div>
