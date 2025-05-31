@@ -23,14 +23,25 @@ const postApi = baseApi.injectEndpoints({
       invalidatesTags: ["Post"],
     }),
     feedPosts: builder.query({
-      query: () => ({
-        url: "/posts/feed",
-        method: "GET",
-      }),
+      query: (filters) => {
+        const params = new URLSearchParams();
+
+        console.log("Filters:", filters);
+        if (filters?.length > 0) {
+          filters?.forEach((filter: { key: string; value: string }) =>
+            params.append(filter.key, filter.value)
+          );
+        }
+        return {
+          url: "/posts/feed",
+          method: "GET",
+          params,
+        };
+      },
       providesTags: ["Post"],
     }),
     getUserTimelinePosts: builder.query({
-      query: ({ username,filters }) => {
+      query: ({ username, filters }) => {
         const params = new URLSearchParams();
         if (filters?.length > 0) {
           filters?.forEach((filter: { key: string; value: string }) =>

@@ -3,20 +3,20 @@ import { useFeedPostsQuery } from "@/redux/features/post/postApi";
 import { IPost } from "@/types/post.types";
 import PostCard from "../home/posts/post-card";
 
-const WatchVideo = () => {
+const PhotosPage = () => {
   const { data: responseData } = useFeedPostsQuery([
-    { key: "mediaType", value: "video" },
+    { key: "mediaType", value: "image" },
   ]);
-  const videoPostsData = responseData?.data?.attributes?.results;
+  const photosData = responseData?.data?.attributes?.results;
   // const totalResults = responseData?.data?.attributes?.totalResults;
 
   return (
     <section className="w-full">
-      {videoPostsData?.map((post: IPost) => (
+      {photosData?.map((post: IPost) => (
         <PostCard key={post._id} post={post} />
       ))}
     </section>
   );
 };
 
-export default WatchVideo;
+export default PhotosPage;
