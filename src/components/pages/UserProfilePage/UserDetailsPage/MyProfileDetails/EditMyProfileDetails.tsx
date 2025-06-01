@@ -114,7 +114,7 @@ const EditMyProfileDetails = ({
     <section className="w-full grid grid-cols-1 md:grid-cols-3 gap-4 mt-8">
       <div className="w-full col-span-2 border border-[#E2E8F0] shadow p-4">
         <div className="border-b border-[#E2E8F0] pb-4 mb-4">
-          <h1 className="text-xl font-semibold">Personal Information</h1>
+          <h1 className="text-base md:text-lg font-semibold">Personal Information</h1>
         </div>
         <CustomForm
           onSubmit={handleEditProfileInformation}
@@ -286,7 +286,7 @@ const EditMyProfileDetails = ({
       <div className="w-full col-span-1 space-y-8">
         <div className="border border-[#E2E8F0] shadow p-4">
           <div className="border-b border-[#E2E8F0] pb-4 mb-4">
-            <h1 className="text-xl font-semibold">Your Photo</h1>
+            <h1 className="text-base md:text-xl font-semibold">Your Photo</h1>
           </div>
           <div className="flex items-center gap-4 mb-4">
             <Image
@@ -296,7 +296,7 @@ const EditMyProfileDetails = ({
               alt="profile"
               className="size-[50px] rounded-full object-cover ring-2 ring-gray-400"
             />
-            <h1 className="text-lg">Edit Your Profile Photo</h1>
+            <h1 className="ttext-base md:text-lg">Edit Your Profile Photo</h1>
           </div>
           <div className="w-full border-2 p-6 border-dashed border-gray-400 rounded text-center relative">
             {profileImagePreview ? (
@@ -378,7 +378,7 @@ const EditMyProfileDetails = ({
         </div>
         <div className="border border-[#E2E8F0] shadow p-4">
           <div className="border-b border-[#E2E8F0] pb-4 mb-4">
-            <h1 className="text-xl font-semibold">Edit Your Cover Photo</h1>
+            <h1 className="text-base md:text-xl font-semibold">Edit Your Cover Photo</h1>
           </div>
           <div className="flex items-center gap-4 mb-4">
             <Image
@@ -388,7 +388,7 @@ const EditMyProfileDetails = ({
               alt="cover"
               className="size-[50px] rounded-full object-cover ring-2 ring-gray-400"
             />
-            <h1 className="text-lg">Edit Your Cover Photo</h1>
+            <h1 className="text-base md:text-lg">Edit Your Cover Photo</h1>
           </div>
           <div className="w-full border-2 p-6 border-dashed border-gray-400 rounded text-center relative">
             {coverImagePreview ? (

@@ -17,7 +17,7 @@ const MyConnections: React.FC = () => {
     );
   } else if (myConnections?.length > 0) {
     content = (
-      <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-7">
+      <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-5">
         {myConnections.map((connection: IConnection, index: number) => (
           <MyConnectionCard key={index} connection={connection} />
         ))}

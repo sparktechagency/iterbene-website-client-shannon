@@ -10,7 +10,7 @@ const ContactList: React.FC = () => {
   ];
 
   return (
-    <section className="w-full">
+    <section className="w-full hidden md:block">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold uppercase">Contacts</h1>
         <div className="size-8 rounded-full bg-primary flex items-center justify-center text-white">

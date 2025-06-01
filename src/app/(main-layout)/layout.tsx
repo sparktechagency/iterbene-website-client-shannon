@@ -17,7 +17,7 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
           <MainNavigation />
           {user ? <Invitations /> : <UpcomingEvent />}
         </div>
-        <div className="w-full md:col-span-9 px-5">{children}</div>
+        <div className="w-full md:col-span-9 px-4">{children}</div>
       </section>
     </section>
   );

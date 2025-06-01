@@ -101,7 +101,11 @@ const Stories = () => {
             spaceBetween: 16,
           },
           1024: {
-            slidesPerView: 4,
+            slidesPerView: 4.5,
+            spaceBetween: 16,
+          },
+          1280: {
+            slidesPerView: 4.5,
             spaceBetween: 16,
           },
         }}

@@ -5,7 +5,7 @@ import React from "react";
 
 const page = () => {
   return (
-    <section className="w-full grid grid-cols-1 md:grid-cols-12 gap-5 pr-5">
+    <section className="w-full grid grid-cols-1 md:grid-cols-12 gap-5">
       <div className="w-full md:col-span-8 space-y-5 md:space-y-8 overflow-y-auto">
         <WatchVideo />
       </div>
