@@ -1,3 +1,5 @@
+import { IItinerary } from "./itinerary.types";
+
 export interface ISortedReaction {
   type: string;
   count: number;
@@ -52,7 +54,7 @@ export interface IPost {
   postType: string;
   content: string;
   media: IMedia[];
-  itinerary: string;
+  itinerary: IItinerary;
   sortedReactions: ISortedReaction[];
   visitedLocationName: string;
   privacy: string;

@@ -239,7 +239,7 @@ export const useGoogleLocationSearch = (
 
   // Search locations
   const searchLocations = useCallback(async (query: string) => {
-    const effectiveQuery = query?.trim() || defaultQuery?.trim() || '';
+    const effectiveQuery = query.trim() || defaultQuery?.trim() || '';
     
     if (!effectiveQuery || effectiveQuery.length < minQueryLength) {
       setPredictions([]);

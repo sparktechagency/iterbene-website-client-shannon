@@ -10,6 +10,7 @@ import {
   Train,
   Bus,
   Car,
+  Ship,
 } from "lucide-react";
 import CustomModal from "@/components/custom/custom-modal";
 import moment from "moment";
@@ -49,6 +50,26 @@ const ShowItineraryModal = ({
       ? moment(time, "HH:mm").format("h:mm A")
       : "Invalid Time";
   };
+  const getTravelModeIcon = (mode: string) => {
+    switch (mode?.toLowerCase()) {
+      case "plane":
+        return <Plane className="size-6 text-blue-500" />;
+      case "train":
+        return <Train className="size-6 text-blue-500" />;
+      case "car":
+        return <Car className="size-6 text-blue-500" />;
+      case "bus":
+        return <Bus className="size-6 text-blue-500" />;
+      case "walk":
+        return <BiWalk className="size-6 text-blue-500" />;
+      case "bicycle":
+        return <IoIosBicycle className="size-6 text-blue-500" />;
+      case "boat":
+        return <Ship className="size-6 text-blue-500" />;
+      default:
+        return <Plane className="size-6 text-blue-500" />;
+    }
+  };
 
   return (
     <CustomModal
@@ -79,21 +100,7 @@ const ShowItineraryModal = ({
         {/* Trip Header */}
         <div className="mb-6 p-4 bg-gray-50 rounded-lg">
           <div className="flex items-center gap-2 mb-2">
-            {itinerary?.travelMode === "plane" ? (
-              <Plane className="text-blue-600" size={20} />
-            ) : itinerary?.travelMode === "train" ? (
-              <Train className="text-blue-600" size={20} />
-            ) : itinerary?.travelMode === "bus" ? (
-              <Bus className="text-blue-600" size={20} />
-            ) : itinerary?.travelMode === "car" ? (
-              <Car className="text-blue-600" size={20} />
-            ) : itinerary?.travelMode === "bicycle" ? (
-              <IoIosBicycle className="text-blue-600" size={20} />
-            ) : itinerary?.travelMode === "walk" ? (
-              <BiWalk className="text-blue-600" size={20} />
-            ): (
-              <Plane className="text-blue-600" size={20} />
-            )}
+            {getTravelModeIcon(itinerary?.travelMode)}
             <h3 className="text-lg font-semibold text-gray-800">
               {itinerary?.tripName}
             </h3>
