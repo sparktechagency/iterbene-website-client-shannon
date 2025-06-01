@@ -16,7 +16,7 @@ const StoryCard: React.FC<StoryCardProps> = ({
   authorImage,
 }) => {
   return (
-    <div className="relative w-full h-[300px] rounded-xl overflow-hidden shadow-lg cursor-pointer">
+    <div className="relative w-full h-[240px] md:h-[260px] rounded-xl overflow-hidden shadow-lg cursor-pointer">
       {mediaType === "image" ? (
         <Image
           src={image}

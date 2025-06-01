@@ -90,8 +90,22 @@ const Stories = () => {
   return (
     <section className="w-full">
       <Swiper
-        slidesPerView={4}
-        spaceBetween={16}
+        slidesPerView={2.5}
+        breakpoints={{
+          640: {
+            slidesPerView: 3.5,
+            spaceBetween: 16,
+          },
+          768: {
+            slidesPerView: 3.5,
+            spaceBetween: 16,
+          },
+          1024: {
+            slidesPerView: 4,
+            spaceBetween: 16,
+          },
+        }}
+        spaceBetween={8}
         freeMode={true}
         pagination={{
           clickable: true,
@@ -103,7 +117,7 @@ const Stories = () => {
         <SwiperSlide>
           <div
             onClick={() => setIsCreateModalOpen(true)}
-            className="relative w-full h-[300px] rounded-xl overflow-hidden shadow-lg cursor-pointer"
+            className="relative w-full h-[240px] md:h-[260px] rounded-xl overflow-hidden shadow-lg cursor-pointer"
           >
             <Image
               src="https://i.postimg.cc/dVP9Fh3N/2588a7b47b42d6dddfdfa08bb9300d00.jpg"

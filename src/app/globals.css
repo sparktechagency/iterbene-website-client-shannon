@@ -6,6 +6,7 @@ body{
   margin: 0;
   box-sizing: border-box;
   scroll-behavior: smooth;
+  background-color: #F5F5F5;
 }
 
 @theme {

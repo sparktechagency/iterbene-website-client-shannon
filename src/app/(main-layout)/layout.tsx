@@ -9,7 +9,7 @@ import React from "react";
 const MainLayout = ({ children }: { children: React.ReactNode }) => {
   const user = true;
   return (
-    <section className="w-full bg-[#F5F5F5] pt-[130px]">
+    <section className="w-full pt-[90px] md:pt-[130px]">
       <Header />
       <section className="w-full container grid grid-cols-1 md:grid-cols-12 gap-5">
         <div className="w-full hidden md:block max-w-[382px] mx-auto col-span-full md:col-span-3 space-y-5 md:space-y-8 pl-5">
