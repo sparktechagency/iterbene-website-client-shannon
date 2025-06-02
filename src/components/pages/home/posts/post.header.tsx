@@ -3,20 +3,25 @@ import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { HiGlobe } from "react-icons/hi";
 import { TiLocation } from "react-icons/ti";
-import { BsThreeDots } from "react-icons/bs";
 import { IPost } from "@/types/post.types";
-import { Lock, Users } from "lucide-react";
+import { Lock, MoreHorizontal, Users } from "lucide-react";
 import moment from "moment";
 import useUser from "@/hooks/useUser";
 import { motion, AnimatePresence } from "framer-motion"; // Import Framer Motion
+import { useDeletePostMutation } from "@/redux/features/post/postApi";
+import ConfirmationPopup from "@/components/custom/custom-popup";
+import toast from "react-hot-toast";
+import { TError } from "@/types/error";
 
 const PostHeader = ({ post }: { post: IPost }) => {
   const user = useUser();
   const [isOpen, setIsOpen] = useState(false);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
-
   const isOwnPost = post?.userId?._id == user?._id;
+
+  const [isDeletePopupOpen, setIsDeletePopupOpen] = useState(false);
+  const [deletePost, { isLoading: isDeleting }] = useDeletePostMutation();
 
   const toggleDropdown = () => setIsOpen(!isOpen);
 
@@ -26,8 +31,19 @@ const PostHeader = ({ post }: { post: IPost }) => {
   };
 
   const handleDelete = () => {
-    console.log("Delete post:", post?._id);
     setIsOpen(false);
+    setIsDeletePopupOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    try {
+      await deletePost(post._id).unwrap();
+      setIsDeletePopupOpen(false);
+      toast.success("Post deleted successfully!");
+    } catch (error) {
+      const err = error as TError;
+      toast.error(err?.data?.message || "Something went wrong!");
+    }
   };
 
   const handleSave = () => {
@@ -91,12 +107,10 @@ const PostHeader = ({ post }: { post: IPost }) => {
     hidden: {
       opacity: 0,
       y: -10,
-      scale: 0.95,
     },
     visible: {
       opacity: 1,
       y: 0,
-      scale: 1,
       transition: {
         duration: 0.2,
         ease: "easeOut",
@@ -156,9 +170,9 @@ const PostHeader = ({ post }: { post: IPost }) => {
         <button
           ref={triggerRef}
           onClick={toggleDropdown}
-          className="cursor-pointer"
+          className="cursor-pointer p-3 hover:bg-gray-100 rounded-full transition-colors"
         >
-          <BsThreeDots size={28} />
+          <MoreHorizontal size={23} />
         </button>
         <AnimatePresence>
           {isOpen && (
@@ -174,13 +188,13 @@ const PostHeader = ({ post }: { post: IPost }) => {
                 <>
                   <button
                     onClick={handleEdit}
-                    className="block w-full text-left px-4 py-2 text-gray-800 hover:bg-gray-100 rounded-t-xl"
+                    className="block w-full text-left px-4 py-3 text-gray-800 hover:bg-gray-100 rounded-t-xl cursor-pointer"
                   >
                     Edit
                   </button>
                   <button
                     onClick={handleDelete}
-                    className="block w-full text-left px-4 py-2 text-gray-800 hover:bg-gray-100"
+                    className="block w-full text-left px-4 py-3 text-rose-500 hover:bg-gray-100 rounded-b-xl cursor-pointer"
                   >
                     Delete
                   </button>
@@ -189,19 +203,19 @@ const PostHeader = ({ post }: { post: IPost }) => {
                 <>
                   <button
                     onClick={handleSave}
-                    className="block w-full text-left px-4 py-2 text-gray-800 hover:bg-gray-100"
+                    className="block w-full text-left px-4 py- text-gray-800 hover:bg-gray-100"
                   >
                     Save
                   </button>
                   <button
                     onClick={handleHide}
-                    className="block w-full text-left px-4 py-2 text-gray-800 hover:bg-gray-100"
+                    className="block w-full text-left px-4 py-3 text-gray-800 hover:bg-gray-100"
                   >
                     Hide
                   </button>
                   <button
                     onClick={handleReport}
-                    className="block w-full text-left px-4 py-2 text-gray-800 hover:bg-gray-100"
+                    className="block w-full text-left px-4 py-3 text-gray-800 hover:bg-gray-100"
                   >
                     Report
                   </button>
@@ -211,6 +225,17 @@ const PostHeader = ({ post }: { post: IPost }) => {
           )}
         </AnimatePresence>
       </div>
+      <ConfirmationPopup
+        isOpen={isDeletePopupOpen}
+        onClose={() => setIsDeletePopupOpen(false)}
+        onConfirm={handleConfirmDelete}
+        type="delete"
+        title="Delete Post"
+        message="Are you sure you want to delete this post? This action cannot be undone."
+        confirmText="Delete"
+        cancelText="Cancel"
+        isLoading={isDeleting}
+      />
     </section>
   );
 };

@@ -14,6 +14,21 @@ const postApi = baseApi.injectEndpoints({
       },
       invalidatesTags: ["Post", "Hashtag"],
     }),
+    updatePost: builder.mutation({
+      query: (data) => ({
+        url: "/posts",
+        method: "PATCH",
+        body: data,
+      }),
+      invalidatesTags: ["Post"],
+    }),
+    deletePost: builder.mutation({
+      query: (id) => ({
+        url: `/posts/${id}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["Post"],
+    }),
     sharePost: builder.mutation({
       query: (data) => ({
         url: "/posts/share",
@@ -109,6 +124,8 @@ export const {
   useGetUserTimelinePostsQuery,
   useGetGroupPostsQuery,
   useGetEventPostsQuery,
+  useDeletePostMutation,
+  useUpdatePostMutation,
   useAddOrRemoveReactionMutation,
   useCreateCommentMutation,
   useUpdateCommentMutation,
