@@ -1,29 +1,24 @@
 "use client";
 import { IComment } from "@/types/post.types";
 import Image from "next/image";
-import { FaHeart, FaEllipsisV } from "react-icons/fa";
+import { FaHeart } from "react-icons/fa";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
 import useUser from "@/hooks/useUser";
+import formatTimeAgo from "@/utils/formatTimeAgo";
+import { BsThreeDots } from "react-icons/bs";
 
 const PostCommentSection = ({ comments }: { comments: IComment[] }) => {
   const user = useUser();
   const currentUserId = user?._id;
-  const [menuOpen, setMenuOpen] = useState<string | null>(null);
-  const [replyInputOpen, setReplyInputOpen] = useState<string | null>(null); // Track which comment's reply input is open
+  const [menuOpenId, setMenuOpenId] = useState<string | null>(null);
+  const [replyInputOpen, setReplyInputOpen] = useState<string | null>(null);
   const [replyText, setReplyText] = useState(""); // Store reply text
 
-  // Function to get relative time (e.g., "5 minutes ago")
-  const getRelativeTime = (date: Date) => {
-    const now = new Date("2025-05-20T17:24:00+06:00"); // Current time from system
-    const diffMs = now.getTime() - date.getTime();
-    const diffMinutes = Math.floor(diffMs / 60000);
-    const diffHours = Math.floor(diffMs / 3600000);
-    const diffDays = Math.floor(diffMs / 86400000);
-
-    if (diffMinutes < 60) return `${diffMinutes} minutes ago`;
-    if (diffHours < 24) return `${diffHours} hours ago`;
-    return `${diffDays} days ago`;
+  // Handle reply button click, setting the username in the reply input
+  const handleReplyClick = (commentId: string, username: string) => {
+    setReplyInputOpen(replyInputOpen === commentId ? null : commentId);
+    setReplyText(replyInputOpen === commentId ? "" : `@${username} `);
   };
 
   // Placeholder function to handle reply submission
@@ -45,10 +40,7 @@ const PostCommentSection = ({ comments }: { comments: IComment[] }) => {
     <section className="mt-4 px-3">
       <AnimatePresence>
         {topLevelComments?.map((comment: IComment) => (
-          <div
-            key={comment?._id}
-            className="mb-4"
-          >
+          <div key={comment?._id} className="mb-4">
             <div className="flex items-start space-x-3 relative">
               <Image
                 src={comment?.userId?.profileImage || "/default-avatar.png"}
@@ -58,41 +50,59 @@ const PostCommentSection = ({ comments }: { comments: IComment[] }) => {
                 className="w-9 h-9 rounded-full object-cover border border-gray-300"
               />
               <div className="flex-1 min-w-0">
-                <div className="w-fit bg-gray-100 px-3 py-2 rounded-2xl max-w-full">
+                <div className="w-fit bg-gray-100/70 px-3 py-2 rounded-2xl max-w-full">
                   <div className="flex justify-between items-start">
-                    <p className="font-semibold text-gray-800">
+                    <p className="font-medium text-gray-800">
                       {comment?.userId?.fullName}
                     </p>
-                    <button
-                      onClick={() =>
-                        setMenuOpen(
-                          menuOpen === comment._id ? null : comment._id
-                        )
-                      }
-                      className="text-gray-500 hover:text-gray-700 ml-2"
-                    >
-                      <FaEllipsisV />
-                    </button>
                   </div>
                   <p className="text-gray-700 break-all max-w-full mt-1">
                     {comment?.comment}
                   </p>
                 </div>
-                <div className="flex items-center space-x-4 mt-2 ml-1 text-gray-500 text-xs">
-                  <button className="hover:text-blue-600 transition-colors flex items-center space-x-1">
+                <div className="w-56 flex items-center space-x-4 mt-2 ml-1 text-gray-500 text-xs relative">
+                  <button className="hover:text-rose-500 transition-colors flex items-center space-x-1 cursor-pointer">
                     <FaHeart size={16} />
                   </button>
                   <button
                     onClick={() =>
-                      setReplyInputOpen(
-                        replyInputOpen === comment._id ? null : comment._id
-                      )
+                      handleReplyClick(comment._id, comment.userId.fullName)
                     }
-                    className="hover:text-blue-600 transition-colors"
+                    className="hover:text-primary transition-colors cursor-pointer"
                   >
                     Reply
                   </button>
-                  <span>{getRelativeTime(new Date(comment.createdAt))}</span>
+                  <button
+                    onClick={() =>
+                      setMenuOpenId(menuOpenId === comment._id ? null : comment._id)
+                    }
+                    className="hover:text-primary transition-colors cursor-pointer"
+                  >
+                    <BsThreeDots size={20} />
+                  </button>
+                  {menuOpenId === comment._id && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -5 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -5 }}
+                      className="absolute right-0 top-2 w-32 bg-white border border-gray-200 rounded-xl shadow-lg z-10"
+                    >
+                      {comment.userId?._id === currentUserId ? (
+                        <>
+                          <button className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-t-xl cursor-pointer">
+                            Edit
+                          </button>
+                          <button className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100 rounded-b-xl cursor-pointer">
+                            Delete
+                          </button>
+                        </>
+                      ) : (
+                        <button className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100">
+                          Report
+                        </button>
+                      )}
+                    </motion.div>
+                  )}
                 </div>
                 {/* Reply Input */}
                 {replyInputOpen === comment._id && (
@@ -102,14 +112,13 @@ const PostCommentSection = ({ comments }: { comments: IComment[] }) => {
                     exit={{ opacity: 0, y: 5 }}
                     className="mt-2 relative"
                   >
-                    {/* Reply connection line */}
                     <div className="flex space-x-2 ml-12">
                       <Image
                         src={
                           currentUserId
                             ? user?.profileImage
                             : "/default-avatar.png"
-                        } // Replace with current user's profile image
+                        }
                         alt="Your Profile"
                         width={32}
                         height={32}
@@ -142,35 +151,11 @@ const PostCommentSection = ({ comments }: { comments: IComment[] }) => {
                   </motion.div>
                 )}
               </div>
-              {menuOpen === comment._id && (
-                <motion.div
-                  initial={{ opacity: 0, y: -5 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -5 }}
-                  className="absolute right-0 top-0 mt-8 w-32 bg-white border border-gray-200 rounded shadow-lg z-10"
-                >
-                  {comment.userId?._id === currentUserId ? (
-                    <>
-                      <button className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                        Edit
-                      </button>
-                      <button className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100">
-                        Delete
-                      </button>
-                    </>
-                  ) : (
-                    <button className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100">
-                      Report
-                    </button>
-                  )}
-                </motion.div>
-              )}
             </div>
             {/* Render Replies */}
             {getReplies(comment._id.toString()).length > 0 && (
               <div className="ml-12 mt-2 relative">
-                {/* Connection line for replies - Facebook style curved line */}
-
+                <div className="absolute left-[-28px] top-0 w-4 h-full border-l-2 border-b-2 border-gray-300 rounded-bl-lg"></div>
                 <AnimatePresence>
                   {getReplies(comment._id.toString()).map((reply: IComment) => (
                     <motion.div
@@ -199,13 +184,13 @@ const PostCommentSection = ({ comments }: { comments: IComment[] }) => {
                               </p>
                               <button
                                 onClick={() =>
-                                  setMenuOpen(
-                                    menuOpen === reply._id ? null : reply._id
+                                  setMenuOpenId(
+                                    menuOpenId === reply._id ? null : reply._id
                                   )
                                 }
                                 className="text-gray-500 hover:text-gray-700 ml-2"
                               >
-                                <FaEllipsisV />
+                                <BsThreeDots size={16} />
                               </button>
                             </div>
                             <p className="text-gray-700 break-all max-w-full mt-1">
@@ -219,19 +204,13 @@ const PostCommentSection = ({ comments }: { comments: IComment[] }) => {
                             </button>
                             <button
                               onClick={() =>
-                                setReplyInputOpen(
-                                  replyInputOpen === reply._id
-                                    ? null
-                                    : reply._id
-                                )
+                                handleReplyClick(reply._id, reply.userId.fullName)
                               }
                               className="hover:text-blue-600 transition-colors"
                             >
                               Reply
                             </button>
-                            <span>
-                              {getRelativeTime(new Date(reply.createdAt))}
-                            </span>
+                            <span>{formatTimeAgo(reply.createdAt)}</span>
                           </div>
                           {/* Reply Input for Replies */}
                           {replyInputOpen === reply._id && (
@@ -245,9 +224,9 @@ const PostCommentSection = ({ comments }: { comments: IComment[] }) => {
                                 <Image
                                   src={
                                     currentUserId
-                                      ? "/default-avatar.png"
+                                      ? user?.profileImage
                                       : "/default-avatar.png"
-                                  } // Replace with current user's profile image
+                                  }
                                   alt="Your Profile"
                                   width={32}
                                   height={32}
@@ -256,9 +235,7 @@ const PostCommentSection = ({ comments }: { comments: IComment[] }) => {
                                 <div className="flex-1 relative border border-[#DDDDDD] rounded-xl">
                                   <textarea
                                     value={replyText}
-                                    onChange={(e) =>
-                                      setReplyText(e.target.value)
-                                    }
+                                    onChange={(e) => setReplyText(e.target.value)}
                                     onKeyDown={(e) => {
                                       if (e.key === "Enter" && !e.shiftKey) {
                                         e.preventDefault();
@@ -285,7 +262,7 @@ const PostCommentSection = ({ comments }: { comments: IComment[] }) => {
                             </motion.div>
                           )}
                         </div>
-                        {menuOpen === reply._id && (
+                        {menuOpenId === reply._id && (
                           <motion.div
                             initial={{ opacity: 0, y: -5 }}
                             animate={{ opacity: 1, y: 0 }}

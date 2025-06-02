@@ -17,6 +17,8 @@ import toast from "react-hot-toast";
 import { Tooltip } from "antd";
 import { AnimatePresence, motion } from "framer-motion";
 import PostDetailsHeader from "./PostDetailsHeader";
+import PostCommentInput from "../posts/post.comment.input";
+import PostCommentSection from "../posts/post.comment.section";
 
 interface PostDetailsProps {
   isOpen: boolean;
@@ -231,6 +233,10 @@ const PostDetails = ({ isOpen, onClose, post }: PostDetailsProps) => {
               )}
             </div>
           </div>
+          <PostCommentInput
+            post={post}
+          />
+          <PostCommentSection comments={post?.comments} />
         </div>
       </section>
     </CustomModal>
