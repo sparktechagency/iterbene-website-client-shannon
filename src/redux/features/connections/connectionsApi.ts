@@ -10,6 +10,13 @@ const connectionsApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["Connections"],
     }),
+    checkIsConnected: builder.query({
+      query: (friendId) => ({
+        url: `/connections/check-connected/${friendId}`,
+        method: "GET",
+      }),
+      providesTags: ["Connections"],
+    }),
     checkIsSentConnectionExists: builder.query({
       query: (friendId) => ({
         url: `/connections/check-sent-connection/${friendId}`,
@@ -89,6 +96,7 @@ export const {
   useCheckIsSentConnectionExistsQuery,
   useRemoveSuggestionConnectionMutation,
   useDeclineConnectionMutation,
+  useCheckIsConnectedQuery,
   useGetMyConnectionsQuery,
   useGetConnectionRequestsQuery,
   useGetSentConnectionRequestsQuery,

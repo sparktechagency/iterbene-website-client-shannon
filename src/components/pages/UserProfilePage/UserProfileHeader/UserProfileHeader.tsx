@@ -1,9 +1,52 @@
 import CustomButton from "@/components/custom/custom-button";
+import {
+  useAddConnectionMutation,
+  useCancelConnectionMutation,
+  useCheckIsSentConnectionExistsQuery,
+} from "@/redux/features/connections/connectionsApi";
+import { TError } from "@/types/error";
 import { IUser } from "@/types/user.types";
 import Image from "next/image";
+import Link from "next/link";
 import React from "react";
+import toast from "react-hot-toast";
 
 const UserProfileHeader = ({ userData }: { userData: IUser }) => {
+  //add connection
+  const [addConnection, { isLoading }] = useAddConnectionMutation();
+  //cancel connection
+  const [cancelConnection, { isLoading: isLoadingCancel }] =
+    useCancelConnectionMutation();
+  const { data: responseData } = useCheckIsSentConnectionExistsQuery(
+    userData?._id,
+    {
+      refetchOnMountOrArgChange: true,
+      skip: !userData?._id,
+    }
+  );
+  const isSentConnectionExists =
+    responseData?.data?.attributes?.status === "pending";
+  const isConnected = responseData?.data?.attributes?.status === "accepted";
+
+  const handleAddConnection = async () => {
+    try {
+      const payload = { receivedBy: userData?._id };
+      await addConnection(payload).unwrap();
+      toast.success("Connection sent successfully!");
+    } catch (error) {
+      const err = error as TError;
+      toast.error(err?.data?.message || "Something went wrong!");
+    }
+  };
+  const handleCancelRequest = async () => {
+    try {
+      await cancelConnection(userData?._id).unwrap();
+      toast.success("Request canceled successfully!");
+    } catch (error) {
+      const err = error as TError;
+      toast.error(err?.data?.message || "Something went wrong!");
+    }
+  };
   return (
     <div className="w-full bg-white rounded-2xl relative mt-[112px]">
       {/* Background Image */}
@@ -28,7 +71,7 @@ const UserProfileHeader = ({ userData }: { userData: IUser }) => {
       )}
       {/* Profile Section */}
       <div className="w-full flex flex-col md:flex-row justify-between items-center gap-4 md:gap-8  lg:pl-[240px] p-7 md:p-10 ">
-        <div className="space-y-1 ">
+        <div className="space-y-1  flex-1">
           {/* User full name */}
           <h1 className="text-center md:text-left text-lg sm:text-xl md:text-2xl font-bold text-gray-800">
             {userData?.fullName}
@@ -39,13 +82,35 @@ const UserProfileHeader = ({ userData }: { userData: IUser }) => {
             <span>· {userData?.followingCount} following</span>
           </div>
         </div>
-        <div className="flex gap-7">
-          <CustomButton variant="default" className="px-8 py-3 mt-5" fullWidth>
-            Follow
-          </CustomButton>
-          <CustomButton variant="outline" className="px-5 py-3 mt-5" fullWidth>
-            Message
-          </CustomButton>
+        <div className="w-full flex gap-7 justify-end flex-1">
+          {isConnected ? (
+            <CustomButton variant="default" className="px-8 py-3">
+              Connected
+            </CustomButton>
+          ) : isSentConnectionExists ? (
+            <CustomButton
+              onClick={handleCancelRequest}
+              loading={isLoadingCancel}
+              variant="default"
+              className="px-8 py-3"
+            >
+              Cancel Request
+            </CustomButton>
+          ) : (
+            <CustomButton
+              variant="default"
+              onClick={handleAddConnection}
+              loading={isLoading}
+              className="px-8 py-3"
+            >
+              Connect
+            </CustomButton>
+          )}
+          <Link href={`/messages/${userData?._id}`}>
+            <CustomButton variant="outline" className="px-8 py-3">
+              Message
+            </CustomButton>
+          </Link>
         </div>
       </div>
     </div>
