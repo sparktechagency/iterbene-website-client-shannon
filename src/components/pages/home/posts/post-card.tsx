@@ -22,6 +22,7 @@ import PostHeader from "./post.header";
 import CustomModal from "@/components/custom/custom-modal";
 import Image from "next/image";
 import { IoMdClose } from "react-icons/io";
+import PostDetails from "../post-details/PostDetails";
 
 interface PostCardProps {
   post: IPost;
@@ -42,12 +43,14 @@ const formatNumber = (num: number): string => {
   return num.toString();
 };
 
-const PostCard = ({ post, shouldAutoplay }: PostCardProps) => {
+const PostCard = ({ post }: PostCardProps) => {
   const user = useUser();
   const currentUserId = user?._id;
   const [showReactions, setShowReactions] = useState<boolean>(false);
   const [showReactionDetails, setShowReactionDetails] =
     useState<boolean>(false);
+
+  const [showPostDetails, setShowPostDetails] = useState<boolean>(false);
 
   // Find the user's reaction, if any
   const userReaction = post.reactions?.find(
@@ -105,7 +108,7 @@ const PostCard = ({ post, shouldAutoplay }: PostCardProps) => {
           );
         })}
       </p>
-      <PostContentRender data={post.media || []}  shouldAutoplay={shouldAutoplay}/>
+      <PostContentRender data={post.media || []} />
       {/* Show reactions summary */}
       <div className="mt-5">
         {nonZeroReactions?.length > 0 && (
@@ -262,7 +265,10 @@ const PostCard = ({ post, shouldAutoplay }: PostCardProps) => {
               )}
             </AnimatePresence>
           </div>
-          <div className="flex items-center space-x-2 cursor-pointer">
+          <div
+            onClick={() => setShowPostDetails(true)}
+            className="flex items-center space-x-2 cursor-pointer"
+          >
             <svg
               width="26"
               height="26"
@@ -290,9 +296,13 @@ const PostCard = ({ post, shouldAutoplay }: PostCardProps) => {
           )}
         </div>
       </div>
-
       <PostCommentInput post={post} />
       <PostCommentSection comments={post?.comments} />
+      <PostDetails
+        post={post}
+        isOpen={showPostDetails}
+        onClose={() => setShowPostDetails(false)}
+      />
     </div>
   );
 };
