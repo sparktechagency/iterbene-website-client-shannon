@@ -12,6 +12,7 @@ import ConfirmationPopup from "@/components/custom/custom-popup";
 import toast from "react-hot-toast";
 import { TError } from "@/types/error";
 import formatTimeAgo from "@/utils/formatTimeAgo";
+import Link from "next/link";
 
 const PostHeader = ({ post }: { post: IPost }) => {
   const user = useUser();
@@ -114,9 +115,10 @@ const PostHeader = ({ post }: { post: IPost }) => {
         />
         <div>
           <div className="flex items-center gap-2">
-            <p className="font-medium text-gray-800 text-lg">
+           <Link href={`/${post?.userId?.username}`}> <p className="font-medium text-gray-800 text-lg hover:underline">
               {post?.userId?.fullName}
             </p>
+            </Link>
             <span className="text-sm">
               {post?.createdAt && formatTimeAgo(post?.createdAt)}
             </span>

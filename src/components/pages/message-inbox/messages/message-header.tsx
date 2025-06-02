@@ -1,6 +1,11 @@
-import React from "react";
+'use client';
+
+import { useParams } from "next/navigation";
 
 const MessageHeader = () => {
+  const params = useParams();
+
+  console.log(params)
   return (
     <div className="flex items-center p-4">
       <div className="flex items-center space-x-2">
@@ -12,3 +17,4 @@ const MessageHeader = () => {
 };
 
 export default MessageHeader;
+

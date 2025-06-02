@@ -16,10 +16,6 @@ interface UserTimelineContentRenderProps {
 const UserTimelineContentRender = ({
   data,
 }: UserTimelineContentRenderProps) => {
-  if (!data || data.length === 0) {
-    return <div>No media to display</div>;
-  }
-
   return (
     <div className="w-full ">
       <Swiper
