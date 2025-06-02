@@ -21,7 +21,7 @@ const CustomModal: React.FC<CustomModalProps> = ({
   maxWidth = "max-w-2xl",
   maxHeight = "max-h-[80vh]",
   showCloseButton = true,
-  closeOnBackdropClick = true,
+  closeOnBackdropClick = false,
 }) => {
   // Prevent background scrolling when modal is open
   // useEffect(() => {

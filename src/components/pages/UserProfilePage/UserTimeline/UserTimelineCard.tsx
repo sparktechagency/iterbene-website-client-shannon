@@ -18,8 +18,8 @@ import { MdOutlineLuggage } from "react-icons/md";
 import CustomModal from "@/components/custom/custom-modal";
 import Image from "next/image";
 import { IoMdClose } from "react-icons/io";
-import UserTimelineHeader from "./UserTimelineHeader";
 import UserTimelineContentRender from "./UserTimelineContentRender";
+import PostHeader from "../../home/posts/post.header";
 
 interface PostCardProps {
   post: IPost;
@@ -89,7 +89,7 @@ const UserTimelineCard = ({ post }: PostCardProps) => {
 
   return (
     <div className="w-full flex flex-col bg-white rounded-xl p-4 mb-4 relative">
-      <UserTimelineHeader post={post} />
+      <PostHeader post={post} />
       <p className="text-gray-700 flex-1 mb-3">
         {post?.content?.split(/(\s+)/).map((word, index) => {
           const isHashtag = word.match(/^#\w+/);

@@ -25,6 +25,7 @@ import { IoMdClose } from "react-icons/io";
 
 interface PostCardProps {
   post: IPost;
+  shouldAutoplay?: boolean;
 }
 
 // Utility function to format numbers (e.g., 1000 → 1k, 1100 → 1.1k, 41500 → 41.5k, 1000000 → 1m)
@@ -41,7 +42,7 @@ const formatNumber = (num: number): string => {
   return num.toString();
 };
 
-const PostCard = ({ post }: PostCardProps) => {
+const PostCard = ({ post, shouldAutoplay }: PostCardProps) => {
   const user = useUser();
   const currentUserId = user?._id;
   const [showReactions, setShowReactions] = useState<boolean>(false);
@@ -88,14 +89,6 @@ const PostCard = ({ post }: PostCardProps) => {
     }
   };
 
-  // Get the primary reaction to display (the one with highest count)
-  // const primaryReaction =
-  //   nonZeroReactions && nonZeroReactions.length > 0
-  //     ? nonZeroReactions.reduce((prev, current) =>
-  //         current.count > prev.count ? current : prev
-  //       )
-  //     : null;
-
   return (
     <div className="w-full  bg-white rounded-xl p-4 mb-4 relative">
       <PostHeader post={post} />
@@ -112,15 +105,16 @@ const PostCard = ({ post }: PostCardProps) => {
           );
         })}
       </p>
-      <PostContentRender data={post.media || []} />
+      <PostContentRender data={post.media || []}  shouldAutoplay={shouldAutoplay}/>
       {/* Show reactions summary */}
       <div className="mt-5">
         {nonZeroReactions?.length > 0 && (
           <div className="relative mb-2 mt-2">
-            <div onClick={() => setShowReactionDetails(true)} className="w-fit flex items-center gap-1 cursor-pointer">
-              <div
-                className="flex -space-x-1 cursor-pointer "
-              >
+            <div
+              onClick={() => setShowReactionDetails(true)}
+              className="w-fit flex items-center gap-1 cursor-pointer"
+            >
+              <div className="flex -space-x-1 cursor-pointer ">
                 {/* Show up to 3 reaction types */}
                 {nonZeroReactions.slice(0, 3).map((reaction) => (
                   <div key={reaction.type}>
@@ -177,7 +171,9 @@ const PostCard = ({ post }: PostCardProps) => {
                           </div>
                         </div>
                         <span
-                          className={`${reactionColors[reaction?.reactionType]}`}
+                          className={`${
+                            reactionColors[reaction?.reactionType]
+                          }`}
                         >
                           {reactionIcons[reaction?.reactionType]}
                         </span>
@@ -212,8 +208,9 @@ const PostCard = ({ post }: PostCardProps) => {
                     {reactionIcons[userReaction.reactionType]}
                   </span>
                   <span
-                    className={`font-semibold capitalize  ${reactionColors[userReaction.reactionType]
-                      }`}
+                    className={`font-semibold capitalize  ${
+                      reactionColors[userReaction.reactionType]
+                    }`}
                   >
                     <span> {userReaction.reactionType}</span>
                   </span>
@@ -245,10 +242,11 @@ const PostCard = ({ post }: PostCardProps) => {
                         onClick={() => handleReaction(reaction)}
                         whileHover={{ scale: 1.25 }}
                         whileTap={{ scale: 0.9 }}
-                        className={`text-2xl cursor-pointer ${userReaction?.reactionType === reaction
+                        className={`text-2xl cursor-pointer ${
+                          userReaction?.reactionType === reaction
                             ? reactionColors[reaction]
                             : "text-gray-500 hover:text-secondary"
-                          }`}
+                        }`}
                       >
                         <Tooltip
                           title={
