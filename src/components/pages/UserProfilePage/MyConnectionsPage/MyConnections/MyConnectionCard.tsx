@@ -1,14 +1,27 @@
 "use client";
+import ConfirmationPopup from "@/components/custom/custom-popup";
+import { useBlockUserMutation } from "@/redux/features/blockUser/blockUserApi";
+import { useRemoveConnectionMutation } from "@/redux/features/connections/connectionsApi";
 import { IConnection } from "@/types/connection.types";
+import { TError } from "@/types/error";
 import { AnimatePresence, motion } from "framer-motion";
 import { Ellipsis } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useState, useRef, useEffect } from "react";
+import toast from "react-hot-toast";
 
 const MyConnectionCard = ({ connection }: { connection: IConnection }) => {
   const [showOptions, setShowOptions] = useState<boolean>(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const [isRemoveConnectionPopup, setRemoveConnectionPopup] =
+    useState<boolean>(false);
+  const [isBlockUserPopup, setBlockUserPopup] = useState<boolean>(false);
+  // Remove Connection Mutation
+  const [removeConnection, { isLoading: isRemovingConnection }] =
+    useRemoveConnectionMutation();
+  //block connection
+  const [blockUser, { isLoading: isBlockingUser }] = useBlockUserMutation();
 
   // Close menu on outside click
   useEffect(() => {
@@ -24,6 +37,36 @@ const MyConnectionCard = ({ connection }: { connection: IConnection }) => {
     };
   }, []);
 
+  // Remove Connection handle function
+  const handleRemoveConnection = () => {
+    setShowOptions(false);
+    setRemoveConnectionPopup(true);
+  };
+  const handleConfirmRemoveConnection = async () => {
+    try {
+      await removeConnection(connection?._id).unwrap();
+      toast.success("Remove connection successfully");
+      setBlockUserPopup(false)
+    } catch (error) {
+      const err = error as TError;
+      toast.error(err?.data?.message || "Something went wrong");
+    }
+  };
+  // Block user
+  const handleBlockUser = () => {
+    setShowOptions(false);
+    setBlockUserPopup(true);
+  };
+  const handleConfirmBlockUser = async () => {
+    try {
+      await blockUser(connection?._id).unwrap();
+      toast.success("Block User Successfully");
+      setBlockUserPopup(false)
+    } catch (error) {
+      const err = error as TError;
+      toast.error(err?.data?.message || "Something went wrong");
+    }
+  };
   return (
     <div className="flex items-center justify-between bg-white p-4 rounded-xl relative">
       <Link href={`/${connection?.username}`}>
@@ -56,17 +99,47 @@ const MyConnectionCard = ({ connection }: { connection: IConnection }) => {
             initial={{ opacity: 0, y: -5 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -5 }}
-            className="absolute right-8 top-20 w-40 bg-white border border-gray-200 rounded-xl shadow-lg z-10"
+            className="absolute right-5 top-20 w-48 bg-white border border-gray-200 rounded-xl shadow-lg z-10"
           >
-            <button className="w-full text-left font-medium px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 transition-all duration-300 rounded-t-xl cursor-pointer">
+            <button
+              onClick={handleRemoveConnection}
+              className="block w-full text-left px-4 py-3 text-gray-800 hover:bg-gray-100 rounded-t-xl cursor-pointer"
+            >
               Remove Connection
             </button>
-            <button className="w-full text-left font-medium px-4 py-3 text-sm text-red-600 hover:bg-gray-100 transition-all duration-300 rounded-b-xl cursor-pointer">
+            <button
+              onClick={handleBlockUser}
+              className="block w-full text-left px-4 py-3 text-rose-500 hover:bg-gray-100 rounded-b-xl cursor-pointer"
+            >
               Block
             </button>
           </motion.div>
         </AnimatePresence>
       )}
+      {/* Remove connection popup */}
+      <ConfirmationPopup
+        isOpen={isRemoveConnectionPopup}
+        onClose={() => setRemoveConnectionPopup(false)}
+        onConfirm={handleConfirmRemoveConnection}
+        type="delete"
+        title="Remove Connection"
+        message="Are you sure you want to remove connection? This action cannot be undone."
+        confirmText="Remove"
+        cancelText="Cancel"
+        isLoading={isRemovingConnection}
+      />
+      {/* Block  */}
+      <ConfirmationPopup
+        isOpen={isBlockUserPopup}
+        onClose={() => setBlockUserPopup(false)}
+        onConfirm={handleConfirmBlockUser}
+        type="delete"
+        title="Block User"
+        message="Are you sure you want to block this user? This action cannot be undone."
+        confirmText="Yes"
+        cancelText="No"
+        isLoading={isBlockingUser}
+      />
     </div>
   );
 };

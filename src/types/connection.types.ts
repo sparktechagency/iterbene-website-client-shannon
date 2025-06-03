@@ -26,7 +26,7 @@ export interface IMyConnections {
 }
 
 export interface IConnection {
-  id: string;
+  _id: string;
   fullName: string;
   username: string;
   profileImage: string;

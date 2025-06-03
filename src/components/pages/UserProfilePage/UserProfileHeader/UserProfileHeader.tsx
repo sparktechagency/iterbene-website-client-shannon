@@ -47,6 +47,7 @@ const UserProfileHeader = ({ userData }: { userData: IUser }) => {
       toast.error(err?.data?.message || "Something went wrong!");
     }
   };
+  console.log("Response Data", responseData);
   return (
     <div className="w-full bg-white rounded-2xl relative mt-[112px]">
       {/* Background Image */}

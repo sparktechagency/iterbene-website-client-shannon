@@ -21,7 +21,7 @@ const PostHeader = ({ post }: { post: IPost }) => {
   const dropdownRef = useRef<HTMLDivElement>(null);
   const isOwnPost = post?.userId?._id == user?._id;
 
-  const [isDeletePopupOpen, setIsDeletePopupOpen] = useState(false);
+  const [isDeletePopupOpen, setIsDeletePopupOpen] = useState<boolean>(false);
   const [deletePost, { isLoading: isDeleting }] = useDeletePostMutation();
 
   const toggleDropdown = () => setIsOpen(!isOpen);

@@ -1,7 +1,9 @@
 import { baseApi } from "../api/baseApi";
 
 const connectionsApi = baseApi.injectEndpoints({
+  overrideExisting: true,
   endpoints: (builder) => ({
+    // add connection
     addConnection: builder.mutation({
       query: (data) => ({
         url: "/connections/add",
@@ -10,13 +12,7 @@ const connectionsApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["Connections"],
     }),
-    checkIsConnected: builder.query({
-      query: (friendId) => ({
-        url: `/connections/check-connected/${friendId}`,
-        method: "GET",
-      }),
-      providesTags: ["Connections"],
-    }),
+    // check connection exist or not exist
     checkIsSentConnectionExists: builder.query({
       query: (friendId) => ({
         url: `/connections/check-sent-connection/${friendId}`,
@@ -34,6 +30,13 @@ const connectionsApi = baseApi.injectEndpoints({
     cancelConnection: builder.mutation({
       query: (friendId) => ({
         url: `/connections/cancel/${friendId}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["Connections"],
+    }),
+    removeConnection: builder.mutation({
+      query: (removedByUserId) => ({
+        url: `/connections/delete/${removedByUserId}`,
         method: "DELETE",
       }),
       invalidatesTags: ["Connections"],
@@ -96,7 +99,7 @@ export const {
   useCheckIsSentConnectionExistsQuery,
   useRemoveSuggestionConnectionMutation,
   useDeclineConnectionMutation,
-  useCheckIsConnectedQuery,
+  useRemoveConnectionMutation,
   useGetMyConnectionsQuery,
   useGetConnectionRequestsQuery,
   useGetSentConnectionRequestsQuery,
