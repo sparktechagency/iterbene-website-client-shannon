@@ -46,7 +46,7 @@ const MyConnectionCard = ({ connection }: { connection: IConnection }) => {
     try {
       await removeConnection(connection?._id).unwrap();
       toast.success("Remove connection successfully");
-      setBlockUserPopup(false)
+      setBlockUserPopup(false);
     } catch (error) {
       const err = error as TError;
       toast.error(err?.data?.message || "Something went wrong");
@@ -61,14 +61,14 @@ const MyConnectionCard = ({ connection }: { connection: IConnection }) => {
     try {
       await blockUser(connection?._id).unwrap();
       toast.success("Block User Successfully");
-      setBlockUserPopup(false)
+      setBlockUserPopup(false);
     } catch (error) {
       const err = error as TError;
       toast.error(err?.data?.message || "Something went wrong");
     }
   };
   return (
-    <div className="flex items-center justify-between bg-white p-4 rounded-xl relative">
+    <div className="flex items-center justify-between bg-white p-3 rounded-xl relative">
       <Link href={`/${connection?.username}`}>
         <div className="flex items-center space-x-4">
           <Image
@@ -99,7 +99,7 @@ const MyConnectionCard = ({ connection }: { connection: IConnection }) => {
             initial={{ opacity: 0, y: -5 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -5 }}
-            className="absolute right-5 top-20 w-48 bg-white border border-gray-200 rounded-xl shadow-lg z-10"
+            className="absolute right-5 top-20 w-48 bg-white border border-gray-200 rounded-xl shadow-lg z-50"
           >
             <button
               onClick={handleRemoveConnection}

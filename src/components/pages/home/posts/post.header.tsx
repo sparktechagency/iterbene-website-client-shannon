@@ -109,7 +109,6 @@ const PostHeader = ({
       },
     },
   };
-
   return (
     <section className="w-full flex justify-between items-center gap-4">
       <div className="flex items-center mb-3">

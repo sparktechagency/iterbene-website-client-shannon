@@ -6,12 +6,16 @@ import { useParams } from "next/navigation";
 import UserTimelineCard from "./UserTimelineCard";
 import UserTimelineSkeletonCard from "./UserTimelineSkeletonCard";
 import InfiniteScrollWrapper from "@/components/custom/InfiniteScrollWrapper";
-
 const UserTimeline = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
 
   const { userName } = useParams();
-  const username = typeof userName === "string" ? userName : Array.isArray(userName) ? userName[0] : "";
+  const username =
+    typeof userName === "string"
+      ? userName
+      : Array.isArray(userName)
+      ? userName[0]
+      : "";
 
   const {
     data: responseData,
@@ -56,9 +60,13 @@ const UserTimeline = () => {
       isLoading={isLoading && currentPage === 1}
       isFetching={isFetching}
       hasMore={userTimelineData.length + (currentPage - 1) * 9 < totalResults}
-      renderItem={(post: IPost) => <UserTimelineCard key={post._id} post={post} refetch={refetch} />}
+      renderItem={(post: IPost) => (
+        <UserTimelineCard key={post._id} post={post} refetch={refetch} />
+      )}
       renderLoading={renderLoading}
-      renderNoData={() => <h1 className="text-center text-gray-500 py-8">No Post available</h1>}
+      renderNoData={() => (
+        <h1 className="text-center text-gray-500 py-8">No Post available</h1>
+      )}
       onFetchMore={fetchMoreData}
       onRefresh={refreshData}
       gridCols="grid-cols-1 md:grid-cols-2 lg:grid-cols-3"

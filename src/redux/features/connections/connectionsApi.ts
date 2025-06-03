@@ -56,10 +56,13 @@ const connectionsApi = baseApi.injectEndpoints({
       invalidatesTags: ["Connections"],
     }),
     getMyConnections: builder.query({
-      query: ({ page, limit }) => {
+      query: (filters) => {
         const params = new URLSearchParams();
-        if (page) params.append("page", page);
-        if (limit) params.append("limit", limit);
+        if (filters?.length > 0) {
+          filters?.forEach((filter: { key: string; value: string }) =>
+            params.append(filter?.key, filter?.value)
+          );
+        }
         return {
           url: `/connections`,
           method: "GET",

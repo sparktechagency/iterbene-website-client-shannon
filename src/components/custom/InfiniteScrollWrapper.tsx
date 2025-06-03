@@ -71,8 +71,9 @@ const InfiniteScrollWrapper = <T,>({
   }
 
   return (
-    <section className="w-full space-y-3 rounded-2xl">
+    <section className="w-full space-y-3 z-10 r">
       <InfiniteScroll
+        className="!overflow-visible"
         dataLength={displayItems.length}
         next={onFetchMore}
         hasMore={hasMore}
@@ -80,12 +81,6 @@ const InfiniteScrollWrapper = <T,>({
         refreshFunction={onRefresh}
         pullDownToRefresh={!!onRefresh}
         pullDownToRefreshThreshold={50}
-        pullDownToRefreshContent={
-          <h3 style={{ textAlign: "center" }}>↓ Pull down to refresh</h3>
-        }
-        releaseToRefreshContent={
-          <h3 style={{ textAlign: "center" }}>↑ Release to refresh</h3>
-        }
       >
         <div className={`w-full grid ${gridCols} gap-3`}>
           {displayItems.map((item, index) => renderItem(item, index))}
