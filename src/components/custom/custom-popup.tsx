@@ -1,6 +1,8 @@
 "use client";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, AlertTriangle, Trash2, Check } from "lucide-react";
+import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 
 interface ConfirmationPopupProps {
   isOpen: boolean;
@@ -29,6 +31,27 @@ const ConfirmationPopup: React.FC<ConfirmationPopupProps> = ({
   isLoading = false,
   closeOnBackdropClick = true,
 }) => {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+    return () => setMounted(false);
+  }, []);
+
+  useEffect(() => {
+    if (isOpen) {
+      // Prevent body scroll when modal is open
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+
+    // Cleanup function to reset body overflow
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isOpen]);
+
   const handleModalClick = (e: React.MouseEvent) => {
     e.stopPropagation();
   };
@@ -78,7 +101,7 @@ const ConfirmationPopup: React.FC<ConfirmationPopupProps> = ({
 
   const typeConfig = getTypeConfig();
 
-  return (
+  const modalContent = (
     <AnimatePresence>
       {isOpen && (
         <motion.div
@@ -86,7 +109,8 @@ const ConfirmationPopup: React.FC<ConfirmationPopupProps> = ({
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.3, ease: "easeInOut" }}
-          className="fixed inset-0 bg-black/30 flex items-center justify-center z-50 p-4"
+          className="fixed inset-0 bg-black/50 flex items-center justify-center p-4"
+          style={{ zIndex: 9999 }}
           onClick={closeOnBackdropClick ? onClose : undefined}
         >
           <motion.div
@@ -104,7 +128,7 @@ const ConfirmationPopup: React.FC<ConfirmationPopupProps> = ({
           >
             {/* Close button */}
             <button
-              className="absolute top-4 right-4 text-gray-600 transition-colors cursor-pointer"
+              className="absolute top-4 right-4 text-gray-600 hover:text-gray-800 transition-colors cursor-pointer"
               onClick={onClose}
             >
               <X className="size-6" />
@@ -134,14 +158,14 @@ const ConfirmationPopup: React.FC<ConfirmationPopupProps> = ({
               {/* Buttons */}
               <div className="flex gap-3 justify-center">
                 <button
-                  className="px-8 py-3 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-xl font-medium transition-colors  cursor-pointer"
+                  className="px-8 py-3 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-xl font-medium transition-colors cursor-pointer"
                   onClick={onClose}
                   disabled={isLoading}
                 >
                   {cancelText}
                 </button>
                 <button
-                  className={`px-8 py-3 rounded-xl font-medium transition-colors cursor-pointer  ${typeConfig.confirmBg} ${typeConfig.confirmText} disabled:opacity-50 disabled:cursor-not-allowed`}
+                  className={`px-8 py-3 rounded-xl font-medium transition-colors cursor-pointer ${typeConfig.confirmBg} ${typeConfig.confirmText} disabled:opacity-50 disabled:cursor-not-allowed`}
                   onClick={handleConfirm}
                   disabled={isLoading}
                 >
@@ -160,6 +184,12 @@ const ConfirmationPopup: React.FC<ConfirmationPopupProps> = ({
       )}
     </AnimatePresence>
   );
+
+  // Only render portal on client side
+  if (!mounted) return null;
+
+  // Create portal to render modal outside of current DOM hierarchy
+  return createPortal(modalContent, document.body);
 };
 
 export default ConfirmationPopup;

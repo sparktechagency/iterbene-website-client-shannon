@@ -71,22 +71,20 @@ const InfiniteScrollWrapper = <T,>({
   }
 
   return (
-    <section className="w-full space-y-3 z-10 r">
-      <InfiniteScroll
-        className="!overflow-visible"
-        dataLength={displayItems.length}
-        next={onFetchMore}
-        hasMore={hasMore}
-        loader={<div className="mt-3">{renderLoading()}</div>}
-        refreshFunction={onRefresh}
-        pullDownToRefresh={!!onRefresh}
-        pullDownToRefreshThreshold={50}
-      >
-        <div className={`w-full grid ${gridCols} gap-3`}>
-          {displayItems.map((item, index) => renderItem(item, index))}
-        </div>
-      </InfiniteScroll>
-    </section>
+    <InfiniteScroll
+      className="w-full  z-10 !overflow-visible"
+      dataLength={displayItems.length}
+      next={onFetchMore}
+      hasMore={hasMore}
+      loader={<div className="mt-3">{renderLoading()}</div>}
+      refreshFunction={onRefresh}
+      pullDownToRefresh={!!onRefresh}
+      pullDownToRefreshThreshold={50}
+    >
+      <div className={`w-full grid ${gridCols} gap-3`}>
+        {displayItems.map((item, index) => renderItem(item, index))}
+      </div>
+    </InfiniteScroll>
   );
 };
 
