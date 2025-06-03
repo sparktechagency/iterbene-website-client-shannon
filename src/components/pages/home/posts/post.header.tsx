@@ -14,7 +14,13 @@ import { TError } from "@/types/error";
 import formatTimeAgo from "@/utils/formatTimeAgo";
 import Link from "next/link";
 
-const PostHeader = ({ post }: { post: IPost }) => {
+const PostHeader = ({
+  post,
+  refetch,
+}: {
+  post: IPost;
+  refetch: () => void;
+}) => {
   const user = useUser();
   const [isOpen, setIsOpen] = useState(false);
   const triggerRef = useRef<HTMLButtonElement>(null);
@@ -41,6 +47,7 @@ const PostHeader = ({ post }: { post: IPost }) => {
       await deletePost(post._id).unwrap();
       setIsDeletePopupOpen(false);
       toast.success("Post deleted successfully!");
+      refetch();
     } catch (error) {
       const err = error as TError;
       toast.error(err?.data?.message || "Something went wrong!");
@@ -115,9 +122,11 @@ const PostHeader = ({ post }: { post: IPost }) => {
         />
         <div>
           <div className="flex items-center gap-2">
-           <Link href={`/${post?.userId?.username}`}> <p className="font-medium text-gray-800 text-lg hover:underline">
-              {post?.userId?.fullName}
-            </p>
+            <Link href={`/${post?.userId?.username}`}>
+              {" "}
+              <p className="font-medium text-gray-800 text-lg hover:underline">
+                {post?.userId?.fullName}
+              </p>
             </Link>
             <span className="text-sm">
               {post?.createdAt && formatTimeAgo(post?.createdAt)}

@@ -23,9 +23,9 @@ import PostHeader from "../../home/posts/post.header";
 
 interface PostCardProps {
   post: IPost;
+  refetch: () => void;
 }
 
-// Utility function to format numbers (e.g., 1000 → 1k, 1100 → 1.1k, 41500 → 41.5k, 1000000 → 1m)
 const formatNumber = (num: number): string => {
   if (num < 1000) return num.toString();
   if (num >= 1000 && num < 1000000) {
@@ -39,27 +39,22 @@ const formatNumber = (num: number): string => {
   return num.toString();
 };
 
-const UserTimelineCard = ({ post }: PostCardProps) => {
+const UserTimelineCard = ({ post, refetch }: PostCardProps) => {
   const user = useUser();
   const currentUserId = user?._id;
   const [showReactions, setShowReactions] = useState<boolean>(false);
-  const [showReactionDetails, setShowReactionDetails] =
-    useState<boolean>(false);
+  const [showReactionDetails, setShowReactionDetails] = useState<boolean>(false);
 
-  // Find the user's reaction, if any
   const userReaction = post.reactions?.find(
     (reaction: IReaction) => reaction?.userId?._id === currentUserId
   );
 
-  // Get reactions with non-zero counts
   const nonZeroReactions = post?.sortedReactions?.filter(
     (reaction: ISortedReaction) => reaction?.count > 0
   );
 
-  // Add or remove reactions
   const [addOrRemoveReaction] = useAddOrRemoveReactionMutation();
 
-  // Reaction icon mapping
   const reactionIcons: { [key: string]: JSX.Element } = {
     love: <FaHeart size={23} className="text-red-500" />,
     luggage: <MdOutlineLuggage size={25} className="text-blue-500 -mt-0.5" />,
@@ -67,9 +62,8 @@ const UserTimelineCard = ({ post }: PostCardProps) => {
     smile: <FaFaceSmile size={23} className="text-yellow-500" />,
   };
 
-  // Reaction colors
   const reactionColors: { [key: string]: string } = {
-    love: "text-red-500 ",
+    love: "text-red-500",
     luggage: "text-blue-500",
     ban: "text-orange-500",
     smile: "text-yellow-500",
@@ -78,7 +72,6 @@ const UserTimelineCard = ({ post }: PostCardProps) => {
   const handleReaction = async (reactionType: string) => {
     try {
       await addOrRemoveReaction({ postId: post._id, reactionType }).unwrap();
-
       setShowReactions(false);
     } catch (error) {
       const err = error as TError;
@@ -86,10 +79,9 @@ const UserTimelineCard = ({ post }: PostCardProps) => {
     }
   };
 
-
   return (
     <div className="w-full flex flex-col bg-white rounded-xl p-4 mb-4 relative">
-      <PostHeader post={post} />
+      <PostHeader post={post} refetch={refetch} />
       <p className="text-gray-700 flex-1 mb-3">
         {post?.content?.split(/(\s+)/).map((word, index) => {
           const isHashtag = word.match(/^#\w+/);
@@ -104,15 +96,11 @@ const UserTimelineCard = ({ post }: PostCardProps) => {
         })}
       </p>
       <UserTimelineContentRender data={post.media || []} />
-      {/* Show reactions summary */}
       <div className="mt-5">
         {nonZeroReactions?.length > 0 && (
           <div className="relative mb-2 mt-2">
             <div onClick={() => setShowReactionDetails(true)} className="w-fit flex items-center gap-1 cursor-pointer">
-              <div
-                className="flex -space-x-1 cursor-pointer "
-              >
-                {/* Show up to 3 reaction types */}
+              <div className="flex -space-x-1 cursor-pointer">
                 {nonZeroReactions.slice(0, 3).map((reaction) => (
                   <div key={reaction.type}>
                     <span className={`${reactionColors[reaction.type]}`}>
@@ -121,18 +109,14 @@ const UserTimelineCard = ({ post }: PostCardProps) => {
                   </div>
                 ))}
               </div>
-              <span className="text-[18px] hover:underline cursor-pointer font-semibold text-gray-500 ">
+              <span className="text-[18px] hover:underline cursor-pointer font-semibold text-gray-500">
                 {formatNumber(post?.reactions?.length || 0)}
               </span>
             </div>
-
-            {/* Reaction details popup */}
             <CustomModal
               header={
                 <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 rounded-t-xl">
-                  <h2 className="text-xl font-semibold text-gray-800">
-                    All Reactions
-                  </h2>
+                  <h2 className="text-xl font-semibold text-gray-800">All Reactions</h2>
                   <button
                     className="text-gray-600 border-gray-400 cursor-pointer size-10 bg-[#EEFDFB] rounded-full border flex justify-center items-center"
                     onClick={() => setShowReactionDetails(false)}
@@ -146,7 +130,7 @@ const UserTimelineCard = ({ post }: PostCardProps) => {
               maxHeight="h-[50vh]"
             >
               {post?.reactions?.length > 0 && (
-                <div className="w-full space-y-2 ">
+                <div className="w-full space-y-2">
                   {post?.reactions?.map((reaction) => (
                     <div key={reaction.userId._id}>
                       <div className="flex justify-between items-center gap-2 border-b border-gray-200 pb-1">
@@ -158,18 +142,12 @@ const UserTimelineCard = ({ post }: PostCardProps) => {
                             height={40}
                             className="size-[40px] rounded-full"
                           />
-                          <div className="flex flex-col  mt-2">
-                            <h1 className="font-semibold">
-                              {reaction?.userId?.fullName}
-                            </h1>
-                            <span className="text-gray-500">
-                              {reaction?.userId?.username}
-                            </span>
+                          <div className="flex flex-col mt-2">
+                            <h1 className="font-semibold">{reaction?.userId?.fullName}</h1>
+                            <span className="text-gray-500">{reaction?.userId?.username}</span>
                           </div>
                         </div>
-                        <span
-                          className={`${reactionColors[reaction?.reactionType]}`}
-                        >
+                        <span className={`${reactionColors[reaction?.reactionType]}`}>
                           {reactionIcons[reaction?.reactionType]}
                         </span>
                       </div>
@@ -180,7 +158,6 @@ const UserTimelineCard = ({ post }: PostCardProps) => {
             </CustomModal>
           </div>
         )}
-
         <div className="flex gap-7 items-center border-y border-[#DDDDDD] py-3">
           <div
             className="relative flex items-center"
@@ -197,21 +174,18 @@ const UserTimelineCard = ({ post }: PostCardProps) => {
             >
               {userReaction ? (
                 <>
-                  <span
-                    className={`${reactionColors[userReaction.reactionType]}`}
-                  >
+                  <span className={`${reactionColors[userReaction.reactionType]}`}>
                     {reactionIcons[userReaction.reactionType]}
                   </span>
                   <span
-                    className={`font-semibold capitalize  ${reactionColors[userReaction.reactionType]
-                      }`}
+                    className={`font-semibold capitalize ${reactionColors[userReaction.reactionType]}`}
                   >
-                    <span> {userReaction.reactionType}</span>
+                    <span>{userReaction.reactionType}</span>
                   </span>
                 </>
               ) : (
                 <div className="flex items-center gap-1">
-                  <FaRegHeart size={23} className=" text-gray-500" />
+                  <FaRegHeart size={23} className="text-gray-500" />
                   <span className="font-semibold text-gray-500">Love</span>
                 </div>
               )}
@@ -223,29 +197,23 @@ const UserTimelineCard = ({ post }: PostCardProps) => {
                   animate={{ opacity: 1, y: -9 }}
                   exit={{ opacity: 0, y: 0 }}
                   transition={{ duration: 0.2 }}
-                  className="absolute -top-12 -left-2 bg-white border border-gray-50 rounded-full shadow-lg px-3 py-2 flex space-x-3 z-10"
+                  className="absolute -top-12 -left-2 bg-white border border-gray-200 rounded-full shadow-lg px-3 py-2 flex space-x-3 z-10"
                 >
                   {Object.keys(ReactionType).map((reactionKey) => {
-                    const reaction =
-                      ReactionType[
-                        reactionKey as keyof typeof ReactionType
-                      ].toLowerCase();
+                    const reaction = ReactionType[reactionKey as keyof typeof ReactionType].toLowerCase();
                     return (
                       <motion.button
                         key={reaction}
                         onClick={() => handleReaction(reaction)}
                         whileHover={{ scale: 1.25 }}
                         whileTap={{ scale: 0.9 }}
-                        className={`text-2xl cursor-pointer ${userReaction?.reactionType === reaction
+                        className={`text-2xl cursor-pointer ${
+                          userReaction?.reactionType === reaction
                             ? reactionColors[reaction]
                             : "text-gray-500 hover:text-secondary"
-                          }`}
+                        }`}
                       >
-                        <Tooltip
-                          title={
-                            reaction.charAt(0).toUpperCase() + reaction.slice(1)
-                          }
-                        >
+                        <Tooltip title={reaction.charAt(0).toUpperCase() + reaction.slice(1)}>
                           {reactionIcons[reaction]}
                         </Tooltip>
                       </motion.button>
@@ -269,16 +237,12 @@ const UserTimelineCard = ({ post }: PostCardProps) => {
                 fill="currentColor"
               ></path>
             </svg>
-            <span className="font-semibold">
-              {formatNumber(post?.comments?.length || 0)}
-            </span>
+            <span className="font-semibold">{formatNumber(post?.comments?.length || 0)}</span>
           </div>
           {post?.itinerary && (
             <div className="flex items-center space-x-2 cursor-pointer">
               <FaCalendarCheck className="h-5 w-5 text-primary" />
-              <span className="font-semibold">
-                {formatNumber(post?.itineraryViewCount)}
-              </span>
+              <span className="font-semibold">{formatNumber(post?.itineraryViewCount)}</span>
             </div>
           )}
         </div>
