@@ -59,8 +59,9 @@ const connectionsApi = baseApi.injectEndpoints({
       query: (filters) => {
         const params = new URLSearchParams();
         if (filters?.length > 0) {
-          filters?.forEach((filter: { key: string; value: string }) =>
-            params.append(filter?.key, filter?.value)
+          filters?.forEach(
+            (filter: { key: string; value: string }) =>
+              filter?.value && params.append(filter?.key, filter?.value)
           );
         }
         return {
@@ -72,10 +73,20 @@ const connectionsApi = baseApi.injectEndpoints({
       providesTags: ["Connections"],
     }),
     getConnectionRequests: builder.query({
-      query: () => ({
-        url: "/connections/requests/received",
-        method: "GET",
-      }),
+      query: (filters) => {
+        const params = new URLSearchParams();
+        if (filters?.length > 0) {
+          filters?.forEach(
+            (filter: { key: string; value: string }) =>
+              filter?.value && params.append(filter?.key, filter?.value)
+          );
+        }
+        return {
+          url: `/connections/requests/received`,
+          method: "GET",
+          params,
+        };
+      },
       providesTags: ["Connections"],
     }),
     getSentConnectionRequests: builder.query({

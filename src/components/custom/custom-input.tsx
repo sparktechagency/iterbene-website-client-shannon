@@ -1,6 +1,5 @@
 import { EyeIcon, EyeOff } from "lucide-react";
 import { useState } from "react";
-import { Controller, useFormContext } from "react-hook-form";
 import { motion } from "framer-motion";
 
 type TInputProps = {
@@ -18,6 +17,7 @@ type TInputProps = {
   onChange?: (
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => void;
+  value?: string; // Add value prop for controlled input
 };
 
 const CustomInput = ({
@@ -33,8 +33,8 @@ const CustomInput = ({
   isTextarea = false,
   onClick,
   onChange,
+  value = "", // Default to empty string
 }: TInputProps) => {
-  const { control } = useFormContext();
   const [showPassword, setShowPassword] = useState(false);
 
   // Toggle password visibility
@@ -62,72 +62,57 @@ const CustomInput = ({
       {label && (
         <label
           htmlFor={name}
-          className="block text-gray-950 mb-2  text-[15px]"
+          className="block text-gray-950 mb-2 text-[15px]"
         >
           {label} {required && <span className="text-red-500">*</span>}
         </label>
       )}
-      <Controller
-        control={control}
-        name={name}
-        render={({ field, fieldState: { error } }) => (
-          <div className="relative">
-            <motion.div
-              className={`${fullWidth ? "w-full" : "w-auto"} flex items-center ${
-                variant === "outline"
-                  ? "bg-transparent border-b border-primary rounded-none"
-                  : "border rounded-lg"
-              } ${error ? "border-red-500" : "border-[#DDDDDD]"}`}
-              whileFocus={{ scale: 1.02 }}
-              transition={{ duration: 0.2 }}
-            >
-              {/* Icon in front of the input/textarea */}
-              {icon && <div className="pl-2 self-start pt-3">{icon}</div>}
-              {isTextarea ? (
-                <textarea
-                  {...field}
-                  value={field.value || ""}
-                  placeholder={placeholder}
-                  onChange={(e) => {
-                    field.onChange(e);
-                    if (onChange) onChange(e);
-                  }}
-                  onClick={onClick}
-                  className={`w-full ${textareaSizeClass} outline-none  text-gray-900 resize-nonee`}
-                />
-              ) : (
-                <input
-                  {...field}
-                  value={field.value || ""}
-                  type={inputType}
-                  placeholder={placeholder}
-                  onChange={(e) => {
-                    field.onChange(e);
-                    if (onChange) onChange(e);
-                  }}
-                  onClick={onClick}
-                  className={`w-full ${inputSizeClass} outline-none  text-gray-900`}
-                />
-              )}
-              {/* Password visibility toggle icon (only for input with type="password") */}
-              {!isTextarea && type === "password" && (
-                <button
-                  type="button"
-                  onClick={togglePassword}
-                  className="text-gray-500 p-2 cursor-pointer"
-                >
-                  {showPassword ? <EyeIcon size={24} /> : <EyeOff size={24} />}
-                </button>
-              )}
-            </motion.div>
-            {error && (
-              <span id={`${name}-error`} className="text-red-500 text-sm mt-1">
-                {error.message}
-              </span>
-            )}
-          </div>
+      <motion.div
+        className={`${fullWidth ? "w-full" : "w-auto"} flex items-center ${
+          variant === "outline"
+            ? "bg-transparent border-b border-primary rounded-none"
+            : "border rounded-lg"
+        } border-[#DDDDDD]`}
+        whileFocus={{ scale: 1.02 }}
+        transition={{ duration: 0.2 }}
+      >
+        {/* Icon in front of the input/textarea */}
+        {icon && <div className="pl-2 self-start pt-3">{icon}</div>}
+        {isTextarea ? (
+          <textarea
+            name={name}
+            value={value}
+            placeholder={placeholder}
+            onChange={(e) => {
+              if (onChange) onChange(e);
+            }}
+            onClick={onClick}
+            className={`w-full ${textareaSizeClass} outline-none text-gray-900 resize-none`}
+          />
+        ) : (
+          <input
+            name={name}
+            value={value}
+            type={inputType}
+            placeholder={placeholder}
+            onChange={(e) => {
+              if (onChange) onChange(e);
+            }}
+            onClick={onClick}
+            className={`w-full ${inputSizeClass} outline-none text-gray-900`}
+          />
         )}
-      />
+        {/* Password visibility toggle icon (only for input with type="password") */}
+        {!isTextarea && type === "password" && (
+          <button
+            type="button"
+            onClick={togglePassword}
+            className="text-gray-500 p-2 cursor-pointer"
+          >
+            {showPassword ? <EyeIcon size={24} /> : <EyeOff size={24} />}
+          </button>
+        )}
+      </motion.div>
     </div>
   );
 };

@@ -1,15 +1,18 @@
 "use client";
-import { ChevronDown } from "lucide-react";
 import React, { useState } from "react";
 import MyConnections from "./MyConnections/MyConnections";
 import MyRequestConnections from "./MyRequestConnections/MyRequestConnections";
+import CustomSelectField from "@/components/custom/custom-seletectField";
 const MyConnectionsPage = () => {
   const [activeTab, setActiveTab] = useState<string>("My Connections");
+  const [sortBy, setSortBy] = useState<string>("");
+
+  console.log(sortBy);
   return (
     <section className="w-full pb-20">
       {/* Tabs */}
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between pb-5 gap-5">
-        <div className="flex space-x-4 ">
+        <div className="w-full flex space-x-4">
           <button
             onClick={() => setActiveTab("My Connections")}
             className={`px-9 py-1.5 rounded-xl font-semibold transition-colors cursor-pointer ${
@@ -29,16 +32,43 @@ const MyConnectionsPage = () => {
             Requests
           </button>
         </div>
-        <div className="px-4 py-2.5 border border-[#B5B7C5] rounded-xl font-semibold text-sm flex items-center gap-2 text-gray-900">
-          <span className="font-medium">Recently</span>
-          <ChevronDown size={24} />
+        <div className="w-full max-w-40">
+          <CustomSelectField
+            items={[
+              {
+                label: "Recently",
+                value: "createdAt",
+              },
+              {
+                label: "Name (A-Z)",
+                value: "nameAsc",
+              },
+              {
+                label: "Name (Z-A)",
+                value: "nameDesc",
+              },
+              {
+                label: "Oldest First",
+                value: "createdAtAsc",
+              },
+              {
+                label: "Last Interaction",
+                value: "lastInteraction",
+              },
+            ]}
+            name="sortBy"
+            fullWidth
+            value={sortBy}
+            placeholder="Sort By"
+            onChange={(e) => setSortBy(e.target.value)}
+          />
         </div>
       </div>
       {/* Content */}
       {activeTab === "My Connections" ? (
-        <MyConnections />
+        <MyConnections sortBy={sortBy} />
       ) : (
-        <MyRequestConnections />
+        <MyRequestConnections sortBy={sortBy} />
       )}
     </section>
   );
