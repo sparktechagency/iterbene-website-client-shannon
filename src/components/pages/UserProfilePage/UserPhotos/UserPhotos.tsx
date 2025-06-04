@@ -1,13 +1,16 @@
 "use client";
 import { useGetUserTimelinePostsQuery } from "@/redux/features/post/postApi";
 import { IMedia, IPost } from "@/types/post.types";
-import Image from "next/image";
 import { useParams } from "next/navigation";
 import { useState, useMemo } from "react";
 import Lightbox from "yet-another-react-lightbox";
 import "yet-another-react-lightbox/styles.css";
+import UserPhotoCard from "./UserPhotoCard";
+import UserPhotosSkeleton from "./UserPhotosSkeleton";
+import InfiniteScrollWrapper from "@/components/custom/InfiniteScrollWrapper";
 
 const UserPhotos = () => {
+  const [currentPage, setCurrentPage] = useState<number>(1);
   const [open, setOpen] = useState(false);
   const [photoIndex, setPhotoIndex] = useState(0);
   const { userName } = useParams();
@@ -15,6 +18,7 @@ const UserPhotos = () => {
   const {
     data: responseData,
     isLoading,
+    isFetching,
   } = useGetUserTimelinePostsQuery(
     {
       username: userName,
@@ -23,12 +27,21 @@ const UserPhotos = () => {
           key: "mediaType",
           value: "image",
         },
+        {
+          key: "page",
+          value: currentPage,
+        },
+        {
+          key: "limit",
+          value: 8,
+        },
       ],
     },
     { refetchOnMountOrArgChange: true, skip: !userName }
   );
 
   const userTimelineImageData = responseData?.data?.attributes?.results;
+  const totalResults = responseData?.data?.attributes?.totalResults;
 
   // Flatten all media items into a single array for easier handling
   const allMediaItems = useMemo(() => {
@@ -36,7 +49,7 @@ const UserPhotos = () => {
 
     const flattened = userTimelineImageData.flatMap((post: IPost) =>
       post.media
-        .filter((media) => media.mediaType === "image") 
+        .filter((media) => media.mediaType === "image")
         .map((media) => ({
           ...media,
           postId: post._id,
@@ -47,7 +60,7 @@ const UserPhotos = () => {
 
   // Create slides array for lightbox
   const lightboxSlides = useMemo(() => {
-    return allMediaItems.map((media:IMedia) => ({
+    return allMediaItems.map((media: IMedia) => ({
       src: media.mediaUrl,
       alt: media._id || "Photo",
     }));
@@ -57,26 +70,22 @@ const UserPhotos = () => {
     setPhotoIndex(mediaIndex);
     setOpen(true);
   };
+  const fetchMoreData = () => {
+    if (!isLoading && !isFetching) {
+      setCurrentPage((prev) => prev + 1);
+    }
+  };
 
-
-  if (isLoading) {
-    return (
-      <div className="w-full bg-white p-5 rounded-2xl">
-        <div className="text-center py-8">Loading photos...</div>
-      </div>
-    );
-  }
-
-  if (!userTimelineImageData?.length || !allMediaItems.length) {
-    return (
-      <div className="w-full bg-white p-5 rounded-2xl">
-        <div className="flex justify-between mb-4 border-b border-[#B5B7C5] pb-4">
-          <h2 className="text-lg font-semibold text-gray-800">Photos</h2>
-        </div>
-        <div className="text-center py-8 text-gray-500">No photos found</div>
-      </div>
-    );
-  }
+  const refreshData = () => {
+    setCurrentPage(1);
+  };
+  const renderLoading = () => (
+    <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      {Array.from({ length: 8 }).map((_, index) => (
+        <UserPhotosSkeleton key={`skeleton-${index}`} />
+      ))}
+    </div>
+  );
 
   return (
     <div className="w-full bg-white p-5 rounded-2xl">
@@ -88,26 +97,36 @@ const UserPhotos = () => {
         </span>
       </div>
       {/* Photo Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-        {userTimelineImageData?.map((photo: IPost, index: number) =>
-          photo.media.map((media:IMedia) => (
-            <div
-              key={media._id}
-              className="w-full h-56 md:h-80 relative cursor-pointer"
-              onClick={() => handleImageClick(index)}
-            >
-              <Image
-                src={media?.mediaUrl}
-                alt={media?._id}
-                fill
-                className="object-cover rounded-xl"
-                sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1280px) 25vw, 25vw"
-                priority={index < 4} // Prioritize loading for the first row
+      <InfiniteScrollWrapper<IPost>
+        items={userTimelineImageData}
+        isLoading={isLoading && currentPage === 1}
+        isFetching={isFetching}
+        hasMore={
+          userTimelineImageData?.length + (currentPage - 1) * 9 < totalResults
+        }
+        renderItem={(video: IPost) =>
+          video.media?.map((media, index) => {
+            return (
+              <UserPhotoCard
+                key={index}
+                handleImageClick={handleImageClick}
+                index={index}
+                media={media}
               />
-            </div>
-          ))
+            );
+          })
+        }
+        renderLoading={renderLoading}
+        renderNoData={() => (
+          <h1 className="text-center text-gray-500 py-8">
+            No timeline photos available
+          </h1>
         )}
-      </div>
+        onFetchMore={fetchMoreData}
+        onRefresh={refreshData}
+        gridCols="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4"
+        keyExtractor={(post: IPost) => post?._id}
+      />
 
       {/* Lightbox */}
       {lightboxSlides.length > 0 && (

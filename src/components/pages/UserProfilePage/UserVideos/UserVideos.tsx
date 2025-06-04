@@ -46,8 +46,8 @@ const UserVideos = () => {
     setCurrentPage(1);
   };
   const renderLoading = () => (
-    <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-      {Array.from({ length: 9 }).map((_, index) => (
+    <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      {Array.from({ length: 8 }).map((_, index) => (
         <UserVideoSkeleton key={`skeleton-${index}`} />
       ))}
     </div>
