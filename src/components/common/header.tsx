@@ -13,19 +13,226 @@ import { FaRegCalendarAlt, FaRegUserCircle } from "react-icons/fa";
 import { FiMapPin } from "react-icons/fi";
 import { HiOutlineUserGroup } from "react-icons/hi";
 import { IoMdNotificationsOutline } from "react-icons/io";
-import { IoChatboxEllipsesOutline, IoSettingsOutline } from "react-icons/io5";
+import { IoChatboxEllipsesOutline } from "react-icons/io5";
 import { MdAlternateEmail, MdOutlineNotifications } from "react-icons/md";
 import { Drawer } from "antd";
 import CustomButton from "../custom/custom-button";
 import useUser from "@/hooks/useUser";
 import { IUser } from "@/types/user.types";
 import { useRouter } from "next/navigation";
+import MessagesDropdown from "./MessagesDropdown";
+import NotificationsDropdown from "./NotificationsDropdown";
+import UserDropdown from "./UserDropdown";
 
-// Define types for dropdown props
-interface DropdownProps {
-  user?: IUser;
+// Enhanced Search Results Dropdown Component
+type SearchDropdownProps = {
   isOpen: boolean;
-}
+  searchValue: string;
+  searchResults: {
+    users: IUser[];
+    hashtags: any[];
+    locations: any[];
+  };
+  loading: boolean;
+  onResultClick: (result: any, type: string) => void;
+  onSearchPosts: (query: string) => void;
+};
+
+const SearchDropdown: React.FC<SearchDropdownProps> = ({
+  isOpen,
+  searchValue,
+  searchResults,
+  // loading,
+  onResultClick,
+  onSearchPosts,
+}) => {
+  if (!isOpen) return null;
+
+  const hasResults =
+    searchResults.users.length > 0 ||
+    searchResults.hashtags.length > 0 ||
+    searchResults.locations.length > 0;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: -10 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -10 }}
+      transition={{ duration: 0.2 }}
+      className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-lg border border-gray-200 max-h-96 overflow-y-auto z-50"
+    >
+      <div className="p-4">
+        {hasResults ? (
+          <div className="space-y-4">
+            {/* Users Section */}
+            {searchResults.users.length > 0 && (
+              <div>
+                <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">
+                  Users
+                </h4>
+                <div className="space-y-1">
+                  {searchResults.users.map((user, index) => (
+                    <div
+                      key={`user-${index}`}
+                      className="flex items-center gap-3 p-3 hover:bg-gray-50 rounded-lg cursor-pointer transition-colors"
+                      onClick={() => onResultClick(user, "user")}
+                    >
+                      <div className="flex-shrink-0">
+                        {user.profileImage ? (
+                          <Image
+                            src={user.profileImage}
+                            width={32}
+                            height={32}
+                            className="size-8 rounded-full object-cover"
+                            alt="user"
+                          />
+                        ) : (
+                          <div className="size-8 rounded-full bg-gray-200 flex items-center justify-center">
+                            <FaRegUserCircle
+                              size={16}
+                              className="text-gray-500"
+                            />
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-gray-900 truncate">
+                          {user.fullName || user.username}
+                        </p>
+                        <p className="text-xs text-gray-500 truncate">
+                          @{user.username}
+                        </p>
+                      </div>
+                      {user.followersCount !== undefined && (
+                        <div className="flex-shrink-0">
+                          <span className="text-xs text-gray-400">
+                            {user.followersCount} Followers
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Hashtags Section */}
+            {searchResults.hashtags.length > 0 && (
+              <div>
+                <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">
+                  Hashtags
+                </h4>
+                <div className="space-y-1">
+                  {searchResults.hashtags.map((hashtag, index) => (
+                    <div
+                      key={`hashtag-${index}`}
+                      className="flex items-center gap-3 p-3 hover:bg-gray-50 rounded-lg cursor-pointer transition-colors"
+                      onClick={() => onResultClick(hashtag, "hashtag")}
+                    >
+                      <div className="flex-shrink-0">
+                        <div className="size-8 rounded-full bg-blue-100 flex items-center justify-center">
+                          <span className="text-blue-600 font-bold text-sm">
+                            #
+                          </span>
+                        </div>
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-gray-900 truncate">
+                          #{hashtag.name}
+                        </p>
+                        <p className="text-xs text-gray-500 truncate">
+                          {hashtag.postsCount} Posts
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Locations Section */}
+            {searchResults.locations.length > 0 && (
+              <div>
+                <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">
+                  Locations
+                </h4>
+                <div className="space-y-1">
+                  {searchResults.locations.map((location, index) => (
+                    <div
+                      key={`location-${index}`}
+                      className="flex items-center gap-3 p-3 hover:bg-gray-50 rounded-lg cursor-pointer transition-colors"
+                      onClick={() => onResultClick(location, "location")}
+                    >
+                      <div className="flex-shrink-0">
+                        <div className="size-8 rounded-full bg-green-100 flex items-center justify-center">
+                          <FiMapPin size={16} className="text-green-600" />
+                        </div>
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-gray-900 truncate">
+                          {location.locationName}
+                        </p>
+                        <p className="text-xs text-gray-500 truncate">
+                          {location.postsCount} Posts
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Search Posts Option - Always show at bottom when there are results */}
+            <div className="border-t pt-3">
+              <div
+                className="flex items-center gap-3 p-3 hover:bg-blue-50 rounded-lg cursor-pointer transition-colors"
+                onClick={() => onSearchPosts(searchValue)}
+              >
+                <div className="flex-shrink-0">
+                  <div className="size-8 rounded-full bg-blue-100 flex items-center justify-center">
+                    <Search size={16} className="text-blue-600" />
+                  </div>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-gray-900">
+                    Search for {searchValue} in posts
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    Find posts containing your search term
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        ) : searchValue ? (
+          // No results found - Show option to search in posts
+          <div className="text-center p-2">
+            {/* Search Posts Button */}
+            <div
+              className="flex items-center gap-2 cursor-pointer"
+              onClick={() => onSearchPosts(searchValue)}
+            >
+              <div className="flex-shrink-0">
+                <Search size={24} />
+              </div>
+              <div className="flex-1 text-left">
+                <p className="text-base font-medium text-gray-900">
+                  {searchValue}
+                </p>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="text-center py-8 text-gray-500">
+            <Search size={24} className="mx-auto mb-2 text-gray-300" />
+            <p className="text-sm">Start typing to search...</p>
+          </div>
+        )}
+      </div>
+    </motion.div>
+  );
+};
+
 // Mobile Menu Component
 const MobileMenu: React.FC<{
   user?: IUser;
@@ -148,363 +355,10 @@ const MobileMenu: React.FC<{
   );
 };
 
-// Dropdown component for Messages (Desktop/Tablet)
-const MessagesDropdown: React.FC<DropdownProps> = ({ isOpen }) => {
-  const dropdownRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const handleClickInside = (event: MouseEvent) => {
-      event.stopPropagation();
-    };
-
-    const dropdownElement = dropdownRef.current;
-    if (dropdownElement) {
-      dropdownElement.addEventListener("click", handleClickInside);
-    }
-
-    return () => {
-      if (dropdownElement) {
-        dropdownElement.removeEventListener("click", handleClickInside);
-      }
-    };
-  }, []);
-
-  return (
-    <AnimatePresence>
-      {isOpen && (
-        <motion.div
-          ref={dropdownRef}
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: 10 }}
-          transition={{ duration: 0.2 }}
-          className="absolute top-16 right-0 bg-white rounded-xl shadow-lg p-6 w-[min(662px,90vw)] z-50"
-        >
-          <div className="flex justify-between items-center mb-2">
-            <h3 className="font-semibold text-lg">Messages</h3>
-            <button className="text-sm text-primary">Mark all as read</button>
-          </div>
-          <div className="space-y-3 max-h-80 overflow-y-auto">
-            {Array(4)
-              .fill(null)
-              .map((_, index) => (
-                <div
-                  key={index}
-                  className="text-gray-800 hover:bg-[#ECFCFA] px-4 py-3 rounded-xl flex items-center gap-4"
-                >
-                  <Image
-                    src="https://i.ibb.co.com/hFTPRsW0/0de9d1146da18068833210d399cd593e.jpg"
-                    width={60}
-                    height={60}
-                    className="size-14 rounded-full flex-shrink-0"
-                    alt="user"
-                  />
-                  <div className="flex-1 min-w-0">
-                    <h1 className="font-medium truncate">
-                      <span className="font-semibold">Alexandra Broke</span>{" "}
-                      send you <span className="font-semibold">Message</span>
-                    </h1>
-                    <p className="text-sm text-gray-500">1 min ago</p>
-                  </div>
-                  <div className="flex-shrink-0">
-                    <span className="w-3 h-3 bg-primary rounded-full block"></span>
-                  </div>
-                </div>
-              ))}
-          </div>
-          <div className="mt-3 border-t border-[#E2E8F0] pt-5 flex justify-center items-center">
-            <h1 className="text-primary text-sm cursor-pointer">
-              View all messages
-            </h1>
-          </div>
-        </motion.div>
-      )}
-    </AnimatePresence>
-  );
-};
-
-// Dropdown component for Notifications (Desktop/Tablet)
-const NotificationsDropdown: React.FC<DropdownProps> = ({ isOpen }) => {
-  const dropdownRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const handleClickInside = (event: MouseEvent) => {
-      event.stopPropagation();
-    };
-
-    const dropdownElement = dropdownRef.current;
-    if (dropdownElement) {
-      dropdownElement.addEventListener("click", handleClickInside);
-    }
-
-    return () => {
-      if (dropdownElement) {
-        dropdownElement.removeEventListener("click", handleClickInside);
-      }
-    };
-  }, []);
-
-  return (
-    <AnimatePresence>
-      {isOpen && (
-        <motion.div
-          ref={dropdownRef}
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: 10 }}
-          transition={{ duration: 0.2 }}
-          className="absolute top-16 right-0 bg-white rounded-xl shadow-lg p-6 w-[min(662px,90vw)] z-50"
-        >
-          <div className="flex justify-between items-center mb-2">
-            <h3 className="font-semibold text-lg">Notifications</h3>
-            <button className="text-sm text-primary">Mark all as read</button>
-          </div>
-          <div className="space-y-3 max-h-80 overflow-y-auto">
-            {Array(6)
-              .fill(null)
-              .map((_, index) => (
-                <div
-                  key={index}
-                  className="text-gray-800 hover:bg-[#ECFCFA] px-4 py-3 rounded-xl flex items-center gap-4"
-                >
-                  <Image
-                    src="https://i.ibb.co.com/hFTPRsW0/0de9d1146da18068833210d399cd593e.jpg"
-                    width={60}
-                    height={60}
-                    className="size-14 rounded-full flex-shrink-0"
-                    alt="user"
-                  />
-                  <div className="flex-1 min-w-0">
-                    <p className="font-medium truncate">
-                      {index % 2 === 0
-                        ? "Your password was changed"
-                        : "Alexandra Brooke sent you a connection request"}
-                    </p>
-                    <p className="text-sm text-gray-500">1 week ago</p>
-                  </div>
-                  <div className="flex-shrink-0">
-                    <span className="w-3 h-3 bg-primary rounded-full block"></span>
-                  </div>
-                </div>
-              ))}
-          </div>
-          <div className="mt-3 border-t border-[#E2E8F0] pt-5 flex justify-center items-center">
-            <h1 className="text-primary text-sm cursor-pointer">
-              View all notifications
-            </h1>
-          </div>
-        </motion.div>
-      )}
-    </AnimatePresence>
-  );
-};
-
-// Dropdown component for Settings (Desktop only)
-const SettingsDropdown: React.FC<DropdownProps> = ({ isOpen }) => {
-
-  console.log("Setting Open", isOpen);
-  const dropdownRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const handleClickInside = (event: MouseEvent) => {
-      event.stopPropagation();
-    };
-
-    const dropdownElement = dropdownRef.current;
-    if (dropdownElement) {
-      dropdownElement.addEventListener("click", handleClickInside);
-    }
-
-    return () => {
-      if (dropdownElement) {
-        dropdownElement.removeEventListener("click", handleClickInside);
-      }
-    };
-  }, []);
-
-  return (
-    <AnimatePresence>
-      {isOpen && (
-        <motion.div
-          ref={dropdownRef}
-          initial={{ opacity: 0, x: -10 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: -10 }}
-          transition={{ duration: 0.2 }}
-          className="absolute bottom-1 left-[-228px] rounded-xl p-3.5 w-[228px] z-50"
-        >
-          <div className="space-y-3">
-            <Link
-              href="/about-us"
-              className="text-gray-800 hover:bg-[#ECFCFA] p-3 rounded-xl flex items-center gap-4 text-sm"
-            >
-              About Us
-            </Link>
-            <Link
-              href="/terms-and-conditions"
-              className="text-gray-800 hover:bg-[#ECFCFA] p-3 rounded-xl flex items-center gap-4 text-sm"
-            >
-              Terms & Conditions
-            </Link>
-            <Link
-              href="/privacy-policy"
-              className="text-gray-800 hover:bg-[#ECFCFA] p-3 rounded-xl flex items-center gap-4 text-sm"
-            >
-              Privacy Policy
-            </Link>
-          </div>
-        </motion.div>
-      )}
-    </AnimatePresence>
-  );
-};
-
-// Dropdown component for User Profile (Desktop/Tablet)
-const UserDropdown: React.FC<DropdownProps> = ({ user, isOpen }) => {
-  const router = useRouter();
-  const dropdownRef = useRef<HTMLDivElement>(null);
-  const [isSettingsOpen, setIsSettingsOpen] = useState<boolean>(false);
-
-  useEffect(() => {
-    const handleClickInside = (event: MouseEvent) => {
-      event.stopPropagation();
-    };
-
-    const dropdownElement = dropdownRef.current;
-    if (dropdownElement) {
-      dropdownElement.addEventListener("click", handleClickInside);
-    }
-
-    return () => {
-      if (dropdownElement) {
-        dropdownElement.removeEventListener("click", handleClickInside);
-      }
-    };
-  }, []);
-
-  const toggleSettings = () => {
-    setIsSettingsOpen((prev) => !prev);
-  };
-
-  const handleLogout = () => {
-    document.cookie =
-      "accessToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
-    document.cookie =
-      "refreshToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
-    window.location.reload();
-    router.push("/");
-  };
-
-  return (
-    <AnimatePresence>
-      {isOpen && (
-        <motion.div
-          ref={dropdownRef}
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: 10 }}
-          transition={{ duration: 0.2 }}
-          className="absolute top-16 right-0 bg-white rounded-xl shadow-md p-6 w-[min(430px,90vw)] z-50"
-        >
-          <Link href={`/${user?.username}`}>
-            <div className="flex items-center gap-3 mb-4 bg-[#ECFCFA] p-4 rounded-xl">
-              {user?.profileImage && (
-                <Image
-                  src={user?.profileImage}
-                  width={40}
-                  height={40}
-                  className="size-14 rounded-full flex-shrink-0"
-                  alt="user"
-                />
-              )}
-              <div className="flex-1 min-w-0">
-                <p className="font-medium truncate">{user?.fullName}</p>
-                <p className="text-sm text-gray-500 truncate">
-                  @{user?.username}
-                </p>
-              </div>
-            </div>
-          </Link>
-          <div className="space-y-3 overflow-y-auto">
-            <Link
-              href={`/${user?.username}`}
-              className="text-gray-800 hover:bg-[#ECFCFA] px-4 py-3 rounded-xl flex items-center gap-4"
-            >
-              <FaRegUserCircle size={24} />
-              <span>My Profile</span>
-            </Link>
-            <Link
-              href={`/${user?.username}/timeline`}
-              className="text-gray-800 hover:bg-[#ECFCFA] px-4 py-3 rounded-xl flex items-center gap-4"
-            >
-              <LucideCalendarCheck size={24} />
-              <span>Timeline</span>
-            </Link>
-            <Link
-              href="/messages"
-              className="text-gray-800 hover:bg-[#ECFCFA] px-4 py-3 rounded-xl flex items-center gap-4"
-            >
-              <IoChatboxEllipsesOutline size={24} />
-              <span>Messages</span>
-              <span className="ml-2 size-6 rounded-full bg-primary text-white flex justify-center items-center text-sm">
-                5
-              </span>
-            </Link>
-            <Link
-              href="/groups"
-              className="text-gray-800 hover:bg-[#ECFCFA] px-4 py-3 rounded-xl flex items-center gap-4"
-            >
-              <HiOutlineUserGroup size={24} />
-              <span>Groups</span>
-            </Link>
-            <Link
-              href={`/${user?.username}/maps`}
-              className="text-gray-800 hover:bg-[#ECFCFA] px-4 py-3 rounded-xl flex items-center gap-4 "
-            >
-              <FiMapPin size={24} />
-              <span>Maps</span>
-            </Link>
-            <Link
-              href="/events"
-              className="text-gray-800 hover:bg-[#ECFCFA] px-4 py-3 rounded-xl flex items-center gap-4"
-            >
-              <FaRegCalendarAlt size={24} />
-              <span>Events</span>
-            </Link>
-            <Link
-              href={`/${user?.username}/invitations`}
-              className="text-gray-800 hover:bg-[#ECFCFA] px-4 py-3 rounded-xl flex items-center gap-4"
-            >
-              <MdAlternateEmail size={24} />
-              <span>Invitations</span>
-            </Link>
-            <div className="relative">
-              <button
-                onClick={toggleSettings}
-                className="text-gray-800 hover:bg-[#ECFCFA] px-4 py-3 rounded-xl flex items-center gap-4 w-full text-left cursor-pointer"
-              >
-                <IoSettingsOutline size={24} />
-                <span>Settings</span>
-              </button>
-              <SettingsDropdown isOpen={isSettingsOpen} />
-            </div>
-            <button
-              onClick={handleLogout}
-              className="w-full cursor-pointer flex items-center px-4 py-3 gap-4 text-red-500 hover:bg-gray-100 rounded-xl"
-            >
-              <BiLogOut size={24} />
-              <span>Logout</span>
-            </button>
-          </div>
-        </motion.div>
-      )}
-    </AnimatePresence>
-  );
-};
-
 // Header Component
 const Header: React.FC = () => {
   const user = useUser();
+  const router = useRouter();
   // Desktop/Tablet dropdown states
   const [isMessagesOpen, setIsMessagesOpen] = useState<boolean>(false);
   const [isNotificationsOpen, setIsNotificationsOpen] =
@@ -518,11 +372,26 @@ const Header: React.FC = () => {
   const [isSearchOpen, setIsSearchOpen] = useState<boolean>(false);
   const [searchValue, setSearchValue] = useState<string>("");
 
+  // Search dropdown states
+  const [isSearchDropdownOpen, setIsSearchDropdownOpen] =
+    useState<boolean>(false);
+  const [searchResults, setSearchResults] = useState<{
+    users: any[];
+    hashtags: any[];
+    locations: any[];
+  }>({
+    users: [],
+    hashtags: [],
+    locations: [],
+  });
+  const [searchLoading, setSearchLoading] = useState<boolean>(false);
+
   const messagesRef = useRef<HTMLDivElement>(null);
   const notificationsRef = useRef<HTMLDivElement>(null);
   const userRef = useRef<HTMLDivElement>(null);
   const searchRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const desktopSearchRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -543,9 +412,12 @@ const Header: React.FC = () => {
       }
       if (
         searchRef.current &&
-        !searchRef.current.contains(event.target as Node)
+        !searchRef.current.contains(event.target as Node) &&
+        desktopSearchRef.current &&
+        !desktopSearchRef.current.contains(event.target as Node)
       ) {
         setIsSearchOpen(false);
+        setIsSearchDropdownOpen(false);
       }
     };
 
@@ -561,6 +433,60 @@ const Header: React.FC = () => {
       searchInputRef.current.focus();
     }
   }, [isSearchOpen]);
+
+  // Handle search input changes with debounce
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      if (searchValue.trim()) {
+        handleSearch(searchValue);
+        setIsSearchDropdownOpen(true);
+      } else {
+        setSearchResults({
+          users: [],
+          hashtags: [],
+          locations: [],
+        });
+        setIsSearchDropdownOpen(false);
+      }
+    }, 300);
+
+    return () => clearTimeout(timeoutId);
+  }, [searchValue]);
+
+  // Function to handle search - replace with your API call
+  const handleSearch = async (query: string) => {
+    setSearchLoading(true);
+    try {
+      // TODO: Replace with your actual API calls
+      const [usersResponse, hashtagsResponse, locationsResponse] =
+        await Promise.all([
+          fetch(`/api/users/search?q=${encodeURIComponent(query)}`),
+          fetch(`/api/hashtags/search?q=${encodeURIComponent(query)}`),
+          fetch(`/api/posts/locations/search?q=${encodeURIComponent(query)}`),
+        ]);
+
+      const [usersData, hashtagsData, locationsData] = await Promise.all([
+        usersResponse.json(),
+        hashtagsResponse.json(),
+        locationsResponse.json(),
+      ]);
+
+      setSearchResults({
+        users: usersData.users || [],
+        hashtags: hashtagsData.hashtags || [],
+        locations: locationsData.locations || [],
+      });
+    } catch (error) {
+      console.error("Search error:", error);
+      setSearchResults({
+        users: [],
+        hashtags: [],
+        locations: [],
+      });
+    } finally {
+      setSearchLoading(false);
+    }
+  };
 
   const toggleMessages = () => {
     setIsMessagesOpen((prev) => !prev);
@@ -588,83 +514,155 @@ const Header: React.FC = () => {
     setIsSearchOpen((prev) => !prev);
     if (isSearchOpen) {
       setSearchValue("");
+      setIsSearchDropdownOpen(false);
     }
   };
 
+  // Updated handleSearchSubmit function in Header component
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle search logic here
-    console.log("Search:", searchValue);
-    setIsSearchOpen(false);
+    if (searchValue.trim()) {
+      // If no suggestions shown or user pressed Enter, go to posts search
+      handleSearchPosts(searchValue.trim());
+    }
+  };
+
+  // New function to handle post search navigation
+  const handleSearchPosts = (query: string) => {
+    // Navigate to posts search page with query parameter
+    router.push(`/search/posts?q=${encodeURIComponent(query)}`);
+
+    // Close dropdown and clear search
+    setIsSearchDropdownOpen(false);
     setSearchValue("");
+    setIsSearchOpen(false); // Close mobile search too
+  };
+
+  const handleSearchResultClick = (result: any, type: string) => {
+    console.log("Clicked result:", result, "Type:", type);
+
+    // Navigate based on result type
+    const router = useRouter();
+
+    switch (type) {
+      case "user":
+        // Navigate to user profile page
+        router.push(`/${result.username}`);
+        break;
+      case "hashtag":
+        // Navigate to hashtag posts page
+        router.push(`/hashtag/${result.name}`);
+        break;
+      case "location":
+        // Navigate to location posts page
+        router.push(`/location/${encodeURIComponent(result.locationName)}`);
+        break;
+      default:
+        console.log("Unknown result type");
+    }
+
+    // Close dropdown and clear search
+    setIsSearchDropdownOpen(false);
+    setSearchValue("");
+  };
+
+  const handleSearchFocus = () => {
+    if (searchValue.trim()) {
+      setIsSearchDropdownOpen(true);
+    }
   };
 
   return (
     <nav className="w-full bg-[#F0FAF9] h-[72px] md:h-[88px] lg:h-[112px] fixed top-0 left-0 z-50">
-      <div className="w-full container mx-auto flex justify-between items-center h-full px-4  md:px-5 gap-3 md:gap-5">
+      <div className="w-full container mx-auto grid grid-cols-5 justify-between items-center h-full px-4 md:px-5 gap-3 md:gap-5">
         {/* Logo */}
-        <Link href={"/"} className="flex-shrink-0">
+        <Link href={"/"} className="col-span-1">
           <Image src={logo.src} alt="logo" width={75} height={75} />
         </Link>
 
         {/* Search Bar - Always visible on Desktop, conditional on Tablet/Mobile */}
-        <AnimatePresence mode="wait">
-          {isSearchOpen ? (
-            <motion.div
-              key="mobile-search"
-              ref={searchRef}
-              initial={{ width: 0, opacity: 0 }}
-              animate={{ width: "100%", opacity: 1 }}
-              exit={{ width: 0, opacity: 0 }}
-              transition={{ duration: 0.3, ease: "easeInOut" }}
-              className="flex-1 max-w-2xl mx-auto bg-white rounded-xl border border-white overflow-hidden"
-            >
-              <form onSubmit={handleSearchSubmit} className="flex items-center">
+        <div className="col-span-3 flex items-center relative">
+          <AnimatePresence mode="wait">
+            {isSearchOpen ? (
+              <motion.div
+                key="mobile-search"
+                ref={searchRef}
+                initial={{ width: 0, opacity: 0 }}
+                animate={{ width: "100%", opacity: 1 }}
+                exit={{ width: 0, opacity: 0 }}
+                transition={{ duration: 0.3, ease: "easeInOut" }}
+                className="flex-1 max-w-3xl mx-auto bg-white rounded-xl border border-white overflow-hidden relative"
+              >
+                <form
+                  onSubmit={handleSearchSubmit}
+                  className="flex items-center"
+                >
+                  <input
+                    ref={searchInputRef}
+                    type="text"
+                    name="search"
+                    id="mobile-search"
+                    className="w-full px-3 py-2 md:py-3 outline-none text-sm md:text-base"
+                    placeholder="Search..."
+                    value={searchValue}
+                    onChange={(e) => setSearchValue(e.target.value)}
+                    onFocus={handleSearchFocus}
+                  />
+                  <button
+                    type="submit"
+                    className="p-2 hover:bg-gray-50 rounded-r-xl"
+                  >
+                    <Search className="text-gray-500" size={18} />
+                  </button>
+                </form>
+                <SearchDropdown
+                  isOpen={isSearchDropdownOpen}
+                  searchValue={searchValue}
+                  searchResults={searchResults}
+                  loading={searchLoading}
+                  onResultClick={handleSearchResultClick}
+                  onSearchPosts={handleSearchPosts} // Add this new prop
+                />
+              </motion.div>
+            ) : (
+              <motion.div
+                key="desktop-search"
+                ref={desktopSearchRef}
+                initial={{ opacity: 1 }}
+                animate={{ opacity: 1 }}
+                className="hidden md:flex-1 max-w-3xl mx-auto bg-white rounded-xl border border-white md:flex justify-between items-center relative"
+              >
                 <input
-                  ref={searchInputRef}
                   type="text"
                   name="search"
-                  id="mobile-search"
-                  className="w-full px-3 py-2 md:py-3 outline-none text-sm md:text-base"
-                  placeholder="Search..."
+                  id="search"
+                  className="flex-1 px-3 py-2 md:py-3 outline-none text-sm md:text-base"
+                  placeholder="Search"
                   value={searchValue}
                   onChange={(e) => setSearchValue(e.target.value)}
+                  onFocus={handleSearchFocus}
                 />
-                <button
-                  type="submit"
-                  className="p-2 hover:bg-gray-50 rounded-r-xl"
-                >
-                  <Search className="text-gray-500" size={18} />
-                </button>
-              </form>
-            </motion.div>
-          ) : (
-            <motion.div
-              key="desktop-search"
-              initial={{ opacity: 1 }}
-              animate={{ opacity: 1 }}
-              className="hidden md:flex-1 max-w-2xl mx-auto  bg-white rounded-xl border border-white md:flex justify-between items-center"
-            >
-              <input
-                type="text"
-                name="search"
-                id="search"
-                className="flex-1 px-3 py-2 md:py-3 outline-none text-sm md:text-base"
-                placeholder="Search"
-                value={searchValue}
-                onChange={(e) => setSearchValue(e.target.value)}
-              />
-              <Search className="text-gray-500 mr-2" size={20} />
-            </motion.div>
-          )}
-        </AnimatePresence>
+                <Search className="text-gray-500 mr-2" size={20} />
+                <SearchDropdown
+                  isOpen={isSearchDropdownOpen}
+                  searchValue={searchValue}
+                  searchResults={searchResults}
+                  loading={searchLoading}
+                  onResultClick={handleSearchResultClick}
+                  onSearchPosts={handleSearchPosts} // Add this new prop
+                />
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+
         {/* Desktop/Tablet Actions */}
         {user ? (
-          <div className="hidden md:flex justify-end items-center gap-3 md:gap-5 relative">
+          <div className="w-full col-span-1 hidden md:flex justify-end items-center gap-3 md:gap-5 relative">
             {!isSearchOpen && (
               <motion.button
                 onClick={toggleSearch}
-                className="flex md:hidden size-10 md:size-12 rounded-full border border-[#40E0D0] bg-white  justify-center items-center cursor-pointer hover:shadow-md transition-shadow"
+                className="flex md:hidden size-10 md:size-12 rounded-full border border-[#40E0D0] bg-white justify-center items-center cursor-pointer hover:shadow-md transition-shadow"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
@@ -714,7 +712,7 @@ const Header: React.FC = () => {
             </div>
           </div>
         ) : (
-          <div className="hidden md:flex items-center">
+          <div className="w-full col-span-1 hidden md:flex items-center">
             <Link href="/login">
               <motion.div
                 whileHover={{ scale: 1.05 }}
@@ -732,63 +730,61 @@ const Header: React.FC = () => {
         )}
 
         {/* Mobile Actions */}
-        {
-          <motion.div
-            className="block md:hidden items-center gap-3"
-            animate={{
-              marginLeft: isSearchOpen ? "8px" : "0px",
-            }}
-            transition={{ duration: 0.3 }}
-          >
-            {user ? (
-              <>
-                {!isSearchOpen && (
-                  <motion.button
-                    onClick={toggleSearch}
-                    className="p-2 rounded-full hover:bg-white/50 transition-colors"
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                  >
-                    <Search size={20} />
-                  </motion.button>
-                )}
-
-                {isSearchOpen && (
-                  <motion.button
-                    onClick={toggleSearch}
-                    className="p-2 rounded-full hover:bg-white/50 transition-colors"
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                  >
-                    <X size={20} />
-                  </motion.button>
-                )}
-
-                {!isSearchOpen && (
-                  <motion.button
-                    onClick={toggleMobileMenu}
-                    className="p-2 rounded-full hover:bg-white/50 transition-colors"
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                  >
-                    <Menu size={24} />
-                  </motion.button>
-                )}
-              </>
-            ) : (
-              <Link href="/login">
-                <motion.div
+        <motion.div
+          className="block md:hidden items-center gap-3"
+          animate={{
+            marginLeft: isSearchOpen ? "8px" : "0px",
+          }}
+          transition={{ duration: 0.3 }}
+        >
+          {user ? (
+            <>
+              {!isSearchOpen && (
+                <motion.button
+                  onClick={toggleSearch}
+                  className="p-2 rounded-full hover:bg-white/50 transition-colors"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                 >
-                  <CustomButton variant="default" className="px-4 py-2 text-sm">
-                    Login
-                  </CustomButton>
-                </motion.div>
-              </Link>
-            )}
-          </motion.div>
-        }
+                  <Search size={20} />
+                </motion.button>
+              )}
+
+              {isSearchOpen && (
+                <motion.button
+                  onClick={toggleSearch}
+                  className="p-2 rounded-full hover:bg-white/50 transition-colors"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <X size={20} />
+                </motion.button>
+              )}
+
+              {!isSearchOpen && (
+                <motion.button
+                  onClick={toggleMobileMenu}
+                  className="p-2 rounded-full hover:bg-white/50 transition-colors"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <Menu size={24} />
+                </motion.button>
+              )}
+            </>
+          ) : (
+            <Link href="/login">
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <CustomButton variant="default" className="px-4 py-2 text-sm">
+                  Login
+                </CustomButton>
+              </motion.div>
+            </Link>
+          )}
+        </motion.div>
       </div>
       {/* Mobile Menu Drawer */}
       <MobileMenu
