@@ -3,21 +3,51 @@ import { useState, useRef, useEffect } from "react";
 import { Send, Smile } from "lucide-react";
 import Image from "next/image";
 import EmojiPicker, { EmojiClickData, Theme } from "emoji-picker-react";
-import { useCreateCommentMutation } from "@/redux/features/post/postApi";
+import {
+  useCreateCommentMutation,
+  useUpdateCommentMutation,
+} from "@/redux/features/post/postApi";
 import { IPost } from "@/types/post.types";
 import { TError } from "@/types/error";
 import toast from "react-hot-toast";
 import useUser from "@/hooks/useUser";
 
-const PostCommentInput = ({ post }: { post: IPost }) => {
+interface PostCommentInputProps {
+  post: IPost;
+  editCommentId: string | null;
+  editCommentText: string;
+  setEditCommentId: (id: string | null) => void;
+  setEditCommentText: (text: string) => void;
+}
+
+const PostCommentInput = ({
+  post,
+  editCommentId,
+  editCommentText,
+  setEditCommentId,
+  setEditCommentText,
+}: PostCommentInputProps) => {
   const user = useUser();
-  const [newComment, setNewComment] = useState("");
+  const [newComment, setNewComment] = useState(editCommentText);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const emojiPickerRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const [createComment] = useCreateCommentMutation();
+  const [updateComment] = useUpdateCommentMutation();
+
+  // Sync newComment with editCommentText when it changes
+  useEffect(() => {
+    setNewComment(editCommentText);
+    if (editCommentText && textareaRef.current) {
+      textareaRef.current.focus();
+      const length = editCommentText.length;
+      textareaRef.current.setSelectionRange(length, length);
+    } else if (editCommentText && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [editCommentText]);
 
   // Auto-resize textarea, focus, and set cursor to end
   useEffect(() => {
@@ -26,7 +56,6 @@ const PostCommentInput = ({ post }: { post: IPost }) => {
       textarea.style.height = "auto";
       textarea.style.height = `${textarea.scrollHeight}px`;
       textarea.focus();
-      // Set cursor to the end of the text
       const length = newComment.length;
       textarea.setSelectionRange(length, length);
     }
@@ -37,7 +66,6 @@ const PostCommentInput = ({ post }: { post: IPost }) => {
     setNewComment(newComment + emojiData.emoji);
     if (textareaRef.current) {
       textareaRef.current.focus();
-      // Set cursor to the end after adding emoji
       const length = (newComment + emojiData.emoji).length;
       textareaRef.current.setSelectionRange(length, length);
     } else if (inputRef.current) {
@@ -66,12 +94,26 @@ const PostCommentInput = ({ post }: { post: IPost }) => {
   }, [showEmojiPicker]);
 
   const handleCommentSubmit = async () => {
-    if (newComment.trim() !== "") {
+    if (newComment?.trim() !== "") {
       try {
-        await createComment({
-          comment: newComment,
-          postId: post?._id,
-        }).unwrap();
+        if (editCommentId) {
+          const editCommentPayload = {
+            commentId: editCommentId,
+            postId: post?._id,
+            comment: newComment,
+          };
+          // Update existing comment
+          await updateComment(editCommentPayload).unwrap();
+          toast.success("Comment updated successfully!");
+          setEditCommentId(null); // Clear edit state
+          setEditCommentText("");
+        } else {
+          // Create new comment
+          await createComment({
+            comment: newComment,
+            postId: post?._id,
+          }).unwrap();
+        }
         setNewComment(""); // Clear the input field
         setShowEmojiPicker(false); // Close emoji picker on submit
         if (inputRef.current) {
@@ -90,6 +132,14 @@ const PostCommentInput = ({ post }: { post: IPost }) => {
       e.preventDefault();
       handleCommentSubmit();
     }
+  };
+
+  // Handle cancel edit
+  const handleCancelEdit = () => {
+    setNewComment("");
+    setEditCommentId(null);
+    setEditCommentText("");
+    setShowEmojiPicker(false);
   };
 
   return (
@@ -113,7 +163,9 @@ const PostCommentInput = ({ post }: { post: IPost }) => {
             <input
               ref={inputRef}
               type="text"
-              placeholder="Write a comment..."
+              placeholder={
+                editCommentId ? "Edit your comment..." : "Write a comment..."
+              }
               value={newComment}
               onChange={(e) => setNewComment(e.target.value)}
               onKeyDown={handleKeyDown}
@@ -122,7 +174,9 @@ const PostCommentInput = ({ post }: { post: IPost }) => {
           ) : (
             <textarea
               ref={textareaRef}
-              placeholder="Write a comment..."
+              placeholder={
+                editCommentId ? "Edit your comment..." : "Write a comment..."
+              }
               value={newComment}
               onChange={(e) => setNewComment(e.target.value)}
               onKeyDown={handleKeyDown}
@@ -145,6 +199,14 @@ const PostCommentInput = ({ post }: { post: IPost }) => {
                 >
                   <Send size={24} />
                 </button>
+                {editCommentId && (
+                  <button
+                    onClick={handleCancelEdit}
+                    className="text-gray-500 hover:text-gray-700 text-sm cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+                )}
               </>
             ) : (
               <button

@@ -102,18 +102,29 @@ const postApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["Post"],
     }),
+    addOrRemoveCommentReaction: builder.mutation({
+      query: (data) => ({
+        url: "/posts/comment-reaction",
+        method: "POST",
+        body: data,
+      }),
+      invalidatesTags: ["Post"],
+    }),
     updateComment: builder.mutation({
-      query: ({ commentId, comment }) => ({
+      query: ({ commentId, postId, comment }) => ({
         url: `/posts/comment/${commentId}`,
         method: "PATCH",
-        body: { comment },
+        body: { postId, comment },
       }),
+      invalidatesTags: ["Post"],
     }),
     deleteComment: builder.mutation({
-      query: (commentId) => ({
+      query: ({ commentId, postId }) => ({
         url: `/posts/comment/${commentId}`,
         method: "DELETE",
+        body: { postId },
       }),
+      invalidatesTags: ["Post"],
     }),
   }),
 });
@@ -129,6 +140,7 @@ export const {
   useUpdatePostMutation,
   useAddOrRemoveReactionMutation,
   useCreateCommentMutation,
+  useAddOrRemoveCommentReactionMutation,
   useUpdateCommentMutation,
   useDeleteCommentMutation,
 } = postApi;

@@ -49,6 +49,13 @@ const PostCard = ({ post }: PostCardProps) => {
   const [showReactions, setShowReactions] = useState<boolean>(false);
   const [showReactionDetails, setShowReactionDetails] =
     useState<boolean>(false);
+  const [editCommentId, setEditCommentId] = useState<string | null>(null);
+  const [editCommentText, setEditCommentText] = useState("");
+
+  const handleEdit = (commentId: string, commentText: string) => {
+    setEditCommentId(commentId);
+    setEditCommentText(commentText);
+  };
 
   const [showPostDetails, setShowPostDetails] = useState<boolean>(false);
 
@@ -296,8 +303,14 @@ const PostCard = ({ post }: PostCardProps) => {
           )}
         </div>
       </div>
-      <PostCommentInput post={post} />
-      <PostCommentSection comments={post?.comments} />
+      <PostCommentInput
+        post={post}
+        editCommentId={editCommentId}
+        editCommentText={editCommentText}
+        setEditCommentId={setEditCommentId}
+        setEditCommentText={setEditCommentText}
+      />
+      <PostCommentSection post={post} onEdit={handleEdit} />
       <PostDetails
         post={post}
         isOpen={showPostDetails}

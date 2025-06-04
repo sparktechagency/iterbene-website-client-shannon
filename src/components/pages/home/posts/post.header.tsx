@@ -60,11 +60,6 @@ const PostHeader = ({
     setIsOpen(false);
   };
 
-  const handleHide = () => {
-    console.log("Hide post:", post?._id);
-    setIsOpen(false);
-  };
-
   const handleReport = () => {
     console.log("Report post:", post?._id);
     setIsOpen(false);
@@ -189,19 +184,13 @@ const PostHeader = ({
                 <>
                   <button
                     onClick={handleSave}
-                    className="block w-full text-left px-4 py- text-gray-800 hover:bg-gray-100"
+                   className="block w-full text-left px-4 py-3 text-gray-800 hover:bg-gray-100 rounded-t-xl cursor-pointer"
                   >
                     Save
                   </button>
                   <button
-                    onClick={handleHide}
-                    className="block w-full text-left px-4 py-3 text-gray-800 hover:bg-gray-100"
-                  >
-                    Hide
-                  </button>
-                  <button
                     onClick={handleReport}
-                    className="block w-full text-left px-4 py-3 text-gray-800 hover:bg-gray-100"
+                    className="block w-full text-left px-4 py-3 text-rose-500 hover:bg-gray-100"
                   >
                     Report
                   </button>

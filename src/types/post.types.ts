@@ -18,6 +18,20 @@ export interface IReaction {
   createdAt: Date;
 }
 
+export interface ICommentReaction {
+  userId: {
+    _id: string;
+    fullName: string;
+    username: string;
+    profileImage: string;
+    id: string;
+  };
+  commentId: string;
+  reactionType: ReactionType;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 export interface IComment {
   _id: string;
   userId: {
@@ -30,6 +44,7 @@ export interface IComment {
   postId: string;
   replyTo?: string;
   parentCommentId?: string;
+  reactions: ICommentReaction[];
   comment: string;
   createdAt: Date;
   updatedAt: Date;
