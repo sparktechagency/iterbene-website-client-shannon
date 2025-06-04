@@ -5,8 +5,11 @@ import { useState } from "react";
 import InfiniteScrollWrapper from "@/components/custom/InfiniteScrollWrapper";
 import { IConnection } from "@/types/connection.types";
 import MyConnectionCard from "./MyConnectionCard";
+
 const MyConnections = ({ sortBy }: { sortBy: string }) => {
   const [currentPage, setCurrentPage] = useState<number>(1);
+  const [removedItemIds, setRemovedItemIds] = useState<string[]>([]);
+  
   // get my connections
   const {
     data: responseData,
@@ -29,6 +32,11 @@ const MyConnections = ({ sortBy }: { sortBy: string }) => {
 
   const refreshData = () => {
     setCurrentPage(1);
+    setRemovedItemIds([]); // Clear removed items on refresh
+  };
+
+  const handleItemRemove = (itemId: string) => {
+    setRemovedItemIds((prev) => [...prev, itemId]);
   };
 
   const renderLoading = () => (
@@ -46,7 +54,11 @@ const MyConnections = ({ sortBy }: { sortBy: string }) => {
       isFetching={isFetching}
       hasMore={myAllConnections?.length + (currentPage - 1) * 9 < totalResults}
       renderItem={(connection: IConnection) => (
-        <MyConnectionCard key={connection?._id} connection={connection} />
+        <MyConnectionCard 
+          key={connection?._id} 
+          connection={connection}
+          onRemove={() => handleItemRemove(connection._id)}
+        />
       )}
       renderLoading={renderLoading}
       renderNoData={() => (
@@ -58,6 +70,8 @@ const MyConnections = ({ sortBy }: { sortBy: string }) => {
       onRefresh={refreshData}
       gridCols="grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
       keyExtractor={(connection: IConnection) => connection._id}
+      onItemRemove={handleItemRemove}
+      removedItemIds={removedItemIds}
     />
   );
 };

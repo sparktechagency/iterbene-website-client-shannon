@@ -23,7 +23,7 @@ import PostHeader from "../../home/posts/post.header";
 
 interface PostCardProps {
   post: IPost;
-  refetch: () => void;
+  onRemove?: () => void;
 }
 
 const formatNumber = (num: number): string => {
@@ -39,7 +39,7 @@ const formatNumber = (num: number): string => {
   return num.toString();
 };
 
-const UserTimelineCard = ({ post, refetch }: PostCardProps) => {
+const UserTimelineCard = ({ post, onRemove }: PostCardProps) => {
   const user = useUser();
   const currentUserId = user?._id;
   const [showReactions, setShowReactions] = useState<boolean>(false);
@@ -81,7 +81,7 @@ const UserTimelineCard = ({ post, refetch }: PostCardProps) => {
 
   return (
     <div className="w-full flex flex-col bg-white rounded-xl p-4 mb-4 relative">
-      <PostHeader post={post} refetch={refetch} />
+      <PostHeader post={post}  onRemove={onRemove} />
       <p className="text-gray-700 flex-1 mb-3">
         {post?.content?.split(/(\s+)/).map((word, index) => {
           const isHashtag = word.match(/^#\w+/);

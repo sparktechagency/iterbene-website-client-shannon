@@ -16,10 +16,10 @@ import Link from "next/link";
 
 const PostHeader = ({
   post,
-  refetch,
+  onRemove,
 }: {
   post: IPost;
-  refetch: () => void;
+  onRemove?: () => void;
 }) => {
   const user = useUser();
   const [isOpen, setIsOpen] = useState(false);
@@ -47,7 +47,8 @@ const PostHeader = ({
       await deletePost(post._id).unwrap();
       setIsDeletePopupOpen(false);
       toast.success("Post deleted successfully!");
-      refetch();
+      // Call onRemove to update UI immediately
+      onRemove?.();
     } catch (error) {
       const err = error as TError;
       toast.error(err?.data?.message || "Something went wrong!");

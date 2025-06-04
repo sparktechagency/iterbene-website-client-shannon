@@ -8,6 +8,7 @@ import UserTimelineSkeletonCard from "./UserTimelineSkeletonCard";
 import InfiniteScrollWrapper from "@/components/custom/InfiniteScrollWrapper";
 const UserTimeline = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
+  const [removePostIds, setRemovePostIds] = useState<string[]>([]);
 
   const { userName } = useParams();
   const username =
@@ -21,7 +22,6 @@ const UserTimeline = () => {
     data: responseData,
     isLoading,
     isFetching,
-    refetch,
   } = useGetUserTimelinePostsQuery(
     {
       username,
@@ -44,8 +44,12 @@ const UserTimeline = () => {
 
   const refreshData = () => {
     setCurrentPage(1);
+    setRemovePostIds([]);
   };
 
+  const handleRemovePost = (postId: string) => {
+    setRemovePostIds((prev) => [...prev, postId]);
+  };
   const renderLoading = () => (
     <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
       {Array.from({ length: 9 }).map((_, index) => (
@@ -61,7 +65,11 @@ const UserTimeline = () => {
       isFetching={isFetching}
       hasMore={userTimelineData.length + (currentPage - 1) * 9 < totalResults}
       renderItem={(post: IPost) => (
-        <UserTimelineCard key={post._id} post={post} refetch={refetch} />
+        <UserTimelineCard
+          key={post._id}
+          post={post}
+          onRemove={() => handleRemovePost(post._id)}
+        />
       )}
       renderLoading={renderLoading}
       renderNoData={() => (
@@ -69,6 +77,8 @@ const UserTimeline = () => {
       )}
       onFetchMore={fetchMoreData}
       onRefresh={refreshData}
+      onItemRemove={handleRemovePost}
+      removedItemIds={removePostIds}
       gridCols="grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
       keyExtractor={(post: IPost) => post._id}
     />

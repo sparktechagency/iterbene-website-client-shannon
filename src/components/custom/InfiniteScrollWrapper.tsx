@@ -14,6 +14,9 @@ interface InfiniteScrollWrapperProps<T> {
   onRefresh?: () => void;
   gridCols?: string;
   keyExtractor?: (item: T) => string;
+  // New props for data management
+  onItemRemove?: (itemId: string) => void;
+  removedItemIds?: string[];
 }
 
 const InfiniteScrollWrapper = <T,>({
@@ -28,13 +31,22 @@ const InfiniteScrollWrapper = <T,>({
   onRefresh,
   gridCols = "grid-cols-1",
   keyExtractor,
+  // onItemRemove,
+  removedItemIds = [],
 }: InfiniteScrollWrapperProps<T>) => {
   const [displayItems, setDisplayItems] = useState<T[]>([]);
 
+  // Reset display items when fresh data comes (like after refresh or initial load)
   useEffect(() => {
     if (items && !isLoading && !isFetching) {
       setDisplayItems((prev) => {
+        // If it's the first page load or refresh, replace all data
+        if (items.length > 0 && prev.length === 0) {
+          return items;
+        }
+
         if (!keyExtractor) return [...prev, ...items];
+
         const existingKeys = new Set(prev.map(keyExtractor));
         const newItems = items.filter(
           (item) => !existingKeys.has(keyExtractor(item))
@@ -44,11 +56,30 @@ const InfiniteScrollWrapper = <T,>({
     }
   }, [items, isLoading, isFetching, keyExtractor]);
 
+  // Remove items from display when they are deleted
+  useEffect(() => {
+    if (removedItemIds.length > 0 && keyExtractor) {
+      setDisplayItems((prev) =>
+        prev.filter((item) => !removedItemIds.includes(keyExtractor(item)))
+      );
+    }
+  }, [removedItemIds, keyExtractor]);
+
   useEffect(() => {
     if (!isLoading && !isFetching && items.length === 0) {
       setDisplayItems([]);
     }
   }, [items, isLoading, isFetching]);
+
+  // Function to remove item from display
+  // const handleItemRemove = (itemId: string) => {
+  //   setDisplayItems((prev) =>
+  //     prev.filter((item) =>
+  //       keyExtractor ? keyExtractor(item) !== itemId : true
+  //     )
+  //   );
+  //   onItemRemove?.(itemId);
+  // };
 
   if (isLoading) {
     return (
@@ -72,7 +103,7 @@ const InfiniteScrollWrapper = <T,>({
 
   return (
     <InfiniteScroll
-      className="w-full  z-10 !overflow-visible"
+      className="w-full z-10 !overflow-visible"
       dataLength={displayItems.length}
       next={onFetchMore}
       hasMore={hasMore}
@@ -83,6 +114,9 @@ const InfiniteScrollWrapper = <T,>({
     >
       <div className={`w-full grid ${gridCols} gap-3`}>
         {displayItems.map((item, index) => renderItem(item, index))}
+        {/* {displayItems.map((item, index) => 
+        renderItem(item, index, handleItemRemove) // Pass handleItemRemove here
+      )} */}
       </div>
     </InfiniteScroll>
   );

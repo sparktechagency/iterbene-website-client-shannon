@@ -11,12 +11,18 @@ import Link from "next/link";
 import { useState, useRef, useEffect } from "react";
 import toast from "react-hot-toast";
 
-const MyConnectionCard = ({ connection }: { connection: IConnection }) => {
+interface MyConnectionCardProps {
+  connection: IConnection;
+  onRemove?: () => void; // New prop for handling removal
+}
+
+const MyConnectionCard = ({ connection, onRemove }: MyConnectionCardProps) => {
   const [showOptions, setShowOptions] = useState<boolean>(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const [isRemoveConnectionPopup, setRemoveConnectionPopup] =
     useState<boolean>(false);
   const [isBlockUserPopup, setBlockUserPopup] = useState<boolean>(false);
+
   // Remove Connection Mutation
   const [removeConnection, { isLoading: isRemovingConnection }] =
     useRemoveConnectionMutation();
@@ -42,31 +48,39 @@ const MyConnectionCard = ({ connection }: { connection: IConnection }) => {
     setShowOptions(false);
     setRemoveConnectionPopup(true);
   };
+
   const handleConfirmRemoveConnection = async () => {
     try {
       await removeConnection(connection?._id).unwrap();
       toast.success("Remove connection successfully");
-      setBlockUserPopup(false);
+      setRemoveConnectionPopup(false);
+      // Call onRemove to update UI immediately
+      onRemove?.();
     } catch (error) {
       const err = error as TError;
       toast.error(err?.data?.message || "Something went wrong");
     }
   };
+
   // Block user
   const handleBlockUser = () => {
     setShowOptions(false);
     setBlockUserPopup(true);
   };
+
   const handleConfirmBlockUser = async () => {
     try {
       await blockUser(connection?._id).unwrap();
       toast.success("Block User Successfully");
       setBlockUserPopup(false);
+      // Call onRemove to update UI immediately
+      onRemove?.();
     } catch (error) {
       const err = error as TError;
       toast.error(err?.data?.message || "Something went wrong");
     }
   };
+
   return (
     <div className="flex items-center justify-between bg-white p-3 rounded-xl relative">
       <Link href={`/${connection?.username}`}>
@@ -128,7 +142,7 @@ const MyConnectionCard = ({ connection }: { connection: IConnection }) => {
         cancelText="Cancel"
         isLoading={isRemovingConnection}
       />
-      {/* Block  */}
+      {/* Block popup */}
       <ConfirmationPopup
         isOpen={isBlockUserPopup}
         onClose={() => setBlockUserPopup(false)}
