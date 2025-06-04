@@ -16,12 +16,12 @@ const PostContentRender = ({ data }: PostContentRenderProps) => {
       <div className="w-full mt-3">
         {media.mediaType === "image" ? (
           <Image
-              src={media?.mediaUrl}
-              alt={`Post media`}
-              width={400}
-              height={350}
-              className="w-full object-contain cursor-pointer rounded-md"
-            />
+            src={media?.mediaUrl}
+            alt={`Post media`}
+            width={400}
+            height={350}
+            className="w-full object-contain cursor-pointer rounded-md"
+          />
         ) : (
           <VideoCard url={media?.mediaUrl} className="w-full h-[350px]" />
         )}
@@ -224,7 +224,6 @@ const PostContentRender = ({ data }: PostContentRenderProps) => {
 };
 
 export default PostContentRender;
-
 
 // "use client";
 // import Image from "next/image";
