@@ -59,8 +59,9 @@ const postApi = baseApi.injectEndpoints({
       query: ({ username, filters }) => {
         const params = new URLSearchParams();
         if (filters?.length > 0) {
-          filters?.forEach((filter: { key: string; value: string }) =>
-            params.append(filter.key, filter.value)
+          filters?.forEach(
+            (filter: { key: string; value: string }) =>
+              filter.value && params.append(filter.key, filter.value)
           );
         }
         return {
