@@ -20,7 +20,6 @@ const MyJoinedGroups = ({sortBy}:{sortBy:string}) => {
 
   const myAllJoinedGroups = responseData?.data?.attributes?.results || [];
   const totalResults = responseData?.data?.attributes?.totalResults || 0;
-
   const fetchMoreData = () => {
     if (!isLoading && !isFetching) {
       setCurrentPage((prev) => prev + 1);

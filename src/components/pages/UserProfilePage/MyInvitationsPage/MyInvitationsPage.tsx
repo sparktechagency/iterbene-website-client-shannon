@@ -3,14 +3,15 @@
 import { useState } from "react";
 import MyUpComingTours from "./MyUpComingTours/MyUpComingTours";
 import MyInvitations from "./MyInvitations/MyInvitations";
-import { ChevronDown } from "lucide-react";
+import CustomSelectField from "@/components/custom/custom-seletectField";
 
 const MyInvitationsPage = () => {
+  const [sortBy, setSortBy] = useState<string>("");
   const [activeTab, setActiveTab] = useState<"upcomingTour" | "invitation">(
     "upcomingTour"
   );
   return (
-    <section>
+     <section className="w-full pb-20">
       {/* Tabs */}
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between pb-5 gap-5">
         <div className="flex space-x-4 ">
@@ -33,14 +34,37 @@ const MyInvitationsPage = () => {
             Invitations
           </button>
         </div>
-        <div className="px-4 py-2.5 border border-[#B5B7C5] rounded-xl font-semibold text-sm flex items-center gap-2 text-gray-900">
-          <span className="font-medium">Recently</span>
-          <ChevronDown size={24} />
+        <div className="w-full max-w-40">
+          <CustomSelectField
+            items={[
+              {
+                label: "Recently",
+                value: "createdAt",
+              },
+              {
+                label: "Name (A-Z)",
+                value: "nameAsc",
+              },
+              {
+                label: "Name (Z-A)",
+                value: "nameDesc",
+              },
+              {
+                label: "Oldest First",
+                value: "-createdAt",
+              },
+            ]}
+            name="sortBy"
+            fullWidth
+            value={sortBy}
+            placeholder="Sort By"
+            onChange={(e) => setSortBy(e.target.value)}
+          />
         </div>
       </div>
       {/* Content */}
       <div className="w-full">
-        {activeTab === "upcomingTour" ? <MyUpComingTours /> : <MyInvitations />}
+        {activeTab === "upcomingTour" ? <MyUpComingTours sortBy={sortBy} /> : <MyInvitations sortBy={sortBy} />}
       </div>
     </section>
   );
