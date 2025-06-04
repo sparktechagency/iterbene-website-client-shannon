@@ -1,15 +1,15 @@
 "use client";
-
-import { ChevronDown } from "lucide-react";
 import { useState } from "react";
 import MyJoinedGroups from "./MyJoinedGroups/MyJoinedGroups";
 import MyInvitationsGroups from "./MyInvitationsGroup/MyInvitationsGroups";
+import CustomSelectField from "@/components/custom/custom-seletectField";
 
 const MyGroupsPage = () => {
   const [activeTab, setActiveTab] = useState<string>("myGroups");
+  const [sortBy, setSortBy] = useState<string>("");
 
   return (
-    <div>
+   <section className="w-full pb-20">
       {/* Tabs */}
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between pb-5 gap-5">
         <div className="flex space-x-4 ">
@@ -32,20 +32,43 @@ const MyGroupsPage = () => {
             Invitations
           </button>
         </div>
-        <div className="px-4 py-2.5 border border-[#B5B7C5] rounded-xl font-semibold text-sm flex items-center gap-2 text-gray-900">
-          <span className="font-medium">Recently</span>
-          <ChevronDown size={24} />
+        <div className="w-full max-w-40">
+          <CustomSelectField
+            items={[
+              {
+                label: "Recently",
+                value: "createdAt",
+              },
+              {
+                label: "Name (A-Z)",
+                value: "nameAsc",
+              },
+              {
+                label: "Name (Z-A)",
+                value: "nameDesc",
+              },
+              {
+                label: "Oldest First",
+                value: "-createdAt",
+              },
+            ]}
+            name="sortBy"
+            fullWidth
+            value={sortBy}
+            placeholder="Sort By"
+            onChange={(e) => setSortBy(e.target.value)}
+          />
         </div>
       </div>
       {/* Content */}
       <div className="w-full">
         {activeTab === "myGroups" ? (
-          <MyJoinedGroups />
+          <MyJoinedGroups sortBy={sortBy} />
         ) : (
-          <MyInvitationsGroups />
+          <MyInvitationsGroups sortBy={sortBy} />
         )}
       </div>
-    </div>
+    </section>
   );
 };
 

@@ -49,11 +49,7 @@ const MyConnectionsPage = () => {
               },
               {
                 label: "Oldest First",
-                value: "createdAtAsc",
-              },
-              {
-                label: "Last Interaction",
-                value: "lastInteraction",
+                value: "-createdAt",
               },
             ]}
             name="sortBy"

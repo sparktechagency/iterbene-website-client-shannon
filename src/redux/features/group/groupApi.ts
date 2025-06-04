@@ -73,10 +73,20 @@ const groupApi = baseApi.injectEndpoints({
       invalidatesTags: ["Groups"],
     }),
     getMyJoinedGroups: builder.query({
-      query: () => ({
-        url: "/groups/my-join-groups",
-        method: "GET",
-      }),
+      query: (filters) => {
+        const params = new URLSearchParams();
+        if (filters?.length > 0) {
+          filters?.forEach(
+            (filter: { key: string; value: string }) =>
+              filter?.value && params.append(filter?.key, filter?.value)
+          );
+        }
+        return {
+          url: `/groups/my-join-groups`,
+          method: "GET",
+          params,
+        };
+      },
       providesTags: ["Groups"],
     }),
     getSuggestionsGroups: builder.query({
@@ -87,10 +97,20 @@ const groupApi = baseApi.injectEndpoints({
       providesTags: ["Groups"],
     }),
     getMyInvitedGroups: builder.query({
-      query: () => ({
-        url: "/groups/invites/my-invites",
-        method: "GET",
-      }),
+      query: (filters) => {
+        const params = new URLSearchParams();
+        if (filters?.length > 0) {
+          filters?.forEach(
+            (filter: { key: string; value: string }) =>
+              filter?.value && params.append(filter?.key, filter?.value)
+          );
+        }
+        return {
+          url: `/groups/invites/my-invites`,
+          method: "GET",
+          params,
+        };
+      },
       providesTags: ["Groups"],
     }),
   }),
