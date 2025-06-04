@@ -18,12 +18,13 @@ import { MdOutlineLuggage } from "react-icons/md";
 import CustomModal from "@/components/custom/custom-modal";
 import Image from "next/image";
 import { IoMdClose } from "react-icons/io";
-import UserIteItineraryHeader from "./UserIteItineraryHeader";
 import UserIteItineraryContent from "./UserIteItineraryContent";
 import { Calendar } from "lucide-react";
+import PostHeader from "../../home/posts/post.header";
 
 interface PostCardProps {
   post: IPost;
+  onRemove?: () => void;
 }
 
 // Utility function to format numbers (e.g., 1000 → 1k, 1100 → 1.1k, 41500 → 41.5k, 1000000 → 1m)
@@ -40,7 +41,7 @@ const formatNumber = (num: number): string => {
   return num.toString();
 };
 
-const UserIteItineraryCard = ({ post }: PostCardProps) => {
+const UserIteItineraryCard = ({ post,onRemove }: PostCardProps) => {
   const user = useUser();
   const currentUserId = user?._id;
   const [showReactions, setShowReactions] = useState<boolean>(false);
@@ -90,7 +91,7 @@ const UserIteItineraryCard = ({ post }: PostCardProps) => {
 
   return (
     <div className="w-full flex flex-col bg-white rounded-xl p-4 mb-4 relative">
-      <UserIteItineraryHeader post={post} />
+      <PostHeader post={post} onRemove={onRemove} />
       <p className="text-gray-700 flex-1 mb-3">
         {post?.content?.split(/(\s+)/).map((word, index) => {
           const isHashtag = word.match(/^#\w+/);
