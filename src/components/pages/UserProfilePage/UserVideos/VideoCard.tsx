@@ -207,7 +207,7 @@ const VideoCard = forwardRef<VideoCardRef, VideoCardProps>(
       isPlaying,
     }));
 
-    const playVideo = async () => {
+    const playVideo = React.useCallback(async () => {
       if (videoRef.current) {
         try {
           await videoRef.current.play();
@@ -220,7 +220,7 @@ const VideoCard = forwardRef<VideoCardRef, VideoCardProps>(
           console.log("Autoplay failed:", error);
         }
       }
-    };
+    }, [onPlayStateChange, url, userInteracted]);
 
     const pauseVideo = () => {
       if (videoRef.current) {
@@ -278,7 +278,7 @@ const VideoCard = forwardRef<VideoCardRef, VideoCardProps>(
         video.removeEventListener("canplay", handleCanPlay);
         video.removeEventListener("contextmenu", (e) => e.preventDefault());
       };
-    }, [autoplay, url]);
+    }, [autoplay, url, onPlayStateChange, playVideo, userInteracted]);
 
     const togglePlay = () => {
       setUserInteracted(true);
@@ -348,8 +348,9 @@ const VideoCard = forwardRef<VideoCardRef, VideoCardProps>(
 
         {/* Custom Controls (Visible after user interaction) */}
         <div
-          className={`absolute bottom-0 left-0 right-0 bg-gradient-to-t rounded-xl from-black/70 to-transparent p-4 transition-opacity duration-300 ${showControls && userInteracted ? "opacity-100" : "opacity-0"
-            }`}
+          className={`absolute bottom-0 left-0 right-0 bg-gradient-to-t rounded-xl from-black/70 to-transparent p-4 transition-opacity duration-300 ${
+            showControls && userInteracted ? "opacity-100" : "opacity-0"
+          }`}
           onClick={(e) => e.stopPropagation()}
         >
           <div className="flex items-center justify-between gap-3 mb-3">

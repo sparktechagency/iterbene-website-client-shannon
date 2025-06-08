@@ -14,10 +14,10 @@ import useUser from "@/hooks/useUser";
 
 interface PostCommentInputProps {
   post: IPost;
-  editCommentId: string | null;
-  editCommentText: string;
-  setEditCommentId: (id: string | null) => void;
-  setEditCommentText: (text: string) => void;
+  editCommentId?: string | null;
+  editCommentText?: string;
+  setEditCommentId?: (id: string | null) => void;
+  setEditCommentText?: (text: string) => void;
 }
 
 const PostCommentInput = ({
@@ -105,8 +105,8 @@ const PostCommentInput = ({
           // Update existing comment
           await updateComment(editCommentPayload).unwrap();
           toast.success("Comment updated successfully!");
-          setEditCommentId(null); // Clear edit state
-          setEditCommentText("");
+          if (setEditCommentId) setEditCommentId(null); // Clear edit state
+          if (setEditCommentText) setEditCommentText("");
         } else {
           // Create new comment
           await createComment({
@@ -137,8 +137,8 @@ const PostCommentInput = ({
   // Handle cancel edit
   const handleCancelEdit = () => {
     setNewComment("");
-    setEditCommentId(null);
-    setEditCommentText("");
+    if (setEditCommentId) setEditCommentId(null);
+    if (setEditCommentText) setEditCommentText("");
     setShowEmojiPicker(false);
   };
 

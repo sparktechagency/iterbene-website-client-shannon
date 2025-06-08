@@ -236,7 +236,7 @@ const PostDetails = ({ isOpen, onClose, post }: PostDetailsProps) => {
           <PostCommentInput
             post={post}
           />
-          <PostCommentSection comments={post?.comments} />
+          <PostCommentSection post={post} />
         </div>
       </section>
     </CustomModal>

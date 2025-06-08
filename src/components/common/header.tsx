@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/ban-ts-comment */
 "use client";
 
 import logo from "@/asset/logo/logo.png";
@@ -24,17 +23,30 @@ import MessagesDropdown from "./MessagesDropdown";
 import NotificationsDropdown from "./NotificationsDropdown";
 import UserDropdown from "./UserDropdown";
 
+// Define types for search results
+interface IHashtag {
+  name: string;
+  postsCount: number;
+}
+
+interface ILocation {
+  locationName: string;
+  postsCount: number;
+}
+
+interface SearchResult {
+  users: IUser[];
+  hashtags: IHashtag[];
+  locations: ILocation[];
+}
+
 // Enhanced Search Results Dropdown Component
 type SearchDropdownProps = {
   isOpen: boolean;
   searchValue: string;
-  searchResults: {
-    users: IUser[];
-    hashtags: any[];
-    locations: any[];
-  };
+  searchResults: SearchResult;
   loading: boolean;
-  onResultClick: (result: any, type: string) => void;
+  onResultClick: (result: IUser | IHashtag | ILocation, type: string) => void;
   onSearchPosts: (query: string) => void;
 };
 
@@ -375,11 +387,7 @@ const Header: React.FC = () => {
   // Search dropdown states
   const [isSearchDropdownOpen, setIsSearchDropdownOpen] =
     useState<boolean>(false);
-  const [searchResults, setSearchResults] = useState<{
-    users: any[];
-    hashtags: any[];
-    locations: any[];
-  }>({
+  const [searchResults, setSearchResults] = useState<SearchResult>({
     users: [],
     hashtags: [],
     locations: [],
@@ -538,24 +546,25 @@ const Header: React.FC = () => {
     setIsSearchOpen(false); // Close mobile search too
   };
 
-  const handleSearchResultClick = (result: any, type: string) => {
+  const handleSearchResultClick = (result: IUser | IHashtag | ILocation, type: string) => {
     console.log("Clicked result:", result, "Type:", type);
 
     // Navigate based on result type
-    const router = useRouter();
-
     switch (type) {
       case "user":
         // Navigate to user profile page
-        router.push(`/${result.username}`);
+        const userResult = result as IUser;
+        router.push(`/${userResult.username}`);
         break;
       case "hashtag":
         // Navigate to hashtag posts page
-        router.push(`/hashtag/${result.name}`);
+        const hashtagResult = result as IHashtag;
+        router.push(`/hashtag/${hashtagResult.name}`);
         break;
       case "location":
         // Navigate to location posts page
-        router.push(`/location/${encodeURIComponent(result.locationName)}`);
+        const locationResult = result as ILocation;
+        router.push(`/location/${encodeURIComponent(locationResult.locationName)}`);
         break;
       default:
         console.log("Unknown result type");
@@ -787,6 +796,7 @@ const Header: React.FC = () => {
         </motion.div>
       </div>
       {/* Mobile Menu Drawer */}
+            {/* Mobile Menu Drawer */}
       <MobileMenu
         user={user}
         isOpen={isMobileMenuOpen}

@@ -75,9 +75,10 @@ export const useGoogleLocationSearch = (
   const debounceTimer = useRef<NodeJS.Timeout | null>(null);
   const initAttempts = useRef(0);
   const maxInitAttempts = 5;
+  const shouldExecuteDefaultQuery = useRef(false);
 
   // Check if Google Maps is available
-  const isGoogleMapsAvailable = useCallback(() => {
+  const isGoogleMapsAvailable = useCallback((): boolean => {
     return !!(
       typeof window !== "undefined" &&
       window.google?.maps?.places?.AutocompleteService &&
@@ -164,7 +165,7 @@ export const useGoogleLocationSearch = (
   }, [isGoogleMapsAvailable]);
 
   // Initialize services
-  const initializeServices = useCallback(() => {
+  const initializeServices = useCallback((): boolean => {
     try {
       if (isGoogleMapsAvailable()) {
         autocompleteService.current =
@@ -183,11 +184,9 @@ export const useGoogleLocationSearch = (
 
         console.log("Google Maps services initialized successfully");
 
-        // Execute default query if provided
+        // Mark that we should execute default query
         if (defaultQuery && defaultQuery.length >= minQueryLength) {
-          setTimeout(() => {
-            searchLocations(defaultQuery);
-          }, 100);
+          shouldExecuteDefaultQuery.current = true;
         }
 
         return true;
@@ -201,7 +200,7 @@ export const useGoogleLocationSearch = (
   }, [isGoogleMapsAvailable, defaultQuery, minQueryLength]);
 
   // Main initialization function
-  const initializeGoogleMaps = useCallback(async () => {
+  const initializeGoogleMaps = useCallback(async (): Promise<void> => {
     if (isInitialized) return;
 
     initAttempts.current += 1;
@@ -257,7 +256,7 @@ export const useGoogleLocationSearch = (
 
   // Search locations
   const searchLocations = useCallback(
-    async (query: string) => {
+    async (query: string): Promise<void> => {
       const effectiveQuery = query.trim() || defaultQuery?.trim() || "";
 
       if (!effectiveQuery || effectiveQuery.length < minQueryLength) {
@@ -268,7 +267,7 @@ export const useGoogleLocationSearch = (
       // Initialize if not ready
       if (!isInitialized) {
         if (autoInitialize) {
-          initializeGoogleMaps();
+          await initializeGoogleMaps();
         }
         return;
       }
@@ -393,14 +392,26 @@ export const useGoogleLocationSearch = (
   );
 
   // Clear predictions
-  const clearPredictions = useCallback(() => {
+  const clearPredictions = useCallback((): void => {
     setPredictions([]);
   }, []);
+
+  // Auto-initialize effect
   useEffect(() => {
     if (autoInitialize) {
       initializeGoogleMaps();
     }
   }, [autoInitialize, initializeGoogleMaps]);
+
+  // Execute default query after initialization
+  useEffect(() => {
+    if (isInitialized && shouldExecuteDefaultQuery.current && defaultQuery) {
+      shouldExecuteDefaultQuery.current = false;
+      setTimeout(() => {
+        searchLocations(defaultQuery);
+      }, 100);
+    }
+  }, [isInitialized, defaultQuery, searchLocations]);
 
   // Cleanup
   useEffect(() => {

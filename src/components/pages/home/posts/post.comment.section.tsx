@@ -18,7 +18,7 @@ import toast from "react-hot-toast";
 
 interface PostCommentSectionProps {
   post: IPost;
-  onEdit: (commentId: string, commentText: string) => void; // Callback for edit
+  onEdit?: (commentId: string, commentText: string) => void; // Callback for edit
 }
 
 const PostCommentSection = ({ post, onEdit }: PostCommentSectionProps) => {
@@ -159,7 +159,9 @@ const PostCommentSection = ({ post, onEdit }: PostCommentSectionProps) => {
 
   //handle edit
   const handleEdit = (commentId: string, commentText: string) => {
-    onEdit(commentId, commentText);
+    if (onEdit) {
+      onEdit(commentId, commentText);
+    }
     setMenuOpenId(null);
   };
 

@@ -11,9 +11,9 @@ import Link from "next/link";
 import toast from "react-hot-toast";
 const AddConnectionCard = ({ connection }: { connection: IConnection }) => {
   const { data: responseData } = useCheckIsSentConnectionExistsQuery(
-    connection?.id,
+    connection?._id,
     {
-      skip: !connection?.id,
+      skip: !connection?._id,
     }
   );
   const [addConnection] = useAddConnectionMutation();
@@ -23,7 +23,7 @@ const AddConnectionCard = ({ connection }: { connection: IConnection }) => {
 
   const handleAddConnection = async () => {
     try {
-      const payload = { receivedBy: connection?.id };
+      const payload = { receivedBy: connection?._id };
       await addConnection(payload).unwrap();
       toast.success("Connection sent successfully!");
     } catch (error) {
@@ -33,7 +33,7 @@ const AddConnectionCard = ({ connection }: { connection: IConnection }) => {
   };
   const handleCancelRequest = async () => {
     try {
-      await cancelRequest(connection?.id).unwrap();
+      await cancelRequest(connection?._id).unwrap();
       toast.success("Request canceled successfully!");
     } catch (error) {
       const err = error as TError;
@@ -43,7 +43,7 @@ const AddConnectionCard = ({ connection }: { connection: IConnection }) => {
 
   const handleRemoveConnection = async () => {
     try {
-      await removeConnection(connection?.id).unwrap();
+      await removeConnection(connection?._id).unwrap();
       toast.success("Connection removed successfully!");
     } catch (error) {
       const err = error as TError;
