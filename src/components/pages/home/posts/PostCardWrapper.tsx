@@ -1,7 +1,7 @@
 "use client";
-import React, { useEffect, useRef, useState } from "react";
+import { useVideoContext } from "@/context/VideoContext";
 import { IPost } from "@/types/post.types";
-import { useVideoContext } from "@/contexts/VideoContext";
+import React, { useEffect, useRef, useState } from "react";
 interface PostCardWrapperProps {
   post: IPost;
   children: React.ReactElement<{ shouldAutoplay?: boolean; post: IPost }>;

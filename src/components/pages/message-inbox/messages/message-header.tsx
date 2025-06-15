@@ -1,10 +1,10 @@
 "use client";
-import { useGetSingleUserQuery } from "@/redux/features/users/userApi";
+import { useGetSingleByUserIdQuery } from "@/redux/features/users/userApi";
 import { useParams } from "next/navigation";
 
 const MessageHeader = () => {
   const { receiverId } = useParams();
-  const { data: result } = useGetSingleUserQuery(receiverId, {
+  const { data: result } = useGetSingleByUserIdQuery(receiverId, {
     refetchOnMountOrArgChange: true,
     skip: !receiverId,
   });

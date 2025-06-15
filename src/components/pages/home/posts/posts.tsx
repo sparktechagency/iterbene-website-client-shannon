@@ -1,9 +1,9 @@
 "use client";
+import { VideoContextProvider } from "@/context/VideoContext";
+import { useFeedPostsQuery } from "@/redux/features/post/postApi";
 import { IPost } from "@/types/post.types";
 import PostCard from "./post-card";
 import PostCardWrapper from "./PostCardWrapper";
-import { VideoContextProvider } from "@/contexts/VideoContext";
-import { useFeedPostsQuery } from "@/redux/features/post/postApi";
 
 const Posts = () => {
   const {
