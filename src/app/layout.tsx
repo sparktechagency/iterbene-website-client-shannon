@@ -4,8 +4,7 @@ import { Source_Sans_3 } from "next/font/google";
 import { ConfigProvider } from "antd";
 import { AntdRegistry } from "@ant-design/nextjs-registry";
 import { Toaster } from "react-hot-toast";
-import { SocketProvider } from "@/lib/socket";
-import Providers from "@/components/providers";
+import { Providers } from "@/components/providers";
 
 const inter = Source_Sans_3({
   subsets: ["latin"],
@@ -34,13 +33,8 @@ export default function RootLayout({
               },
             }}
           >
-            <SocketProvider>
-              <Providers>
-                <Toaster position="top-center" />
-                <div id="google_translate_element" />
-                {children}
-              </Providers>
-            </SocketProvider>
+            <Providers>{children}</Providers>
+            <Toaster position="top-center" />
           </ConfigProvider>
         </AntdRegistry>
       </body>

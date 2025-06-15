@@ -1,10 +1,12 @@
 "use client";
+import { Provider as ReduxProvider } from "react-redux";
+import { SocketProvider } from "@/lib/socket";
 import { store } from "@/redux/store";
-import React from "react";
-import { Provider } from "react-redux";
 
-const Providers = ({ children }: { children: React.ReactNode }) => {
-  return <Provider store={store}>{children}</Provider>;
-};
-
-export default Providers;
+export function Providers({ children }: { children: React.ReactNode }) {
+  return (
+    <ReduxProvider store={store}>
+        <SocketProvider>{children}</SocketProvider>
+    </ReduxProvider>
+  );
+}

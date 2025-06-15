@@ -1,5 +1,5 @@
+import { socket } from "@/lib/socket";
 import { baseApi } from "../api/baseApi";
-import { socket } from "@/context/socketProvider";
 import { IChat } from "@/types/chatTypes";
 import { TError } from "@/types/error";
 import { IMessage } from "@/types/messagesType";

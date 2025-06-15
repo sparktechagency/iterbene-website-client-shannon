@@ -22,6 +22,7 @@ import { useRouter } from "next/navigation";
 import MessagesDropdown from "./MessagesDropdown";
 import NotificationsDropdown from "./NotificationsDropdown";
 import UserDropdown from "./UserDropdown";
+import { useSocket } from "@/lib/socket";
 
 // Define types for search results
 interface IHashtag {
@@ -401,6 +402,18 @@ const Header: React.FC = () => {
   const searchInputRef = useRef<HTMLInputElement>(null);
   const desktopSearchRef = useRef<HTMLDivElement>(null);
 
+  // socket
+  const { socket } = useSocket();
+
+  useEffect(() => {
+       if (socket && user?._id) {
+      socket.emit("user/connect", { userId: user?._id });
+      return () => {
+        socket.emit("user/disconnect", { userId: user?._id });
+      }
+    }
+  }, [socket, user]);
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -546,7 +559,10 @@ const Header: React.FC = () => {
     setIsSearchOpen(false); // Close mobile search too
   };
 
-  const handleSearchResultClick = (result: IUser | IHashtag | ILocation, type: string) => {
+  const handleSearchResultClick = (
+    result: IUser | IHashtag | ILocation,
+    type: string
+  ) => {
     console.log("Clicked result:", result, "Type:", type);
 
     // Navigate based on result type
@@ -564,7 +580,9 @@ const Header: React.FC = () => {
       case "location":
         // Navigate to location posts page
         const locationResult = result as ILocation;
-        router.push(`/location/${encodeURIComponent(locationResult.locationName)}`);
+        router.push(
+          `/location/${encodeURIComponent(locationResult.locationName)}`
+        );
         break;
       default:
         console.log("Unknown result type");
@@ -581,6 +599,9 @@ const Header: React.FC = () => {
     }
   };
 
+
+
+  console.log("User data:", user);
   return (
     <nav className="w-full bg-[#F0FAF9] h-[72px] md:h-[88px] lg:h-[112px] fixed top-0 left-0 z-50">
       <div className="w-full container mx-auto grid grid-cols-5 justify-between items-center h-full px-4 md:px-5 gap-3 md:gap-5">
@@ -796,7 +817,7 @@ const Header: React.FC = () => {
         </motion.div>
       </div>
       {/* Mobile Menu Drawer */}
-            {/* Mobile Menu Drawer */}
+      {/* Mobile Menu Drawer */}
       <MobileMenu
         user={user}
         isOpen={isMobileMenuOpen}
