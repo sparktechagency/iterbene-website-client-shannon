@@ -19,7 +19,8 @@ const AddConnectionCard = ({ connection }: { connection: IConnection }) => {
   const [addConnection] = useAddConnectionMutation();
   const [removeConnection] = useRemoveSuggestionConnectionMutation();
   const [cancelRequest] = useCancelConnectionMutation();
-  const checkSentConnectionExist = responseData?.data?.attributes;
+  const result = responseData?.data?.attributes;
+  const checkSentConnectionExist = result?.status === "pending";
 
   const handleAddConnection = async () => {
     try {
@@ -50,6 +51,8 @@ const AddConnectionCard = ({ connection }: { connection: IConnection }) => {
       toast.error(err?.data?.message || "Something went wrong!");
     }
   };
+
+  console.log("Check Sent Connection Exist:", responseData);
   return (
     <div className="w-full h-fit bg-white rounded-2xl  p-4 flex flex-col items-center">
       {/* Profile Image */}
@@ -68,29 +71,18 @@ const AddConnectionCard = ({ connection }: { connection: IConnection }) => {
       </h2>
       {/* Buttons */}
       <div className="flex flex-col gap-4 w-full">
-        {checkSentConnectionExist ? (
-          <button
-            onClick={handleCancelRequest}
-            className="border border-[#9EA1B3] text-gray-900 px-5 py-3   rounded-xl hover:bg-gray-100 transition cursor-pointer"
-          >
-            Cancel Request
-          </button>
-        ) : (
-          <>
-            <button
-              onClick={handleAddConnection}
-              className="bg-[#FEEFE8] text-secondary px-5 py-3 rounded-xl border border-secondary transition cursor-pointer"
-            >
-              Add Connection
-            </button>
-            <button
-              onClick={handleRemoveConnection}
-              className="border border-[#9EA1B3] text-gray-900 px-5 py-3   rounded-xl hover:bg-gray-100 transition cursor-pointer"
-            >
-              Remove
-            </button>
-          </>
-        )}
+        <button
+          onClick={handleAddConnection}
+          className="bg-[#FEEFE8] text-secondary px-5 py-3 rounded-xl border border-secondary transition cursor-pointer"
+        >
+          Add Connection
+        </button>
+        <button
+          onClick={handleRemoveConnection}
+          className="border border-[#9EA1B3] text-gray-900 px-5 py-3   rounded-xl hover:bg-gray-100 transition cursor-pointer"
+        >
+          Remove
+        </button>
       </div>
     </div>
   );
