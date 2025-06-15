@@ -10,12 +10,13 @@ import { IMessage, MessageType } from "@/types/messagesType";
 import Lightbox from "yet-another-react-lightbox";
 import "yet-another-react-lightbox/styles.css";
 import { useGetSingleByUserIdQuery } from "@/redux/features/users/userApi";
+import Link from "next/link";
+import pdf from "@/asset/message/pdf.png";
 const MessageBody = () => {
   const { receiverId } = useParams();
   const user = useUser();
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxImages, setLightboxImages] = useState<string[]>([]);
-  const [currentTime, setCurrentTime] = useState(moment());
   const messagesRef = useRef<HTMLDivElement>(null);
   const { data: result } = useGetSingleByUserIdQuery(receiverId, {
     refetchOnMountOrArgChange: true,
@@ -38,15 +39,6 @@ const MessageBody = () => {
     setLightboxImages(images);
     setLightboxOpen(true);
   };
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentTime(moment()); // Update current time every 60 seconds
-    }, 60000); // Runs every 60 seconds
-
-    return () => clearInterval(interval); // Cleanup interval on unmount
-  }, []);
-
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
     setTimeout(() => {
@@ -117,17 +109,24 @@ const MessageBody = () => {
 
                 {/* Message Content */}
                 <div
-                  className={`w-full max-w-[300px] md:max-w-[500px] flex flex-col ${
+                  className={`w-full  max-w-[300px] md:max-w-[500px] flex flex-col justify-between  ${
                     isMyMessage ? "items-end" : "items-start"
                   } flex-shrink-0`}
                 >
                   {/* Mixed Content */}
                   {message?.content?.messageType === MessageType.MIXED && (
                     <div
-                      className={`flex flex-col gap-y-2 ${
-                        isMyMessage ? "flex-row-reverse" : ""
+                      className={`flex flex-col justify-between items-end space-y-1 group ${
+                        isMyMessage ? "items-end" : "items-start"
                       }`}
                     >
+                      <span
+                        className={`text-xs text-gray-500 ${
+                          isMyMessage ? "mr-2 mb-1" : "ml-2 mb-1"
+                        } `}
+                      >
+                        {moment(message?.createdAt).format("h:mm A")}
+                      </span>
                       <div
                         className="relative cursor-pointer"
                         onClick={() => openLightbox(fileUrls)}
@@ -150,15 +149,8 @@ const MessageBody = () => {
                           isMyMessage ? "items-end" : "items-start"
                         }`}
                       >
-                        <span
-                          className={`text-xs text-gray-500 ${
-                            isMyMessage ? "mr-2 mb-1" : "ml-2 mb-1"
-                          } `}
-                        >
-                          {currentTime?.format("h:mm A")}{" "}
-                        </span>
                         <div
-                          className={`max-w-md p-3 rounded-xl ${
+                          className={`max-w-fit p-3 rounded-xl ${
                             isMyMessage
                               ? "bg-[#E6E6E6] text-gray-800"
                               : "bg-[#ECFCFA] text-[#1A1A1A]"
@@ -182,7 +174,7 @@ const MessageBody = () => {
                           isMyMessage ? "mr-2 mb-1" : "ml-2 mb-1"
                         } `}
                       >
-                        {currentTime?.format("h:mm A")}{" "}
+                        {moment(message?.createdAt).format("h:mm A")}
                       </span>
                       <div
                         className={`max-w-md p-3 rounded-xl ${
@@ -208,7 +200,7 @@ const MessageBody = () => {
                           isMyMessage ? "mr-2 mb-1" : "ml-2 mb-1"
                         } `}
                       >
-                        {currentTime?.format("h:mm A")}{" "}
+                        {moment(message?.createdAt).format("h:mm A")}
                       </span>
                       <div
                         className="relative cursor-pointer"
@@ -250,15 +242,34 @@ const MessageBody = () => {
 
                   {/* Document Message */}
                   {message?.content?.messageType === MessageType.DOCUMENT && (
-                    <div>
-                      <a
-                        href={`${fileUrls[0]}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-blue-500 underline"
+                    <div className={`flex flex-col justify-between items-end space-y-1 group ${
+                        isMyMessage ? "items-end" : "items-start"
+                      }`}>
+                       <span
+                        className={`text-xs text-gray-500 ${
+                          isMyMessage ? "mr-2 mb-1" : "ml-2 mb-1"
+                        } `}
                       >
-                        View Document
-                      </a>
+                        {moment(message?.createdAt).format("h:mm A")}
+                      </span>
+                      {fileUrls?.map((fileUrl, index) => (
+                        <div
+                          key={index}
+                          className="relative cursor-pointer bg-[#E6E6E6] border border-gray-300 rounded-xl p-2"
+                        >
+                          <Link
+                            href={fileUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-3  underline"
+                          >
+                            <Image src={pdf} width={40} height={40} alt="pdf" />
+                            <span className="truncate">
+                              {fileUrl.split("/").pop()}
+                            </span>
+                          </Link>
+                        </div>
+                      ))}
                     </div>
                   )}
                 </div>

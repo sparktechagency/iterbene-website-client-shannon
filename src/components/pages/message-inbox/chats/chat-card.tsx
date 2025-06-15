@@ -7,14 +7,12 @@ import moment from "moment";
 import Image from "next/image";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { useEffect, useState } from "react";
 interface ChatListCardProps {
   chat: IChat;
 }
 
 const ChatCard = ({ chat }: ChatListCardProps) => {
   const { lastMessage } = chat;
-  const [currentTime, setCurrentTime] = useState(moment());
   const user = useUser();
   const { content, senderId, createdAt } = lastMessage || {};
   const myLastMessage = senderId === user?.id;
@@ -24,14 +22,6 @@ const ChatCard = ({ chat }: ChatListCardProps) => {
   const receiverDetails: IUser | undefined = (
     chat?.participants as IUser[]
   )?.find((u: IUser) => u._id !== user?._id);
-
-  // **Update time every minute for "x minutes ago"**
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentTime(moment());
-    }, 60000);
-    return () => clearInterval(interval);
-  }, []);
 
   /** 📌 Render Last Message Content */
   const renderMessageContent = () => {
@@ -93,7 +83,7 @@ const ChatCard = ({ chat }: ChatListCardProps) => {
         <p>
           {createdAt && (
             <p className="text-[#999999] text-xs">
-              {moment(createdAt).from(currentTime)}
+              {moment(createdAt).format("h:mm A")}
             </p>
           )}
         </p>
