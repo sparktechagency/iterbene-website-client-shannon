@@ -6,10 +6,15 @@ import ChatListCardSkeleton from "./ChatListCardSkeleton";
 import ChatCard from "./chat-card";
 
 const Chats = () => {
-  const { data: responseData, isLoading: chatLoading } = useGetChatsQuery({
-    page: 1,
-    limit: 12,
-  });
+  const { data: responseData, isLoading: chatLoading } = useGetChatsQuery(
+    {
+      page: 1,
+      limit: 12,
+    },
+    {
+      refetchOnMountOrArgChange: true,
+    }
+  );
   const totalResults = responseData?.data?.attributes?.totalResults;
   const [chats, setChats] = useState<IChat[]>([]);
 

@@ -5,6 +5,7 @@ export interface IChat {
   chatType: string;
   participants: string[];
   lastMessage?: IMessage;
+  unviewedCount?: number;
   createdAt: Date;
   updatedAt: Date;
 }
