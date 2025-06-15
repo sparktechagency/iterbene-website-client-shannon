@@ -149,7 +149,11 @@ const MessageFooter = () => {
       )}
 
       {/* Message Input Area */}
-      <div className={`px-4 py-2 border border-[#CAD1CF] flex items-end space-x-2 ${message?.length > 0 ? "rounded-2xl" : "rounded-full"}`}>
+      <div
+        className={`px-4 py-2 border border-[#CAD1CF] flex items-end space-x-2 ${
+          message?.length > 0 ? "rounded-2xl" : "rounded-full"
+        }`}
+      >
         {/* Hidden file input */}
         <input
           type="file"
@@ -172,6 +176,7 @@ const MessageFooter = () => {
         {/* Textarea */}
         <textarea
           ref={textareaRef}
+          id="input-message"
           placeholder="Type a message..."
           value={message}
           onChange={handleChange}

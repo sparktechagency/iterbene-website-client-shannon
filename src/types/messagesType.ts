@@ -16,14 +16,11 @@ export interface IContent {
 export interface IMessage {
   _id?: string;
   chatId: string | string;
-  senderId: {
+  senderId: string;
+  receiverId: {
     fullName: string;
-    profileImage: {
-      imageUrl: string;
-      file: Record<string, unknown>;
-    };
+    profileImage: string
   };
-  receiverId: string;
   content: IContent;
   seenBy?: string[];
   deletedBy?: string[];
