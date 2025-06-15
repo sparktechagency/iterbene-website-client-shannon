@@ -1,73 +1,73 @@
-'use client';
-import React from "react";
+"use client";
+import { useState, useEffect } from "react";
+import { IChat } from "@/types/chatTypes";
+import { useGetChatsQuery } from "@/redux/features/inbox/inboxApi";
+import ChatListCardSkeleton from "./ChatListCardSkeleton";
 import ChatCard from "./chat-card";
-import { useParams } from "next/navigation";
-// Define the IChat interface
-interface IChat {
-  _id: number;
-  userName: string;
-  profileImage: string;
-  lastMessage: string;
-  timeStamp: string;
-}
-
-// Demo data
-const demoChats: IChat[] = [
-  {
-    _id: 1,
-    userName: "Alice Johnson",
-    profileImage: "https://randomuser.me/api/portraits/women/1.jpg",
-    lastMessage: "Hey, how's it going?",
-    timeStamp: "10:30 AM",
-  },
-  {
-    _id: 2,
-    userName: "Bob Smith",
-    profileImage: "https://randomuser.me/api/portraits/men/2.jpg",
-    lastMessage: "Can we meet tomorrow?",
-    timeStamp: "9:15 AM",
-  },
-  {
-    _id: 3,
-    userName: "Clara Williams",
-    profileImage: "https://randomuser.me/api/portraits/women/3.jpg",
-    lastMessage: "Thanks for the update!",
-    timeStamp: "Yesterday",
-  },
-  {
-    _id: 4,
-    userName: "David Brown",
-    profileImage: "https://randomuser.me/api/portraits/men/4.jpg",
-    lastMessage: "I'll send the files soon.",
-    timeStamp: "Monday",
-  },
-  {
-    _id: 5,
-    userName: "Alice Johnson",
-    profileImage: "https://randomuser.me/api/portraits/men/5.jpg",
-    lastMessage: "I'll send the files soon.",
-    timeStamp: "Monday",
-  },
-];
 
 const Chats = () => {
-    const {chatId} = useParams()
+  const { data: responseData, isLoading: chatLoading } = useGetChatsQuery({
+    page: 1,
+    limit: 12,
+  });
+  const totalResults = responseData?.data?.attributes?.totalResults;
+  const [chats, setChats] = useState<IChat[]>([]);
+
+  /** 📌 Sort chats whenever new data is received */
+  useEffect(() => {
+    if (responseData?.data?.attributes?.results) {
+      console.log("Chats:", responseData?.data?.attributes?.results);
+      // **Sort chats by `updatedAt` (newest first)**
+      const sortedChats = [...responseData.data.attributes.results].sort(
+        (a, b) =>
+          new Date(b.updatedAt!).getTime() - new Date(a.updatedAt!).getTime()
+      );
+      setChats(sortedChats);
+    }
+  }, [responseData]);
+
+  /** 📌 Render content */
+  let content = null;
+
+  if (chatLoading && chats.length <= 0) {
+    content = (
+      <div className="w-full flex flex-col gap-6 overflow-y-auto">
+        {[...Array(6)].map((_, index) => (
+          <ChatListCardSkeleton key={index} />
+        ))}
+      </div>
+    );
+  } else if (!chatLoading && totalResults === 0) {
+    content = (
+      <div className="w-full flex items-center justify-center">
+        <h1 className="text-2xl font-semibold">No Chats Found</h1>
+      </div>
+    );
+  } else if (!chatLoading && totalResults > 0) {
+    content = (
+      <div className={`w-full  flex flex-col gap-2  overflow-y-auto`}>
+        {chats.map((chat: IChat) => (
+          <ChatCard key={chat._id} chat={chat} />
+        ))}
+      </div>
+    );
+  }
+
   return (
-    <div className={`"w-full" ${chatId && "hidden md:block"}`}>
+    <section>
+      {/* Search Bar */}
       <div className="mb-6">
         <input
           type="text"
           name="search"
-          className="w-full py-3 px-4 border border-[#CCC0DB] rounded-2xl"
+          className="w-full py-3 px-4 border border-[#CCC0DB] rounded-2xl outline-none"
           placeholder="Search"
         />
       </div>
-      <div className="space-y-6">
-        {demoChats.map((chat, index) => (
-          <ChatCard key={index} chat={chat} />
-        ))}
-      </div>
-    </div>
+
+      {/* Chat List (Dynamically Sorted) */}
+      {content}
+    </section>
   );
 };
 

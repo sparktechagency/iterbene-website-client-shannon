@@ -68,7 +68,7 @@ const inboxApi = baseApi.injectEndpoints({
         params.append("page", page.toString());
         params.append("limit", limit.toString());
         if (userName) params.append("userName", userName);
-        return { url: `/chat`, method: "GET", params };
+        return { url: `/chats`, method: "GET", params };
       },
       async onCacheEntryAdded(
         arg,
