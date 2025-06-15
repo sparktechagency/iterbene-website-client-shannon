@@ -296,14 +296,15 @@ const MessageFooter = () => {
         <textarea
           ref={textareaRef}
           id="input-message"
-          placeholder={hasOnlyNonImageAttachments ? "You can't send documents and texts at the same time" : "Type a message..."}
+          // placeholder={hasOnlyNonImageAttachments ? "You can't send documents and texts at the same time" : "Type a message..."}
+          placeholder="Type a message..."
           value={hasOnlyNonImageAttachments ? "" : message}
           onChange={hasOnlyNonImageAttachments ? () => {} : handleChange}
           onKeyPress={hasOnlyNonImageAttachments ? () => {} : handleKeyPress}
           rows={1}
           className={`w-full p-2 focus:outline-none resize-none overflow-hidden ${
             hasOnlyNonImageAttachments 
-              ? "text-gray-400 placeholder-red-400 cursor-not-allowed " 
+              ? "text-gray-800 placeholder-gray-500 cursor-not-allowed " 
               : "text-gray-800 placeholder-gray-500"
           }`}
           style={{

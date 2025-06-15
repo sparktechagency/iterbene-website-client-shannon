@@ -63,11 +63,11 @@ const inboxApi = baseApi.injectEndpoints({
 
     /** 📌 Get All Chats */
     getChats: builder.query({
-      query: ({ page = 1, limit = 10, userName }) => {
+      query: ({ page = 1, limit = 10 }) => {
         const params = new URLSearchParams();
         params.append("page", page.toString());
         params.append("limit", limit.toString());
-        if (userName) params.append("userName", userName);
+        // if (userName) params.append("userName", userName);
         return { url: `/chats`, method: "GET", params };
       },
       async onCacheEntryAdded(
@@ -157,9 +157,10 @@ const inboxApi = baseApi.injectEndpoints({
             return;
           }
           const newMessage = responseData.data.attributes;
-
           const cacheKeys = Object.keys(getState().baseApi.queries);
           const getChatsKey = cacheKeys.find((key) => key.includes("getChats"));
+
+          console.log("Get Chats Key:", getChatsKey);
 
           if (!getChatsKey) return;
 
@@ -172,7 +173,7 @@ const inboxApi = baseApi.injectEndpoints({
           dispatch(
             inboxApi.util.updateQueryData(
               "getMessages",
-              messageData.chatId,
+              messageData?.receiverId,
               (draft) => {
                 if (!draft?.data?.attributes?.results) return;
                 draft.data.attributes.results.push(newMessage);
@@ -188,7 +189,7 @@ const inboxApi = baseApi.injectEndpoints({
               (draft) => {
                 if (!draft?.data?.attributes?.results) return;
                 const chatToUpdate = draft.data.attributes.results.find(
-                  (chat: IChat) => chat._id === messageData.chatId
+                  (chat: IChat) => chat._id === newMessage?.chatId
                 );
                 if (chatToUpdate) {
                   chatToUpdate.lastMessage = newMessage;

@@ -242,7 +242,7 @@ const MessageBody = () => {
 
                   {/* Document Message */}
                   {message?.content?.messageType === MessageType.DOCUMENT && (
-                    <div className={`flex flex-col justify-between items-end space-y-1 group ${
+                    <div className={`flex flex-col justify-between items-end gap-2 group ${
                         isMyMessage ? "items-end" : "items-start"
                       }`}>
                        <span
@@ -255,13 +255,13 @@ const MessageBody = () => {
                       {fileUrls?.map((fileUrl, index) => (
                         <div
                           key={index}
-                          className="relative cursor-pointer bg-[#E6E6E6] border border-gray-300 rounded-xl p-2"
+                          className="w-56 relative cursor-pointer bg-[#E6E6E6] border border-gray-300 rounded-xl p-2"
                         >
                           <Link
                             href={fileUrl}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="flex items-center gap-3  underline"
+                            className=" flex items-center gap-3 underline"
                           >
                             <Image src={pdf} width={40} height={40} alt="pdf" />
                             <span className="truncate">
