@@ -80,13 +80,13 @@ const ChatCard = ({ chat }: ChatListCardProps) => {
             <p className="text-xs text-gray-600">{renderMessageContent()}</p>
           </div>
         </div>
-        <p>
+        <>
           {createdAt && (
             <p className="text-[#999999] text-xs">
               {moment(createdAt).format("h:mm A")}
             </p>
           )}
-        </p>
+        </>
       </div>
     </Link>
   );

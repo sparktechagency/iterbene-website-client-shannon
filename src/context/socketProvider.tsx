@@ -1,7 +1,7 @@
-'use client';
-import { socketUrl } from "@/config/config";
+"use client";
 import { createContext, useContext, useEffect } from "react";
 import { io, Socket } from "socket.io-client";
+import { socketUrl } from "@/config/config";
 
 interface SocketContextType {
   socket: Socket | null;
@@ -19,20 +19,27 @@ export const socket = io(socketUrl, {
   reconnectionDelayMax: 5000,
   timeout: 20000,
   transports: ["websocket", "polling"],
-  secure: false,
+  secure: process.env.NODE_ENV === "production", // true for production, false for dev
 });
 
 export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
-    console.log(socket.on("connect", () => console.log("Socket connected")));
     socket.on("connect", () => console.log("Socket connected"));
-    socket.on("disconnect", (reason) => console.log(`Socket disconnected: ${reason}`));
-    socket.on("reconnect_failed", () => console.log("Socket reconnection failed"));
+    socket.on("disconnect", (reason) =>
+      console.log(`Socket disconnected: ${reason}`)
+    );
+    socket.on("reconnect_failed", () =>
+      console.log("Socket reconnection failed")
+    );
 
     return () => {
       socket.disconnect();
     };
   }, []);
 
-  return <SocketContext.Provider value={{ socket }}>{children}</SocketContext.Provider>;
+  return (
+    <SocketContext.Provider value={{ socket }}>
+      {children}
+    </SocketContext.Provider>
+  );
 };

@@ -1,10 +1,11 @@
 import "./globals.css";
 import type { Metadata } from "next";
 import { Source_Sans_3 } from "next/font/google";
-import { Providers } from "@/components/providers";
 import { ConfigProvider } from "antd";
 import { AntdRegistry } from "@ant-design/nextjs-registry";
 import { Toaster } from "react-hot-toast";
+import { SocketProvider } from "@/lib/socket";
+import Providers from "@/components/providers";
 
 const inter = Source_Sans_3({
   subsets: ["latin"],
@@ -33,8 +34,13 @@ export default function RootLayout({
               },
             }}
           >
-            <Providers>{children}</Providers>
-            <Toaster position="top-center" />
+            <SocketProvider>
+              <Providers>
+                <Toaster position="top-center" />
+                <div id="google_translate_element" />
+                {children}
+              </Providers>
+            </SocketProvider>
           </ConfigProvider>
         </AntdRegistry>
       </body>

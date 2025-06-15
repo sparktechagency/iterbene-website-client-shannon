@@ -1,34 +1,46 @@
 "use client";
-
-import { createContext, useContext, useEffect, useState } from "react";
+import { socketUrl } from "@/config/config";
+import { createContext, useContext, useEffect } from "react";
 import { io, Socket } from "socket.io-client";
 
-const SocketContext = createContext<Socket | null>(null);
+interface SocketContextType {
+  socket: Socket | null;
+}
 
-export function SocketProvider({ children }: { children: React.ReactNode }) {
-  const [socket, setSocket] = useState<Socket | null>(null);
+export const SocketContext = createContext<SocketContextType>({ socket: null });
 
+export const useSocket = () => useContext(SocketContext);
+
+// Create a globally accessible socket instance
+export const socket = io(socketUrl, {
+  reconnection: true,
+  reconnectionAttempts: 5,
+  reconnectionDelay: 1000,
+  reconnectionDelayMax: 5000,
+  timeout: 20000,
+  transports: ["websocket", "polling"],
+  secure: false,
+});
+
+export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
-    const socketInstance = io(process.env.NEXT_PUBLIC_SOCKET_URL || "", {
-      withCredentials: true,
-    });
-
-    setSocket(socketInstance);
+    console.log(socket.on("connect", () => console.log("Socket connected")));
+    socket.on("connect", () => console.log("Socket connected"));
+    socket.on("disconnect", (reason) =>
+      console.log(`Socket disconnected: ${reason}`)
+    );
+    socket.on("reconnect_failed", () =>
+      console.log("Socket reconnection failed")
+    );
 
     return () => {
-      socketInstance.close();
+      socket.disconnect();
     };
   }, []);
 
   return (
-    <SocketContext.Provider value={socket}>{children}</SocketContext.Provider>
+    <SocketContext.Provider value={{ socket }}>
+      {children}
+    </SocketContext.Provider>
   );
-}
-
-export const useSocket = () => {
-  const socket = useContext(SocketContext);
-  if (!socket) {
-    throw new Error("useSocket must be used within a SocketProvider");
-  }
-  return socket;
 };

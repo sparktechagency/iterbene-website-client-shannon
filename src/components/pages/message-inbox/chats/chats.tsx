@@ -16,7 +16,6 @@ const Chats = () => {
   /** 📌 Sort chats whenever new data is received */
   useEffect(() => {
     if (responseData?.data?.attributes?.results) {
-      console.log("Chats:", responseData?.data?.attributes?.results);
       // **Sort chats by `updatedAt` (newest first)**
       const sortedChats = [...responseData.data.attributes.results].sort(
         (a, b) =>
