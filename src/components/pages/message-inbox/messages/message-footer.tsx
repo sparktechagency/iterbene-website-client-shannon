@@ -249,7 +249,7 @@ const MessageFooter = () => {
 
       {/* Message Input Area */}
       <div
-        className={`px-4 py-2 border border-[#CAD1CF] flex items-end space-x-2 ${
+        className={`px-4 py-1.5 border border-[#CAD1CF] flex items-center space-x-2 ${
           message?.length > 0 ? "rounded-2xl" : "rounded-full"
         }`}
       >
@@ -275,7 +275,7 @@ const MessageFooter = () => {
         {/* Attachment button (all files) */}
         <button
           onClick={handleAttachmentClick}
-          className="size-10 flex justify-center items-center rounded-full flex-shrink-0 text-gray-500 hover:text-gray-700 border border-[#CAD1CF] transition-colors cursor-pointer"
+          className="size-8 flex justify-center items-center rounded-full flex-shrink-0 text-gray-500 hover:text-gray-700 border border-[#CAD1CF] transition-colors cursor-pointer"
           disabled={isLoading}
           title="Attach file"
         >
@@ -285,7 +285,7 @@ const MessageFooter = () => {
         {/* Camera button (images only) */}
         <button
           onClick={handleCameraClick}
-          className="size-10 flex justify-center items-center rounded-full flex-shrink-0 text-gray-500 hover:text-gray-700 border border-[#CAD1CF] transition-colors cursor-pointer"
+          className="size-8 flex justify-center items-center rounded-full flex-shrink-0 text-gray-500 hover:text-gray-700 border border-[#CAD1CF] transition-colors cursor-pointer"
           disabled={isLoading}
           title="Add image"
         >
@@ -323,9 +323,9 @@ const MessageFooter = () => {
             (!message.trim() && selectedFiles.length === 0) ||
             (hasOnlyNonImageAttachments && selectedFiles.length === 0)
           }
-          className="size-10 cursor-pointer flex justify-center items-center rounded-full flex-shrink-0 text-gray-500 hover:text-gray-700 border border-[#CAD1CF] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="size-9 cursor-pointer flex justify-center items-center rounded-full flex-shrink-0 text-gray-500 hover:text-gray-700 border border-[#CAD1CF] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          <Send size={22} />
+          <Send size={20} />
         </button>
       </div>
     </div>

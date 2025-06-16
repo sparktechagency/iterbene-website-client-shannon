@@ -3,10 +3,11 @@ import useUser from "@/hooks/useUser";
 import { IChat } from "@/types/chatTypes";
 import { MessageType } from "@/types/messagesType";
 import { IUser } from "@/types/user.types";
-import moment from "moment";
+import { getMessengerTimeFormat } from "@/utils/getMessengerTimeFormat";
 import Image from "next/image";
 import Link from "next/link";
 import { useParams } from "next/navigation";
+
 interface ChatListCardProps {
   chat: IChat;
 }
@@ -15,7 +16,7 @@ const ChatCard = ({ chat }: ChatListCardProps) => {
   const { lastMessage } = chat;
   const user = useUser();
   const { content, senderId, createdAt } = lastMessage || {};
-  const myLastMessage = senderId === user?.id;
+  const myLastMessage = senderId === user?._id;
   const { receiverId } = useParams();
 
   // Get the receiver user details
@@ -77,13 +78,13 @@ const ChatCard = ({ chat }: ChatListCardProps) => {
             <h1 className="text-[18px] font-medium">
               {receiverDetails?.fullName}
             </h1>
-            <p className="text-xs text-gray-600">{renderMessageContent()}</p>
+            <p className="text-[14px] text-gray-600">{renderMessageContent()}</p>
           </div>
         </div>
         <>
           {createdAt && (
-            <p className="text-[#999999] text-xs">
-              {moment(createdAt).format("h:mm A")}
+            <p className="text-[#999999] text-[14px]">
+              {getMessengerTimeFormat(createdAt)}
             </p>
           )}
         </>
