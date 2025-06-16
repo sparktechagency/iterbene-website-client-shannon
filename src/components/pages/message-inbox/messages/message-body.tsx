@@ -19,7 +19,7 @@ import { debounce } from "lodash";
 import DateSeparator from "./DateSeparator";
 import MessageLoadingSkeleton from "./MessageLoadingSkeleton";
 import { getDateGroupLabel, groupMessagesByDate } from "@/utils/dateGroup";
-import MessageItem from "./MessageItemProps";
+import MessageItem from "./MessageItem";
 
 const MessageBody = () => {
   const { receiverId } = useParams();
@@ -109,41 +109,33 @@ const MessageBody = () => {
 
         if (newMessages.length === 0 && !isInitialLoad) return prev;
 
-        // Check if it's a new message from current user or newer than existing messages
         const isNewMessageAdded = newMessages.some(
           (msg: IMessage) =>
             msg.senderId === user?._id ||
             (prev.length > 0 &&
-              msg?.createdAt !== undefined &&
-              prev[prev.length - 1]?.createdAt !== undefined &&
-              new Date(msg.createdAt) >
-                new Date(prev[prev.length - 1].createdAt as Date))
+              msg?.createdAt &&
+              prev[prev.length - 1]?.createdAt &&
+              new Date(msg.createdAt) > new Date(prev[prev.length - 1].createdAt as Date))
         );
 
         if (isInitialLoad) {
           setShouldScrollToBottom(true);
           return newMessages;
         } else {
-          // For real-time updates, add new messages to the end
-          const updatedMessages = [...prev];
-          newMessages.forEach((newMsg: IMessage) => {
-            const existingIndex = updatedMessages.findIndex(
-              (msg) => msg._id === newMsg._id
-            );
-            if (existingIndex === -1) {
-              updatedMessages.push(newMsg);
-            }
-          });
+          const updatedMessages = [...prev, ...newMessages].filter(
+            (msg, index, self) =>
+              index === self.findIndex((m) => m._id === msg._id)
+          );
 
-          // Sort by createdAt to maintain order
           updatedMessages.sort(
             (a, b) =>
-              new Date(a?.createdAt as Date).getTime() -
-              new Date(b?.createdAt as Date).getTime()
+              new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
           );
 
           if (isNewMessageAdded) {
             setShouldScrollToBottom(true);
+          } else {
+            setShouldScrollToBottom(false); // Avoid auto-scroll for old messages
           }
 
           return updatedMessages;
@@ -172,10 +164,11 @@ const MessageBody = () => {
           return prev;
         }
 
-        // Add older messages to the beginning
-        const updatedMessages = [...newMessages, ...prev];
+        const updatedMessages = [...newMessages, ...prev].filter(
+          (msg, index, self) =>
+            index === self.findIndex((m) => m._id === msg._id)
+        );
 
-        // Sort by createdAt to maintain order
         updatedMessages.sort(
           (a, b) =>
             new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
@@ -301,8 +294,6 @@ const MessageBody = () => {
         if (inputField) {
           inputField.focus();
         }
-
-        setShouldScrollToBottom(false);
       }, 100);
       return () => clearTimeout(timeoutId);
     }
@@ -322,10 +313,10 @@ const MessageBody = () => {
     (messagesLoading && currentPage > 1);
 
   return (
-    <div className="w-full relative h-[calc(85vh-200px)]">
+    <div className="w-full relative h-[calc(85vh-200px)] ">
       <div
         ref={scrollRef}
-        className="w-full h-full overflow-y-auto p-4 space-y-5 messages-box"
+        className="w-full h-full overflow-x-hidden overflow-y-auto p-4 space-y-5 messages-box"
         style={{ scrollBehavior: "smooth" }}
       >
         {/* Loading indicator at top */}
@@ -398,7 +389,7 @@ const MessageBody = () => {
         <Lightbox
           open={lightboxOpen}
           close={() => setLightboxOpen(false)}
-          slides={lightboxImages.map((url) => ({ src: `${url}` }))}
+          slides={lightboxImages.map((url) => ({ src: url }))}
         />
       )}
     </div>

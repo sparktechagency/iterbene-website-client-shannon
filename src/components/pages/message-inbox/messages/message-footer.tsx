@@ -255,9 +255,8 @@ const MessageFooter = () => {
 
       {/* Message Input Area */}
       <div
-        className={`px-4 py-1.5 border border-[#CAD1CF] flex items-center space-x-2 ${
-          message?.length > 0 ? "rounded-2xl" : "rounded-full"
-        }`}
+        className={`px-4 py-1.5 border border-[#CAD1CF] flex items-center space-x-2 ${message?.length > 0 ? "rounded-2xl" : "rounded-full"
+          }`}
       >
         {/* Hidden file inputs */}
         <input
@@ -305,14 +304,13 @@ const MessageFooter = () => {
           // placeholder={hasOnlyNonImageAttachments ? "You can't send documents and texts at the same time" : "Type a message..."}
           placeholder="Type a message..."
           value={hasOnlyNonImageAttachments ? "" : message}
-          onChange={hasOnlyNonImageAttachments ? () => {} : handleChange}
-          onKeyPress={hasOnlyNonImageAttachments ? () => {} : handleKeyPress}
+          onChange={hasOnlyNonImageAttachments ? () => { } : handleChange}
+          onKeyPress={hasOnlyNonImageAttachments ? () => { } : handleKeyPress}
           rows={1}
-          className={`w-full p-2 focus:outline-none resize-none overflow-hidden ${
-            hasOnlyNonImageAttachments
+          className={`w-full p-2 focus:outline-none resize-none overflow-hidden ${hasOnlyNonImageAttachments
               ? "text-gray-800 placeholder-gray-500 cursor-not-allowed "
               : "text-gray-800 placeholder-gray-500"
-          }`}
+            }`}
           style={{
             minHeight: "30px",
             maxHeight: "120px",
