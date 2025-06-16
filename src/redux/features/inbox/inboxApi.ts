@@ -165,7 +165,6 @@ const inboxApi = baseApi.injectEndpoints({
               getMessagesKey.replace("getMessages(", "").replace(")", "")
             ) || {};
 
-          console.log("Active message query args:", activeMessageQueryArgs);
           dispatch(
             inboxApi.util.updateQueryData(
               "getMessages",
@@ -173,6 +172,7 @@ const inboxApi = baseApi.injectEndpoints({
               (draft) => {
                 if (!draft?.data?.attributes?.results) return;
                 draft.data.attributes.results.push(newMessage);
+                console.log("PUSHED NEW MESSAGE", newMessage);
               }
             )
           );
