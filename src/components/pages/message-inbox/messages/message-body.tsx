@@ -29,11 +29,14 @@ const MessageBody = () => {
 
   // Fetch messages
   const { data: responseData, isLoading: messagesLoading } =
-    useGetMessagesQuery(receiverId, {
-      refetchOnMountOrArgChange: true,
-      pollingInterval: 60000, // Poll every 1 minute
-      skip: !receiverId,
-    });
+    useGetMessagesQuery(
+      { receiverId },
+      {
+        refetchOnMountOrArgChange: true,
+        pollingInterval: 60000, // Poll every 1 minute
+        skip: !receiverId,
+      }
+    );
 
   const allMessages = useMemo(
     () => responseData?.data?.attributes?.results || [],
@@ -81,8 +84,10 @@ const MessageBody = () => {
           .sort() // Sort dates chronologically
           .map((dateKey) => {
             const messagesForDate = groupedMessages[dateKey];
-            console.log("Messages for date:", messagesForDate[0].createdAt);
-            const dateLabel = getDateGroupLabel(messagesForDate[0].createdAt as Date);
+
+            const dateLabel = getDateGroupLabel(
+              messagesForDate[0].createdAt as Date
+            );
 
             return (
               <div key={dateKey}>

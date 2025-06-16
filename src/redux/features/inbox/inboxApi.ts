@@ -93,10 +93,20 @@ const inboxApi = baseApi.injectEndpoints({
       query: (chatId) => `/chat/${chatId}`,
     }),
     getMessages: builder.query({
-      query: (receiverId) => ({
-        url: `/messages/${receiverId}`,
-        method: "GET",
-      }),
+      query: ({ receiverId, filters }) => {
+        const params = new URLSearchParams();
+        if (filters?.length > 0) {
+          filters?.forEach(
+            (filter: { key: string; value: string }) =>
+              filter?.value && params.append(filter?.key, filter?.value)
+          );
+        }
+        return {
+          url: `/messages/${receiverId}`,
+          method: "GET",
+          params,
+        };
+      },
       async onCacheEntryAdded(
         arg,
         { cacheDataLoaded, cacheEntryRemoved, updateCachedData }
