@@ -3,8 +3,8 @@ import Skeleton from "@/components/custom/custom-skeleton";
 const MessageLoadingSkeleton: React.FC = () => {
   return (
     <>
-      {Array.from({ length: 5 }).map((_, index) => {
-        const isMyMessage = index % 2 === 0; // Simulating sender/receiver alternation
+      {Array.from({ length: 7 }).map((_, index) => {
+        const isMyMessage = index % 2 === 1; // Simulating sender/receiver alternation
         return (
           <div
             key={index}
@@ -22,7 +22,7 @@ const MessageLoadingSkeleton: React.FC = () => {
             )}
 
             {/* Message Content */}
-            <Skeleton width="200px" height="30px" className="rounded-xl" />
+            <Skeleton width="200px" height="55px" className="rounded-xl" />
           </div>
         );
       })}

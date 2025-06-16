@@ -170,9 +170,9 @@ const inboxApi = baseApi.injectEndpoints({
               "getMessages",
               activeMessageQueryArgs,
               (draft) => {
+                console.log("Draft:", JSON.stringify(draft));
                 if (!draft?.data?.attributes?.results) return;
                 draft.data.attributes.results.push(newMessage);
-                console.log("PUSHED NEW MESSAGE", newMessage);
               }
             )
           );

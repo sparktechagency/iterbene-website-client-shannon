@@ -68,9 +68,9 @@ const ChatCard = ({ chat }: ChatListCardProps) => {
             <Image
               src={receiverDetails?.profileImage}
               alt={receiverDetails?.username || "User"}
-              width={55}
-              height={55}
-              className="size-[55px] rounded-full object-cover flex-shrink-0"
+              width={50}
+              height={50}
+              className="size-[50px] rounded-full object-cover flex-shrink-0"
             />
           )}
 

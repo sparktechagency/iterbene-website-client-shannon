@@ -9,7 +9,7 @@ export const getDateGroupLabel = (date: string | Date): string => {
   
   // Today - show time as well
   if (messageDate.isSame(today, 'day')) {
-    return `Today ${messageDate.format('h:mm A')}`; // Today 2:30 PM
+    return `Today`; // Today 2:30 PM
   }
   
   // Yesterday
