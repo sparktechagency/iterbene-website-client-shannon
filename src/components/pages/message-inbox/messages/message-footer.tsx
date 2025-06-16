@@ -6,12 +6,13 @@ import { useParams } from "next/navigation";
 import Image from "next/image";
 import { TError } from "@/types/error";
 import toast from "react-hot-toast";
+import { CgSpinner } from "react-icons/cg";
 
 interface SelectedFile {
   file: File;
   preview?: string; // Optional for non-image files
   id: string;
-  type: 'image' | 'file';
+  type: "image" | "file";
 }
 
 const MessageFooter = () => {
@@ -50,7 +51,7 @@ const MessageFooter = () => {
             file,
             preview: event.target?.result as string,
             id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
-            type: 'image'
+            type: "image",
           };
 
           setSelectedFiles((prev) => [...prev, newFile]);
@@ -81,7 +82,7 @@ const MessageFooter = () => {
       const newFile: SelectedFile = {
         file,
         id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
-        type: 'file'
+        type: "file",
       };
 
       // If it's an image, add preview
@@ -89,7 +90,7 @@ const MessageFooter = () => {
         const reader = new FileReader();
         reader.onload = (event) => {
           newFile.preview = event.target?.result as string;
-          newFile.type = 'image';
+          newFile.type = "image";
           setSelectedFiles((prev) => [...prev, newFile]);
         };
         reader.readAsDataURL(file);
@@ -129,21 +130,22 @@ const MessageFooter = () => {
 
   // Format file size
   const formatFileSize = (bytes: number) => {
-    if (bytes === 0) return '0 Bytes';
+    if (bytes === 0) return "0 Bytes";
     const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const sizes = ["Bytes", "KB", "MB", "GB"];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
   };
 
   // Get file extension
   const getFileExtension = (filename: string) => {
-    return filename.split('.').pop()?.toUpperCase() || '';
+    return filename.split(".").pop()?.toUpperCase() || "";
   };
 
   // Check if there are ONLY non-image attachments (no images at all)
-  const hasOnlyNonImageAttachments = selectedFiles.length > 0 && 
-    selectedFiles.every(file => !file.file.type.startsWith("image/"));
+  const hasOnlyNonImageAttachments =
+    selectedFiles.length > 0 &&
+    selectedFiles.every((file) => !file.file.type.startsWith("image/"));
 
   // Handle send message
   const handleSendMessage = async () => {
@@ -151,7 +153,7 @@ const MessageFooter = () => {
     if (isLoading) return;
 
     const formData = new FormData();
-    
+
     // Send message text normally, unless there are only non-image attachments
     if (!hasOnlyNonImageAttachments) {
       formData.append("message", message);
@@ -159,7 +161,7 @@ const MessageFooter = () => {
       // For only non-image attachments, send empty message
       formData.append("message", "");
     }
-    
+
     formData.append("receiverId", receiverId as string);
 
     // Add files to form data
@@ -202,7 +204,7 @@ const MessageFooter = () => {
           >
             {selectedFiles?.map((selectedFile) => (
               <div key={selectedFile.id} className="relative flex-shrink-0">
-                {selectedFile.type === 'image' && selectedFile.preview ? (
+                {selectedFile.type === "image" && selectedFile.preview ? (
                   // Image preview
                   <div className="relative">
                     <Image
@@ -223,13 +225,17 @@ const MessageFooter = () => {
                   // File preview
                   <div className="relative bg-gray-100 rounded-lg p-2 w-32 border">
                     <div className="flex items-center space-x-2">
-                      <FileText size={16} className="text-gray-600 flex-shrink-0" />
+                      <FileText
+                        size={16}
+                        className="text-gray-600 flex-shrink-0"
+                      />
                       <div className="flex-1 min-w-0">
                         <p className="text-xs text-gray-800 truncate font-medium">
                           {selectedFile.file.name}
                         </p>
                         <p className="text-xs text-gray-500">
-                          {getFileExtension(selectedFile.file.name)} • {formatFileSize(selectedFile.file.size)}
+                          {getFileExtension(selectedFile.file.name)} •{" "}
+                          {formatFileSize(selectedFile.file.size)}
                         </p>
                       </div>
                     </div>
@@ -258,7 +264,7 @@ const MessageFooter = () => {
           type="file"
           ref={fileInputRef}
           onChange={handleFileSelect}
-        //  only can accept pdf
+          //  only can accept pdf
           accept="application/pdf"
           multiple
           className="hidden"
@@ -281,7 +287,7 @@ const MessageFooter = () => {
         >
           <Paperclip size={20} />
         </button>
-        
+
         {/* Camera button (images only) */}
         <button
           onClick={handleCameraClick}
@@ -303,8 +309,8 @@ const MessageFooter = () => {
           onKeyPress={hasOnlyNonImageAttachments ? () => {} : handleKeyPress}
           rows={1}
           className={`w-full p-2 focus:outline-none resize-none overflow-hidden ${
-            hasOnlyNonImageAttachments 
-              ? "text-gray-800 placeholder-gray-500 cursor-not-allowed " 
+            hasOnlyNonImageAttachments
+              ? "text-gray-800 placeholder-gray-500 cursor-not-allowed "
               : "text-gray-800 placeholder-gray-500"
           }`}
           style={{
@@ -316,17 +322,21 @@ const MessageFooter = () => {
         />
 
         {/* Send button */}
-        <button
-          onClick={handleSendMessage}
-          disabled={
-            isLoading || 
-            (!message.trim() && selectedFiles.length === 0) ||
-            (hasOnlyNonImageAttachments && selectedFiles.length === 0)
-          }
-          className="size-9 cursor-pointer flex justify-center items-center rounded-full flex-shrink-0 text-gray-500 hover:text-gray-700 border border-[#CAD1CF] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          <Send size={20} />
-        </button>
+        {isLoading ? (
+          <CgSpinner className="animate-spin size-9 text-primary" />
+        ) : (
+          <button
+            onClick={handleSendMessage}
+            disabled={
+              isLoading ||
+              (!message.trim() && selectedFiles.length === 0) ||
+              (hasOnlyNonImageAttachments && selectedFiles.length === 0)
+            }
+            className="size-9 cursor-pointer flex justify-center items-center rounded-full flex-shrink-0 text-gray-500 hover:text-gray-700 border border-[#CAD1CF] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <Send size={20} />
+          </button>
+        )}
       </div>
     </div>
   );
