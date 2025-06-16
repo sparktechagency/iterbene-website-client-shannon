@@ -115,9 +115,7 @@ const inboxApi = baseApi.injectEndpoints({
           await cacheDataLoaded;
           const messageEvent = "new-message";
           const handleNewMessage = (newMessageData: { data: IMessage }) => {
-            console.log("New message data:", newMessageData);
             const newMessage = newMessageData.data;
-            console.log("New message:", newMessage);
             updateCachedData((draft) => {
               if (!draft?.data?.attributes?.results) return;
               draft.data.attributes.results.push(newMessage);
@@ -152,17 +150,26 @@ const inboxApi = baseApi.injectEndpoints({
           const newMessage = responseData.data.attributes;
           const cacheKeys = Object.keys(getState().baseApi.queries);
           const getChatsKey = cacheKeys.find((key) => key.includes("getChats"));
+          const getMessagesKey = cacheKeys.find((key) =>
+            key.includes("getMessages")
+          );
 
-          if (!getChatsKey) return;
+          if (!getChatsKey || !getMessagesKey) return;
 
-          const activeQueryArgs =
+          const activeChatQueryArgs =
             JSON.parse(getChatsKey.replace("getChats(", "").replace(")", "")) ||
             {};
 
+          const activeMessageQueryArgs =
+            JSON.parse(
+              getMessagesKey.replace("getMessages(", "").replace(")", "")
+            ) || {};
+
+          console.log("Active message query args:", activeMessageQueryArgs);
           dispatch(
             inboxApi.util.updateQueryData(
               "getMessages",
-              messageData.receiverId,
+              activeMessageQueryArgs,
               (draft) => {
                 if (!draft?.data?.attributes?.results) return;
                 draft.data.attributes.results.push(newMessage);
@@ -173,7 +180,7 @@ const inboxApi = baseApi.injectEndpoints({
           dispatch(
             inboxApi.util.updateQueryData(
               "getChats",
-              activeQueryArgs,
+              activeChatQueryArgs,
               (draft) => {
                 if (!draft?.data?.attributes?.results) return;
                 const chatToUpdate = draft.data.attributes.results.find(

@@ -30,7 +30,13 @@ const MessageBody = () => {
   // Fetch messages
   const { data: responseData, isLoading: messagesLoading } =
     useGetMessagesQuery(
-      { receiverId },
+      {
+        receiverId,
+        filters: [
+          { key: "page", value: 1 },
+          { key: "limit", value: 10 },
+        ],
+      },
       {
         refetchOnMountOrArgChange: true,
         pollingInterval: 60000, // Poll every 1 minute
@@ -81,19 +87,16 @@ const MessageBody = () => {
         <MessageLoadingSkeleton />
       ) : (
         Object.keys(groupedMessages)
-          .sort() // Sort dates chronologically
+          .sort()
           .map((dateKey) => {
             const messagesForDate = groupedMessages[dateKey];
-
             const dateLabel = getDateGroupLabel(
               messagesForDate[0].createdAt as Date
             );
-
             return (
-              <div key={dateKey}>
+              <div key={dateKey}> 
                 {/* Date Separator */}
                 <DateSeparator label={dateLabel} />
-
                 {/* Messages for this date */}
                 <div className="space-y-3">
                   {messagesForDate.map((message: IMessage) => {
