@@ -170,7 +170,6 @@ const inboxApi = baseApi.injectEndpoints({
               "getMessages",
               activeMessageQueryArgs,
               (draft) => {
-                console.log("Draft:", JSON.stringify(draft));
                 if (!draft?.data?.attributes?.results) return;
                 draft.data.attributes.results.push(newMessage);
               }
@@ -182,8 +181,9 @@ const inboxApi = baseApi.injectEndpoints({
               "getChats",
               activeChatQueryArgs,
               (draft) => {
+                console.log("Draft Chat:", JSON.parse(JSON.stringify(draft)));
                 if (!draft?.data?.attributes?.results) return;
-                const chatToUpdate = draft.data.attributes.results.find(
+                const chatToUpdate = draft?.data?.attributes?.results?.find(
                   (chat: IChat) => chat._id === newMessage.chatId
                 );
                 if (chatToUpdate) {
@@ -192,6 +192,7 @@ const inboxApi = baseApi.injectEndpoints({
                   draft.data.attributes.results = [
                     ...draft.data.attributes.results,
                   ];
+                  console.log("UPDATED CHAT:", JSON.parse(JSON.stringify(draft.data.attributes.results)));
                 }
               }
             )
