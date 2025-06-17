@@ -1,8 +1,23 @@
+"use client";
 import Header from "@/components/common/header";
 import Chats from "@/components/pages/message-inbox/chats/chats";
-import React from "react";
+import useUser from "@/hooks/useUser";
+import { useSocket } from "@/lib/socket";
+import { useEffect } from "react";
 
-const layout = ({ children }: { children: React.ReactNode }) => {
+const Layout = ({ children }: { children: React.ReactNode }) => {
+  const user = useUser();
+  const { socket } = useSocket();
+
+  useEffect(() => {
+    if (socket && user?._id) {
+      socket.emit("user/connectInMessageBox", { userId: user?._id });
+      return () => {
+        socket.emit("user/disconnectInMessageBox", { userId: user?._id });
+      };
+    }
+  }, [socket, user]);
+
   return (
     <section className="w-full">
       <Header />
@@ -18,4 +33,4 @@ const layout = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
-export default layout;
+export default Layout;

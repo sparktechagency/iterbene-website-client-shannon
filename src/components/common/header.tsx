@@ -404,7 +404,6 @@ const Header: React.FC = () => {
 
   // socket
   const { socket } = useSocket();
-
   useEffect(() => {
        if (socket && user?._id) {
       socket.emit("user/connect", { userId: user?._id });

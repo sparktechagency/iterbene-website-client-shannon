@@ -1,14 +1,64 @@
+
+"use client";
+import { useGetAllNotificationsQuery, useViewSingleNotificationMutation } from "@/redux/features/notifications/notificationsApi";
+import { INotification } from "@/types/notification.types";
 import { IUser } from "@/types/user.types";
 import { AnimatePresence, motion } from "framer-motion";
+import moment from "moment";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { useEffect, useRef } from "react";
+
 interface DropdownProps {
   user?: IUser;
   isOpen: boolean;
 }
+
 const MessagesDropdown: React.FC<DropdownProps> = ({ isOpen }) => {
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
+  const [viewSingleNotification] = useViewSingleNotificationMutation();
 
+  // Get all message notifications
+  const { data: responseData, isLoading: isNotificationsLoading } = useGetAllNotificationsQuery([
+    {
+      key: "page",
+      value: 1,
+    },
+    {
+      key: "limit",
+      value: 10,
+    },
+    {
+      key: "type",
+      value: "message",
+    },
+  ]);
+
+  const messagesNotifications = responseData?.data?.attributes?.results || [];
+
+  // Handle click on notification card
+  const handleNotificationClick = async (notification: INotification) => {
+    if (!notification._id) return;
+
+    try {
+      // Call viewSingleNotification API
+      const response = await viewSingleNotification(notification._id).unwrap();
+      if (response) {
+        // Navigate to /messages/[senderId]
+        // Assuming senderId is stored in notification.linkId or can be derived
+        const senderId = notification.linkId || notification.receiverId; // Adjust based on your schema
+        if (senderId) {
+          router.push(`/messages/${senderId}`);
+        }
+      }
+    } catch (error) {
+      console.error("Error viewing notification:", error);
+      // Optionally show an error toast
+    }
+  };
+
+  // Prevent dropdown from closing when clicking inside
   useEffect(() => {
     const handleClickInside = (event: MouseEvent) => {
       event.stopPropagation();
@@ -39,38 +89,49 @@ const MessagesDropdown: React.FC<DropdownProps> = ({ isOpen }) => {
         >
           <div className="flex justify-between items-center mb-2">
             <h3 className="font-semibold text-lg">Messages</h3>
-            <button className="text-sm text-primary">Mark all as read</button>
+            {/* <button className="text-sm text-primary">Mark all as read</button> */}
           </div>
           <div className="space-y-3 max-h-80 overflow-y-auto">
-            {Array(4)
-              .fill(null)
-              .map((_, index) => (
+            {isNotificationsLoading ? (
+              <div className="text-center text-gray-500">Loading notifications...</div>
+            ) : messagesNotifications.length === 0 ? (
+              <div className="text-center text-gray-500">No message notifications</div>
+            ) : (
+              messagesNotifications.map((notification: INotification, index: number) => (
                 <div
-                  key={index}
-                  className="text-gray-800 hover:bg-[#ECFCFA] px-4 py-3 rounded-xl flex items-center gap-4"
+                  key={notification._id?.toString() || index}
+                  onClick={() => handleNotificationClick(notification)}
+                  className="text-gray-800 hover:bg-[#ECFCFA] px-4 py-3 rounded-xl cursor-pointer flex items-center gap-4"
                 >
-                  <Image
-                    src="https://i.ibb.co.com/hFTPRsW0/0de9d1146da18068833210d399cd593e.jpg"
-                    width={60}
-                    height={60}
-                    className="size-14 rounded-full flex-shrink-0"
-                    alt="user"
-                  />
+                  {notification?.image && (
+                    <Image
+                      src={notification.image}
+                      width={60}
+                      height={60}
+                      className="size-14 rounded-full flex-shrink-0"
+                      alt="user"
+                    />
+                  )}
                   <div className="flex-1 min-w-0">
-                    <h1 className="font-medium truncate">
-                      <span className="font-semibold">Alexandra Broke</span>{" "}
-                      send you <span className="font-semibold">Message</span>
-                    </h1>
-                    <p className="text-sm text-gray-500">1 min ago</p>
+                    <h1 className="font-medium truncate">{notification?.title}</h1>
+                    <p className="text-sm text-gray-500">
+                      {moment(notification?.createdAt).fromNow()}
+                    </p>
                   </div>
-                  <div className="flex-shrink-0">
-                    <span className="w-3 h-3 bg-primary rounded-full block"></span>
-                  </div>
+                  {!notification.viewStatus && (
+                    <div className="flex-shrink-0">
+                      <span className="w-3 h-3 bg-primary rounded-full block"></span>
+                    </div>
+                  )}
                 </div>
-              ))}
+              ))
+            )}
           </div>
           <div className="mt-3 border-t border-[#E2E8F0] pt-5 flex justify-center items-center">
-            <h1 className="text-primary text-sm cursor-pointer">
+            <h1
+              className="text-primary text-sm cursor-pointer"
+              onClick={() => router.push("/messages")}
+            >
               View all messages
             </h1>
           </div>
@@ -79,4 +140,5 @@ const MessagesDropdown: React.FC<DropdownProps> = ({ isOpen }) => {
     </AnimatePresence>
   );
 };
+
 export default MessagesDropdown;

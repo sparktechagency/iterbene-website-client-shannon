@@ -80,6 +80,7 @@ export const baseApi = createApi({
     "Post",
     "Hashtag",
     "Connections",
+    "Notifications",
   ],
   endpoints: () => ({}),
 });
