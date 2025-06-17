@@ -562,7 +562,6 @@ const Header: React.FC = () => {
     result: IUser | IHashtag | ILocation,
     type: string
   ) => {
-    console.log("Clicked result:", result, "Type:", type);
 
     // Navigate based on result type
     switch (type) {
@@ -705,7 +704,7 @@ const Header: React.FC = () => {
               >
                 <BsChatSquareDots size={24} />
               </motion.button>
-              <MessagesDropdown isOpen={isMessagesOpen} />
+              <MessagesDropdown isOpen={isMessagesOpen} user={user} />
             </div>
 
             <div ref={notificationsRef}>

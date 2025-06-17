@@ -6,8 +6,6 @@ import CustomSelectField from "@/components/custom/custom-seletectField";
 const MyConnectionsPage = () => {
   const [activeTab, setActiveTab] = useState<string>("My Connections");
   const [sortBy, setSortBy] = useState<string>("");
-
-  console.log(sortBy);
   return (
     <section className="w-full pb-20">
       {/* Tabs */}

@@ -11,7 +11,6 @@ const EventDetails = () => {
     skip: !eventId,
   });
   const eventDetailsData = responseData?.data?.attributes;
-  console.log("Event Details Data:", eventDetailsData);
   return (
     <>
       <EventDetailsHeader eventDetailsData={eventDetailsData} />

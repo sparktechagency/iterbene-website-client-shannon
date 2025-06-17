@@ -69,7 +69,6 @@ const CustomVideoPlayer: React.FC<VideoPlayerProps> = ({ url }) => {
 
     // Sometimes, the metadata might already be loaded before the event listener is added
     if (video.readyState >= 1) {
-      console.log("Metadata already loaded, setting duration directly");
       handleLoadedMetadata();
     }
 

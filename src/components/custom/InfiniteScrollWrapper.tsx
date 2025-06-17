@@ -101,9 +101,6 @@ const InfiniteScrollWrapper = <T,>({
     );
   }
 
-
-  console.log("Items to display:", items);
-  console.log("Has more:", hasMore);
   return (
     <InfiniteScroll
       className="w-full z-10 !overflow-visible"

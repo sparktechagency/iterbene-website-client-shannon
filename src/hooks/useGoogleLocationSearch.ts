@@ -182,8 +182,6 @@ export const useGoogleLocationSearch = (
         setIsInitialized(true);
         setError(null);
 
-        console.log("Google Maps services initialized successfully");
-
         // Mark that we should execute default query
         if (defaultQuery && defaultQuery.length >= minQueryLength) {
           shouldExecuteDefaultQuery.current = true;
@@ -232,9 +230,6 @@ export const useGoogleLocationSearch = (
         const retryDelay = Math.min(
           1000 * Math.pow(2, initAttempts.current - 1),
           8000
-        );
-        console.log(
-          `Retrying Google Maps initialization in ${retryDelay}ms (attempt ${initAttempts.current}/${maxInitAttempts})`
         );
 
         setTimeout(() => {

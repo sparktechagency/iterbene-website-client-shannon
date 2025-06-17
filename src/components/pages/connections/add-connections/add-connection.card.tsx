@@ -51,8 +51,6 @@ const AddConnectionCard = ({ connection }: { connection: IConnection }) => {
       toast.error(err?.data?.message || "Something went wrong!");
     }
   };
-
-  console.log("Check Sent Connection Exist:", responseData);
   return (
     <div className="w-full h-fit bg-white rounded-2xl  p-4 flex flex-col items-center">
       {/* Profile Image */}

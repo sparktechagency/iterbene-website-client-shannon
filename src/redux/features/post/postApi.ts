@@ -40,8 +40,6 @@ const postApi = baseApi.injectEndpoints({
     feedPosts: builder.query({
       query: (filters) => {
         const params = new URLSearchParams();
-
-        console.log("Filters:", filters);
         if (filters?.length > 0) {
           filters?.forEach((filter: { key: string; value: string }) =>
             params.append(filter.key, filter.value)

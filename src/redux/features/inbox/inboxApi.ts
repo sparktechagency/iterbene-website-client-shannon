@@ -236,10 +236,6 @@ const inboxApi = baseApi.injectEndpoints({
                     if (!draft?.data?.attributes?.results) {
                       draft.data = { attributes: { results: [] } };
                     }
-                    console.log(
-                      "Draft data",
-                      JSON.parse(JSON.stringify(draft))
-                    );
                     const normalizedReceiverId = receiverId;
                     const chatToUpdate = draft.data.attributes.results.find(
                       (chat: IChat) =>
@@ -259,17 +255,12 @@ const inboxApi = baseApi.injectEndpoints({
                     if (chatToUpdate) {
                       chatToUpdate.lastMessage = newMessage;
                       chatToUpdate.updatedAt = newMessage.createdAt;
-                      console.log("Pushing message to chat", chatToUpdate);
                       draft.data.attributes.results = [
                         chatToUpdate,
                         ...draft.data.attributes.results.filter(
                           (chat: IChat) => chat._id !== chatToUpdate._id
                         ),
                       ];
-                      console.log(
-                        "UPDATED DRAFT DATA",
-                        JSON.parse(JSON.stringify(chatToUpdate))
-                      );
                     } else {
                       const newChat: IChat = {
                         _id: chatId,

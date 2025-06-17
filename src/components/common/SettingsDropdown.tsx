@@ -7,8 +7,6 @@ interface DropdownProps {
   isOpen: boolean;
 }
 const SettingsDropdown: React.FC<DropdownProps> = ({ isOpen }) => {
-
-  console.log("Setting Open", isOpen);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {

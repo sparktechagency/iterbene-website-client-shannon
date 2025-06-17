@@ -6,8 +6,6 @@ const SuggestionEvent = () => {
   const { data: responseData, isLoading } =
     useGetSuggestionsEventsQuery(undefined);
   const suggestionsEvent = responseData?.data?.attributes?.results;
-
-  console.log(responseData);
   let content = null;
   if (isLoading) {
     content = <p>Loading...</p>;

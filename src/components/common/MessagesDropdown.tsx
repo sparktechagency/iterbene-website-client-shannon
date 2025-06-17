@@ -1,62 +1,88 @@
-
 "use client";
-import { useGetAllNotificationsQuery, useViewSingleNotificationMutation } from "@/redux/features/notifications/notificationsApi";
+import { useSocket } from "@/lib/socket";
+import {
+  useGetAllNotificationsQuery,
+  useViewSingleNotificationMutation,
+} from "@/redux/features/notifications/notificationsApi";
 import { INotification } from "@/types/notification.types";
 import { IUser } from "@/types/user.types";
 import { AnimatePresence, motion } from "framer-motion";
 import moment from "moment";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import toast from "react-hot-toast";
 
 interface DropdownProps {
   user?: IUser;
   isOpen: boolean;
 }
 
-const MessagesDropdown: React.FC<DropdownProps> = ({ isOpen }) => {
+const MessagesDropdown: React.FC<DropdownProps> = ({ isOpen, user }) => {
+  const { socket } = useSocket();
   const dropdownRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const [viewSingleNotification] = useViewSingleNotificationMutation();
 
   // Get all message notifications
-  const { data: responseData, isLoading: isNotificationsLoading } = useGetAllNotificationsQuery([
-    {
-      key: "page",
-      value: 1,
-    },
-    {
-      key: "limit",
-      value: 10,
-    },
-    {
-      key: "type",
-      value: "message",
-    },
-  ]);
+  const { data: responseData, isLoading: isNotificationsLoading, refetch } =
+    useGetAllNotificationsQuery([
+      { key: "page", value: 1 },
+      { key: "limit", value: 10 },
+      { key: "type", value: "message" },
+    ]);
 
-  const messagesNotifications = responseData?.data?.attributes?.results || [];
+  // Local state to manage notifications
+  const [localNotifications, setLocalNotifications] = useState<INotification[]>(
+    responseData?.data?.attributes?.results || []
+  );
+
+  // Sync local state with fetched data
+  useEffect(() => {
+    if (responseData?.data?.attributes?.results) {
+      setLocalNotifications(responseData.data.attributes.results);
+    }
+  }, [responseData]);
 
   // Handle click on notification card
   const handleNotificationClick = async (notification: INotification) => {
     if (!notification._id) return;
 
     try {
-      // Call viewSingleNotification API
       const response = await viewSingleNotification(notification._id).unwrap();
       if (response) {
-        // Navigate to /messages/[senderId]
-        // Assuming senderId is stored in notification.linkId or can be derived
-        const senderId = notification.linkId || notification.receiverId; // Adjust based on your schema
+        const senderId = notification.linkId || notification.receiverId;
         if (senderId) {
           router.push(`/messages/${senderId}`);
         }
       }
     } catch (error) {
       console.error("Error viewing notification:", error);
-      // Optionally show an error toast
     }
   };
+
+  // Handle socket notifications
+  useEffect(() => {
+    if (socket && user?._id) {
+      const notificationEvent = `notification::${user._id}`;
+      const handleNotification = (notificationData: { data: INotification }) => {
+        const notification = notificationData.data;
+        if (notification.type === "message") {
+          // Add new notification to local state
+          setLocalNotifications((prev) => [notification, ...prev]);
+          toast.success(notification?.title);
+          // Optionally trigger refetch to sync with server
+          refetch();
+        }
+      };
+
+      socket.on(notificationEvent, handleNotification);
+
+      return () => {
+        socket.off(notificationEvent, handleNotification);
+      };
+    }
+  }, [socket, user, refetch]);
 
   // Prevent dropdown from closing when clicking inside
   useEffect(() => {
@@ -89,15 +115,18 @@ const MessagesDropdown: React.FC<DropdownProps> = ({ isOpen }) => {
         >
           <div className="flex justify-between items-center mb-2">
             <h3 className="font-semibold text-lg">Messages</h3>
-            {/* <button className="text-sm text-primary">Mark all as read</button> */}
           </div>
           <div className="space-y-3 max-h-80 overflow-y-auto">
             {isNotificationsLoading ? (
-              <div className="text-center text-gray-500">Loading notifications...</div>
-            ) : messagesNotifications.length === 0 ? (
-              <div className="text-center text-gray-500">No message notifications</div>
+              <div className="text-center text-gray-500">
+                Loading notifications...
+              </div>
+            ) : localNotifications.length === 0 ? (
+              <div className="text-center text-gray-500">
+                No message notifications
+              </div>
             ) : (
-              messagesNotifications.map((notification: INotification, index: number) => (
+              localNotifications.map((notification: INotification, index: number) => (
                 <div
                   key={notification._id?.toString() || index}
                   onClick={() => handleNotificationClick(notification)}

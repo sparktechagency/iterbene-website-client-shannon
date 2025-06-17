@@ -325,8 +325,6 @@ const CreatePost = () => {
     setLocationQuery(defaultLocation);
     searchLocations(defaultLocation); // Trigger search with default value
   };
-
-  console.log("Itinerary:", itinerary);
   return (
     <section className="w-full bg-white rounded-xl">
       {/* Post Input Section */}

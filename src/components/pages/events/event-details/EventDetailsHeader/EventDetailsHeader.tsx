@@ -66,8 +66,6 @@ const EventDetailsHeader = ({
   const closeInviteModal = () => {
     setIsInviteModalOpen(false);
   };
-
-  console.log("isInterested Users:", isInterested);
   return (
     <>
       <div className="w-full bg-white rounded-xl relative">

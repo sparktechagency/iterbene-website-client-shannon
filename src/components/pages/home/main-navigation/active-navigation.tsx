@@ -10,7 +10,6 @@ interface ActiveNavigationProps {
 const ActiveNavigation = ({ navLink }: { navLink: ActiveNavigationProps }) => {
   const pathName = usePathname();
   const isActive = pathName === navLink.href;
-  console.log(pathName, navLink.href);
   return (
     <Link
       href={navLink.href}
