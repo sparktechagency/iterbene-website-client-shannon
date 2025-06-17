@@ -19,12 +19,11 @@ const ChatCard = ({ chat }: ChatListCardProps) => {
   const myLastMessage = senderId === user?._id;
   const { receiverId } = useParams();
 
-  // Get the receiver user details
-  const receiverDetails: IUser | undefined = (
-    chat?.participants as IUser[]
-  )?.find((u: IUser) => u._id !== user?._id);
+  const receiverDetails: Partial<IUser> | undefined = chat?.participants.find(
+    (p: Partial<IUser> | string) =>
+      (typeof p === "string" ? p : p._id) !== user?._id
+  ) as Partial<IUser> | undefined;
 
-  /** 📌 Render Last Message Content */
   const renderMessageContent = () => {
     if (!content) return "";
 
@@ -38,17 +37,13 @@ const ChatCard = ({ chat }: ChatListCardProps) => {
       case MessageType.IMAGE:
         return myLastMessage ? "You sent a photo" : "sent a photo";
       case MessageType.AUDIO:
-        return myLastMessage
-          ? "You sent an audio message"
-          : "sent an audio message";
+        return myLastMessage ? "You sent an audio message" : "sent an audio message";
       case MessageType.VIDEO:
         return myLastMessage ? "You sent a video" : "sent a video";
       case MessageType.DOCUMENT:
         return myLastMessage ? "You sent a document" : "sent a document";
       case MessageType.MIXED:
-        return myLastMessage
-          ? "You sent a mixed message"
-          : "sent a mixed message";
+        return myLastMessage ? "You sent a mixed message" : "sent a mixed message";
       default:
         return "";
     }
@@ -57,7 +52,7 @@ const ChatCard = ({ chat }: ChatListCardProps) => {
   return (
     <Link href={`/messages/${receiverDetails?._id}`} className="block">
       <div
-        className={`w-full flex items-center justify-between p-4 border  rounded-2xl cursor-pointer ${
+        className={`w-full flex items-center justify-between p-4 border rounded-2xl cursor-pointer ${
           receiverDetails?._id === receiverId
             ? "bg-[#C4F5F0] border-[#C4F5F0]"
             : "bg-white border-[#CCC0DB]"
@@ -66,7 +61,7 @@ const ChatCard = ({ chat }: ChatListCardProps) => {
         <div className="flex items-center gap-3">
           {receiverDetails?.profileImage && (
             <Image
-              src={receiverDetails?.profileImage}
+              src={receiverDetails.profileImage}
               alt={receiverDetails?.username || "User"}
               width={50}
               height={50}
@@ -76,7 +71,7 @@ const ChatCard = ({ chat }: ChatListCardProps) => {
 
           <div>
             <h1 className="text-[18px] font-medium">
-              {receiverDetails?.fullName}
+              {receiverDetails?.fullName || "Unknown User"}
             </h1>
             <p className="text-[14px] text-gray-600">{renderMessageContent()}</p>
           </div>

@@ -1,6 +1,6 @@
 import {
   useAddConnectionMutation,
-  useCancelConnectionMutation,
+  // useCancelConnectionMutation,
   useCheckIsSentConnectionExistsQuery,
   useRemoveSuggestionConnectionMutation,
 } from "@/redux/features/connections/connectionsApi";
@@ -18,9 +18,9 @@ const AddConnectionCard = ({ connection }: { connection: IConnection }) => {
   );
   const [addConnection] = useAddConnectionMutation();
   const [removeConnection] = useRemoveSuggestionConnectionMutation();
-  const [cancelRequest] = useCancelConnectionMutation();
-  const result = responseData?.data?.attributes;
-  const checkSentConnectionExist = result?.status === "pending";
+  // const [cancelRequest] = useCancelConnectionMutation();
+  // const result = responseData?.data?.attributes;
+  // const checkSentConnectionExist = result?.status === "pending";
 
   const handleAddConnection = async () => {
     try {
@@ -32,15 +32,15 @@ const AddConnectionCard = ({ connection }: { connection: IConnection }) => {
       toast.error(err?.data?.message || "Something went wrong!");
     }
   };
-  const handleCancelRequest = async () => {
-    try {
-      await cancelRequest(connection?._id).unwrap();
-      toast.success("Request canceled successfully!");
-    } catch (error) {
-      const err = error as TError;
-      toast.error(err?.data?.message || "Something went wrong!");
-    }
-  };
+  // const handleCancelRequest = async () => {
+  //   try {
+  //     await cancelRequest(connection?._id).unwrap();
+  //     toast.success("Request canceled successfully!");
+  //   } catch (error) {
+  //     const err = error as TError;
+  //     toast.error(err?.data?.message || "Something went wrong!");
+  //   }
+  // };
 
   const handleRemoveConnection = async () => {
     try {

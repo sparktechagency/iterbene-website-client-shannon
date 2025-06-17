@@ -69,7 +69,7 @@ const InvitationCard = ({ event }: UpcomingEventCardProps) => {
               <div className="bg-white rounded-full px-4 py-2 flex items-center gap-1">
                 <PiUserBold size={24} className="text-secondary" />
                 <span className="text-sm font-semibold text-gray-800">
-                  {event?.eventId.interestCount}
+                  {event?.eventId?.interestCount}
                 </span>
               </div>
             </div>

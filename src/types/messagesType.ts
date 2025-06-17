@@ -18,8 +18,10 @@ export interface IMessage {
   chatId: string | string;
   senderId: string;
   receiverId: {
+    _id: string;
     fullName: string;
     profileImage: string
+    email: string
   };
   content: IContent;
   seenBy?: string[];

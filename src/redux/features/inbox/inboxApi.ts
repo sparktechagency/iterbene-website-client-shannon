@@ -1,62 +1,21 @@
 import { socket } from "@/lib/socket";
 import { baseApi } from "../api/baseApi";
 import { IChat } from "@/types/chatTypes";
-import { TError } from "@/types/error";
 import { IMessage } from "@/types/messagesType";
+import { IUser } from "@/types/user.types";
 
 const inboxApi = baseApi.injectEndpoints({
   overrideExisting: true,
   endpoints: (builder) => ({
-    createChat: builder.mutation({
-      query: (data) => ({
-        url: "/chat",
-        method: "POST",
-        body: data,
-      }),
-      async onQueryStarted(arg, { dispatch, queryFulfilled, getState }) {
-        try {
-          const { data: responseData } = await queryFulfilled;
-          if (!responseData?.data?.attributes) return;
-          const newChat = responseData.data.attributes;
-
-          const cacheKeys = Object.keys(getState().baseApi.queries);
-          const getChatsKey = cacheKeys.find((key) => key.includes("getChats"));
-
-          if (!getChatsKey) return;
-
-          const activeQueryArgs =
-            JSON.parse(getChatsKey.replace("getChats(", "").replace(")", "")) ||
-            {};
-
-          dispatch(
-            inboxApi.util.updateQueryData(
-              "getChats",
-              activeQueryArgs,
-              (draft) => {
-                if (!draft?.data?.attributes?.results) return;
-                const alreadyExist = draft.data.attributes.results.find(
-                  (chat: IChat) => chat._id === newChat._id
-                );
-                if (!alreadyExist) {
-                  draft.data.attributes.results = [
-                    newChat,
-                    ...draft.data.attributes.results,
-                  ];
-                }
-              }
-            )
-          );
-        } catch (error) {
-          const err = error as TError;
-          console.log(err?.data?.message);
-        }
-      },
-    }),
     getChats: builder.query({
-      query: ({ page = 1, limit = 10 }) => {
+      query: (filters) => {
         const params = new URLSearchParams();
-        params.append("page", page.toString());
-        params.append("limit", limit.toString());
+        if (filters?.length > 0) {
+          filters.forEach(
+            (filter: { key: string; value: string }) =>
+              filter?.value && params.append(filter.key, filter.value)
+          );
+        }
         return { url: "/chats", method: "GET", params };
       },
       async onCacheEntryAdded(
@@ -67,14 +26,17 @@ const inboxApi = baseApi.injectEndpoints({
           await cacheDataLoaded;
           const chatEvent = "new-chat";
           const handleChat = (chatData: { data: IChat }) => {
-            const conversation = chatData.data;
             updateCachedData((draft) => {
-              if (!draft?.data?.attributes?.results) return;
+              if (!draft?.data?.attributes?.results) {
+                draft.data = { attributes: { results: [] } };
+              }
+              const conversation = chatData?.data;
               const existingChat = draft.data.attributes.results.find(
                 (chat: IChat) => chat._id === conversation._id
               );
               if (existingChat) {
                 existingChat.lastMessage = conversation.lastMessage;
+                existingChat.updatedAt = conversation.updatedAt;
               } else {
                 draft.data.attributes.results.unshift(conversation);
               }
@@ -84,8 +46,7 @@ const inboxApi = baseApi.injectEndpoints({
           await cacheEntryRemoved;
           socket.off(chatEvent, handleChat);
         } catch (error) {
-          const err = error as TError;
-          console.log(err?.data?.message);
+          console.error("Get chats socket error:", error);
         }
       },
     }),
@@ -96,9 +57,9 @@ const inboxApi = baseApi.injectEndpoints({
       query: ({ receiverId, filters }) => {
         const params = new URLSearchParams();
         if (filters?.length > 0) {
-          filters?.forEach(
+          filters.forEach(
             (filter: { key: string; value: string }) =>
-              filter?.value && params.append(filter?.key, filter?.value)
+              filter?.value && params.append(filter.key, filter.value)
           );
         }
         return {
@@ -116,17 +77,28 @@ const inboxApi = baseApi.injectEndpoints({
           const messageEvent = "new-message";
           const handleNewMessage = (newMessageData: { data: IMessage }) => {
             const newMessage = newMessageData.data;
-            updateCachedData((draft) => {
-              if (!draft?.data?.attributes?.results) return;
-              draft.data.attributes.results.push(newMessage);
-            });
+            if (
+              newMessage.receiverId?._id === arg.receiverId ||
+              newMessage.senderId === arg.receiverId
+            ) {
+              updateCachedData((draft) => {
+                if (!draft?.data?.attributes?.results) {
+                  draft.data = { attributes: { results: [] } };
+                }
+                const exists = draft.data.attributes.results.find(
+                  (msg: IMessage) => msg._id === newMessage._id
+                );
+                if (!exists) {
+                  draft.data.attributes.results.unshift(newMessage);
+                }
+              });
+            }
           };
           socket.on(messageEvent, handleNewMessage);
           await cacheEntryRemoved;
           socket.off(messageEvent, handleNewMessage);
         } catch (error) {
-          const err = error as TError;
-          console.log(err?.data?.message);
+          console.error("Get messages socket error:", error);
         }
       },
     }),
@@ -137,69 +109,191 @@ const inboxApi = baseApi.injectEndpoints({
         body: data,
       }),
       async onQueryStarted(arg, { dispatch, queryFulfilled, getState }) {
-        const messageData: Record<string, string | File> = {};
-        if (arg instanceof FormData) {
-          arg.forEach((value, key) => (messageData[key] = value));
-        } else {
-          Object.assign(messageData, arg);
-        }
-
         try {
-          const { data: responseData } = await queryFulfilled;
-          if (!responseData?.data?.attributes) return;
-          const newMessage = responseData.data.attributes;
           const cacheKeys = Object.keys(getState().baseApi.queries);
-          const getChatsKey = cacheKeys.find((key) => key.includes("getChats"));
-          const getMessagesKey = cacheKeys.find((key) =>
+          const getMyProfileKey = cacheKeys.find((key) =>
+            key.includes("getMyProfile")
+          );
+          let senderInfo: IUser | undefined;
+          if (getMyProfileKey) {
+            const profileQuery = getState().baseApi.queries[getMyProfileKey];
+            if (
+              profileQuery &&
+              typeof profileQuery === "object" &&
+              "data" in profileQuery &&
+              profileQuery.data &&
+              typeof profileQuery.data === "object" &&
+              "data" in profileQuery.data &&
+              profileQuery.data.data &&
+              typeof profileQuery.data.data === "object" &&
+              "attributes" in profileQuery.data.data
+            ) {
+              senderInfo = (profileQuery.data.data as { attributes: IUser })
+                .attributes;
+            }
+          }
+
+          if (!senderInfo) {
+            throw new Error("Sender info is missing");
+          }
+
+          const { data: responseData } = await queryFulfilled;
+          const newMessage = responseData.data.attributes;
+          const chatId = newMessage.chatId;
+          const receiverId = arg.receiverId || newMessage.receiverId?._id;
+
+          let receiverInfo: IUser | undefined;
+          if (
+            newMessage.receiverId &&
+            typeof newMessage.receiverId === "object"
+          ) {
+            receiverInfo = newMessage.receiverId;
+          } else {
+            const getChatsCacheKeys = cacheKeys.filter((key) =>
+              key.includes("getChats")
+            );
+            for (const cacheKey of getChatsCacheKeys) {
+              try {
+                const chatCache = getState().baseApi.queries[cacheKey];
+                if (chatCache && "data" in chatCache && chatCache.data) {
+                  const chats =
+                    (
+                      chatCache.data as {
+                        data?: { attributes?: { results?: IChat[] } };
+                      }
+                    )?.data?.attributes?.results || [];
+                  for (const chat of chats) {
+                    const participant = chat.participants.find(
+                      (p: IUser | string) =>
+                        (typeof p === "string" ? p : p._id) === receiverId
+                    );
+                    if (participant && typeof participant === "object") {
+                      receiverInfo = participant;
+                      break;
+                    }
+                  }
+                  if (receiverInfo) break;
+                }
+              } catch (error) {
+                console.error("Get chats cache error:", error);
+                continue;
+              }
+            }
+          }
+
+          if (!receiverInfo) {
+            console.warn("Receiver info not found, using basic info");
+            receiverInfo = { _id: receiverId } as IUser;
+          }
+
+          const getMessagesCacheKeys = cacheKeys.filter((key) =>
             key.includes("getMessages")
           );
 
-          if (!getChatsKey || !getMessagesKey) return;
-
-          const activeChatQueryArgs =
-            JSON.parse(getChatsKey.replace("getChats(", "").replace(")", "")) ||
-            {};
-
-          const activeMessageQueryArgs =
-            JSON.parse(
-              getMessagesKey.replace("getMessages(", "").replace(")", "")
-            ) || {};
-
-          dispatch(
-            inboxApi.util.updateQueryData(
-              "getMessages",
-              activeMessageQueryArgs,
-              (draft) => {
-                if (!draft?.data?.attributes?.results) return;
-                draft.data.attributes.results.push(newMessage);
-              }
-            )
-          );
-
-          dispatch(
-            inboxApi.util.updateQueryData(
-              "getChats",
-              activeChatQueryArgs,
-              (draft) => {
-                console.log("Draft Chat:", JSON.parse(JSON.stringify(draft)));
-                if (!draft?.data?.attributes?.results) return;
-                const chatToUpdate = draft?.data?.attributes?.results?.find(
-                  (chat: IChat) => chat._id === newMessage.chatId
+          getMessagesCacheKeys.forEach((cacheKey) => {
+            try {
+              const messageQueryArgs = JSON.parse(
+                cacheKey.replace("getMessages(", "").replace(")", "")
+              );
+              if (messageQueryArgs?.receiverId === receiverId) {
+                dispatch(
+                  inboxApi.util.updateQueryData(
+                    "getMessages",
+                    messageQueryArgs,
+                    (draft) => {
+                      if (!draft?.data?.attributes?.results) {
+                        draft.data = { attributes: { results: [] } };
+                      }
+                      const exists = draft.data.attributes.results.find(
+                        (msg: IMessage) => msg._id === newMessage._id
+                      );
+                      if (!exists) {
+                        draft.data.attributes.results.unshift(newMessage);
+                      }
+                    }
+                  )
                 );
-                if (chatToUpdate) {
-                  chatToUpdate.lastMessage = newMessage;
-                  chatToUpdate.updatedAt = newMessage.createdAt;
-                  draft.data.attributes.results = [
-                    ...draft.data.attributes.results,
-                  ];
-                  console.log("UPDATED CHAT:", JSON.parse(JSON.stringify(draft.data.attributes.results)));
-                }
               }
-            )
+            } catch (e) {
+              console.error("Failed to parse message query args:", e);
+            }
+          });
+
+          const getChatsCacheKeys = cacheKeys.filter((key) =>
+            key.includes("getChats")
           );
+
+          getChatsCacheKeys.forEach((cacheKey) => {
+            try {
+              const chatQueryArgs = JSON.parse(
+                cacheKey.replace("getChats(", "").replace(")", "")
+              );
+              dispatch(
+                inboxApi.util.updateQueryData(
+                  "getChats",
+                  chatQueryArgs,
+                  (draft) => {
+                    if (!draft?.data?.attributes?.results) {
+                      draft.data = { attributes: { results: [] } };
+                    }
+                    console.log(
+                      "Draft data",
+                      JSON.parse(JSON.stringify(draft))
+                    );
+                    const normalizedReceiverId = receiverId;
+                    const chatToUpdate = draft.data.attributes.results.find(
+                      (chat: IChat) =>
+                        chat._id === chatId ||
+                        ((chat.participants as (IUser | string)[]).some(
+                          (p) =>
+                            (typeof p === "string" ? p : p._id) ===
+                            senderInfo._id
+                        ) &&
+                          (chat.participants as (IUser | string)[]).some(
+                            (p) =>
+                              (typeof p === "string" ? p : p._id) ===
+                              normalizedReceiverId
+                          ))
+                    );
+
+                    if (chatToUpdate) {
+                      chatToUpdate.lastMessage = newMessage;
+                      chatToUpdate.updatedAt = newMessage.createdAt;
+                      console.log("Pushing message to chat", chatToUpdate);
+                      draft.data.attributes.results = [
+                        chatToUpdate,
+                        ...draft.data.attributes.results.filter(
+                          (chat: IChat) => chat._id !== chatToUpdate._id
+                        ),
+                      ];
+                      console.log(
+                        "UPDATED DRAFT DATA",
+                        JSON.parse(JSON.stringify(chatToUpdate))
+                      );
+                    } else {
+                      const newChat: IChat = {
+                        _id: chatId,
+                        chatType: "single",
+                        participants: [
+                          senderInfo as IUser,
+                          receiverInfo as IUser,
+                        ] as (IUser | string)[],
+                        lastMessage: newMessage,
+                        unviewedCount: 0,
+                        createdAt: newMessage.createdAt,
+                        updatedAt: newMessage.createdAt,
+                      };
+                      draft.data.attributes.results.unshift(newChat);
+                    }
+                  }
+                )
+              );
+            } catch (e) {
+              console.error("Failed to parse chat query args:", e);
+            }
+          });
         } catch (error) {
-          const err = error as TError;
-          console.log(err?.data?.message);
+          console.error("Send message error:", error);
         }
       },
     }),
@@ -207,7 +301,6 @@ const inboxApi = baseApi.injectEndpoints({
 });
 
 export const {
-  useCreateChatMutation,
   useGetChatQuery,
   useGetChatsQuery,
   useGetMessagesQuery,

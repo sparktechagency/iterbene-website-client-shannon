@@ -5,12 +5,19 @@ import { useEffect, useState } from "react";
 import { IChat } from "@/types/chatTypes";
 const ContactList: React.FC = () => {
   const { data: responseData } = useGetChatsQuery(
-    {
-      page: 1,
-      limit: 10,
-    },
+    [
+      {
+        key: "page",
+        value: 1,
+      },
+      {
+        key: "limit",
+        value: 8,
+      }
+    ],
     {
       refetchOnMountOrArgChange: true,
+      refetchOnFocus: true,
     }
   );
   const totalResults = responseData?.data?.attributes?.totalResults;
@@ -36,7 +43,7 @@ const ContactList: React.FC = () => {
           <span>{totalResults || 0}</span>
         </div>
       </div>
-      <div className="w-full space-y-4 mt-4">
+      <div className="w-full flex flex-col gap-2 mt-4">
         {contacts?.map((contact) => (
           <ContactListCard key={contact._id} contact={contact} />
         ))}
