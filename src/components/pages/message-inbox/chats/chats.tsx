@@ -35,6 +35,15 @@ const Chats = () => {
   const totalResults = chatData?.totalResults || 0;
   const chats = chatData?.results;
 
+  // Sort chats by updatedAt in descending order (newest first)
+  const sortedChats = chats
+    ? [...chats].sort((a: IChat, b: IChat) => {
+        return (
+          new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+        );
+      })
+    : [];
+
   useEffect(() => {
     if (chats?.length > 0) {
       const totalLoaded = page * 8;
@@ -71,7 +80,7 @@ const Chats = () => {
 
   let content = null;
 
-  if (chatLoading && page === 1 && chats?.length === 0) {
+  if (chatLoading && page === 1 && sortedChats?.length === 0) {
     content = (
       <div className="w-full flex flex-col gap-6 overflow-y-auto">
         {[...Array(6)].map((_, index) => (
@@ -79,17 +88,17 @@ const Chats = () => {
         ))}
       </div>
     );
-  } else if (!chatLoading && chats?.length === 0 && page === 1) {
+  } else if (!chatLoading && sortedChats?.length === 0 && page === 1) {
     content = (
       <div className="w-full flex items-center justify-center">
         <h1 className="text-2xl font-semibold">No Chats Found</h1>
       </div>
     );
-  } else if (chats?.length > 0) {
+  } else if (sortedChats?.length > 0) {
     content = (
       <div className="w-full flex flex-col h-[calc(85vh-130px)] gap-2 overflow-y-auto">
-        {chats.map((chat: IChat, index: number) => {
-          if (chats?.length === index + 1) {
+        {sortedChats.map((chat: IChat, index: number) => {
+          if (sortedChats?.length === index + 1) {
             return (
               <div key={chat._id} ref={lastChatElementRef}>
                 <ChatCard chat={chat} />

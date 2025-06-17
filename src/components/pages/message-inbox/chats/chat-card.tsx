@@ -37,13 +37,19 @@ const ChatCard = ({ chat }: ChatListCardProps) => {
       case MessageType.IMAGE:
         return myLastMessage ? "You sent a photo" : "sent a photo";
       case MessageType.AUDIO:
-        return myLastMessage ? "You sent an audio message" : "sent an audio message";
+        return myLastMessage
+          ? "You sent an audio message"
+          : "sent an audio message";
       case MessageType.VIDEO:
         return myLastMessage ? "You sent a video" : "sent a video";
       case MessageType.DOCUMENT:
         return myLastMessage ? "You sent a document" : "sent a document";
       case MessageType.MIXED:
-        return myLastMessage ? "You sent a mixed message" : "sent a mixed message";
+        return `${myLastMessage ? "You: " : ""}${
+          content.text && content.text.length > 20
+            ? `${content.text.slice(0, 20)}...`
+            : content.text
+        }`;
       default:
         return "";
     }
@@ -73,7 +79,9 @@ const ChatCard = ({ chat }: ChatListCardProps) => {
             <h1 className="text-[18px] font-medium">
               {receiverDetails?.fullName || "Unknown User"}
             </h1>
-            <p className="text-[14px] text-gray-600">{renderMessageContent()}</p>
+            <p className="text-[14px] text-gray-600">
+              {renderMessageContent()}
+            </p>
           </div>
         </div>
         <>

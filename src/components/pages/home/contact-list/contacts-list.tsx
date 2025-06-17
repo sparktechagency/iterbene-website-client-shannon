@@ -12,7 +12,7 @@ const ContactList: React.FC = () => {
       },
       {
         key: "limit",
-        value: 8,
+        value: 6,
       }
     ],
     {
