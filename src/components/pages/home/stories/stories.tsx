@@ -10,41 +10,18 @@ import { FreeMode, Pagination } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
 import StoryCard from "./stories.card";
 import { useGetFeedStoriesQuery } from "@/redux/features/stories/storiesApi";
-
-interface Media {
-  url: string;
-  type: "image" | "video" | "mixed";
-  textContent?: string;
-  textFontFamily?: string;
-  backgroundColor?: string;
-}
-
-interface Story {
-  id: number | string;
-  media: Media[];
-  authorName: string;
-  authorImage: string;
-}
+import { IStory } from "@/types/stories.types";
 
 const Stories = () => {
   const {
-    data: storiesData,
-    isLoading,
-    error,
+    data: storiesData
   } = useGetFeedStoriesQuery(undefined);
   const router = useRouter();
-  const [stories, setStories] = useState<Story[]>([]);
+  const [stories, setStories] = useState<IStory[]>([]);
 
   useEffect(() => {
     if (storiesData?.data?.attributes?.results) {
-      setStories(
-        storiesData.data.attributes.results.map((story: any) => ({
-          id: story._id,
-          media: story.mediaIds,
-          authorName: story.userId.username,
-          authorImage: story.userId.profileImage,
-        }))
-      );
+      setStories(storiesData?.data?.attributes?.results)
     }
   }, [storiesData]);
 
@@ -56,8 +33,6 @@ const Stories = () => {
     router.push(`/story/${storyId}`);
   };
 
-  if (isLoading) return <div>Loading...</div>;
-  if (error) return <div>Error loading stories</div>;
 
   return (
     <section className="w-full">
@@ -100,14 +75,14 @@ const Stories = () => {
           </div>
         </SwiperSlide>
 
-        {stories.map((story) => (
-          <SwiperSlide key={story.id}>
-            <div onClick={() => handleStoryClick(story.id)}>
+        {stories?.map((story) => (
+          <SwiperSlide key={story._id}>
+            <div onClick={() => handleStoryClick(story._id)}>
               <StoryCard
-                image={story.media[0].mediaUrl}
-                mediaType={story.media[0].mediaType}
-                authorName={story.authorName}
-                authorImage={story.authorImage}
+                image={story?.mediaIds[0]?.mediaUrl}
+                mediaType={story?.mediaIds[0]?.mediaType}
+                authorName={story?.userId?.username}
+                authorImage={story?.userId?.profileImage}
               />
             </div>
           </SwiperSlide>

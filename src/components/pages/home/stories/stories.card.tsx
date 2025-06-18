@@ -4,7 +4,7 @@ import React from "react";
 
 interface StoryCardProps {
   image: string;
-  mediaType?: "image" | "video";
+  mediaType: string;
   authorName: string;
   authorImage: string;
 }
