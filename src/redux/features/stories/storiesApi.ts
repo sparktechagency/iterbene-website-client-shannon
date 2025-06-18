@@ -1,22 +1,25 @@
 import { baseApi } from "../api/baseApi";
 
 const storiesApi = baseApi.injectEndpoints({
+  overrideExisting: true,
   endpoints: (builder) => ({
-    getStoryFeed: builder.query({
-      query: () => "/stories/feed",
-      providesTags: ["Story"],
-    }),
-    getStory: builder.query({
-      query: (id) => `/stories/${id}`,
-      providesTags: (result, error, id) => [{ type: "Story", id }],
-    }),
     createStory: builder.mutation({
       query: (formData) => ({
         url: "/stories",
         method: "POST",
         body: formData,
       }),
-      invalidatesTags: ["Story"],
+      invalidatesTags: ["Stories"],
+    }),
+       getStory: builder.query({
+      query: (id) => `/stories/${id}`,
+    }),
+    getFeedStories: builder.query({
+      query: () => ({
+        url: "/stories/feed",
+        method: "GET",
+      }),
+      providesTags: ["Stories"],
     }),
     viewStory: builder.mutation({
       query: (storyId) => ({
@@ -24,9 +27,6 @@ const storiesApi = baseApi.injectEndpoints({
         method: "POST",
         body: { storyId },
       }),
-      invalidatesTags: (result, error, { storyId }) => [
-        { type: "Story", id: storyId },
-      ],
     }),
     reactToStory: builder.mutation({
       query: ({ storyId, reactionType }) => ({
@@ -34,25 +34,19 @@ const storiesApi = baseApi.injectEndpoints({
         method: "POST",
         body: { storyId, reactionType },
       }),
-      invalidatesTags: (result, error, { storyId }) => [
-        { type: "Story", id: storyId },
-      ],
     }),
     replyToStory: builder.mutation({
       query: ({ storyId, message }) => ({
         url: "/stories/reply",
         method: "POST",
         body: { storyId, message },
-      }),
-      invalidatesTags: (result, error, { storyId }) => [
-        { type: "Story", id: storyId },
-      ],
+      })
     }),
   }),
 });
 
 export const {
-  useGetStoryFeedQuery,
+  useGetFeedStoriesQuery,
   useGetStoryQuery,
   useCreateStoryMutation,
   useViewStoryMutation,

@@ -76,7 +76,7 @@ export const baseApi = createApi({
     "Message",
     "Maps",
     "Block",
-    "Story",
+    "Stories",
     "Post",
     "Hashtag",
     "Connections",

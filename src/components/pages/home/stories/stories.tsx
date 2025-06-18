@@ -1,116 +1,88 @@
 "use client";
 import { Plus } from "lucide-react";
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import "swiper/css";
 import "swiper/css/free-mode";
 import "swiper/css/pagination";
 import { FreeMode, Pagination } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
 import StoryCard from "./stories.card";
+import { useGetFeedStoriesQuery } from "@/redux/features/stories/storiesApi";
 
 interface Media {
   url: string;
-  type: "image" | "video";
-}
-
-interface Story {
-  id: number;
-  media: Media[];
-  authorName: string;
-  authorImage: string;
-  text?: string;
-  textColor?: string;
-  font?: string;
+  type: "image" | "video" | "mixed";
+  textContent?: string;
+  textFontFamily?: string;
   backgroundColor?: string;
 }
 
+interface Story {
+  id: number | string;
+  media: Media[];
+  authorName: string;
+  authorImage: string;
+}
+
 const Stories = () => {
-  const [stories, setStories] = useState<Story[]>([
-    {
-      id: 1,
-      media: [
-        { url: "https://www.w3schools.com/html/mov_bbb.mp4", type: "video" },
-      ],
-      authorName: "Sophia Martinez",
-      authorImage: "https://randomuser.me/api/portraits/women/10.jpg",
-    },
-    {
-      id: 2,
-      media: [
-        { url: "https://i.ibb.co.com/Zyy6bvr/post3.jpg", type: "image" },
-        { url: "https://www.w3schools.com/html/mov_bbb.mp4", type: "video" },
-      ],
-      authorName: "Ethan Carter",
-      authorImage: "https://randomuser.me/api/portraits/men/11.jpg",
-    },
-    {
-      id: 3,
-      media: [
-        { url: "https://i.ibb.co.com/Z6792YGV/post2.jpg", type: "image" },
-      ],
-      authorName: "Ava Thompson",
-      authorImage: "https://randomuser.me/api/portraits/women/12.jpg",
-    },
-    {
-      id: 4,
-      media: [
-        { url: "https://i.ibb.co.com/TBFhZcsc/post1.jpg", type: "image" },
-      ],
-      authorName: "Liam Brooks",
-      authorImage: "https://randomuser.me/api/portraits/men/13.jpg",
-    },
-    {
-      id: 5,
-      media: [
-        {
-          url: "https://i.postimg.cc/dVP9Fh3N/2588a7b47b42d6dddfdfa08bb9300d00.jpg",
-          type: "image",
-        },
-      ],
-      authorName: "Olivia Hayes",
-      authorImage: "https://randomuser.me/api/portraits/women/14.jpg",
-    },
-  ]);
+  const {
+    data: storiesData,
+    isLoading,
+    error,
+  } = useGetFeedStoriesQuery(undefined);
+  const router = useRouter();
+  const [stories, setStories] = useState<Story[]>([]);
+
+  useEffect(() => {
+    if (storiesData?.data?.attributes?.results) {
+      setStories(
+        storiesData.data.attributes.results.map((story: any) => ({
+          id: story._id,
+          media: story.mediaIds,
+          authorName: story.userId.username,
+          authorImage: story.userId.profileImage,
+        }))
+      );
+    }
+  }, [storiesData]);
+
+  const handleAddJourney = () => {
+    router.push("/stories");
+  };
+
+  const handleStoryClick = (storyId: number | string) => {
+    router.push(`/story/${storyId}`);
+  };
+
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div>Error loading stories</div>;
 
   return (
     <section className="w-full">
       <Swiper
         slidesPerView={2.5}
         breakpoints={{
-          640: {
-            slidesPerView: 3.5,
-            spaceBetween: 16,
-          },
-          768: {
-            slidesPerView: 3.5,
-            spaceBetween: 16,
-          },
-          1024: {
-            slidesPerView: 4.5,
-            spaceBetween: 16,
-          },
-          1280: {
-            slidesPerView: 4.5,
-            spaceBetween: 16,
-          },
+          640: { slidesPerView: 3.5, spaceBetween: 16 },
+          768: { slidesPerView: 3.5, spaceBetween: 16 },
+          1024: { slidesPerView: 4.5, spaceBetween: 16 },
+          1280: { slidesPerView: 4.5, spaceBetween: 16 },
         }}
         spaceBetween={8}
         freeMode={true}
-        pagination={{
-          clickable: true,
-          el: null,
-        }}
+        pagination={{ clickable: true, el: null }}
         modules={[FreeMode, Pagination]}
         className="mySwiper"
       >
         <SwiperSlide>
           <div
             className="relative w-full h-[240px] md:h-[260px] rounded-xl overflow-hidden shadow-lg cursor-pointer"
+            onClick={handleAddJourney}
           >
             <Image
               src="https://i.postimg.cc/dVP9Fh3N/2588a7b47b42d6dddfdfa08bb9300d00.jpg"
-              alt="Story Image"
+              alt="Add Journey"
               width={200}
               height={380}
               className="object-cover w-full h-full rounded-xl"
@@ -130,10 +102,10 @@ const Stories = () => {
 
         {stories.map((story) => (
           <SwiperSlide key={story.id}>
-            <div>
+            <div onClick={() => handleStoryClick(story.id)}>
               <StoryCard
-                image={story.media[0].url}
-                mediaType={story.media[0].type}
+                image={story.media[0].mediaUrl}
+                mediaType={story.media[0].mediaType}
                 authorName={story.authorName}
                 authorImage={story.authorImage}
               />
