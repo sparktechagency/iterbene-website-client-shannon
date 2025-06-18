@@ -7,8 +7,6 @@ import "swiper/css/free-mode";
 import "swiper/css/pagination";
 import { FreeMode, Pagination } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
-import CreateStoryModal from "./create-story-modal";
-import StoriesModal from "./stories-modal";
 import StoryCard from "./stories.card";
 
 interface Media {
@@ -28,9 +26,6 @@ interface Story {
 }
 
 const Stories = () => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const [selectedStoryIndex, setSelectedStoryIndex] = useState(0);
   const [stories, setStories] = useState<Story[]>([
     {
       id: 1,
@@ -78,15 +73,6 @@ const Stories = () => {
     },
   ]);
 
-  const handleStoryClick = (index: number) => {
-    setSelectedStoryIndex(index);
-    setIsModalOpen(true);
-  };
-
-  const handleAddStory = (newStory: Story) => {
-    setStories((prev) => [...prev, newStory]);
-  };
-
   return (
     <section className="w-full">
       <Swiper
@@ -120,7 +106,6 @@ const Stories = () => {
       >
         <SwiperSlide>
           <div
-            onClick={() => setIsCreateModalOpen(true)}
             className="relative w-full h-[240px] md:h-[260px] rounded-xl overflow-hidden shadow-lg cursor-pointer"
           >
             <Image
@@ -143,9 +128,9 @@ const Stories = () => {
           </div>
         </SwiperSlide>
 
-        {stories.map((story, index) => (
+        {stories.map((story) => (
           <SwiperSlide key={story.id}>
-            <div onClick={() => handleStoryClick(index)}>
+            <div>
               <StoryCard
                 image={story.media[0].url}
                 mediaType={story.media[0].type}
@@ -156,22 +141,6 @@ const Stories = () => {
           </SwiperSlide>
         ))}
       </Swiper>
-
-      {isModalOpen && (
-        <StoriesModal
-          stories={stories}
-          selectedStoryIndex={selectedStoryIndex}
-          setSelectedStoryIndex={setSelectedStoryIndex}
-          onClose={() => setIsModalOpen(false)}
-        />
-      )}
-
-      {isCreateModalOpen && (
-        <CreateStoryModal
-          onClose={() => setIsCreateModalOpen(false)}
-          onAddStory={handleAddStory}
-        />
-      )}
     </section>
   );
 };
