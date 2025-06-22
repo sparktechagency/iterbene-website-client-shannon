@@ -1,14 +1,14 @@
 "use client";
 import authImage from "@/asset/auth/auth.jpg";
 import logo from "@/asset/logo/logo.png";
-import Image from "next/image";
-import { useState } from "react";
 import CustomButton from "@/components/custom/custom-button";
-import { useRouter, useSearchParams } from "next/navigation";
-import OTPInput from "react-otp-input";
 import { useVerifyEmailMutation } from "@/redux/features/auth/authApi";
 import { TError } from "@/types/error";
+import Image from "next/image";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useState } from "react";
 import toast from "react-hot-toast";
+import OTPInput from "react-otp-input";
 
 const VerifyEmail = () => {
   const searchParams = useSearchParams();
@@ -80,7 +80,7 @@ const VerifyEmail = () => {
               onChange={handleOtpChange}
               numInputs={6}
               renderInput={(props) => <input {...props} />}
-              containerStyle="otp-container"
+              container mx-autoStyle="otp-container mx-auto"
               inputStyle={{
                 width: "100%",
                 maxWidth: "7rem",

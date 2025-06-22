@@ -1,7 +1,7 @@
 "use client";
+import { IMedia } from "@/types/post.types";
 import Image from "next/image";
 import VideoCard from "../../UserProfilePage/UserVideos/VideoCard";
-import { IMedia } from "@/types/post.types";
 interface PostContentRenderProps {
   data: IMedia[];
 }
@@ -295,14 +295,14 @@ export default PostContentRender;
 //   src: string;
 //   alt: string;
 //   className?: string;
-//   containerHeight?: string;
+//   container mx-autoHeight?: string;
 // }
 
 // const SmartImage = ({
 //   src,
 //   alt,
 //   className = "",
-//   containerHeight = "350px",
+//   container mx-autoHeight = "350px",
 // }: SmartImageProps) => {
 //   const [bgColor, setBgColor] = useState("#f3f4f6");
 //   const [imageLoaded, setImageLoaded] = useState(false);
@@ -331,7 +331,7 @@ export default PostContentRender;
 //     return (
 //       <div
 //         className={`relative w-full rounded-xl overflow-hidden bg-gray-200 flex items-center justify-center ${className}`}
-//         style={{ height: containerHeight }}
+//         style={{ height: container mx-autoHeight }}
 //       >
 //         <span className="text-gray-500">Image failed to load</span>
 //       </div>
@@ -342,7 +342,7 @@ export default PostContentRender;
 //     <div
 //       className={`relative w-full rounded-xl overflow-hidden ${className}`}
 //       style={{
-//         height: containerHeight,
+//         height: container mx-autoHeight,
 //         backgroundColor: imageLoaded ? bgColor : "#f3f4f6",
 //         transition: "background-color 0.3s ease",
 //       }}
@@ -401,13 +401,13 @@ export default PostContentRender;
 //   const renderMedia = (
 //     media: IMedia,
 //     className: string,
-//     containerHeight: string = "350px"
+//     container mx-autoHeight: string = "350px"
 //   ) => {
 //     if (!media.mediaUrl) {
 //       return (
 //         <div
 //           className={`relative w-full rounded-xl overflow-hidden bg-gray-200 flex items-center justify-center ${className}`}
-//           style={{ height: containerHeight }}
+//           style={{ height: container mx-autoHeight }}
 //         >
 //           <span className="text-gray-500">Media not available</span>
 //         </div>
@@ -420,7 +420,7 @@ export default PostContentRender;
 //           src={media.mediaUrl}
 //           alt="Post media"
 //           className={className}
-//           containerHeight={containerHeight}
+//           container mx-autoHeight={container mx-autoHeight}
 //         />
 //       );
 //     } else if (media.mediaType === "video") {

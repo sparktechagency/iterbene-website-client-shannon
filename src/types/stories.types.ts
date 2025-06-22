@@ -1,3 +1,20 @@
+interface IViewer {
+  _id: string;
+  fullName: string;
+  username: string;
+  profileImage: string;
+}
+
+interface IReactions {
+  userId: {
+    _id: string;
+    fullName: string;
+    username: string;
+    profileImage: string;
+  };
+  reactionType: string;
+}
+
 interface IMedia {
   _id: string;
   mediaType: string;
@@ -16,8 +33,9 @@ export interface IStory {
   _id: string;
   userId: IUser;
   mediaIds: IMedia[];
-  viewedBY: IUser[];
-  reactions: string[];
+  viewedBy: IViewer[];
+  reactions: IReactions[];
+  viewCount: number;
   replies: string[];
   privacy: string;
   expiresAt: Date;

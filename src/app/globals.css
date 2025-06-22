@@ -20,22 +20,7 @@ body::-webkit-scrollbar {
   --color-primary: oklch(80.5% 0.135 192.5); /* #40E0D0 (turquoise) */
   --color-secondary: oklch(67.85% 0.202 40.38); /* Supports opacity */
 
-  /* Breakpoints matching Tailwind v3 screens (unchanged) */
-  --breakpoint-sm: 375px;
-  --breakpoint-md: 768px;
-  --breakpoint-lg: 1024px;
-  --breakpoint-xl: 1336px;
-  --breakpoint-2xl: 1620px;
 }
-
-/* Container (unchanged) */
-@utility container {
-  width: 100%;
-  max-width: 1520px;
-  margin-left: auto;
-  margin-right: auto;
-}
-
 /* OTP Input Styles (unchanged) */
 .otp-input {
   @apply border border-[#E2E8F0];

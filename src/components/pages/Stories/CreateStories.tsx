@@ -13,6 +13,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useCreateStoryMutation } from "@/redux/features/stories/storiesApi";
 import toast from "react-hot-toast";
 import { TError } from "@/types/error";
+import { useRouter } from "next/navigation";
 
 type ViewType = "selection" | "text" | "photo";
 type TextStyleType = "Clean" | "Bold" | "Typewriter" | "Modern";
@@ -31,6 +32,8 @@ const CreateStories: React.FC = () => {
   const [showSettings, setShowSettings] = useState<boolean>(false);
   const [scale, setScale] = useState<number>(1);
   const [rotate, setRotate] = useState<number>(0);
+
+  const router = useRouter();
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const imgRef = useRef<HTMLImageElement>(null);
@@ -259,6 +262,7 @@ const CreateStories: React.FC = () => {
 
     try {
       await createStory(formData).unwrap();
+      router.push("/");
       toast.success("Story created successfully!");
       resetToSelection();
     } catch (err) {

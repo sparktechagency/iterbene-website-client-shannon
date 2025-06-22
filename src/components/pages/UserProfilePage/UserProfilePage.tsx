@@ -1,13 +1,13 @@
 "use client";
-import React from "react";
-import { useParams } from "next/navigation";
-import { useGetSingleUserQuery } from "@/redux/features/users/userApi";
-import NotFoundPage from "../not-found-page/not-found-page";
 import Header from "@/components/common/header";
-import UserProfileHeader from "./UserProfileHeader/UserProfileHeader";
 import useUser from "@/hooks/useUser";
+import { useGetSingleUserQuery } from "@/redux/features/users/userApi";
+import { useParams } from "next/navigation";
+import React from "react";
+import NotFoundPage from "../not-found-page/not-found-page";
 import MyProfileHeader from "./MyProfileHeader/MyProfileHeader";
 import UserNavlinkTab from "./UserNavlinkTab/UserNavlinkTab";
+import UserProfileHeader from "./UserProfileHeader/UserProfileHeader";
 
 const UserProfileInformationPage = ({
   children,
@@ -31,7 +31,7 @@ const UserProfileInformationPage = ({
     content = (
       <section className="w-full mx-auto">
         <Header />
-        <div className="container mx-auto space-y-8 px-4 pb-10">
+        <div className="container mx-auto mx-auto space-y-8 px-4 pb-10">
           {isMyProfile ? (
             <MyProfileHeader userData={userData} />
           ) : (

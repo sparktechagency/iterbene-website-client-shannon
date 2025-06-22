@@ -1,8 +1,8 @@
 "use client";
 import { GoogleMap, Marker, useJsApiLoader } from "@react-google-maps/api";
 
-// Define the map container style
-const mapContainerStyle: React.CSSProperties = {
+// Define the map container mx-auto style
+const mapcontainer mx-autoStyle: React.CSSProperties = {
   width: "100%",
   height: "100%",
 };
@@ -85,68 +85,67 @@ const MapSection = ({
 
   return (
     <div
-      className={`w-full relative px-1 md:px-2 py-2 md:py-4 ${
-        mapHide ? "hidden" : showFullMap ? "col-span-full" : ""
-      }`}
+      className={`w-full relative px-1 md:px-2 py-2 md:py-4 ${mapHide ? "hidden" : showFullMap ? "col-span-full" : ""
+        }`}
     >
       <div className="rounded-2xl shadow-md h-full min-h-[600px] overflow-hidden z-20">
         <GoogleMap
-          mapContainerStyle={mapContainerStyle}
-          center={defaultCenter}
-          zoom={3}
-          options={{
-            zoomControl: false,
-            streetViewControl: false,
-            mapTypeControl: false,
-            fullscreenControl: false,
-            scrollwheel: true,
-            disableDoubleClickZoom: false,
-            keyboardShortcuts: false,
-            draggable: true,
-            clickableIcons: true,
-            gestureHandling: "greedy",
-            styles: [
-              {
-                featureType: "poi",
-                elementType: "labels",
-                stylers: [{ visibility: "on" }],
-              },
-            ],
-          }}
+          mapcontainer mx-autoStyle={mapcontainer mx-autoStyle}
+        center={defaultCenter}
+        zoom={3}
+        options={{
+          zoomControl: false,
+          streetViewControl: false,
+          mapTypeControl: false,
+          fullscreenControl: false,
+          scrollwheel: true,
+          disableDoubleClickZoom: false,
+          keyboardShortcuts: false,
+          draggable: true,
+          clickableIcons: true,
+          gestureHandling: "greedy",
+          styles: [
+            {
+              featureType: "poi",
+              elementType: "labels",
+              stylers: [{ visibility: "on" }],
+            },
+          ],
+        }}
         >
-          {/* Markers for places you're interested in */}
-          {customIcons &&
-            interestedPlaces.map((place, index) => (
-              <Marker
-                key={`interested-${index}`}
-                position={place}
-                icon={customIcons.interested}
-                title={`Interested Place ${index + 1}`}
-              />
-            ))}
-
-          {/* Markers for places you've visited */}
-          {customIcons &&
-            visitedPlaces.map((place, index) => (
-              <Marker
-                key={`visited-${index}`}
-                position={place}
-                icon={customIcons.visited}
-                title={`Visited Place ${index + 1}`}
-              />
-            ))}
-
-          {/* Marker for home location */}
-          {customIcons && (
+        {/* Markers for places you're interested in */}
+        {customIcons &&
+          interestedPlaces.map((place, index) => (
             <Marker
-              position={homeLocation}
-              icon={customIcons.home}
-              title="Home - Dhaka, Bangladesh"
+              key={`interested-${index}`}
+              position={place}
+              icon={customIcons.interested}
+              title={`Interested Place ${index + 1}`}
             />
-          )}
-        </GoogleMap>
-      </div>
+          ))}
+
+        {/* Markers for places you've visited */}
+        {customIcons &&
+          visitedPlaces.map((place, index) => (
+            <Marker
+              key={`visited-${index}`}
+              position={place}
+              icon={customIcons.visited}
+              title={`Visited Place ${index + 1}`}
+            />
+          ))}
+
+        {/* Marker for home location */}
+        {customIcons && (
+          <Marker
+            position={homeLocation}
+            icon={customIcons.home}
+            title="Home - Dhaka, Bangladesh"
+          />
+        )}
+      </GoogleMap>
     </div>
+    </div >
   );
 };
 

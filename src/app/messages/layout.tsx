@@ -21,7 +21,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
   return (
     <section className="w-full">
       <Header />
-      <section className="w-full container pt-[125px]">
+      <section className="w-full container mx-auto pt-[125px]">
         <div className="w-full p-6 flex flex-col md:flex-row gap-6 bg-white rounded-xl">
           <div className="w-full md:w-[25%]">
             <Chats />

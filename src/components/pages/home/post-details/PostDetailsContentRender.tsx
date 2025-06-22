@@ -1,13 +1,12 @@
 "use client";
-import React from "react";
-import { Swiper, SwiperSlide } from "swiper/react";
-import { Navigation, Pagination } from "swiper/modules";
-import VideoCard from "../../UserProfilePage/UserVideos/VideoCard";
 import { IMedia } from "@/types/post.types";
+import SmartImage from "@/utils/SmartImage";
+import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 import "swiper/css";
 import "swiper/css/pagination";
-import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
-import SmartImage from "@/utils/SmartImage";
+import { Navigation, Pagination } from "swiper/modules";
+import { Swiper, SwiperSlide } from "swiper/react";
+import VideoCard from "../../UserProfilePage/UserVideos/VideoCard";
 
 interface PostDetailsContentRenderProps {
   medias: IMedia[];
@@ -35,7 +34,7 @@ const PostDetailsContentRender = ({ medias }: PostDetailsContentRenderProps) => 
               <SmartImage
                 src={media?.mediaUrl}
                 alt={`Post media ${index + 1}`}
-                containerHeight="600px"
+                container mx-autoHeight="600px"
                 className="w-full h-[600px] object-contain rounded-xl cursor-pointer"
               />
             ) : (
