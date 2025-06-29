@@ -55,15 +55,15 @@ const PostHeader = ({
     }
   };
 
-  const handleSave = () => {
-    console.log("Save post:", post?._id);
-    setIsOpen(false);
-  };
+  // const handleSave = () => {
+  //   console.log("Save post:", post?._id);
+  //   setIsOpen(false);
+  // };
 
-  const handleReport = () => {
-    console.log("Report post:", post?._id);
-    setIsOpen(false);
-  };
+  // const handleReport = () => {
+  //   console.log("Report post:", post?._id);
+  //   setIsOpen(false);
+  // };
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -147,25 +147,26 @@ const PostHeader = ({
         </div>
       </div>
 
-      <div className="relative">
-        <button
-          ref={triggerRef}
-          onClick={toggleDropdown}
-          className="cursor-pointer p-3 hover:bg-gray-100 rounded-full transition-colors"
-        >
-          <MoreHorizontal size={23} />
-        </button>
-        <AnimatePresence>
-          {isOpen && (
-            <motion.div
-              ref={dropdownRef}
-              className="absolute right-0 mt-1 w-48 bg-white rounded-xl border border-gray-50 shadow-md z-50"
-              variants={dropdownVariants}
-              initial="hidden"
-              animate="visible"
-              exit="exit"
-            >
-              {isOwnPost ? (
+      {isOwnPost && (
+        <div className="relative">
+          <button
+            ref={triggerRef}
+            onClick={toggleDropdown}
+            className="cursor-pointer p-3 hover:bg-gray-100 rounded-full transition-colors"
+          >
+            <MoreHorizontal size={23} />
+          </button>
+          <AnimatePresence>
+            {isOpen && (
+              <motion.div
+                ref={dropdownRef}
+                className="absolute right-0 mt-1 w-48 bg-white rounded-xl border border-gray-50 shadow-md z-50"
+                variants={dropdownVariants}
+                initial="hidden"
+                animate="visible"
+                exit="exit"
+              >
+                {/* {isOwnPost ? (
                 <>
                   <button
                     onClick={handleEdit}
@@ -195,11 +196,29 @@ const PostHeader = ({
                     Report
                   </button>
                 </>
-              )}
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
+              )} */}
+                {isOwnPost && (
+                  <>
+                    <button
+                      onClick={handleEdit}
+                      className="block w-full text-left px-4 py-3 text-gray-800 hover:bg-gray-100 rounded-t-xl cursor-pointer"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onClick={handleDelete}
+                      className="block w-full text-left px-4 py-3 text-rose-500 hover:bg-gray-100 rounded-b-xl cursor-pointer"
+                    >
+                      Delete
+                    </button>
+                  </>
+                )}
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      )}
+
       <ConfirmationPopup
         isOpen={isDeletePopupOpen}
         onClose={() => setIsDeletePopupOpen(false)}

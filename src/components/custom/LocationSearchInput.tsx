@@ -31,8 +31,7 @@ const LocationSearchInput: React.FC<LocationSearchInputProps> = ({
   disabled = false,
 }) => {
   const [inputValue, setInputValue] = useState(value);
-  const [selectedLocation, setSelectedLocation] =
-    useState<LocationDetails | null>(null);
+  const [selectedLocation, setSelectedLocation] = useState<LocationDetails | null>(null);
   const [showDropdown, setShowDropdown] = useState(false);
 
   const inputRef = useRef<HTMLInputElement>(null);
@@ -66,16 +65,26 @@ const LocationSearchInput: React.FC<LocationSearchInputProps> = ({
     }
   };
 
-  // Handle location selection
+  // Handle location selection - THIS WAS THE MAIN ISSUE
   const handleLocationSelect = async (prediction: LocationPrediction) => {
-    const locationDetails = await getLocationDetails(prediction.place_id);
+    try {
+      const locationDetails = await getLocationDetails(prediction.place_id);
 
-    if (locationDetails) {
-      setSelectedLocation(locationDetails);
-      setInputValue(prediction.description);
-      setShowDropdown(false);
-      clearPredictions();
-      onLocationSelect?.(locationDetails);
+      if (locationDetails) {
+        // Update the input value with the selected location
+        setInputValue(prediction.description);
+        setSelectedLocation(locationDetails);
+        setShowDropdown(false);
+        clearPredictions();
+        
+        // Call the callback with location details
+        onLocationSelect?.(locationDetails);
+        
+        // Also call onInputChange to keep parent updated
+        onInputChange?.(prediction.description);
+      }
+    } catch (error) {
+      console.error("Error selecting location:", error);
     }
   };
 
@@ -107,7 +116,7 @@ const LocationSearchInput: React.FC<LocationSearchInputProps> = ({
     if (value !== inputValue) {
       setInputValue(value);
     }
-  }, [value, inputValue]);
+  }, [value]);
 
   return (
     <div className={`flex flex-col gap-2 ${className}`}>
@@ -128,7 +137,7 @@ const LocationSearchInput: React.FC<LocationSearchInputProps> = ({
               !isInitialized ? "Loading location services..." : placeholder
             }
             disabled={disabled || !isInitialized}
-            className={`w-full px-4 py-3 pl-12 border border-gray-300 rounded-lg outline-none transition-colors`}
+            className="w-full px-4 py-3 pl-12 border border-gray-300 rounded-lg outline-none transition-colors  "
             onFocus={() => {
               if (predictions.length > 0) {
                 setShowDropdown(true);

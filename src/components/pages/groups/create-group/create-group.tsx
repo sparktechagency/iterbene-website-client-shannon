@@ -21,6 +21,8 @@ import toast from "react-hot-toast";
 import { IMyConnections } from "@/types/connection.types";
 import { LocationDetails } from "@/hooks/useGoogleLocationSearch";
 import LocationSearchInput from "@/components/custom/LocationSearchInput";
+import { zodResolver } from "@hookform/resolvers/zod";
+import groupValidationSchema from "@/validation/group.validation";
 
 const { Option } = Select;
 
@@ -71,12 +73,18 @@ const CreateGroup: React.FC = () => {
   };
 
   const handleFormSubmit = async (values: FieldValues) => {
+
     // Validate location selection
     if (!selectedLocation) {
       toast.error("Please select a valid location");
       return;
     }
-
+    // Validate group image
+    if (!groupFile) {
+      toast.error("Please upload a group image");
+      return;
+    }
+    
     try {
       const formData = new FormData();
       formData.append("name", values.groupName);
@@ -134,6 +142,7 @@ const CreateGroup: React.FC = () => {
         }
         isOpen={isModalOpen}
         onClose={closeModal}
+        className="w-full p-2"
       >
         {/* Group Image */}
         <div className="w-full h-44 bg-[#DDDDDD] rounded-xl mb-4 relative flex items-center justify-center">
@@ -191,7 +200,7 @@ const CreateGroup: React.FC = () => {
         </div>
 
         {/* Form */}
-        <CustomForm onSubmit={handleFormSubmit}>
+        <CustomForm onSubmit={handleFormSubmit} resolver={zodResolver(groupValidationSchema)}>
           <div className="flex flex-col gap-6 mt-8">
             <CustomInput
               type="text"
