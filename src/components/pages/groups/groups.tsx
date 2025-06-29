@@ -7,7 +7,7 @@ import SuggestionGroups from "./suggestion-group/SuggestionGroups";
 
 const Groups = () => {
   return (
-    <section className="w-full pb-8 space-y-8">
+    <section className="w-full pb-10 space-y-8">
       <CreateGroup />
       <MyGroups />
       <hr className="border-t border-gray-400" />
