@@ -12,6 +12,7 @@ import {
   useNotInterestEventMutation,
   useRemoveEventMutation,
 } from "@/redux/features/event/eventApi";
+import ConfirmationPopup from "@/components/custom/custom-popup";
 
 const EventDetailsHeader = ({
   eventDetailsData,
@@ -24,12 +25,14 @@ const EventDetailsHeader = ({
     (interestedUser) => interestedUser?._id === user?._id
   );
   const [isInviteModalOpen, setIsInviteModalOpen] = useState<boolean>(false);
+  const [isRemoveModalOpen, setIsRemoveModalOpen] = useState<boolean>(false);
   const router = useRouter();
   const [interested, { isLoading: isInterestedLoading }] =
     useInterestEventMutation();
   const [noInterest, { isLoading: isNoInterestLoading }] =
     useNotInterestEventMutation();
   const [removeEvent, { isLoading: isRemoving }] = useRemoveEventMutation();
+
   const handleRemoveEvent = async () => {
     try {
       await removeEvent(eventDetailsData?._id).unwrap();
@@ -40,6 +43,7 @@ const EventDetailsHeader = ({
       toast.error(err?.data?.message || "Failed to remove event");
     }
   };
+
   const handleInterested = async () => {
     try {
       await interested(eventDetailsData?._id).unwrap();
@@ -49,13 +53,14 @@ const EventDetailsHeader = ({
       toast.error(err?.data?.message || "Failed to express interest");
     }
   };
+
   const handleNotInterest = async () => {
     try {
       await noInterest(eventDetailsData?._id).unwrap();
       toast.success("You are no longer interested in this event");
     } catch (error) {
       const err = error as TError;
-      toast.error(err?.data?.message || "Failed to express interest");
+      toast.error(err?.data?.message || "Failed to express not interested");
     }
   };
 
@@ -66,6 +71,15 @@ const EventDetailsHeader = ({
   const closeInviteModal = () => {
     setIsInviteModalOpen(false);
   };
+
+  const openRemoveModal = () => {
+    setIsRemoveModalOpen(true);
+  };
+
+  const closeRemoveModal = () => {
+    setIsRemoveModalOpen(false);
+  };
+
   return (
     <>
       <div className="w-full bg-white rounded-xl relative">
@@ -79,10 +93,10 @@ const EventDetailsHeader = ({
           />
         )}
 
-        <div className="w-full flex flex-col md:flex-row justify-between items-center gap-4 md:gap-8 px-[24px] pt-[16px] pb-[20px]  ">
+        <div className="w-full flex flex-col md:flex-row justify-between items-center gap-4 md:gap-8 px-[24px] pt-[16px] pb-[20px]">
           <div className="space-y-2">
             <h1 className="text-center md:text-left text-lg sm:text-xl md:text-2xl xl:text-3xl font-bold text-gray-800">
-              {eventDetailsData?.eventName}{" "}
+              {eventDetailsData?.eventName}
             </h1>
             <div className="flex flex-wrap gap-2 sm:gap-3 text-gray-600 text-sm sm:text-lg items-center">
               {eventDetailsData?.privacy === "public" ? (
@@ -112,8 +126,8 @@ const EventDetailsHeader = ({
                 {owner ? (
                   <button
                     disabled={isRemoving}
-                    onClick={handleRemoveEvent}
-                    className="text-gray-600 cursor-pointer bg-transparent border border-gray-600 font-medium px-5 py-2 rounded-xl  transition-colors"
+                    onClick={openRemoveModal}
+                    className="text-gray-600 cursor-pointer bg-transparent border border-gray-600 font-medium px-5 py-2 rounded-xl transition-colors"
                   >
                     Remove
                   </button>
@@ -121,7 +135,7 @@ const EventDetailsHeader = ({
                   <button
                     disabled={isNoInterestLoading}
                     onClick={handleNotInterest}
-                    className="text-gray-600 text-base cursor-pointer bg-transparent border border-gray-600 font-medium px-5 py-2 rounded-xl  transition-colors"
+                    className="text-gray-600 text-base cursor-pointer bg-transparent border border-gray-600 font-medium px-5 py-2 rounded-xl transition-colors"
                   >
                     Not Interested
                   </button>
@@ -148,6 +162,19 @@ const EventDetailsHeader = ({
         isInviteModalOpen={isInviteModalOpen}
         setIsInviteModalOpen={setIsInviteModalOpen}
         closeInviteModal={closeInviteModal}
+      />
+
+      {/* Remove Event Confirmation Modal */}
+      <ConfirmationPopup
+        isOpen={isRemoveModalOpen}
+        onClose={closeRemoveModal}
+        onConfirm={handleRemoveEvent}
+        type="warning"
+        title="Remove Event"
+        message="Are you sure you want to remove this event? This action cannot be undone."
+        confirmText="Remove"
+        cancelText="Cancel"
+        isLoading={isRemoving}
       />
     </>
   );

@@ -43,8 +43,8 @@ const storiesApi = baseApi.injectEndpoints({
       }),
     }),
     deleteStory: builder.mutation({
-      query: (storyId) => ({
-        url: `/stories/${storyId}`,
+      query: (mediaId) => ({
+        url: `/stories/${mediaId}`,
         method: "DELETE",
       }),
       invalidatesTags: ["Stories"],

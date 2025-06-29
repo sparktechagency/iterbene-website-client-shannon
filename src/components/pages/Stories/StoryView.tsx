@@ -16,14 +16,14 @@ import {
   Send,
   Volume2,
   VolumeX,
-  X,
   Trash2,
   MoreVertical,
+  X,
 } from "lucide-react";
 import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
 import React, { useEffect, useRef, useState, useCallback } from "react";
-
+import { motion, AnimatePresence } from "framer-motion"; // Import Framer Motion
 const StoryView = () => {
   const { storyId } = useParams();
   const router = useRouter();
@@ -64,6 +64,9 @@ const StoryView = () => {
   const startTimeRef = useRef<number>(0);
   const pausedTimeRef = useRef<number>(0);
 
+  //is story delete state
+  const showMenuRef = useRef<HTMLDivElement>(null);
+  // Constants
   const STORY_DURATION = 7000;
   const storyData = responseData?.data?.attributes;
 
@@ -296,21 +299,18 @@ const StoryView = () => {
     }
   };
 
-  const handleDeleteStory = async () => {
-    if (currentStory?._id) {
-      try {
-        await deleteStory(currentStory._id).unwrap();
-        // Navigate to next story or home
-        if (allStories.length > 1) {
-          handleNext();
-        } else {
-          router.push("/");
-        }
-      } catch (error) {
-        console.error("Failed to delete story:", error);
+  const handleDeleteStory = async (mediaId: string) => {
+    try {
+      await deleteStory(mediaId).unwrap();
+      // Navigate to next story or home
+      if (allStories.length > 1) {
+        handleNext();
+      } else {
+        router.push("/");
       }
+    } catch (error) {
+      console.error("Failed to delete story:", error);
     }
-    setShowMenu(false);
   };
 
   const formatTimeAgo = (date: Date) => {
@@ -405,33 +405,42 @@ const StoryView = () => {
                 )}
               </button>
             )}
-            {isOwnStory && (
+            {isOwnStory ? (
               <div className="relative">
                 <button
                   onClick={() => setShowMenu(!showMenu)}
-                  className="p-1 rounded-full bg-black/20"
+                  className="p-1 rounded-full bg-gray-300/20 cursor-pointer"
                 >
                   <MoreVertical className="w-5 h-5 text-white" />
                 </button>
-                {showMenu && (
-                  <div className="absolute right-0 top-8 bg-black/80 rounded-lg p-2 min-w-32">
-                    <button
-                      onClick={handleDeleteStory}
-                      className="flex items-center gap-2 text-red-400 text-sm p-2 hover:bg-black/40 rounded w-full"
+                <AnimatePresence>
+                  {showMenu && (
+                    <motion.div
+                      ref={showMenuRef}
+                      className="absolute right-0 mt-1 w-36 p-1 bg-gray-600 shadow-2xl rounded-xl z-50 cursor-pointer"
+                      initial={{ opacity: 0, scale: 0.95 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit="exit"
                     >
-                      <Trash2 className="w-4 h-4" />
-                      Delete
-                    </button>
-                  </div>
-                )}
+                      <button
+                        onClick={() => handleDeleteStory(currentMedia._id)}
+                        className="flex items-center gap-2 text-white text-sm p-2  "
+                      >
+                        <Trash2 className="w-4 h-4 text-red-500" />
+                        Delete
+                      </button>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
+            ) : (
+              <button
+                onClick={() => router.push(`/`)}
+                className="p-1 rounded-full bg-black/20 cursor-pointer"
+              >
+                <X className="w-5 h-5 text-white" />
+              </button>
             )}
-            <button
-              onClick={() => router.push("/")}
-              className="p-1 rounded-full bg-black/20 cursor-pointer"
-            >
-              <X className="w-5 h-5 text-white" />
-            </button>
           </div>
         </div>
 
