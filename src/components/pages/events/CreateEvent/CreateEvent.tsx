@@ -149,6 +149,7 @@ const CreateEvent: React.FC = () => {
         }
         isOpen={isModalOpen}
         onClose={closeModal}
+        className="w-full p-2"
       >
         {/* Event Image */}
         <div className="w-full h-44 bg-[#DDDDDD] rounded-xl mb-4 relative flex items-center justify-center">

@@ -42,7 +42,7 @@
 
 // export default MyGroupCard;
 
-import CustomModal from "@/components/custom/custom-modal";
+import ConfirmationPopup from "@/components/custom/custom-popup";
 import { useRemoveGroupMutation } from "@/redux/features/group/groupApi";
 import { TError } from "@/types/error";
 import { IGroup } from "@/types/group.types";
@@ -51,7 +51,6 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import toast from "react-hot-toast";
-import { IoCloseSharp } from "react-icons/io5";
 import { PiUserBold } from "react-icons/pi";
 const MyGroupCard = ({ group }: { group: IGroup }) => {
   const router = useRouter();
@@ -120,54 +119,18 @@ const MyGroupCard = ({ group }: { group: IGroup }) => {
         </div>
       </div>
       {/* Delete Group Confirmation Modal */}
-      <CustomModal
+      {/* Delete Group Confirmation Modal */}
+      <ConfirmationPopup
         isOpen={isDeleteModalOpen}
         onClose={closeDeleteModal}
-        maxWidth="max-w-md"
-        header={
-          <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 rounded-t-xl">
-            <h2 className="text-xl font-semibold text-gray-800">
-              Confirm Delete Group
-            </h2>
-            <button
-              className="text-gray-600 hover:text-gray-800 text-2xl cursor-pointer"
-              onClick={closeDeleteModal}
-            >
-              <IoCloseSharp size={18} />
-            </button>
-          </div>
-        }
-      >
-        <div className="p-6 space-y-4">
-          <p className="text-gray-600 text-lg">
-            Are you sure you want to delete this group? This action will
-            permanently remove the group and all its content for all members.
-            This cannot be undone.
-          </p>
-          <div className="flex gap-3 pt-4 border-t border-gray-200">
-            <button
-              onClick={closeDeleteModal}
-              className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
-            >
-              Cancel
-            </button>
-            <button
-              onClick={() => {
-                handleRemoveGroup();
-                closeDeleteModal();
-              }}
-              disabled={isRemoveLoading}
-              className={`flex-1 px-4 py-2 rounded-lg transition-colors cursor-pointer ${
-                isRemoveLoading
-                  ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                  : "bg-secondary text-white"
-              }`}
-            >
-              {isRemoveLoading ? "Deleting..." : "Delete"}
-            </button>
-          </div>
-        </div>
-      </CustomModal>
+        onConfirm={handleRemoveGroup}
+        type="delete"
+        title="Delete Group"
+        message="Are you sure you want to delete this group? This action cannot be undone."
+        confirmText="Delete"
+        cancelText="Cancel"
+        isLoading={isRemoveLoading}
+      />
     </>
   );
 };
