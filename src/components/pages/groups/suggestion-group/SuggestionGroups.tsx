@@ -1,16 +1,22 @@
 "use client";
-import {useGetSuggestionsGroupsQuery } from "@/redux/features/group/groupApi";
+import { useGetSuggestionsGroupsQuery } from "@/redux/features/group/groupApi";
 import { IGroup } from "@/types/group.types";
 import SuggestionGroupCard from "./SuggestionGroupCard";
+import MyGroupCardSkeleton from "../my-groups/MyGroupCardSkeleton";
 const SuggestionGroups = () => {
   const { data: responseData, isLoading } =
     useGetSuggestionsGroupsQuery(undefined);
   const groupsData = responseData?.data?.attributes?.results;
   let content = null;
-  if (isLoading) {
-    content = <p>Loading...</p>;
-  }
-  if (groupsData?.length === 0) {
+  if (!isLoading) {
+    content = (
+      <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+        {Array.from({ length: 3 }).map((_, index) => (
+          <MyGroupCardSkeleton key={`skeleton-${index}`} />
+        ))}
+      </div>
+    );
+  } else if (groupsData?.length === 0) {
     content = <p className="text-xl">No suggestions groups found</p>;
   } else if (groupsData?.length > 0) {
     content = (
@@ -28,7 +34,6 @@ const SuggestionGroups = () => {
         <h1 className="text-xl md:text-2xl font-semibold text-gray-800">
           You Might Like
         </h1>
-        <button className="text-primary hover:underline">Show more</button>
       </div>
 
       {/* Content Section */}

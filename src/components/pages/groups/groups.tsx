@@ -7,13 +7,16 @@ import SuggestionGroups from "./suggestion-group/SuggestionGroups";
 
 const Groups = () => {
   return (
-    <>
+    <section className="w-full pb-8 space-y-8">
       <CreateGroup />
       <MyGroups />
+      <hr className="border-t border-gray-400" />
       <InvitedGroups />
+       <hr className="border-t border-gray-400" />
       <JoinedGroups />
-      <SuggestionGroups/>
-    </>
+       <hr className="border-t border-gray-400" />
+      <SuggestionGroups />
+    </section>
   );
 };
 

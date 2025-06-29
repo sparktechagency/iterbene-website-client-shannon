@@ -26,7 +26,6 @@ const MyEvents = () => {
         <h1 className="text-xl md:text-2xl font-semibold text-gray-800">
           My Upcoming Events
         </h1>
-        <button className="text-primary hover:underline">Show more</button>
       </div>
       {/* Content Section */}
       {content}

@@ -3,14 +3,20 @@ import { useGetMyGroupsQuery } from "@/redux/features/group/groupApi";
 import { IGroup } from "@/types/group.types";
 import React from "react";
 import MyGroupCard from "./my-group-card";
+import MyGroupCardSkeleton from "./MyGroupCardSkeleton";
 const MyGroups: React.FC = () => {
   const { data: responseData, isLoading } = useGetMyGroupsQuery(undefined);
   const groupsData = responseData?.data?.attributes?.results;
   let content = null;
-  if (isLoading) {
-    content = <p>Loading...</p>;
-  }
-  if (groupsData?.length === 0) {
+  if (!isLoading) {
+    content = (
+      <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+        {Array.from({ length: 3 }).map((_, index) => (
+          <MyGroupCardSkeleton key={`skeleton-${index}`} />
+        ))}
+      </div>
+    );
+  } else if (groupsData?.length === 0) {
     content = <p className="text-xl">No groups found</p>;
   } else if (groupsData?.length > 0) {
     content = (
@@ -22,7 +28,7 @@ const MyGroups: React.FC = () => {
     );
   }
   return (
-    <section className="w-full pt-2 pb-7 border-[#9EA1B3] border-b">
+    <section className="w-full">
       {/* Header Section */}
       <div className="w-full flex items-center justify-between mb-6">
         <h1 className="text-xl md:text-2xl font-semibold text-gray-800">
