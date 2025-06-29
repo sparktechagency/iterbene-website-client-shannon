@@ -100,7 +100,7 @@ const SuggestionConnections = () => {
             <button
               onClick={handleViewMore}
               disabled={isLoadingMore}
-              className="bg-primary text-white cursor-pointer font-medium px-6 py-3 rounded-xl transition-colors duration-200 flex items-center gap-2"
+              className="bg-secondary text-white cursor-pointer font-medium px-6 py-3 rounded-xl transition-colors duration-200 flex items-center gap-2"
             >
               {isLoadingMore ? (
                 <>

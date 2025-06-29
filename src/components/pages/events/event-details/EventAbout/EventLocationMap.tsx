@@ -4,7 +4,9 @@ import { GoogleMap, Marker, useJsApiLoader } from "@react-google-maps/api";
 import React from "react";
 
 // Map container mx-auto style
-const mapcontainer mx-autoStyle: React.CSSProperties = {
+
+// Map container style
+const mapContainerStyle: React.CSSProperties = {
   width: "100%",
   height: "100%",
 };
@@ -26,12 +28,12 @@ const EventLocationMap = ({
   const groupLocation = {
     lat:
       typeof eventDetailsData?.location?.latitude === "number" &&
-        isFinite(eventDetailsData.location.latitude)
+      isFinite(eventDetailsData.location.latitude)
         ? eventDetailsData.location.latitude
         : defaultLocation.lat,
     lng:
       typeof eventDetailsData?.location?.longitude === "number" &&
-        isFinite(eventDetailsData.location.longitude)
+      isFinite(eventDetailsData.location.longitude)
         ? eventDetailsData.location.longitude
         : defaultLocation.lng,
   };
@@ -44,9 +46,9 @@ const EventLocationMap = ({
   // Define custom marker icon only after Google Maps is loaded
   const customMarkerIcon = isLoaded
     ? {
-      url: "https://i.ibb.co/BVgNBSG8/interested.png",
-      scaledSize: new window.google.maps.Size(40, 40),
-    }
+        url: "https://iter-bene.s3.eu-north-1.amazonaws.com/uploads/maps/interested.png",
+        scaledSize: new window.google.maps.Size(40, 40),
+      }
     : null;
 
   if (!isLoaded) {
@@ -71,7 +73,7 @@ const EventLocationMap = ({
     <div className="w-full col-span-full md:col-span-5 bg-white p-4 rounded-xl space-y-2">
       <div className="rounded-xl shadow-md h-[272px] overflow-hidden z-20">
         <GoogleMap
-          mapcontainer mx-autoStyle={mapcontainer mx-autoStyle}
+          mapContainerStyle={mapContainerStyle}
           center={groupLocation}
           zoom={10}
           options={{
@@ -94,7 +96,7 @@ const EventLocationMap = ({
       <h1 className="text-xl md:text-[22px] text-gray-900 mt-4 font-medium">
         {eventDetailsData?.locationName || "Unknown Location"}
       </h1>
-    </div >
+    </div>
   );
 };
 
