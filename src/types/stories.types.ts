@@ -15,13 +15,16 @@ interface IReactions {
   reactionType: string;
 }
 
-interface IMedia {
+interface IStoryMedia {
   _id: string;
-  mediaType: string;
   mediaUrl: string;
   textContent?: string;
   textFontFamily?: string;
   backgroundColor?: string;
+  mediaType: string;
+  viewedBy: IViewer[];
+  viewCount: number;
+  reactions: IReactions[];
 }
 
 interface IUser {
@@ -32,11 +35,7 @@ interface IUser {
 export interface IStory {
   _id: string;
   userId: IUser;
-  mediaIds: IMedia[];
-  viewedBy: IViewer[];
-  reactions: IReactions[];
-  viewCount: number;
-  replies: string[];
+  mediaIds: IStoryMedia[];
   privacy: string;
   expiresAt: Date;
   createdAt: Date;

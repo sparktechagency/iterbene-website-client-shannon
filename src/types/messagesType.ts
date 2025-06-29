@@ -5,6 +5,8 @@ export enum MessageType {
   VIDEO = "video",
   DOCUMENT = "document", // PDF, Word, etc.
   MIXED = "mixed", // Text + Media (Image, Audio, Video, PDF, etc.)
+   STORYMESSAGE = 'storyMessage', // For story messages
+  
 }
 
 export interface IContent {
@@ -23,6 +25,10 @@ export interface IMessage {
     profileImage: string
     email: string
   };
+  storyMedia?:{
+    _id: string
+    mediaUrl: string
+  }
   content: IContent;
   seenBy?: string[];
   deletedBy?: string[];

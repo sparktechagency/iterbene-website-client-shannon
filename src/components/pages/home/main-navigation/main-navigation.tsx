@@ -1,22 +1,19 @@
-import {
-  File,
-  Image as Images,
-} from "lucide-react";
+import { Calendar, Images, Newspaper } from "lucide-react";
 import { HiOutlineUserGroup, HiOutlineUsers } from "react-icons/hi";
-import { FaRegCalendarMinus } from "react-icons/fa";
 import { FiPlayCircle } from "react-icons/fi";
 import ActiveNavigation from "./active-navigation";
+import useUser from "@/hooks/useUser";
 
 const MainNavigation = () => {
-  const user = true;
+  const user = useUser();
   const userNotExistsMenuNavigationLinks = [
     {
-      icon: <File size={24} />,
+      icon: <Newspaper size={24} />,
       name: "Feed",
       href: "/feed",
     },
     {
-      icon: <FaRegCalendarMinus size={24} />,
+      icon: <Calendar size={24} />,
       name: "Events",
       href: "/events",
     },
@@ -33,7 +30,7 @@ const MainNavigation = () => {
   ];
   const userExistsMenuNavigationLinks = [
     {
-      icon: <File size={24} />,
+      icon: <Newspaper size={24} />,
       name: "Feed",
       href: "/feed",
     },
@@ -48,7 +45,7 @@ const MainNavigation = () => {
       href: "/groups",
     },
     {
-      icon: <FaRegCalendarMinus size={24} />,
+      icon: <Calendar size={24} />,
       name: "Events",
       href: "/events",
     },
@@ -63,7 +60,9 @@ const MainNavigation = () => {
       href: "/photos",
     },
   ];
-  const menuNavigationLinks = user ? userExistsMenuNavigationLinks : userNotExistsMenuNavigationLinks;
+  const menuNavigationLinks = user
+    ? userExistsMenuNavigationLinks
+    : userNotExistsMenuNavigationLinks;
   return (
     <section className="w-full bg-white p-6 rounded-2xl">
       <div className="flex flex-col gap-6">

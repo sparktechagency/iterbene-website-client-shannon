@@ -11,7 +11,7 @@ const storiesApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["Stories"],
     }),
-       getStory: builder.query({
+    getStory: builder.query({
       query: (id) => `/stories/${id}`,
     }),
     getFeedStories: builder.query({
@@ -22,25 +22,32 @@ const storiesApi = baseApi.injectEndpoints({
       providesTags: ["Stories"],
     }),
     viewStory: builder.mutation({
-      query: (storyId) => ({
+      query: (mediaId) => ({
         url: "/stories/view",
         method: "POST",
-        body: { storyId },
+        body: { mediaId },
       }),
     }),
     reactToStory: builder.mutation({
-      query: ({ storyId, reactionType }) => ({
+      query: ({ mediaId, reactionType }) => ({
         url: "/stories/react",
         method: "POST",
-        body: { storyId, reactionType },
+        body: { mediaId, reactionType },
       }),
     }),
     replyToStory: builder.mutation({
-      query: ({ storyId, message }) => ({
+      query: ({ mediaId, message }) => ({
         url: "/stories/reply",
         method: "POST",
-        body: { storyId, message },
-      })
+        body: { mediaId, message },
+      }),
+    }),
+    deleteStory: builder.mutation({
+      query: (storyId) => ({
+        url: `/stories/${storyId}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["Stories"],
     }),
   }),
 });
@@ -52,4 +59,5 @@ export const {
   useViewStoryMutation,
   useReactToStoryMutation,
   useReplyToStoryMutation,
+  useDeleteStoryMutation,
 } = storiesApi;
