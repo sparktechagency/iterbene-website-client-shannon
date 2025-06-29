@@ -10,11 +10,8 @@ const Groups = () => {
     <section className="w-full pb-10 space-y-8">
       <CreateGroup />
       <MyGroups />
-      <hr className="border-t border-gray-400" />
       <InvitedGroups />
-       <hr className="border-t border-gray-400" />
       <JoinedGroups />
-       <hr className="border-t border-gray-400" />
       <SuggestionGroups />
     </section>
   );

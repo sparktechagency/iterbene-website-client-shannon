@@ -67,7 +67,7 @@ const InterestedEvents: React.FC = () => {
       </div>
     );
   } else if (allInterestedEvents?.length === 0) {
-    content = <p className="text-center">No interested events found</p>;
+    content = null; // Don't render anything if no events are found
   } else if (allInterestedEvents?.length > 0) {
     content = (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -76,6 +76,11 @@ const InterestedEvents: React.FC = () => {
         ))}
       </div>
     );
+  }
+
+  // Only render the section if there are events or loading
+  if (!isLoading && !isLoadingMore && allInterestedEvents.length === 0) {
+    return null;
   }
 
   return (

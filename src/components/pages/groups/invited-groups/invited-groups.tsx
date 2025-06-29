@@ -57,6 +57,11 @@ const InvitedGroups: React.FC = () => {
   const showViewMoreButton =
     !isLoading && hasMoreData && groupsData?.length > 0;
 
+  // If no data and not loading, return null to hide the component
+  if (!isLoading && !isLoadingMore && allInvitedGroups?.length === 0) {
+    return null;
+  }
+
   let content = null;
   if (isLoading || isLoadingMore) {
     content = (
@@ -79,7 +84,7 @@ const InvitedGroups: React.FC = () => {
   }
 
   return (
-    <section className="w-full">
+    <section className="w-full border-b pb-7 border-gray-400">
       {/* Header Section */}
       <div className="w-full flex items-center justify-between mb-6">
         <h1 className="text-xl md:text-2xl font-semibold text-gray-800">

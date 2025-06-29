@@ -6,14 +6,11 @@ import SuggestionEvent from "./SuggestionEvent/SuggestionEvent";
 
 const Events = () => {
   return (
-   <section className="w-full pb-10 space-y-8">
+    <section className="w-full pb-10 space-y-8">
       <CreateEvent />
       <MyEvents />
-       <hr className="border-t border-gray-400" />
       <InvitedEvents />
-       <hr className="border-t border-gray-400" />
       <InterestedEvents />
-       <hr className="border-t border-gray-400" />
       <SuggestionEvent />
     </section>
   );

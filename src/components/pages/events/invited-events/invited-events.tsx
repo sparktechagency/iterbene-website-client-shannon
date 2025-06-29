@@ -4,6 +4,7 @@ import { IEventInvitation } from "@/types/event.types";
 import React, { useEffect, useState } from "react";
 import InvitedEventCard from "./invited-event-card";
 import MyGroupCardSkeleton from "../../groups/my-groups/MyGroupCardSkeleton";
+
 const InvitedEvents: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [isLoadingMore, setIsLoadingMore] = useState<boolean>(false);
@@ -56,6 +57,11 @@ const InvitedEvents: React.FC = () => {
   const showViewMoreButton =
     !isLoading && hasMoreData && eventsData?.length > 0;
 
+  // If no data and not loading, return null to hide the component
+  if (!isLoading && !isLoadingMore && allInvitedEvents?.length === 0) {
+    return null;
+  }
+
   let content = null;
   if (isLoading || isLoadingMore) {
     content = (
@@ -78,7 +84,7 @@ const InvitedEvents: React.FC = () => {
   }
 
   return (
-    <section className="w-full">
+    <section className="w-full border-b pb-7 border-gray-400 ">
       {/* Header Section */}
       <div className="w-full flex items-center justify-between mb-6">
         <h1 className="text-xl md:text-2xl font-semibold text-gray-800">

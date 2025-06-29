@@ -4,10 +4,11 @@ import { IGroup } from "@/types/group.types";
 import React, { useEffect, useState } from "react";
 import MyGroupCard from "./my-group-card";
 import MyGroupCardSkeleton from "./MyGroupCardSkeleton";
+
 const MyGroups: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [isLoadingMore, setIsLoadingMore] = useState<boolean>(false);
-  const [allMyGroups, setAllConnections] = useState<IGroup[]>([]);
+  const [allMyGroups, setAllMyGroups] = useState<IGroup[]>([]);
   const { data: responseData, isLoading } = useGetMyGroupsQuery(
     [
       {
@@ -29,12 +30,12 @@ const MyGroups: React.FC = () => {
   useEffect(() => {
     if (groupsData && groupsData?.length > 0) {
       if (currentPage === 1) {
-        // First page - replace all connections
-        setAllConnections(groupsData);
+        // First page - replace all groups
+        setAllMyGroups(groupsData);
       } else {
-        // Additional pages - append only new unique connections
-        setAllConnections((prev) => {
-          const existingIds = new Set(prev.map((conn) => conn._id));
+        // Additional pages - append only new unique groups
+        setAllMyGroups((prev) => {
+          const existingIds = new Set(prev.map((group) => group._id));
           const newGroups = groupsData.filter(
             (group: IGroup) => !existingIds.has(group._id)
           );
@@ -56,6 +57,11 @@ const MyGroups: React.FC = () => {
   const showViewMoreButton =
     !isLoading && hasMoreData && groupsData?.length > 0;
 
+  // If no data and not loading, return null to hide the component
+  if (!isLoading && !isLoadingMore && allMyGroups?.length === 0) {
+    return null;
+  }
+
   let content = null;
   if (isLoading || isLoadingMore) {
     content = (
@@ -69,15 +75,16 @@ const MyGroups: React.FC = () => {
     content = <p className="text-center">No groups found</p>;
   } else if (allMyGroups?.length > 0) {
     content = (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3  gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {allMyGroups?.map((group: IGroup) => (
           <MyGroupCard key={group?._id} group={group} />
         ))}
       </div>
     );
   }
+
   return (
-    <section className="w-full">
+    <section className="w-full border-b pb-7 border-gray-400">
       {/* Header Section */}
       <div className="w-full flex items-center justify-between mb-6">
         <h1 className="text-xl md:text-2xl font-semibold text-gray-800">
