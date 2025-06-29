@@ -90,10 +90,7 @@ const Stories = () => {
           <SwiperSlide key={story._id}>
             <div onClick={() => handleStoryClick(story._id)}>
               <StoryCard
-                image={story?.mediaIds[0]?.mediaUrl}
-                mediaType={story?.mediaIds[0]?.mediaType}
-                authorName={story?.userId?.username}
-                authorImage={story?.userId?.profileImage}
+                story={story}
               />
             </div>
           </SwiperSlide>
