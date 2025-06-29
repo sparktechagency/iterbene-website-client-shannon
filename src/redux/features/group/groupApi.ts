@@ -12,10 +12,20 @@ const groupApi = baseApi.injectEndpoints({
       invalidatesTags: ["Groups"],
     }),
     getMyGroups: builder.query({
-      query: () => ({
-        url: "/groups/my-groups",
-        method: "GET",
-      }),
+      query: (filters) => {
+        const params = new URLSearchParams();
+        if (filters) {
+          filters?.forEach(
+            (filter: { key: string; value: string }) =>
+              filter?.value && params.append(filter?.key, filter?.value)
+          );
+        }
+        return {
+          url: "/groups/my-groups",
+          method: "GET",
+          params,
+        };
+      },
       providesTags: ["Groups"],
     }),
     getGroup: builder.query({
@@ -90,10 +100,20 @@ const groupApi = baseApi.injectEndpoints({
       providesTags: ["Groups"],
     }),
     getSuggestionsGroups: builder.query({
-      query: () => ({
-        url: "/groups/suggestions",
-        method: "GET",
-      }),
+      query: (filters) => {
+        const params = new URLSearchParams();
+        if (filters?.length > 0) {
+          filters?.forEach(
+            (filter: { key: string; value: string }) =>
+              filter?.value && params.append(filter?.key, filter?.value)
+          );
+        }
+        return {
+          url: `/groups/suggestions`,
+          method: "GET",
+          params,
+        };
+      },
       providesTags: ["Groups"],
     }),
     getMyInvitedGroups: builder.query({
