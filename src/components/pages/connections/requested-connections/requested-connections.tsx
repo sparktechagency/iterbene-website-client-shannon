@@ -35,7 +35,6 @@ const RequestedConnections: React.FC = () => {
             <h1 className="text-sm font-semibold">{requestCount}</h1>
           </div>
         </div>
-        <button className="text-primary hover:underline">Show more</button>
       </div>
       {/* Content Section */}
       {content}

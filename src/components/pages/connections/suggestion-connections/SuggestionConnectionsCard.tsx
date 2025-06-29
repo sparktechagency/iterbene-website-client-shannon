@@ -1,7 +1,5 @@
 import {
   useAddConnectionMutation,
-  // useCancelConnectionMutation,
-  useCheckIsSentConnectionExistsQuery,
   useRemoveSuggestionConnectionMutation,
 } from "@/redux/features/connections/connectionsApi";
 import { IConnection } from "@/types/connection.types";
@@ -9,18 +7,9 @@ import { TError } from "@/types/error";
 import Image from "next/image";
 import Link from "next/link";
 import toast from "react-hot-toast";
-const AddConnectionCard = ({ connection }: { connection: IConnection }) => {
-  const { data: responseData } = useCheckIsSentConnectionExistsQuery(
-    connection?._id,
-    {
-      skip: !connection?._id,
-    }
-  );
+const SuggestionConnectionsCard = ({ connection }: { connection: IConnection }) => {
   const [addConnection] = useAddConnectionMutation();
   const [removeConnection] = useRemoveSuggestionConnectionMutation();
-  // const [cancelRequest] = useCancelConnectionMutation();
-  // const result = responseData?.data?.attributes;
-  // const checkSentConnectionExist = result?.status === "pending";
 
   const handleAddConnection = async () => {
     try {
@@ -32,15 +21,6 @@ const AddConnectionCard = ({ connection }: { connection: IConnection }) => {
       toast.error(err?.data?.message || "Something went wrong!");
     }
   };
-  // const handleCancelRequest = async () => {
-  //   try {
-  //     await cancelRequest(connection?._id).unwrap();
-  //     toast.success("Request canceled successfully!");
-  //   } catch (error) {
-  //     const err = error as TError;
-  //     toast.error(err?.data?.message || "Something went wrong!");
-  //   }
-  // };
 
   const handleRemoveConnection = async () => {
     try {
@@ -86,4 +66,4 @@ const AddConnectionCard = ({ connection }: { connection: IConnection }) => {
   );
 };
 
-export default AddConnectionCard;
+export default SuggestionConnectionsCard;

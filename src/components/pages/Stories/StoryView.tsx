@@ -22,7 +22,7 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 
 const StoryView = () => {
   const { storyId } = useParams();
@@ -60,7 +60,9 @@ const StoryView = () => {
   const [hasViewedCurrent, setHasViewedCurrent] = useState(false);
 
   const videoRef = useRef<HTMLVideoElement>(null);
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const progressIntervalRef = useRef<number | null>(null);
+  const startTimeRef = useRef<number>(0);
+  const pausedTimeRef = useRef<number>(0);
 
   const STORY_DURATION = 7000;
   const storyData = responseData?.data?.attributes;
@@ -122,7 +124,7 @@ const StoryView = () => {
     setHasViewedCurrent(false);
   }, [currentMediaIndex, storyId]);
 
-  const handleNext = React.useCallback(() => {
+  const handleNext = useCallback(() => {
     if (
       currentStory &&
       currentMediaIndex < (currentStory.mediaIds?.length ?? 0) - 1
@@ -141,27 +143,42 @@ const StoryView = () => {
     }
   }, [currentStory, currentMediaIndex, currentStoryIndex, allStories, router]);
 
-  const startProgress = React.useCallback(() => {
-    setProgress(0);
-    const startTime = Date.now();
+  const clearProgressTimer = useCallback(() => {
+    if (progressIntervalRef.current) {
+      clearInterval(progressIntervalRef.current);
+      progressIntervalRef.current = null;
+    }
+  }, []);
 
-    const updateProgress = () => {
-      const elapsed = Date.now() - startTime;
+  const startProgress = useCallback(() => {
+    clearProgressTimer();
+    setProgress(0);
+    startTimeRef.current = Date.now();
+    pausedTimeRef.current = 0;
+
+    progressIntervalRef.current = window.setInterval(() => {
+      const currentTime = Date.now();
+      const elapsed =
+        currentTime - startTimeRef.current - pausedTimeRef.current;
       const newProgress = Math.min((elapsed / STORY_DURATION) * 100, 100);
+
       setProgress(newProgress);
 
       if (newProgress >= 100) {
+        clearProgressTimer();
         handleNext();
-      } else if (!isPaused) {
-        requestAnimationFrame(updateProgress);
       }
-    };
+    }, 50);
+  }, [STORY_DURATION, handleNext, clearProgressTimer]);
 
+  const pauseProgress = useCallback(() => {
     if (!isPaused) {
-      requestAnimationFrame(updateProgress);
+      pausedTimeRef.current += Date.now() - startTimeRef.current;
+      clearProgressTimer();
     }
-  }, [STORY_DURATION, isPaused, handleNext]);
+  }, [isPaused, clearProgressTimer]);
 
+  // Handle progress based on pause state
   useEffect(() => {
     if (!isPaused && currentStory) {
       startProgress();
@@ -170,11 +187,16 @@ const StoryView = () => {
     }
 
     return () => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-      }
+      clearProgressTimer();
     };
-  }, [currentMediaIndex, isPaused, currentStory, startProgress]);
+  }, [
+    currentMediaIndex,
+    isPaused,
+    currentStory,
+    startProgress,
+    pauseProgress,
+    clearProgressTimer,
+  ]);
 
   useEffect(() => {
     if (videoRef.current) {
@@ -183,12 +205,6 @@ const StoryView = () => {
       });
     }
   }, [currentMediaIndex]);
-
-  const pauseProgress = () => {
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-    }
-  };
 
   const handlePrev = () => {
     if (currentMediaIndex > 0) {
@@ -233,6 +249,10 @@ const StoryView = () => {
 
   const handleLike = async () => {
     if (currentStory?.mediaIds?.[currentMediaIndex]) {
+      // Temporarily pause the story during interaction
+      const wasPaused = isPaused;
+      setIsPaused(true);
+
       const mediaId = currentStory.mediaIds[currentMediaIndex]._id;
       try {
         await reactToStory({
@@ -242,12 +262,21 @@ const StoryView = () => {
         setIsLiked(!isLiked);
       } catch (error) {
         console.error("Failed to react to story:", error);
+      } finally {
+        // Resume story if it wasn't paused before
+        if (!wasPaused) {
+          setIsPaused(false);
+        }
       }
     }
   };
 
   const handleReply = async () => {
     if (replyText.trim() && currentStory?.mediaIds?.[currentMediaIndex]) {
+      // Temporarily pause the story during interaction
+      const wasPaused = isPaused;
+      setIsPaused(true);
+
       const mediaId = currentStory.mediaIds[currentMediaIndex]._id;
       try {
         await replyToStory({
@@ -255,10 +284,14 @@ const StoryView = () => {
           message: replyText.trim(),
         }).unwrap();
         setReplyText("");
-        // Show success message or toast
         console.log("Reply sent successfully!");
       } catch (error) {
         console.error("Failed to send reply:", error);
+      } finally {
+        // Resume story if it wasn't paused before
+        if (!wasPaused) {
+          setIsPaused(false);
+        }
       }
     }
   };
@@ -472,20 +505,18 @@ const StoryView = () => {
                 </div>
                 {currentMedia?.viewedBy?.length > 0 && (
                   <div className="flex items-center gap-2 mt-2">
-                    {currentMedia?.viewedBy.slice(0, 3).map((viewer) => (
+                    {currentMedia?.viewedBy?.map((viewer) => (
                       <div
                         key={viewer?._id}
                         className="w-8 h-8 rounded-full border-2 border-white overflow-hidden"
                       >
-                        {viewer?.profileImage && (
-                          <Image
-                            src={viewer?.profileImage}
-                            alt={viewer?.username}
-                            className="w-full h-full object-cover"
-                            width={32}
-                            height={32}
-                          />
-                        )}
+                        <Image
+                          src={viewer?.profileImage || "/default-avatar.png"}
+                          alt={viewer?.username || "Viewer"}
+                          className="w-full h-full object-cover"
+                          width={32}
+                          height={32}
+                        />
                       </div>
                     ))}
                     {currentMedia?.viewedBy?.length > 3 && (
@@ -506,7 +537,7 @@ const StoryView = () => {
                   value={replyText}
                   onChange={(e) => setReplyText(e.target.value)}
                   onKeyPress={(e) => e.key === "Enter" && handleReply()}
-                  className="flex-1 bg-transparent text-white  text-sm outline-none"
+                  className="flex-1 bg-transparent text-white text-sm outline-none"
                 />
               </div>
               <button
@@ -588,7 +619,7 @@ const StoryView = () => {
                 onClick={() => handleStorySelect(story, index)}
               >
                 <Image
-                  src={story.userId?.profileImage}
+                  src={story.userId?.profileImage || "/default-avatar.png"}
                   alt={story.userId?.username || "User"}
                   className="w-full h-full rounded-full object-cover border-2 border-black"
                   width={48}

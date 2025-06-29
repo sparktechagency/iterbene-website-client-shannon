@@ -97,10 +97,20 @@ const connectionsApi = baseApi.injectEndpoints({
       providesTags: ["Connections"],
     }),
     getSuggestionsConnections: builder.query({
-      query: () => ({
-        url: "/connections/suggestions",
-        method: "GET",
-      }),
+      query: (filters) => {
+        const params = new URLSearchParams();
+        if (filters?.length > 0) {
+          filters?.forEach(
+            (filter: { key: string; value: string }) =>
+              filter?.value && params.append(filter?.key, filter?.value)
+          );
+        }
+        return {
+          url: `/connections/suggestions`,
+          method: "GET",
+          params,
+        };
+      },
       providesTags: ["Connections"],
     }),
   }),

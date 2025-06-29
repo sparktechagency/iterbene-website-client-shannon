@@ -1,12 +1,12 @@
-import AddConnections from "./add-connections/add-connections";
+import SuggationConnections from "./suggestion-connections/SuggestionConnections";
 import RequestedConnections from "./requested-connections/requested-connections";
 
 const Connections = () => {
   return (
-    <section className="w-full space-y-8">
+    <section className="w-full pb-8 space-y-8">
       <RequestedConnections />
       <hr className="border-t border-gray-400" />
-      <AddConnections />
+      <SuggationConnections />
     </section>
   );
 };
