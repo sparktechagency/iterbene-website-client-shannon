@@ -17,7 +17,6 @@ const VideoCard = ({ url, className = "h-56 md:h-80", isVisible = true }: VideoC
   const [progress, setProgress] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
-  const [showControls, setShowControls] = useState(false);
   const [userInteracted, setUserInteracted] = useState(false);
   const [userPaused, setUserPaused] = useState(false); // Track if user manually paused
   const [isHovered, setIsHovered] = useState(false);
@@ -247,16 +246,10 @@ const VideoCard = ({ url, className = "h-56 md:h-80", isVisible = true }: VideoC
 
   const handleMouseEnter = () => {
     setIsHovered(true);
-    setShowControls(true);
   };
 
   const handleMouseLeave = () => {
     setIsHovered(false);
-    setTimeout(() => {
-      if (!isHovered) {
-        setShowControls(false);
-      }
-    }, 1000);
   };
 
   return (
@@ -315,7 +308,7 @@ const VideoCard = ({ url, className = "h-56 md:h-80", isVisible = true }: VideoC
       )}
 
       {/* Controls Overlay */}
-      {showControls && !isLoading && (
+      {isHovered && !isLoading && (
         <div className="absolute cursor-pointer inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20 z-10">
           {/* Bottom controls */}
           <div className="absolute bottom-4 left-4 right-4">

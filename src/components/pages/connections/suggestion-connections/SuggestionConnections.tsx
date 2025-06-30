@@ -55,7 +55,7 @@ const SuggestionConnections: React.FC = () => {
 
   const hasMoreData = currentPage < totalPages;
   const showViewMoreButton =
-    !isLoading && hasMoreData && allConnections.length > 0;
+    !isLoading && hasMoreData && allConnections?.length > 0;
 
   let content = null;
   if (isLoading || isLoadingMore) {
@@ -86,6 +86,8 @@ const SuggestionConnections: React.FC = () => {
     return null;
   }
 
+
+  console.log("Has More Data:", hasMoreData);
   return (
     <section className="w-full">
       {/* Header Section */}

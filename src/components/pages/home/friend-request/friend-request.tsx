@@ -4,7 +4,9 @@ import FriendRequestCard from "./friend-request-card";
 import { IConnectionRequest } from "@/types/connection.types";
 const FriendRequest = () => {
   const { data: responseData, isLoading } =
-    useGetConnectionRequestsQuery(undefined);
+    useGetConnectionRequestsQuery(undefined,{
+      refetchOnMountOrArgChange: true
+    });
   const connectionsRequestData = responseData?.data?.attributes?.results;
   const requestCount = responseData?.data?.attributes?.requestCount;
   let content = null;

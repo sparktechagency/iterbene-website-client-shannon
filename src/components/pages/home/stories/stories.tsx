@@ -16,7 +16,9 @@ import useUser from "@/hooks/useUser";
 const Stories = () => {
   //user
   const user = useUser();
-  const { data: storiesData } = useGetFeedStoriesQuery(undefined);
+  const { data: storiesData } = useGetFeedStoriesQuery(undefined,{
+    refetchOnMountOrArgChange: true
+  });
   const router = useRouter();
   const [stories, setStories] = useState<IStory[]>([]);
 

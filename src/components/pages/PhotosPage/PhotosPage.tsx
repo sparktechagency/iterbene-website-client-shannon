@@ -4,9 +4,12 @@ import { IPost } from "@/types/post.types";
 import PostCard from "../home/posts/post-card";
 
 const PhotosPage = () => {
-  const { data: responseData } = useFeedPostsQuery([
-    { key: "mediaType", value: "image" },
-  ]);
+  const { data: responseData } = useFeedPostsQuery(
+    [{ key: "mediaType", value: "image" }],
+    {
+      refetchOnMountOrArgChange: true,
+    }
+  );
   const photosData = responseData?.data?.attributes?.results;
   // const totalResults = responseData?.data?.attributes?.totalResults;
 

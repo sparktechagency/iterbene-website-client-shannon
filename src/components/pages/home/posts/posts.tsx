@@ -2,7 +2,7 @@
 import { useFeedPostsQuery } from "@/redux/features/post/postApi";
 import { IPost } from "@/types/post.types";
 import PostCard from "./post-card";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 
 const Posts = () => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -11,7 +11,11 @@ const Posts = () => {
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
 
-  const { data: responseData, isLoading, isError } = useFeedPostsQuery(
+  const {
+    data: responseData,
+    isLoading,
+    isError,
+  } = useFeedPostsQuery(
     [
       { key: "page", value: currentPage },
       { key: "limit", value: 10 },
@@ -23,9 +27,13 @@ const Posts = () => {
     }
   );
 
-  const postsData = Array.isArray(responseData?.data?.attributes?.results)
-    ? (responseData.data.attributes.results as IPost[])
-    : [];
+  const postsData = useMemo(
+    () =>
+      Array.isArray(responseData?.data?.attributes?.results)
+        ? (responseData.data.attributes.results as IPost[])
+        : [],
+    [responseData]
+  );
   const totalPages = responseData?.data?.attributes?.totalPages;
 
   // Update posts when new data is fetched

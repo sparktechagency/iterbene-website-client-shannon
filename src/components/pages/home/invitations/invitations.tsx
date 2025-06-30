@@ -11,7 +11,9 @@ import { FreeMode, Pagination, Autoplay } from "swiper/modules";
 import { useGetMyInvitesQuery } from "@/redux/features/event/eventApi";
 import { IEventInvitation } from "@/types/event.types";
 const Invitations: React.FC = () => {
-  const { data: responseData, isLoading } = useGetMyInvitesQuery(undefined);
+  const { data: responseData, isLoading } = useGetMyInvitesQuery(undefined, {
+    refetchOnMountOrArgChange: true,
+  });
   const invitationsEvent = responseData?.data?.attributes?.results;
   const invitationCount = responseData?.data?.attributes?.invitationCount;
   let content = null;
