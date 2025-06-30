@@ -7,34 +7,52 @@ import PostCardWrapper from "./PostCardWrapper";
 
 const Posts = () => {
   const {
-    data: responseData,
-    isLoading,
-    isError,
-  } = useFeedPostsQuery(undefined);
+    data: responseData
+  } = useFeedPostsQuery(undefined,{
+    refetchOnMountOrArgChange: true,
+    refetchOnFocus: true,
+    refetchOnReconnect: true
+  });
   const postsData = responseData?.data?.attributes?.results as
     | IPost[]
     | undefined;
 
-  if (isLoading) {
-    return <div className="w-full text-center py-4">Loading posts...</div>;
-  }
 
-  if (isError) {
-    return (
-      <div className="w-full text-center py-4 text-red-500">
-        Failed to load posts.
-      </div>
-    );
-  }
+  //   const [posts, setPosts] = useState(mockPosts)
+  // const [loading, setLoading] = useState(false)
 
-  if (!postsData || postsData.length === 0) {
-    return <div className="w-full text-center py-4">No posts available.</div>;
-  }
+  // const loadMorePosts = () => {
+  //   setLoading(true)
+  //   setTimeout(() => {
+  //     const newPosts = mockPosts.map((post) => ({
+  //       ...post,
+  //       id: post.id + posts.length,
+  //     }))
+  //     setPosts((prev) => [...prev, ...newPosts])
+  //     setLoading(false)
+  //   }, 1000)
+  // }
+
+  // useEffect(() => {
+  //   const handleScroll = () => {
+  //     if (
+  //       window.innerHeight + document.documentElement.scrollTop !== document.documentElement.offsetHeight ||
+  //       loading
+  //     ) {
+  //       return
+  //     }
+  //     loadMorePosts()
+  //   }
+
+  //   window.addEventListener("scroll", handleScroll)
+  //   return () => window.removeEventListener("scroll", handleScroll)
+  // }, [loading])
+
 
   return (
     <VideoContextProvider>
       <section className="w-full space-y-4">
-        {postsData.map((post: IPost) => (
+        {postsData?.map((post: IPost) => (
           <PostCardWrapper key={post._id} post={post}>
             <PostCard post={post} />
           </PostCardWrapper>

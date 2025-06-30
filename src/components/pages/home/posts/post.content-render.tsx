@@ -4,9 +4,10 @@ import Image from "next/image";
 import VideoCard from "../../UserProfilePage/UserVideos/VideoCard";
 interface PostContentRenderProps {
   data: IMedia[];
+  isVisible?: boolean;
 }
 
-const PostContentRender = ({ data }: PostContentRenderProps) => {
+const PostContentRender = ({ data,isVisible }: PostContentRenderProps) => {
   const mediaCount = data?.length;
 
   // Single media item
@@ -23,7 +24,7 @@ const PostContentRender = ({ data }: PostContentRenderProps) => {
             className="w-full object-contain cursor-pointer rounded-md"
           />
         ) : (
-          <VideoCard url={media?.mediaUrl} className="w-full h-[350px]" />
+          <VideoCard url={media?.mediaUrl} isVisible={isVisible}  className="w-full h-[350px]" />
         )}
       </div>
     );
@@ -44,7 +45,7 @@ const PostContentRender = ({ data }: PostContentRenderProps) => {
                 className="w-full h-[350px]  rounded-xl cursor-pointer"
               />
             ) : (
-              <VideoCard url={media?.mediaUrl} className="w-full h-[350px]" />
+              <VideoCard url={media?.mediaUrl} isVisible={isVisible} className="w-full h-[350px]" />
             )}
           </div>
         ))}
@@ -66,7 +67,7 @@ const PostContentRender = ({ data }: PostContentRenderProps) => {
               className="w-full h-[350px] object-cover rounded-xl cursor-pointer"
             />
           ) : (
-            <VideoCard url={data[0]?.mediaUrl} className="h-[350px]" />
+            <VideoCard url={data[0]?.mediaUrl} isVisible={isVisible}  className="h-[350px]" />
           )}
         </div>
         <div className="col-span-1">
@@ -79,7 +80,7 @@ const PostContentRender = ({ data }: PostContentRenderProps) => {
               className="w-full h-[260px] object-cover rounded-xl cursor-pointer"
             />
           ) : (
-            <VideoCard url={data[1]?.mediaUrl} className="h-[260px]" />
+            <VideoCard url={data[1]?.mediaUrl} isVisible={isVisible}  className="h-[260px]" />
           )}
         </div>
         <div className="col-span-1">
@@ -92,7 +93,7 @@ const PostContentRender = ({ data }: PostContentRenderProps) => {
               className="w-full h-[260px] object-cover rounded-xl cursor-pointer"
             />
           ) : (
-            <VideoCard url={data[2]?.mediaUrl} />
+            <VideoCard url={data[2]?.mediaUrl} isVisible={isVisible}  />
           )}
         </div>
       </div>
@@ -112,7 +113,7 @@ const PostContentRender = ({ data }: PostContentRenderProps) => {
               className="w-full h-full object-cover rounded-xl cursor-pointer"
             />
           ) : (
-            <VideoCard url={data[0]?.mediaUrl} />
+            <VideoCard url={data[0]?.mediaUrl} isVisible={isVisible}  />
           )}
         </div>
         <div className="row-span-2 col-span-1">
@@ -125,7 +126,7 @@ const PostContentRender = ({ data }: PostContentRenderProps) => {
               className="w-full h-full object-cover rounded-xl cursor-pointer"
             />
           ) : (
-            <VideoCard url={data[1]?.mediaUrl} />
+            <VideoCard url={data[1]?.mediaUrl} isVisible={isVisible}  />
           )}
         </div>
         <div className="col-span-1">
@@ -138,7 +139,7 @@ const PostContentRender = ({ data }: PostContentRenderProps) => {
               className="w-full h-full object-cover rounded-xl cursor-pointer"
             />
           ) : (
-            <VideoCard url={data[2]?.mediaUrl} />
+            <VideoCard url={data[2]?.mediaUrl} isVisible={isVisible}  />
           )}
         </div>
         <div className="col-span-1">
@@ -151,7 +152,7 @@ const PostContentRender = ({ data }: PostContentRenderProps) => {
               className="w-full h-full object-cover rounded-xl cursor-pointer"
             />
           ) : (
-            <VideoCard url={data[2]?.mediaUrl} />
+            <VideoCard url={data[2]?.mediaUrl} isVisible={isVisible}  />
           )}
         </div>
       </div>
@@ -171,7 +172,7 @@ const PostContentRender = ({ data }: PostContentRenderProps) => {
               className="w-full h-full object-cover rounded-xl cursor-pointer"
             />
           ) : (
-            <VideoCard url={data[0]?.mediaUrl} />
+            <VideoCard url={data[0]?.mediaUrl} isVisible={isVisible}  />
           )}
         </div>
         <div className="row-span-2 col-span-1">
@@ -184,7 +185,7 @@ const PostContentRender = ({ data }: PostContentRenderProps) => {
               className="w-full h-full object-cover rounded-xl cursor-pointer"
             />
           ) : (
-            <VideoCard url={data[1]?.mediaUrl} />
+            <VideoCard url={data[1]?.mediaUrl} isVisible={isVisible}  />
           )}
         </div>
         <div className="col-span-1">
@@ -197,7 +198,7 @@ const PostContentRender = ({ data }: PostContentRenderProps) => {
               className="w-full h-full object-cover rounded-xl cursor-pointer"
             />
           ) : (
-            <VideoCard url={data[2]?.mediaUrl} />
+            <VideoCard url={data[2]?.mediaUrl} isVisible={isVisible}  />
           )}
         </div>
         <div className="col-span-1 relative">
@@ -210,7 +211,7 @@ const PostContentRender = ({ data }: PostContentRenderProps) => {
               className="w-full h-full object-cover rounded-xl cursor-pointer"
             />
           ) : (
-            <VideoCard url={data[2]?.mediaUrl} />
+            <VideoCard url={data[2]?.mediaUrl} isVisible={isVisible}  />
           )}
           <div className="absolute top-0 left-0 w-full h-full bg-black/30 rounded-xl">
             <span className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white text-xl md:text-3xl">

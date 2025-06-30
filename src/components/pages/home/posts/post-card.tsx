@@ -10,7 +10,7 @@ import {
 } from "@/types/post.types";
 import { Tooltip } from "antd";
 import { AnimatePresence, motion } from "framer-motion";
-import { JSX, useState } from "react";
+import { JSX, useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { FaBan, FaCalendarCheck, FaHeart, FaRegHeart } from "react-icons/fa";
 import { FaFaceSmile } from "react-icons/fa6";
@@ -45,12 +45,50 @@ const formatNumber = (num: number): string => {
 
 const PostCard = ({ post }: PostCardProps) => {
   const user = useUser();
+  const postRef = useRef<HTMLDivElement>(null);
+  const [isVisible, setIsVisible] = useState(false)
   const currentUserId = user?._id;
   const [showReactions, setShowReactions] = useState<boolean>(false);
   const [showReactionDetails, setShowReactionDetails] =
     useState<boolean>(false);
   const [editCommentId, setEditCommentId] = useState<string | null>(null);
   const [editCommentText, setEditCommentText] = useState("");
+
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        const intersectionRatio = entry.intersectionRatio
+        const isIntersecting = entry.isIntersecting
+
+        let newVisibility = false
+
+        if (isIntersecting && intersectionRatio >= 0.5) {
+          newVisibility = true
+        } else if (!isIntersecting || intersectionRatio < 0.3) {
+          newVisibility = false
+        } else {
+          return
+        }
+
+        const timeoutId = setTimeout(() => {
+          setIsVisible(newVisibility)
+        }, 100)
+
+        return () => clearTimeout(timeoutId)
+      },
+      {
+        threshold: [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0],
+        rootMargin: "-20px 0px -20px 0px",
+      },
+    )
+
+    if (postRef.current) {
+      observer.observe(postRef.current)
+    }
+
+    return () => observer.disconnect()
+  }, [])
 
   const handleEdit = (commentId: string, commentText: string) => {
     setEditCommentId(commentId);
@@ -99,8 +137,10 @@ const PostCard = ({ post }: PostCardProps) => {
     }
   };
 
+
+  console.log("Is visible:", isVisible);
   return (
-    <div className="w-full  bg-white rounded-xl p-4 mb-4 relative">
+    <div ref={postRef} className="w-full  bg-white rounded-xl p-4 mb-4 relative">
       <PostHeader post={post} />
       <p className="text-gray-700 mb-4">
         {post?.content?.split(/(\s+)/).map((word, index) => {
@@ -115,7 +155,7 @@ const PostCard = ({ post }: PostCardProps) => {
           );
         })}
       </p>
-      <PostContentRender data={post.media || []} />
+      <PostContentRender data={post.media || []} isVisible={isVisible} />
       {/* Show reactions summary */}
       <div className="mt-5">
         {nonZeroReactions?.length > 0 && (
@@ -181,9 +221,8 @@ const PostCard = ({ post }: PostCardProps) => {
                           </div>
                         </div>
                         <span
-                          className={`${
-                            reactionColors[reaction?.reactionType]
-                          }`}
+                          className={`${reactionColors[reaction?.reactionType]
+                            }`}
                         >
                           {reactionIcons[reaction?.reactionType]}
                         </span>
@@ -218,9 +257,8 @@ const PostCard = ({ post }: PostCardProps) => {
                     {reactionIcons[userReaction.reactionType]}
                   </span>
                   <span
-                    className={`font-semibold capitalize  ${
-                      reactionColors[userReaction.reactionType]
-                    }`}
+                    className={`font-semibold capitalize  ${reactionColors[userReaction.reactionType]
+                      }`}
                   >
                     <span> {userReaction.reactionType}</span>
                   </span>
@@ -252,11 +290,10 @@ const PostCard = ({ post }: PostCardProps) => {
                         onClick={() => handleReaction(reaction)}
                         whileHover={{ scale: 1.25 }}
                         whileTap={{ scale: 0.9 }}
-                        className={`text-2xl cursor-pointer ${
-                          userReaction?.reactionType === reaction
+                        className={`text-2xl cursor-pointer ${userReaction?.reactionType === reaction
                             ? reactionColors[reaction]
                             : "text-gray-500 hover:text-secondary"
-                        }`}
+                          }`}
                       >
                         <Tooltip
                           title={
