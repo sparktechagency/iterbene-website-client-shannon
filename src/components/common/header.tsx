@@ -1,6 +1,6 @@
 "use client";
 
-import logo from "@/asset/logo/logo.png";
+import logo from "@/asset/logo/logo2.png";
 import { AnimatePresence, motion } from "framer-motion";
 import { LucideCalendarCheck, Search, Menu, X } from "lucide-react";
 import Image from "next/image";
@@ -602,7 +602,7 @@ const Header: React.FC = () => {
       <div className="w-full container mx-auto grid grid-cols-5 justify-between items-center h-full px-4 md:px-5 gap-3 md:gap-5">
         {/* Logo */}
         <Link href={"/"} className="col-span-1">
-          <Image src={logo.src} alt="logo" width={75} height={75} />
+          <Image src={logo.src} alt="logo" width={220} height={75} />
         </Link>
 
         {/* Search Bar - Always visible on Desktop, conditional on Tablet/Mobile */}

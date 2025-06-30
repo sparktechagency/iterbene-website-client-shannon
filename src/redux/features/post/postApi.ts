@@ -71,17 +71,37 @@ const postApi = baseApi.injectEndpoints({
       providesTags: ["Post"],
     }),
     getGroupPosts: builder.query({
-      query: (groupId) => ({
-        url: `/posts/group/${groupId}`,
-        method: "GET",
-      }),
+      query: ({ groupId, filters }) => {
+        const params = new URLSearchParams();
+        if (filters?.length > 0) {
+          filters?.forEach(
+            (filter: { key: string; value: string }) =>
+              filter.value && params.append(filter.key, filter.value)
+          );
+        }
+        return {
+          url: `/posts/group/${groupId}`,
+          method: "GET",
+          params,
+        };
+      },
       providesTags: ["Post"],
     }),
     getEventPosts: builder.query({
-      query: (eventId) => ({
-        url: `/posts/event/${eventId}`,
-        method: "GET",
-      }),
+      query: ({eventId, filters}) => {
+        const params = new URLSearchParams();
+        if (filters?.length > 0) {
+          filters?.forEach(
+            (filter: { key: string; value: string }) =>
+              filter.value && params.append(filter.key, filter.value)
+          );
+        }
+        return {
+          url: `/posts/event/${eventId}`,
+          method: "GET",
+          params,
+        };
+      },
       providesTags: ["Post"],
     }),
     addOrRemoveReaction: builder.mutation({

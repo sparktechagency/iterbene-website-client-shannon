@@ -19,6 +19,7 @@ const VideoCard = ({ url, className = "h-56 md:h-80", isVisible = true }: VideoC
   const [duration, setDuration] = useState(0);
   const [showControls, setShowControls] = useState(false);
   const [userInteracted, setUserInteracted] = useState(false);
+  const [userPaused, setUserPaused] = useState(false); // Track if user manually paused
   const [isHovered, setIsHovered] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isFullScreen, setIsFullScreen] = useState(false);
@@ -66,18 +67,19 @@ const VideoCard = ({ url, className = "h-56 md:h-80", isVisible = true }: VideoC
     }
   }, []);
 
-  // Handle visibility-based play/pause
+  // Handle visibility-based play/pause - only if user hasn't manually paused
   useEffect(() => {
     const timeoutId = setTimeout(() => {
-      if (isVisible && !isPlaying && !isLoading) {
+      // Only auto-play/pause if user hasn't manually paused the video
+      if (isVisible && !isPlaying && !isLoading && !userPaused) {
         playVideo();
-      } else if (!isVisible && isPlaying) {
+      } else if (!isVisible && isPlaying && !userPaused) {
         pauseVideo();
       }
     }, 150);
 
     return () => clearTimeout(timeoutId);
-  }, [isVisible, isPlaying, isLoading, playVideo, pauseVideo]);
+  }, [isVisible, isPlaying, isLoading, userPaused, playVideo, pauseVideo]);
 
   useEffect(() => {
     const video = videoRef.current;
@@ -94,7 +96,8 @@ const VideoCard = ({ url, className = "h-56 md:h-80", isVisible = true }: VideoC
 
     const handleCanPlay = () => {
       setIsLoading(false);
-      if (isVisible && !userInteracted) {
+      // Only auto-play if visible and user hasn't paused
+      if (isVisible && !userInteracted && !userPaused) {
         playVideo();
       }
     };
@@ -122,6 +125,7 @@ const VideoCard = ({ url, className = "h-56 md:h-80", isVisible = true }: VideoC
 
     const handleEnded = () => {
       setIsPlaying(false);
+      setUserPaused(false); // Reset user pause state when video ends
     };
 
     const handleError = () => {
@@ -163,18 +167,23 @@ const VideoCard = ({ url, className = "h-56 md:h-80", isVisible = true }: VideoC
       video.removeEventListener("contextmenu", (e) => e.preventDefault());
       document.removeEventListener("fullscreenchange", handleFullScreenChange);
     };
-  }, [playVideo, userInteracted, isVisible]);
+  }, [playVideo, userInteracted, isVisible, userPaused]);
 
   const togglePlay = async () => {
     setUserInteracted(true);
+    
     if (videoRef.current && videoRef.current.ended) {
       videoRef.current.currentTime = 0;
       setProgress(0);
       setCurrentTime(0);
+      setUserPaused(false); // Reset user pause state when restarting
     }
+    
     if (isPlaying) {
+      setUserPaused(true); // Mark as user paused
       pauseVideo();
     } else {
+      setUserPaused(false); // Mark as user resumed
       await playVideo();
     }
   };
@@ -292,6 +301,7 @@ const VideoCard = ({ url, className = "h-56 md:h-80", isVisible = true }: VideoC
                 e.stopPropagation();
                 setError(null);
                 setIsLoading(true);
+                setUserPaused(false); // Reset user pause state on retry
                 if (videoRef.current) {
                   videoRef.current.load();
                 }
