@@ -137,8 +137,6 @@ const PostCard = ({ post }: PostCardProps) => {
     }
   };
 
-
-  console.log("Is visible:", isVisible);
   return (
     <div ref={postRef} className="w-full  bg-white rounded-xl p-4 mb-4 relative">
       <PostHeader post={post} />
