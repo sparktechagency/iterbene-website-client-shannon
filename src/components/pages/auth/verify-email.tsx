@@ -1,48 +1,40 @@
 "use client";
 import authImage from "@/asset/auth/auth.jpg";
 import logo from "@/asset/logo/logo.png";
+import Image from "next/image";
+import { useState } from "react";
 import CustomButton from "@/components/custom/custom-button";
+import { useRouter, useSearchParams } from "next/navigation";
+import OTPInput from "react-otp-input";
 import { useVerifyEmailMutation } from "@/redux/features/auth/authApi";
 import { TError } from "@/types/error";
-import Image from "next/image";
-import { useRouter, useSearchParams } from "next/navigation";
-import { useState } from "react";
 import toast from "react-hot-toast";
-import OTPInput from "react-otp-input";
-
 const VerifyEmail = () => {
   const searchParams = useSearchParams();
-  const type = searchParams.get("type") || ""; // Fallback to empty string if null
+  const type = searchParams.get("type");
   const router = useRouter();
   const [oneTimeCode, setOneTimeCode] = useState<string>("");
   const [verifyEmail, { isLoading }] = useVerifyEmailMutation();
-
   // Handle OTP change
   const handleOtpChange = (otpValue: string) => {
     setOneTimeCode(otpValue);
   };
-
   const handleVerifyEmail = async () => {
-    if (oneTimeCode.length !== 6) {
-      toast.error("Please enter a valid 6-digit OTP");
-      return;
-    }
-
     try {
       const res = await verifyEmail({ otp: oneTimeCode }).unwrap();
       toast.success(res?.message);
-      if (type === "forgot-password") {
-        router.push("/reset-password");
+      if (type == "forgot-password") {
+        router.push(`/reset-password`);
       } else {
-        router.push("/login");
+        router.push(`/login`);
       }
     } catch (error) {
       const err = error as TError;
-      console.error("Error:", error);
+      console.log("Error:", error);
       toast.error(err?.data?.message || "Something went wrong!");
     }
   };
-
+  console.log("Type:", type);
   return (
     <section className="w-full h-screen flex items-center justify-center relative p-5">
       {/* Background with blur effect */}
@@ -52,7 +44,7 @@ const VerifyEmail = () => {
           backgroundSize: "cover",
           backgroundPosition: "center",
           backgroundRepeat: "no-repeat",
-          filter: "blur(8px)",
+          filter: "blur(8px)", // Apply blur effect to background image
         }}
         className="absolute top-0 left-0 w-full h-full"
       ></div>
@@ -60,7 +52,7 @@ const VerifyEmail = () => {
       <div className="absolute top-0 left-0 w-full h-full bg-[#40E0D054]"></div>
       {/* Content that remains sharp */}
       <div className="w-full max-w-[500px] mx-auto px-8 md:px-[65px] py-12 md:py-[56px] bg-[#FFFFFF] z-30 rounded-xl border-2 border-primary shadow-xl shadow-gray-900">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center  justify-between">
           <h1 className="text-xl lg:text-3xl xl:text-4xl font-semibold">
             Verify Email
           </h1>
@@ -80,7 +72,7 @@ const VerifyEmail = () => {
               onChange={handleOtpChange}
               numInputs={6}
               renderInput={(props) => <input {...props} />}
-              container mx-autoStyle="otp-container mx-auto"
+              containerStyle="otp-container"
               inputStyle={{
                 width: "100%",
                 maxWidth: "7rem",
@@ -98,7 +90,7 @@ const VerifyEmail = () => {
           </div>
           <div className="flex gap-1 items-center justify-center">
             <span className="text-sm md:text-[16px] font-medium">
-              Don&#39;t receive OTP?
+              Don&apos;t receive OTP?
             </span>
             <button className="text-sm md:text-[16px] font-medium text-primary hover:underline">
               Resend OTP
@@ -107,7 +99,6 @@ const VerifyEmail = () => {
           <CustomButton
             loading={isLoading}
             onClick={handleVerifyEmail}
-            disabled={oneTimeCode.length !== 6 || isLoading}
             fullWidth
             className="py-4"
           >

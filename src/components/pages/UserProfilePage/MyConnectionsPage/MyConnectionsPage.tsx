@@ -2,10 +2,11 @@
 import React, { useState } from "react";
 import MyConnections from "./MyConnections/MyConnections";
 import MyRequestConnections from "./MyRequestConnections/MyRequestConnections";
-import CustomSelectField from "@/components/custom/custom-seletectField";
+import SelectField from "@/components/custom/SelectField";
 const MyConnectionsPage = () => {
   const [activeTab, setActiveTab] = useState<string>("My Connections");
   const [sortBy, setSortBy] = useState<string>("");
+
   return (
     <section className="w-full pb-20">
       {/* Tabs */}
@@ -31,7 +32,7 @@ const MyConnectionsPage = () => {
           </button>
         </div>
         <div className="w-full max-w-40">
-          <CustomSelectField
+          <SelectField
             items={[
               {
                 label: "Recently",

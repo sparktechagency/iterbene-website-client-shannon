@@ -2,44 +2,13 @@
 import { useState } from "react";
 import MyUpComingTours from "./MyUpComingTours/MyUpComingTours";
 import MyInvitations from "./MyInvitations/MyInvitations";
-import CustomForm from "@/components/custom/custom-form";
-import { FieldValues } from "react-hook-form";
-import CustomSelectField from "@/components/custom/custom-seletectField";
+import SelectField from "@/components/custom/SelectField";
 
 const MyInvitationsPage = () => {
   const [sortBy, setSortBy] = useState<string>("");
   const [activeTab, setActiveTab] = useState<"upcomingTour" | "invitation">(
     "upcomingTour"
   );
-
-  const handleSortByChange = (value: string) => {
-    setSortBy(value);
-    console.log("Sort By Changed:", value);
-  };
-
-  // Form submit handler
-  const handleFormSubmit = (data: FieldValues) => {
-    handleSortByChange(data.sortBy);
-  };
-
-  const selectItems = [
-    {
-      label: "Recently",
-      value: "createdAt",
-    },
-    {
-      label: "Name (A-Z)",
-      value: "nameAsc",
-    },
-    {
-      label: "Name (Z-A)",
-      value: "nameDesc",
-    },
-    {
-      label: "Oldest First",
-      value: "-createdAt",
-    },
-  ];
 
   return (
     <section className="w-full pb-20">
@@ -68,14 +37,31 @@ const MyInvitationsPage = () => {
 
         {/* CustomForm দিয়ে wrap করা select field */}
         <div className="w-full max-w-40">
-          <CustomForm onSubmit={handleFormSubmit}>
-            <CustomSelectField
-              items={selectItems}
-              name="sortBy"
-              fullWidth
-              placeholder="Sort By"
-            />
-          </CustomForm>
+          <SelectField
+            items={[
+              {
+                label: "Recently",
+                value: "createdAt",
+              },
+              {
+                label: "Name (A-Z)",
+                value: "nameAsc",
+              },
+              {
+                label: "Name (Z-A)",
+                value: "nameDesc",
+              },
+              {
+                label: "Oldest First",
+                value: "-createdAt",
+              },
+            ]}
+            name="sortBy"
+            fullWidth
+            value={sortBy}
+            placeholder="Sort By"
+            onChange={(e) => setSortBy(e.target.value)}
+          />
         </div>
       </div>
 

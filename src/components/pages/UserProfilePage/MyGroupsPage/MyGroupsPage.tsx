@@ -2,7 +2,7 @@
 import { useState } from "react";
 import MyJoinedGroups from "./MyJoinedGroups/MyJoinedGroups";
 import MyInvitationsGroups from "./MyInvitationsGroup/MyInvitationsGroups";
-import CustomSelectField from "@/components/custom/custom-seletectField";
+import SelectField from "@/components/custom/SelectField";
 
 const MyGroupsPage = () => {
   const [activeTab, setActiveTab] = useState<string>("myGroups");
@@ -33,7 +33,7 @@ const MyGroupsPage = () => {
           </button>
         </div>
         <div className="w-full max-w-40">
-          <CustomSelectField
+          <SelectField
             items={[
               {
                 label: "Recently",

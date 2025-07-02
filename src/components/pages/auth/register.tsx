@@ -10,12 +10,12 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Checkbox } from "antd";
 import { Lock, Mail, UserRound } from "lucide-react";
 import Image from "next/image";
+import Cookies from "js-cookie";
 import Link from "next/link";
 import { FieldValues } from "react-hook-form";
 import { TError } from "@/types/error";
 import { toast } from "react-hot-toast";
 import { useRouter } from "next/navigation";
-import { cookies } from "next/headers";
 const Register = () => {
   const [register, { isLoading }] = useRegisterMutation();
   const router = useRouter();
@@ -24,9 +24,9 @@ const Register = () => {
       const res = await register(values).unwrap();
       const accessToken = res?.data?.attributes?.accessToken;
       //set access token in cookies
-      if (accessToken) {
-        (await cookies()).set("accessToken", accessToken);
-      }
+      Cookies.set("accessToken", accessToken, {
+        expires: 7,
+      });
       //redirect to verify email page
       router.push("/verify-email");
       toast.success(res?.message);
