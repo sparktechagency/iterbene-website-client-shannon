@@ -12,11 +12,13 @@ interface PostDetailsContentRenderProps {
   medias: IMedia[];
 }
 
-const PostDetailsContentRender = ({ medias }: PostDetailsContentRenderProps) => {
+const PostDetailsContentRender = ({
+  medias,
+}: PostDetailsContentRenderProps) => {
   const mediaCount = medias?.length;
 
   return (
-    <div className="w-full relative">
+    <div className="w-full  relative">
       <Swiper
         modules={[Navigation, Pagination]}
         spaceBetween={16}
@@ -34,11 +36,13 @@ const PostDetailsContentRender = ({ medias }: PostDetailsContentRenderProps) => 
               <SmartImage
                 src={media?.mediaUrl}
                 alt={`Post media ${index + 1}`}
-                container mx-autoHeight="600px"
-                className="w-full h-[600px] object-contain rounded-xl cursor-pointer"
+                className="w-full h-[200px] md:h-[600px] object-contain rounded-xl cursor-pointer"
               />
             ) : (
-              <VideoCard url={media?.mediaUrl} className="w-full h-[600px] object-contain" />
+              <VideoCard
+                url={media?.mediaUrl}
+                className="w-full h-[200px] md:h-[600px] object-contain"
+              />
             )}
           </SwiperSlide>
         ))}
@@ -48,13 +52,13 @@ const PostDetailsContentRender = ({ medias }: PostDetailsContentRenderProps) => 
       {mediaCount > 1 && (
         <>
           <button
-            className="custom-swiper-button-prev absolute left-2 top-1/2 -translate-y-1/2 z-10 bg-gray-800/80 text-white rounded-full p-2 hover:bg-gray-800 transition-colors"
+            className="custom-swiper-button-prev absolute left-2 top-1/2 -translate-y-1/2 z-10 bg-gray-800/80 text-white rounded-full p-2 hover:bg-gray-800 transition-colors cursor-pointer"
             aria-label="Previous slide"
           >
             <ChevronLeftIcon className="h-6 w-6" />
           </button>
           <button
-            className="custom-swiper-button-next absolute right-2 top-1/2 -translate-y-1/2 z-10 bg-gray-800/80 text-white rounded-full p-2 hover:bg-gray-800 transition-colors"
+            className="custom-swiper-button-next absolute right-2 top-1/2 -translate-y-1/2 z-10 bg-gray-800/80 text-white rounded-full p-2 hover:bg-gray-800 transition-colors cursor-pointer"
             aria-label="Next slide"
           >
             <ChevronRightIcon className="h-6 w-6" />

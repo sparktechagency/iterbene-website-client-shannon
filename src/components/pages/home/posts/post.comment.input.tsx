@@ -151,7 +151,7 @@ const PostCommentInput = ({
             alt={user?.username || "User"}
             width={40}
             height={40}
-            className="size-[40px] rounded-full object-cover border border-gray-300"
+            className="size-[40px] rounded-full object-cover border border-gray-300 flex-shrink-0"
           />
         )}
         <div
@@ -169,7 +169,7 @@ const PostCommentInput = ({
               value={newComment}
               onChange={(e) => setNewComment(e.target.value)}
               onKeyDown={handleKeyDown}
-              className="w-full px-4 py-3.5 bg-transparent text-gray-800 placeholder-gray-500 focus:outline-none rounded-full"
+              className="w-full px-4 py-3 bg-transparent text-gray-800 placeholder-gray-500 focus:outline-none rounded-full"
             />
           ) : (
             <textarea
@@ -226,7 +226,7 @@ const PostCommentInput = ({
               <EmojiPicker
                 onEmojiClick={handleEmojiSelect}
                 theme={Theme.LIGHT}
-                style={{ scrollbarColor: "gray #ffffff" }}
+                style={{ scrollbarColor: "gray #ffffff" ,zIndex: 9999}}
               />
             </div>
           )}

@@ -69,16 +69,17 @@ const PostDetails = ({ isOpen, onClose, post }: PostDetailsProps) => {
   };
   return (
     <CustomModal
-      maxWidth="max-w-7xl"
+      maxWidth="max-w-6xl"
       isOpen={isOpen}
       onClose={onClose}
       header={null}
+      maxHeight="max-h-[80vh] md:max-h-[90vh]"
     >
-      <section className="w-full grid grid-cols-1 md:grid-cols-5 gap-5">
-       <div className="col-span-full md:col-span-3 order-2 md:order-1">
-         <PostDetailsContentRender medias={post?.media} />
-       </div>
-        <div className="col-span-full md:col-span-2 order-1 md:order-2">
+      <section className="w-full grid grid-cols-1 md:grid-cols-12 gap-5">
+        <div className="w-full h-fit col-span-full md:col-span-8">
+          <PostDetailsContentRender medias={post?.media} />
+        </div>
+        <div className="w-full max-h-[66vh] overflow-y-auto col-span-full md:col-span-4">
           <PostDetailsHeader post={post} onClose={onClose} />
           <p className="text-gray-700 mb-4">
             {post?.content?.split(/(\s+)/).map((word, index) => {
@@ -222,9 +223,7 @@ const PostDetails = ({ isOpen, onClose, post }: PostDetailsProps) => {
               )}
             </div>
           </div>
-          <PostCommentInput
-            post={post}
-          />
+          <PostCommentInput post={post} />
           <PostCommentSection post={post} />
         </div>
       </section>

@@ -41,8 +41,8 @@ const SmartImage = ({
   if (imageError) {
     return (
       <div
-        className={`relative w-full rounded-xl overflow-hidden bg-gray-200 flex items-center justify-center ${className}`}
-        style={{ height: containerHeight }}
+        className={`relative w-full  rounded-xl overflow-hidden bg-gray-200 flex items-center justify-center ${className}`}
+        // style={{ height: containerHeight }}
       >
         <span className="text-gray-500">Image failed to load</span>
       </div>
