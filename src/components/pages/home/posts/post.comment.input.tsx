@@ -1,6 +1,6 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
-import { Send, Smile } from "lucide-react";
+import { Loader2, Send, Smile } from "lucide-react";
 import Image from "next/image";
 import EmojiPicker, { EmojiClickData, Theme } from "emoji-picker-react";
 import {
@@ -34,8 +34,8 @@ const PostCommentInput = ({
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const [createComment] = useCreateCommentMutation();
-  const [updateComment] = useUpdateCommentMutation();
+  const [createComment, { isLoading: isCreating }] = useCreateCommentMutation();
+  const [updateComment, { isLoading: isUpdating }] = useUpdateCommentMutation();
 
   // Sync newComment with editCommentText when it changes
   useEffect(() => {
@@ -169,7 +169,7 @@ const PostCommentInput = ({
               value={newComment}
               onChange={(e) => setNewComment(e.target.value)}
               onKeyDown={handleKeyDown}
-              className="w-full px-4 py-3 bg-transparent text-gray-800 placeholder-gray-500 focus:outline-none rounded-full"
+              className="w-full px-4 py-3.5 bg-transparent text-gray-800 placeholder-gray-500 focus:outline-none rounded-full"
             />
           ) : (
             <textarea
@@ -193,12 +193,18 @@ const PostCommentInput = ({
                 >
                   <Smile size={24} />
                 </button>
-                <button
-                  onClick={handleCommentSubmit}
-                  className="text-gray-500 hover:text-primary cursor-pointer"
-                >
-                  <Send size={24} />
-                </button>
+                {isCreating || isUpdating ? (
+                  <div className="flex items-center justify-center ">
+                    <Loader2 className="animate-spin text-primary" size={26} />
+                  </div>
+                ) : (
+                  <button
+                    onClick={handleCommentSubmit}
+                    className="text-gray-500 hover:text-primary cursor-pointer"
+                  >
+                    <Send size={24} />
+                  </button>
+                )}
                 {editCommentId && (
                   <button
                     onClick={handleCancelEdit}
@@ -226,7 +232,7 @@ const PostCommentInput = ({
               <EmojiPicker
                 onEmojiClick={handleEmojiSelect}
                 theme={Theme.LIGHT}
-                style={{ scrollbarColor: "gray #ffffff" ,zIndex: 9999}}
+                style={{ scrollbarColor: "gray #ffffff", zIndex: 9999 }}
               />
             </div>
           )}

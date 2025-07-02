@@ -454,7 +454,7 @@ const PostCommentSection = ({
           );
         })}
       </AnimatePresence>
-      {isViewAllComments && post?.comments?.length > 4 && (
+      {post?.media?.length > 0 && isViewAllComments && post?.comments?.length > 4 && (
         <div className="flex justify-center items-center my-4">
           <button
             onClick={() => setShowPostDetails?.(true)}

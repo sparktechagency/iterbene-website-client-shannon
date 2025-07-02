@@ -52,13 +52,13 @@ const PostDetailsContentRender = ({
       {mediaCount > 1 && (
         <>
           <button
-            className="custom-swiper-button-prev absolute left-2 top-1/2 -translate-y-1/2 z-10 bg-gray-800/80 text-white rounded-full p-2 hover:bg-gray-800 transition-colors cursor-pointer"
+            className="custom-swiper-button-prev absolute left-2 top-1/2 -translate-y-1/2 z-10 bg-black/50 text-white rounded-full p-2 hover:bg-black/70 transition-colors cursor-pointer"
             aria-label="Previous slide"
           >
             <ChevronLeftIcon className="h-6 w-6" />
           </button>
           <button
-            className="custom-swiper-button-next absolute right-2 top-1/2 -translate-y-1/2 z-10 bg-gray-800/80 text-white rounded-full p-2 hover:bg-gray-800 transition-colors cursor-pointer"
+            className="custom-swiper-button-next absolute right-2 top-1/2 -translate-y-1/2 z-10 bg-black/50 text-white rounded-full p-2 hover:bg-black/70 transition-colors cursor-pointer"
             aria-label="Next slide"
           >
             <ChevronRightIcon className="h-6 w-6" />

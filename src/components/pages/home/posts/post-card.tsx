@@ -301,8 +301,7 @@ const PostCard = ({ post }: PostCardProps) => {
             </AnimatePresence>
           </div>
           <div
-            onClick={() => setShowPostDetails(true)}
-            className="flex items-center space-x-2 cursor-pointer"
+            className="flex items-center space-x-2"
           >
             <svg
               width="26"
