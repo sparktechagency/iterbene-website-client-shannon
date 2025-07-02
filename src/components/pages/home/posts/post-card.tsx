@@ -23,82 +23,67 @@ import CustomModal from "@/components/custom/custom-modal";
 import Image from "next/image";
 import { IoMdClose } from "react-icons/io";
 import PostDetails from "../post-details/PostDetails";
+import formatPostReactionNumber from "@/utils/formatPostReactionNumber";
 
 interface PostCardProps {
   post: IPost;
-  shouldAutoplay?: boolean;
 }
-
-// Utility function to format numbers (e.g., 1000 → 1k, 1100 → 1.1k, 41500 → 41.5k, 1000000 → 1m)
-const formatNumber = (num: number): string => {
-  if (num < 1000) return num.toString();
-  if (num >= 1000 && num < 1000000) {
-    const value = (num / 1000).toFixed(1);
-    return value.endsWith(".0") ? `${Math.floor(num / 1000)}k` : `${value}k`;
-  }
-  if (num >= 1000000) {
-    const value = (num / 1000000).toFixed(1);
-    return value.endsWith(".0") ? `${Math.floor(num / 1000000)}m` : `${value}m`;
-  }
-  return num.toString();
-};
-
 const PostCard = ({ post }: PostCardProps) => {
   const user = useUser();
   const postRef = useRef<HTMLDivElement>(null);
-  const [isVisible, setIsVisible] = useState(false)
+  const [isVisible, setIsVisible] = useState(false);
   const currentUserId = user?._id;
   const [showReactions, setShowReactions] = useState<boolean>(false);
   const [showReactionDetails, setShowReactionDetails] =
     useState<boolean>(false);
   const [editCommentId, setEditCommentId] = useState<string | null>(null);
-  const [editCommentText, setEditCommentText] = useState("");
+  const [editCommentText, setEditCommentText] = useState<string>("");
+  const [showPostDetails, setShowPostDetails] = useState<boolean>(false);
 
-
+  // define intersection observer
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
-        const intersectionRatio = entry.intersectionRatio
-        const isIntersecting = entry.isIntersecting
+        const intersectionRatio = entry.intersectionRatio;
+        const isIntersecting = entry.isIntersecting;
 
-        let newVisibility = false
+        let newVisibility = false;
 
         if (isIntersecting && intersectionRatio >= 0.5) {
-          newVisibility = true
+          newVisibility = true;
         } else if (!isIntersecting || intersectionRatio < 0.3) {
-          newVisibility = false
+          newVisibility = false;
         } else {
-          return
+          return;
         }
 
         const timeoutId = setTimeout(() => {
-          setIsVisible(newVisibility)
-        }, 100)
+          setIsVisible(newVisibility);
+        }, 100);
 
-        return () => clearTimeout(timeoutId)
+        return () => clearTimeout(timeoutId);
       },
       {
         threshold: [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0],
         rootMargin: "-20px 0px -20px 0px",
-      },
-    )
+      }
+    );
 
     if (postRef.current) {
-      observer.observe(postRef.current)
+      observer.observe(postRef.current);
     }
 
-    return () => observer.disconnect()
-  }, [])
+    return () => observer.disconnect();
+  }, []);
 
+  // handle edit function
   const handleEdit = (commentId: string, commentText: string) => {
     setEditCommentId(commentId);
     setEditCommentText(commentText);
   };
 
-  const [showPostDetails, setShowPostDetails] = useState<boolean>(false);
-
   // Find the user's reaction, if any
-  const userReaction = post.reactions?.find(
+  const userReaction = post?.reactions?.find(
     (reaction: IReaction) => reaction?.userId?._id === currentUserId
   );
 
@@ -126,6 +111,7 @@ const PostCard = ({ post }: PostCardProps) => {
     smile: "text-yellow-500",
   };
 
+  // handle reaction function
   const handleReaction = async (reactionType: string) => {
     try {
       await addOrRemoveReaction({ postId: post._id, reactionType }).unwrap();
@@ -138,11 +124,14 @@ const PostCard = ({ post }: PostCardProps) => {
   };
 
   return (
-    <div ref={postRef} className="w-full  bg-white rounded-xl p-4 mb-4 relative">
+    <div
+      ref={postRef}
+      className="w-full  bg-white rounded-xl p-4 mb-4 relative"
+    >
       <PostHeader post={post} />
       <p className="text-gray-700 mb-4">
         {post?.content?.split(/(\s+)/).map((word, index) => {
-          const isHashtag = word.match(/^#\w+/);
+          const isHashtag = word?.match(/^#\w+/);
           return (
             <span
               key={index}
@@ -153,7 +142,7 @@ const PostCard = ({ post }: PostCardProps) => {
           );
         })}
       </p>
-      <PostContentRender data={post.media || []} isVisible={isVisible} />
+      <PostContentRender data={post?.media || []} isVisible={isVisible} />
       {/* Show reactions summary */}
       <div className="mt-5">
         {nonZeroReactions?.length > 0 && (
@@ -164,16 +153,16 @@ const PostCard = ({ post }: PostCardProps) => {
             >
               <div className="flex -space-x-1 cursor-pointer ">
                 {/* Show up to 3 reaction types */}
-                {nonZeroReactions.slice(0, 3).map((reaction) => (
+                {nonZeroReactions?.slice(0, 3)?.map((reaction) => (
                   <div key={reaction.type}>
-                    <span className={`${reactionColors[reaction.type]}`}>
-                      {reactionIcons[reaction.type]}
+                    <span className={`${reactionColors[reaction?.type]}`}>
+                      {reactionIcons[reaction?.type]}
                     </span>
                   </div>
                 ))}
               </div>
               <span className="text-[18px] hover:underline cursor-pointer font-semibold text-gray-500 ">
-                {formatNumber(post?.reactions?.length || 0)}
+                {formatPostReactionNumber(post?.reactions?.length || 0)}
               </span>
             </div>
 
@@ -195,6 +184,7 @@ const PostCard = ({ post }: PostCardProps) => {
               isOpen={showReactionDetails}
               onClose={() => setShowReactionDetails(false)}
               maxHeight="h-[50vh]"
+              className="w-full p-2"
             >
               {post?.reactions?.length > 0 && (
                 <div className="w-full space-y-2 ">
@@ -219,8 +209,9 @@ const PostCard = ({ post }: PostCardProps) => {
                           </div>
                         </div>
                         <span
-                          className={`${reactionColors[reaction?.reactionType]
-                            }`}
+                          className={`${
+                            reactionColors[reaction?.reactionType]
+                          }`}
                         >
                           {reactionIcons[reaction?.reactionType]}
                         </span>
@@ -255,8 +246,9 @@ const PostCard = ({ post }: PostCardProps) => {
                     {reactionIcons[userReaction.reactionType]}
                   </span>
                   <span
-                    className={`font-semibold capitalize  ${reactionColors[userReaction.reactionType]
-                      }`}
+                    className={`font-semibold capitalize  ${
+                      reactionColors[userReaction.reactionType]
+                    }`}
                   >
                     <span> {userReaction.reactionType}</span>
                   </span>
@@ -288,10 +280,11 @@ const PostCard = ({ post }: PostCardProps) => {
                         onClick={() => handleReaction(reaction)}
                         whileHover={{ scale: 1.25 }}
                         whileTap={{ scale: 0.9 }}
-                        className={`text-2xl cursor-pointer ${userReaction?.reactionType === reaction
+                        className={`text-2xl cursor-pointer ${
+                          userReaction?.reactionType === reaction
                             ? reactionColors[reaction]
                             : "text-gray-500 hover:text-secondary"
-                          }`}
+                        }`}
                       >
                         <Tooltip
                           title={
@@ -325,14 +318,14 @@ const PostCard = ({ post }: PostCardProps) => {
               ></path>
             </svg>
             <span className="font-semibold">
-              {formatNumber(post?.comments?.length || 0)}
+              {formatPostReactionNumber(post?.comments?.length || 0)}
             </span>
           </div>
           {post?.itinerary && (
             <div className="flex items-center space-x-2 cursor-pointer">
               <FaCalendarCheck className="h-5 w-5 text-primary" />
               <span className="font-semibold">
-                {formatNumber(post?.itineraryViewCount)}
+                {formatPostReactionNumber(post?.itineraryViewCount)}
               </span>
             </div>
           )}
@@ -345,7 +338,7 @@ const PostCard = ({ post }: PostCardProps) => {
         setEditCommentId={setEditCommentId}
         setEditCommentText={setEditCommentText}
       />
-      <PostCommentSection post={post} onEdit={handleEdit} />
+      <PostCommentSection post={post} onEdit={handleEdit}  setShowPostDetails={setShowPostDetails} />
       <PostDetails
         post={post}
         isOpen={showPostDetails}

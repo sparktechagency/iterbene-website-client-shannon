@@ -40,15 +40,17 @@ const Posts = () => {
 
   // Add new posts to allPosts when currentPagePosts changes
   useEffect(() => {
-    if (currentPagePosts.length > 0) {
+    if (currentPagePosts?.length > 0) {
       if (currentPage === 1) {
         // Reset posts for first page (handles refreshes/updates)
         setAllPosts(currentPagePosts);
       } else {
         // Append new posts for subsequent pages, avoiding duplicates
-        setAllPosts(prevPosts => {
-          const existingIds = new Set(prevPosts.map(post => post._id));
-          const newPosts = currentPagePosts.filter(post => !existingIds.has(post._id));
+        setAllPosts((prevPosts) => {
+          const existingIds = new Set(prevPosts?.map((post) => post?._id));
+          const newPosts = currentPagePosts?.filter(
+            (post) => !existingIds.has(post._id)
+          );
           return [...prevPosts, ...newPosts];
         });
       }
@@ -57,11 +59,13 @@ const Posts = () => {
 
   // Handle real-time updates: merge updated posts from RTK Query cache
   useEffect(() => {
-    if (currentPagePosts.length > 0 && allPosts.length > 0) {
+    if (currentPagePosts?.length > 0 && allPosts?.length > 0) {
       // Update existing posts with fresh data from current page
-      setAllPosts(prevPosts => {
-        return prevPosts.map(existingPost => {
-          const updatedPost = currentPagePosts.find(p => p._id === existingPost._id);
+      setAllPosts((prevPosts) => {
+        return prevPosts?.map((existingPost) => {
+          const updatedPost = currentPagePosts?.find(
+            (p) => p?._id === existingPost?._id
+          );
           return updatedPost || existingPost;
         });
       });
@@ -81,7 +85,7 @@ const Posts = () => {
   // Load more posts function
   const loadMore = useCallback(() => {
     if (!loading && hasMore) {
-      setCurrentPage(prev => prev + 1);
+      setCurrentPage((prev) => prev + 1);
     }
   }, [loading, hasMore]);
 
@@ -114,8 +118,8 @@ const Posts = () => {
     return (
       <div className="w-full text-center py-4 text-red-500">
         Failed to load posts. Please try again.
-        <button 
-          onClick={() => refetch()} 
+        <button
+          onClick={() => refetch()}
           className="ml-2 px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
         >
           Retry
@@ -133,18 +137,17 @@ const Posts = () => {
       {allPosts.map((post) => (
         <PostCard key={post._id} post={post} />
       ))}
-      
+
       {loading && (
         <div
           className="flex justify-center items-center py-4"
           aria-live="polite"
           aria-busy="true"
         >
-          <div className="w-8 h-8 border-2 border-gray-600 border-t-blue-600 rounded-full animate-spin"></div>
-          <span className="ml-2 text-gray-600">Loading more posts...</span>
+          <div className="w-8 h-8 border-2 border-primary rounded-full animate-spin"></div>
         </div>
       )}
-      
+
       {hasMore && <div id="sentinel" style={{ height: "1px" }}></div>}
     </div>
   );

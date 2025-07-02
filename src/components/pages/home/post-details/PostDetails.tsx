@@ -19,24 +19,13 @@ import { AnimatePresence, motion } from "framer-motion";
 import PostDetailsHeader from "./PostDetailsHeader";
 import PostCommentInput from "../posts/post.comment.input";
 import PostCommentSection from "../posts/post.comment.section";
+import formatPostReactionNumber from "@/utils/formatPostReactionNumber";
 
 interface PostDetailsProps {
   isOpen: boolean;
   onClose: () => void;
   post: IPost;
 }
-const formatNumber = (num: number): string => {
-  if (num < 1000) return num.toString();
-  if (num >= 1000 && num < 1000000) {
-    const value = (num / 1000).toFixed(1);
-    return value.endsWith(".0") ? `${Math.floor(num / 1000)}k` : `${value}k`;
-  }
-  if (num >= 1000000) {
-    const value = (num / 1000000).toFixed(1);
-    return value.endsWith(".0") ? `${Math.floor(num / 1000000)}m` : `${value}m`;
-  }
-  return num.toString();
-};
 const PostDetails = ({ isOpen, onClose, post }: PostDetailsProps) => {
   const user = useUser();
   const currentUserId = user?._id;
@@ -120,7 +109,7 @@ const PostDetails = ({ isOpen, onClose, post }: PostDetailsProps) => {
                     ))}
                   </div>
                   <span className="text-[18px] hover:underline cursor-pointer font-semibold text-gray-500 ">
-                    {formatNumber(post?.reactions?.length || 0)}
+                    {formatPostReactionNumber(post?.reactions?.length || 0)}
                   </span>
                 </div>
               </div>
@@ -220,14 +209,14 @@ const PostDetails = ({ isOpen, onClose, post }: PostDetailsProps) => {
                   ></path>
                 </svg>
                 <span className="font-semibold">
-                  {formatNumber(post?.comments?.length || 0)}
+                  {formatPostReactionNumber(post?.comments?.length || 0)}
                 </span>
               </div>
               {post?.itinerary && (
                 <div className="flex items-center space-x-2 cursor-pointer">
                   <FaCalendarCheck className="h-5 w-5 text-primary" />
                   <span className="font-semibold">
-                    {formatNumber(post?.itineraryViewCount)}
+                    {formatPostReactionNumber(post?.itineraryViewCount)}
                   </span>
                 </div>
               )}

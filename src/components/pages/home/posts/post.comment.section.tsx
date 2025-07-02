@@ -19,9 +19,14 @@ import toast from "react-hot-toast";
 interface PostCommentSectionProps {
   post: IPost;
   onEdit?: (commentId: string, commentText: string) => void; // Callback for edit
+  setShowPostDetails: (value: boolean) => void;
 }
 
-const PostCommentSection = ({ post, onEdit }: PostCommentSectionProps) => {
+const PostCommentSection = ({
+  post,
+  onEdit,
+  setShowPostDetails,
+}: PostCommentSectionProps) => {
   const user = useUser();
   const currentUserId = user?._id;
   const [menuOpenId, setMenuOpenId] = useState<string | null>(null);
@@ -215,7 +220,7 @@ const PostCommentSection = ({ post, onEdit }: PostCommentSectionProps) => {
                   >
                     <button
                       onClick={() =>
-                        handleCommentReaction(post._id, comment._id, "love")
+                        handleCommentReaction(post?._id, comment?._id, "love")
                       }
                       className={`hover:text-rose-500 transition-colors flex items-center space-x-1 cursor-pointer ${
                         isReactionAdded ? "text-rose-500" : "text-gray-500"
@@ -231,14 +236,14 @@ const PostCommentSection = ({ post, onEdit }: PostCommentSectionProps) => {
                     <button
                       onClick={() =>
                         setMenuOpenId(
-                          menuOpenId === comment._id ? null : comment._id
+                          menuOpenId === comment?._id ? null : comment?._id
                         )
                       }
                       className="transition-colors cursor-pointer"
                     >
                       <BsThreeDots size={20} />
                     </button>
-                    {menuOpenId === comment._id && (
+                    {menuOpenId === comment?._id && (
                       <motion.div
                         ref={menuRef}
                         initial={{ opacity: 0, y: -5 }}
@@ -246,11 +251,11 @@ const PostCommentSection = ({ post, onEdit }: PostCommentSectionProps) => {
                         exit={{ opacity: 0, y: -5 }}
                         className="absolute -right-10 top-2 w-40 bg-white border border-gray-50 rounded-xl shadow-lg z-10"
                       >
-                        {comment.userId?._id === currentUserId ? (
+                        {comment?.userId?._id === currentUserId ? (
                           <>
                             <button
                               onClick={() =>
-                                handleEdit(comment._id, comment?.comment)
+                                handleEdit(comment?._id, comment?.comment)
                               }
                               className="w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 transition-all duration-300 rounded-t-xl cursor-pointer"
                             >
@@ -272,7 +277,7 @@ const PostCommentSection = ({ post, onEdit }: PostCommentSectionProps) => {
                     )}
                   </div>
                   {/* Reply Input (kept for replies if enabled) */}
-                  {replyInputOpen === comment._id && (
+                  {replyInputOpen === comment?._id && (
                     <motion.div
                       initial={{ opacity: 0, y: 5 }}
                       animate={{ opacity: 1, y: 0 }}
@@ -399,11 +404,11 @@ const PostCommentSection = ({ post, onEdit }: PostCommentSectionProps) => {
                 </div>
               </div>
               {/* Render Replies */}
-              {getReplies(comment._id.toString()).length > 0 && (
+              {getReplies(comment?._id.toString())?.length > 0 && (
                 <div className="ml-12 mt-2 relative">
                   <div className="absolute left-[-28px] top-0 w-4 h-full border-l-2 border-b-2 border-gray-300 rounded-bl-lg"></div>
                   <AnimatePresence>
-                    {getReplies(comment._id.toString()).map(
+                    {getReplies(comment?._id.toString()).map(
                       (reply: IComment) => (
                         <motion.div
                           key={reply?._id}
@@ -446,9 +451,12 @@ const PostCommentSection = ({ post, onEdit }: PostCommentSectionProps) => {
           );
         })}
       </AnimatePresence>
-      {post?.comments?.length > 2 && (
+      {post?.comments?.length > 4 && (
         <div className="flex justify-center items-center my-4">
-          <button className="text-primary text-base font-medium hover:underline cursor-pointer">
+          <button
+            onClick={() => setShowPostDetails(true)}
+            className="text-primary text-base font-medium hover:underline cursor-pointer"
+          >
             View all {post?.comments?.length} comments
           </button>
         </div>
