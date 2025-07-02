@@ -13,14 +13,11 @@ const EventParticipantsList = ({
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-xl md:text-2xl font-semibold text-gray-900">
           Participants
-        </h2>
-        <a href="#" className="text-primary text-sm md:text-base font-medium">
-          Show more
-        </a>
+        </h2> 
       </div>
 
       {/* Participants list */}
-      <div className="space-y-4">
+      <div className="w-full max-h-[300px] overflow-y-auto space-y-4">
         {eventDetailsData?.interestedUsers?.length > 0 ? (
           eventDetailsData?.interestedUsers?.map((participant) => (
             <div key={participant._id} className="flex items-center gap-4">

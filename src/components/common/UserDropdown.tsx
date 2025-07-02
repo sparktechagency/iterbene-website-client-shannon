@@ -102,9 +102,6 @@ const UserDropdown: React.FC<DropdownProps> = ({ user, isOpen }) => {
             >
               <IoChatboxEllipsesOutline size={24} />
               <span>Messages</span>
-              <span className="ml-2 size-6 rounded-full bg-primary text-white flex justify-center items-center text-sm">
-                5
-              </span>
             </Link>
             <Link
               href="/groups"

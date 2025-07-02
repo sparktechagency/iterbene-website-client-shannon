@@ -13,13 +13,10 @@ const GroupParticipantsList = ({
         <h2 className="text-xl md:text-2xl font-semibold text-gray-900">
           Participants
         </h2>
-        <a href="#" className="text-primary text-sm md:text-base font-medium">
-          Show more
-        </a>
       </div>
 
       {/* Participants list */}
-      <div className="space-y-4">
+      <div className="w-full max-h-[300px] overflow-y-auto space-y-4">
         {groupDetailsData?.members?.length > 0 ? (
           groupDetailsData?.members?.map((participant) => (
             <div key={participant._id} className="flex items-center gap-4">
