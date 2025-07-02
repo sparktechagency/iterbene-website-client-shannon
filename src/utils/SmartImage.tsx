@@ -6,14 +6,12 @@ interface SmartImageProps {
   src: string;
   alt: string;
   className?: string;
-  containerHeight?: string;
 }
 
 const SmartImage = ({
   src,
   alt,
-  className = "",
-  containerHeight = "500px",
+  className = ""
 }: SmartImageProps) => {
   const [bgColor, setBgColor] = useState("#f3f4f6");
   const [imageLoaded, setImageLoaded] = useState(false);
@@ -53,7 +51,6 @@ const SmartImage = ({
     <div
       className={`relative w-full rounded-xl overflow-hidden ${className}`}
       style={{
-        height: containerHeight,
         backgroundColor: imageLoaded ? bgColor : "#f3f4f6",
         transition: "background-color 0.3s ease",
       }}

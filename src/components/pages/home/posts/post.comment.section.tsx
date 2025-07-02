@@ -185,15 +185,11 @@ const PostCommentSection = ({
     }
   };
 
-  // Determine which comments to show based on isViewAllComments
-  const commentsToShow = isViewAllComments 
-    ? topLevelComments?.slice(0, 4) 
-    : topLevelComments;
-
+  const showConditionBaseComment = isViewAllComments ? topLevelComments?.slice(0, 4) : topLevelComments
   return (
     <section className="mt-4 px-3">
       <AnimatePresence>
-        {commentsToShow?.map((comment: IComment) => {
+        {showConditionBaseComment?.map((comment: IComment) => {
           const isReactionAdded = comment?.reactions?.some(
             (r) => r?.userId?._id === user?._id
           );
@@ -458,10 +454,10 @@ const PostCommentSection = ({
           );
         })}
       </AnimatePresence>
-      {!isViewAllComments && post?.comments?.length > 4 && (
+      {isViewAllComments && post?.comments?.length > 4 && (
         <div className="flex justify-center items-center my-4">
           <button
-            onClick={() => setShowPostDetails && setShowPostDetails(true)}
+            onClick={() => setShowPostDetails?.(true)}
             className="text-primary text-base font-medium hover:underline cursor-pointer"
           >
             View all {post?.comments?.length} comments

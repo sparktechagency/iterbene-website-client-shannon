@@ -76,10 +76,10 @@ const PostDetails = ({ isOpen, onClose, post }: PostDetailsProps) => {
       maxHeight="max-h-[80vh] md:max-h-[90vh]"
     >
       <section className="w-full grid grid-cols-1 md:grid-cols-12 gap-5">
-        <div className="w-full h-fit col-span-full md:col-span-8">
+        <div className="w-full h-full  col-span-full md:col-span-8">
           <PostDetailsContentRender medias={post?.media} />
         </div>
-        <div className="w-full max-h-[66vh] overflow-y-auto col-span-full md:col-span-4">
+        <div className="w-full h-full max-h-[66vh] overflow-y-auto col-span-full md:col-span-4">
           <PostDetailsHeader post={post} onClose={onClose} />
           <p className="text-gray-700 mb-4">
             {post?.content?.split(/(\s+)/).map((word, index) => {

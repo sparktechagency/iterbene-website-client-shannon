@@ -18,7 +18,7 @@ const PostDetailsContentRender = ({
   const mediaCount = medias?.length;
 
   return (
-    <div className="w-full  relative">
+    <div className="w-full h-full  relative">
       <Swiper
         modules={[Navigation, Pagination]}
         spaceBetween={16}
