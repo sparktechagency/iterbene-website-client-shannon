@@ -121,7 +121,7 @@ const SearchDropdown: React.FC<SearchDropdownProps> = ({
                         #{hashtag?.name}
                       </p>
                       <p className="text-xs text-gray-500 truncate">
-                        {hashtag?.postsCount || 0} Posts
+                        {hashtag?.postCount || 0} Posts
                       </p>
                     </div>
                   </div>

@@ -6,7 +6,7 @@ export interface TUser {
 }
 export interface IHashtag {
   name: string;
-  postsCount: number;
+  postCount: number;
 }
 
 export interface ISearchResult {
