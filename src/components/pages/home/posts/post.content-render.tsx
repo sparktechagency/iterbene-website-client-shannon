@@ -24,7 +24,7 @@ const PostContentRender = ({ data,isVisible }: PostContentRenderProps) => {
             className="w-full object-contain cursor-pointer rounded-md"
           />
         ) : (
-          <VideoCard url={media?.mediaUrl} isVisible={isVisible}  className="w-full h-[350px]" />
+          <VideoCard url={media?.mediaUrl} isVisible={isVisible}  className="w-full h-[400px]" />
         )}
       </div>
     );

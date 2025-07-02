@@ -224,7 +224,7 @@ const PostDetails = ({ isOpen, onClose, post }: PostDetailsProps) => {
             </div>
           </div>
           <PostCommentInput post={post} />
-          <PostCommentSection post={post} />
+          <PostCommentSection post={post} isViewAllComments={false} />
         </div>
       </section>
     </CustomModal>

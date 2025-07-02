@@ -19,13 +19,15 @@ import toast from "react-hot-toast";
 interface PostCommentSectionProps {
   post: IPost;
   onEdit?: (commentId: string, commentText: string) => void; // Callback for edit
-  setShowPostDetails: (value: boolean) => void;
+  setShowPostDetails?: (value: boolean) => void;
+  isViewAllComments?: boolean;
 }
 
 const PostCommentSection = ({
   post,
   onEdit,
   setShowPostDetails,
+  isViewAllComments = true,
 }: PostCommentSectionProps) => {
   const user = useUser();
   const currentUserId = user?._id;
@@ -183,10 +185,15 @@ const PostCommentSection = ({
     }
   };
 
+  // Determine which comments to show based on isViewAllComments
+  const commentsToShow = isViewAllComments 
+    ? topLevelComments?.slice(0, 4) 
+    : topLevelComments;
+
   return (
     <section className="mt-4 px-3">
       <AnimatePresence>
-        {topLevelComments?.slice(0, 4)?.map((comment: IComment) => {
+        {commentsToShow?.map((comment: IComment) => {
           const isReactionAdded = comment?.reactions?.some(
             (r) => r?.userId?._id === user?._id
           );
@@ -451,10 +458,10 @@ const PostCommentSection = ({
           );
         })}
       </AnimatePresence>
-      {post?.comments?.length > 4 && (
+      {!isViewAllComments && post?.comments?.length > 4 && (
         <div className="flex justify-center items-center my-4">
           <button
-            onClick={() => setShowPostDetails(true)}
+            onClick={() => setShowPostDetails && setShowPostDetails(true)}
             className="text-primary text-base font-medium hover:underline cursor-pointer"
           >
             View all {post?.comments?.length} comments
