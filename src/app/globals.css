@@ -59,6 +59,24 @@ body::-webkit-scrollbar {
   }
 }
 
+
+/* Global CSS file এ add করুন */
+.modal-open {
+  overflow: hidden !important;
+  position: fixed !important;
+  width: 100% !important;
+}
+
+html.modal-open {
+  overflow: hidden !important;
+}
+
+/* Modal backdrop যাতে scroll prevent করে */
+.modal-backdrop {
+  touch-action: none;
+  -webkit-overflow-scrolling: touch;
+}
+
 /* Emoji Picker Scrollbar (override to hide by default, apply custom-scrollbar class if needed) */
 .emoji-picker {
   scrollbar-width: none; /* Firefox */
