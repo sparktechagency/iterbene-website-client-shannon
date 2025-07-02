@@ -5,7 +5,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { LucideCalendarCheck, Search, Menu, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { BiLogOut } from "react-icons/bi";
 import { BsChatSquareDots } from "react-icons/bs";
 import { FaRegCalendarAlt, FaRegUserCircle } from "react-icons/fa";
@@ -23,228 +23,9 @@ import MessagesDropdown from "./MessagesDropdown";
 import NotificationsDropdown from "./NotificationsDropdown";
 import UserDropdown from "./UserDropdown";
 import { useSocket } from "@/lib/socket";
-
-// Define types for search results
-interface IHashtag {
-  name: string;
-  postsCount: number;
-}
-
-interface ILocation {
-  locationName: string;
-  postsCount: number;
-}
-
-interface SearchResult {
-  users: IUser[];
-  hashtags: IHashtag[];
-  locations: ILocation[];
-}
-
-// Enhanced Search Results Dropdown Component
-type SearchDropdownProps = {
-  isOpen: boolean;
-  searchValue: string;
-  searchResults: SearchResult;
-  loading: boolean;
-  onResultClick: (result: IUser | IHashtag | ILocation, type: string) => void;
-  onSearchPosts: (query: string) => void;
-};
-
-const SearchDropdown: React.FC<SearchDropdownProps> = ({
-  isOpen,
-  searchValue,
-  searchResults,
-  // loading,
-  onResultClick,
-  onSearchPosts,
-}) => {
-  if (!isOpen) return null;
-
-  const hasResults =
-    searchResults.users.length > 0 ||
-    searchResults.hashtags.length > 0 ||
-    searchResults.locations.length > 0;
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: -10 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -10 }}
-      transition={{ duration: 0.2 }}
-      className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-lg border border-gray-200 max-h-96 overflow-y-auto z-50"
-    >
-      <div className="p-4">
-        {hasResults ? (
-          <div className="space-y-4">
-            {/* Users Section */}
-            {searchResults.users.length > 0 && (
-              <div>
-                <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">
-                  Users
-                </h4>
-                <div className="space-y-1">
-                  {searchResults.users.map((user, index) => (
-                    <div
-                      key={`user-${index}`}
-                      className="flex items-center gap-3 p-3 hover:bg-gray-50 rounded-lg cursor-pointer transition-colors"
-                      onClick={() => onResultClick(user, "user")}
-                    >
-                      <div className="flex-shrink-0">
-                        {user.profileImage ? (
-                          <Image
-                            src={user.profileImage}
-                            width={32}
-                            height={32}
-                            className="size-8 rounded-full object-cover"
-                            alt="user"
-                          />
-                        ) : (
-                          <div className="size-8 rounded-full bg-gray-200 flex items-center justify-center">
-                            <FaRegUserCircle
-                              size={16}
-                              className="text-gray-500"
-                            />
-                          </div>
-                        )}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-gray-900 truncate">
-                          {user.fullName || user.username}
-                        </p>
-                        <p className="text-xs text-gray-500 truncate">
-                          @{user.username}
-                        </p>
-                      </div>
-                      {user.followersCount !== undefined && (
-                        <div className="flex-shrink-0">
-                          <span className="text-xs text-gray-400">
-                            {user.followersCount} Followers
-                          </span>
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Hashtags Section */}
-            {searchResults.hashtags.length > 0 && (
-              <div>
-                <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">
-                  Hashtags
-                </h4>
-                <div className="space-y-1">
-                  {searchResults.hashtags.map((hashtag, index) => (
-                    <div
-                      key={`hashtag-${index}`}
-                      className="flex items-center gap-3 p-3 hover:bg-gray-50 rounded-lg cursor-pointer transition-colors"
-                      onClick={() => onResultClick(hashtag, "hashtag")}
-                    >
-                      <div className="flex-shrink-0">
-                        <div className="size-8 rounded-full bg-blue-100 flex items-center justify-center">
-                          <span className="text-blue-600 font-bold text-sm">
-                            #
-                          </span>
-                        </div>
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-gray-900 truncate">
-                          #{hashtag.name}
-                        </p>
-                        <p className="text-xs text-gray-500 truncate">
-                          {hashtag.postsCount} Posts
-                        </p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Locations Section */}
-            {searchResults.locations.length > 0 && (
-              <div>
-                <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">
-                  Locations
-                </h4>
-                <div className="space-y-1">
-                  {searchResults.locations.map((location, index) => (
-                    <div
-                      key={`location-${index}`}
-                      className="flex items-center gap-3 p-3 hover:bg-gray-50 rounded-lg cursor-pointer transition-colors"
-                      onClick={() => onResultClick(location, "location")}
-                    >
-                      <div className="flex-shrink-0">
-                        <div className="size-8 rounded-full bg-green-100 flex items-center justify-center">
-                          <FiMapPin size={16} className="text-green-600" />
-                        </div>
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-gray-900 truncate">
-                          {location.locationName}
-                        </p>
-                        <p className="text-xs text-gray-500 truncate">
-                          {location.postsCount} Posts
-                        </p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Search Posts Option - Always show at bottom when there are results */}
-            <div className="border-t pt-3">
-              <div
-                className="flex items-center gap-3 p-3 hover:bg-blue-50 rounded-lg cursor-pointer transition-colors"
-                onClick={() => onSearchPosts(searchValue)}
-              >
-                <div className="flex-shrink-0">
-                  <div className="size-8 rounded-full bg-blue-100 flex items-center justify-center">
-                    <Search size={16} className="text-blue-600" />
-                  </div>
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-gray-900">
-                    Search for {searchValue} in posts
-                  </p>
-                  <p className="text-xs text-gray-500">
-                    Find posts containing your search term
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        ) : searchValue ? (
-          // No results found - Show option to search in posts
-          <div className="text-center p-2">
-            {/* Search Posts Button */}
-            <div
-              className="flex items-center gap-2 cursor-pointer"
-              onClick={() => onSearchPosts(searchValue)}
-            >
-              <div className="flex-shrink-0">
-                <Search size={24} />
-              </div>
-              <div className="flex-1 text-left">
-                <p className="text-base font-medium text-gray-900">
-                  {searchValue}
-                </p>
-              </div>
-            </div>
-          </div>
-        ) : (
-          <div className="text-center py-8 text-gray-500">
-            <Search size={24} className="mx-auto mb-2 text-gray-300" />
-            <p className="text-sm">Start typing to search...</p>
-          </div>
-        )}
-      </div>
-    </motion.div>
-  );
-};
+import { IHashtag, ISearchResult } from "@/types/search.types";
+import SearchDropdown from "./SearchDropdown";
+import { useGetSearchHashtagAndUsersQuery } from "@/redux/features/search/searchApi";
 
 // Mobile Menu Component
 const MobileMenu: React.FC<{
@@ -372,10 +153,10 @@ const MobileMenu: React.FC<{
 const Header: React.FC = () => {
   const user = useUser();
   const router = useRouter();
+  
   // Desktop/Tablet dropdown states
   const [isMessagesOpen, setIsMessagesOpen] = useState<boolean>(false);
-  const [isNotificationsOpen, setIsNotificationsOpen] =
-    useState<boolean>(false);
+  const [isNotificationsOpen, setIsNotificationsOpen] = useState<boolean>(false);
   const [isUserOpen, setIsUserOpen] = useState<boolean>(false);
 
   // Mobile drawer state
@@ -384,16 +165,23 @@ const Header: React.FC = () => {
   // Search bar state for mobile/tablet
   const [isSearchOpen, setIsSearchOpen] = useState<boolean>(false);
   const [searchValue, setSearchValue] = useState<string>("");
+  const [debouncedSearchValue, setDebouncedSearchValue] = useState<string>("");
 
   // Search dropdown states
-  const [isSearchDropdownOpen, setIsSearchDropdownOpen] =
-    useState<boolean>(false);
-  const [searchResults, setSearchResults] = useState<SearchResult>({
+  const [isSearchDropdownOpen, setIsSearchDropdownOpen] = useState<boolean>(false);
+  
+  // Search results
+  const [searchResults, setSearchResults] = useState<ISearchResult>({
     users: [],
     hashtags: [],
-    locations: [],
   });
-  const [searchLoading, setSearchLoading] = useState<boolean>(false);
+
+  // API call with debounced search value
+  const { data: responseData, isLoading: searchLoading } =
+    useGetSearchHashtagAndUsersQuery(debouncedSearchValue, {
+      refetchOnMountOrArgChange: true,
+      skip: !debouncedSearchValue.trim(), // Skip if empty or only whitespace
+    });
 
   const messagesRef = useRef<HTMLDivElement>(null);
   const notificationsRef = useRef<HTMLDivElement>(null);
@@ -402,17 +190,37 @@ const Header: React.FC = () => {
   const searchInputRef = useRef<HTMLInputElement>(null);
   const desktopSearchRef = useRef<HTMLDivElement>(null);
 
-  // socket
+  // Socket setup
   const { socket } = useSocket();
   useEffect(() => {
-       if (socket && user?._id) {
+    if (socket && user?._id) {
       socket.emit("user/connect", { userId: user?._id });
       return () => {
         socket.emit("user/disconnect", { userId: user?._id });
-      }
+      };
     }
   }, [socket, user]);
 
+  // Debounce search input
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchValue(searchValue);
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [searchValue]);
+
+  // Handle search results
+  useEffect(() => {
+    if (responseData?.data?.attributes) {
+      setSearchResults(responseData.data.attributes);
+    } else if (!debouncedSearchValue.trim()) {
+      // Clear results when search is empty
+      setSearchResults({ users: [], hashtags: [] });
+    }
+  }, [responseData, debouncedSearchValue]);
+
+  // Handle click outside to close dropdowns
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -436,7 +244,6 @@ const Header: React.FC = () => {
         desktopSearchRef.current &&
         !desktopSearchRef.current.contains(event.target as Node)
       ) {
-        setIsSearchOpen(false);
         setIsSearchDropdownOpen(false);
       }
     };
@@ -454,60 +261,7 @@ const Header: React.FC = () => {
     }
   }, [isSearchOpen]);
 
-  // Handle search input changes with debounce
-  useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      if (searchValue.trim()) {
-        handleSearch(searchValue);
-        setIsSearchDropdownOpen(true);
-      } else {
-        setSearchResults({
-          users: [],
-          hashtags: [],
-          locations: [],
-        });
-        setIsSearchDropdownOpen(false);
-      }
-    }, 300);
-
-    return () => clearTimeout(timeoutId);
-  }, [searchValue]);
-
-  // Function to handle search - replace with your API call
-  const handleSearch = async (query: string) => {
-    setSearchLoading(true);
-    try {
-      // TODO: Replace with your actual API calls
-      const [usersResponse, hashtagsResponse, locationsResponse] =
-        await Promise.all([
-          fetch(`/api/users/search?q=${encodeURIComponent(query)}`),
-          fetch(`/api/hashtags/search?q=${encodeURIComponent(query)}`),
-          fetch(`/api/posts/locations/search?q=${encodeURIComponent(query)}`),
-        ]);
-
-      const [usersData, hashtagsData, locationsData] = await Promise.all([
-        usersResponse.json(),
-        hashtagsResponse.json(),
-        locationsResponse.json(),
-      ]);
-
-      setSearchResults({
-        users: usersData.users || [],
-        hashtags: hashtagsData.hashtags || [],
-        locations: locationsData.locations || [],
-      });
-    } catch (error) {
-      console.error("Search error:", error);
-      setSearchResults({
-        users: [],
-        hashtags: [],
-        locations: [],
-      });
-    } finally {
-      setSearchLoading(false);
-    }
-  };
-
+  // Close other dropdowns when one opens
   const toggleMessages = () => {
     setIsMessagesOpen((prev) => !prev);
     setIsNotificationsOpen(false);
@@ -533,69 +287,73 @@ const Header: React.FC = () => {
   const toggleSearch = () => {
     setIsSearchOpen((prev) => !prev);
     if (isSearchOpen) {
+      // Clear search when closing
       setSearchValue("");
+      setDebouncedSearchValue("");
       setIsSearchDropdownOpen(false);
     }
   };
 
-  // Updated handleSearchSubmit function in Header component
+  // Handle search input changes
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSearchValue(value);
+    
+    // Show dropdown if there's a value
+    if (value.trim()) {
+      setIsSearchDropdownOpen(true);
+    } else {
+      setIsSearchDropdownOpen(false);
+    }
+  };
+
+  // Handle search focus
+  const handleSearchFocus = () => {
+    // Always show dropdown on focus if there's a search value
+    if (searchValue.trim()) {
+      setIsSearchDropdownOpen(true);
+    }
+  };
+
+  // Handle search form submission
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchValue.trim()) {
-      // If no suggestions shown or user pressed Enter, go to posts search
       handleSearchPosts(searchValue.trim());
     }
   };
 
-  // New function to handle post search navigation
-  const handleSearchPosts = (query: string) => {
-    // Navigate to posts search page with query parameter
+  // Navigate to posts search page
+  const handleSearchPosts = useCallback((query: string) => {
     router.push(`/search/posts?q=${encodeURIComponent(query)}`);
-
-    // Close dropdown and clear search
+    // Reset search state after navigation
     setIsSearchDropdownOpen(false);
     setSearchValue("");
-    setIsSearchOpen(false); // Close mobile search too
-  };
+    setDebouncedSearchValue("");
+    setIsSearchOpen(false);
+  }, [router]);
 
-  const handleSearchResultClick = (
-    result: IUser | IHashtag | ILocation,
-    type: string
-  ) => {
-
-    // Navigate based on result type
+  // Handle search result clicks
+  const handleSearchResultClick = useCallback((result: IUser | IHashtag, type: string) => {
     switch (type) {
       case "user":
-        // Navigate to user profile page
         const userResult = result as IUser;
-        router.push(`/${userResult.username}`);
+        router.push(`/${userResult?.username}`);
         break;
       case "hashtag":
-        // Navigate to hashtag posts page
         const hashtagResult = result as IHashtag;
-        router.push(`/hashtag/${hashtagResult.name}`);
-        break;
-      case "location":
-        // Navigate to location posts page
-        const locationResult = result as ILocation;
-        router.push(
-          `/location/${encodeURIComponent(locationResult.locationName)}`
-        );
+        router.push(`/hashtag/${hashtagResult?.name}`);
         break;
       default:
         console.log("Unknown result type");
     }
 
-    // Close dropdown and clear search
+    // Reset search state after navigation
     setIsSearchDropdownOpen(false);
     setSearchValue("");
-  };
-
-  const handleSearchFocus = () => {
-    if (searchValue.trim()) {
-      setIsSearchDropdownOpen(true);
-    }
-  };
+    setDebouncedSearchValue("");
+    setIsSearchOpen(false);
+  }, [router]);
 
   return (
     <nav className="w-full bg-[#F0FAF9] h-[72px] md:h-[88px] lg:h-[112px] fixed top-0 left-0 z-50">
@@ -630,7 +388,7 @@ const Header: React.FC = () => {
                     className="w-full px-3 py-2 md:py-3 outline-none text-sm md:text-base"
                     placeholder="Search..."
                     value={searchValue}
-                    onChange={(e) => setSearchValue(e.target.value)}
+                    onChange={handleSearchChange}
                     onFocus={handleSearchFocus}
                   />
                   <button
@@ -646,7 +404,7 @@ const Header: React.FC = () => {
                   searchResults={searchResults}
                   loading={searchLoading}
                   onResultClick={handleSearchResultClick}
-                  onSearchPosts={handleSearchPosts} // Add this new prop
+                  onSearchPosts={handleSearchPosts}
                 />
               </motion.div>
             ) : (
@@ -657,24 +415,28 @@ const Header: React.FC = () => {
                 animate={{ opacity: 1 }}
                 className="hidden md:flex-1 max-w-3xl mx-auto bg-white rounded-xl border border-white md:flex justify-between items-center relative"
               >
-                <input
-                  type="text"
-                  name="search"
-                  id="search"
-                  className="flex-1 px-3 py-2 md:py-3 outline-none text-sm md:text-base"
-                  placeholder="Search"
-                  value={searchValue}
-                  onChange={(e) => setSearchValue(e.target.value)}
-                  onFocus={handleSearchFocus}
-                />
-                <Search className="text-gray-500 mr-2" size={20} />
+                <form onSubmit={handleSearchSubmit} className="flex-1 flex items-center">
+                  <input
+                    type="text"
+                    name="search"
+                    id="search"
+                    className="flex-1 px-3 py-2 md:py-3 outline-none text-sm md:text-base"
+                    placeholder="Search"
+                    value={searchValue}
+                    onChange={handleSearchChange}
+                    onFocus={handleSearchFocus}
+                  />
+                  <button type="submit" className="p-2">
+                    <Search className="text-gray-500" size={20} />
+                  </button>
+                </form>
                 <SearchDropdown
                   isOpen={isSearchDropdownOpen}
                   searchValue={searchValue}
                   searchResults={searchResults}
                   loading={searchLoading}
                   onResultClick={handleSearchResultClick}
-                  onSearchPosts={handleSearchPosts} // Add this new prop
+                  onSearchPosts={handleSearchPosts}
                 />
               </motion.div>
             )}
@@ -811,7 +573,7 @@ const Header: React.FC = () => {
           )}
         </motion.div>
       </div>
-      {/* Mobile Menu Drawer */}
+      
       {/* Mobile Menu Drawer */}
       <MobileMenu
         user={user}

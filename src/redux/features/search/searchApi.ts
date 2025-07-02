@@ -10,8 +10,8 @@ const searchApi = baseApi.injectEndpoints({
       }),
     }),
     getSearchHashtagAndUsers: builder.query({
-      query: (query) => ({
-        url: `/search/hashtag-and-users?query=${query}`,
+      query: (searchTerm) => ({
+        url: `/search/users-hashtags?searchTerm=${searchTerm}`,
         method: "GET",
       }),
     }),

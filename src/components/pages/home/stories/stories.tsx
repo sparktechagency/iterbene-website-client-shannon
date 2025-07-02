@@ -54,7 +54,7 @@ const Stories = () => {
       >
         <SwiperSlide>
           <div
-            className="relative w-full h-[240px] md:h-[260px] rounded-xl overflow-hidden shadow-lg cursor-pointer"
+            className="relative w-full h-[210px] md:h-[240px] rounded-xl overflow-hidden shadow-lg cursor-pointer"
             onClick={handleAddJourney}
           >
             {user ? (
