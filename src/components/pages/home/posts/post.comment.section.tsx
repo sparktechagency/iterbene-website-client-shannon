@@ -185,7 +185,10 @@ const PostCommentSection = ({
     }
   };
 
-  const showConditionBaseComment = isViewAllComments ? topLevelComments?.slice(0, 4) : topLevelComments
+  const showConditionBaseComment =
+    isViewAllComments && post?.media?.length < 0
+      ? topLevelComments?.slice(0, 4)
+      : topLevelComments;
   return (
     <section className="mt-4 px-3">
       <AnimatePresence>
@@ -454,16 +457,18 @@ const PostCommentSection = ({
           );
         })}
       </AnimatePresence>
-      {post?.media?.length > 0 && isViewAllComments && post?.comments?.length > 4 && (
-        <div className="flex justify-center items-center my-4">
-          <button
-            onClick={() => setShowPostDetails?.(true)}
-            className="text-primary text-base font-medium hover:underline cursor-pointer"
-          >
-            View all {post?.comments?.length} comments
-          </button>
-        </div>
-      )}
+      {post?.media?.length > 0 &&
+        isViewAllComments &&
+        post?.comments?.length > 4 && (
+          <div className="flex justify-center items-center my-4">
+            <button
+              onClick={() => setShowPostDetails?.(true)}
+              className="text-primary text-base font-medium hover:underline cursor-pointer"
+            >
+              View all {post?.comments?.length} comments
+            </button>
+          </div>
+        )}
     </section>
   );
 };

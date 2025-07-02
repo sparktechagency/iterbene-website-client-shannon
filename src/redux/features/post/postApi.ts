@@ -53,6 +53,13 @@ const postApi = baseApi.injectEndpoints({
       },
       providesTags: ["Post"],
     }),
+    getSinglePost: builder.query({
+      query: (id) => ({
+        url: `/posts/${id}`,
+        method: "GET",
+      }),
+      providesTags: ["Post"],
+    }),
     getUserTimelinePosts: builder.query({
       query: ({ username, filters }) => {
         const params = new URLSearchParams();
@@ -155,6 +162,7 @@ export const {
   useGetGroupPostsQuery,
   useGetEventPostsQuery,
   useDeletePostMutation,
+  useGetSinglePostQuery,
   useUpdatePostMutation,
   useAddOrRemoveReactionMutation,
   useCreateCommentMutation,

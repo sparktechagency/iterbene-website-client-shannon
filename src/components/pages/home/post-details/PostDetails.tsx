@@ -30,7 +30,7 @@ const PostDetails = ({ isOpen, onClose, post }: PostDetailsProps) => {
   const user = useUser();
   const currentUserId = user?._id;
   const [showReactions, setShowReactions] = useState<boolean>(false);
-  const userReaction = post.reactions?.find(
+  const userReaction = post?.reactions?.find(
     (reaction: IReaction) => reaction?.userId?._id === currentUserId
   );
 

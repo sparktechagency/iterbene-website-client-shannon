@@ -20,6 +20,7 @@ import Image from "next/image";
 import { IoMdClose } from "react-icons/io";
 import UserTimelineContentRender from "./UserTimelineContentRender";
 import PostHeader from "../../home/posts/post.header";
+import Link from "next/link";
 
 interface PostCardProps {
   post: IPost;
@@ -43,7 +44,8 @@ const UserTimelineCard = ({ post, onRemove }: PostCardProps) => {
   const user = useUser();
   const currentUserId = user?._id;
   const [showReactions, setShowReactions] = useState<boolean>(false);
-  const [showReactionDetails, setShowReactionDetails] = useState<boolean>(false);
+  const [showReactionDetails, setShowReactionDetails] =
+    useState<boolean>(false);
 
   const userReaction = post.reactions?.find(
     (reaction: IReaction) => reaction?.userId?._id === currentUserId
@@ -81,25 +83,30 @@ const UserTimelineCard = ({ post, onRemove }: PostCardProps) => {
 
   return (
     <div className="w-full flex flex-col bg-white rounded-xl p-4 mb-4 relative">
-      <PostHeader post={post}  onRemove={onRemove} />
-      <p className="text-gray-700 flex-1 mb-3">
-        {post?.content?.split(/(\s+)/).map((word, index) => {
-          const isHashtag = word.match(/^#\w+/);
-          return (
-            <span
-              key={index}
-              className={isHashtag ? "text-blue-500 font-bold" : ""}
-            >
-              {word}
-            </span>
-          );
-        })}
-      </p>
-      <UserTimelineContentRender data={post.media || []} />
+      <PostHeader post={post} onRemove={onRemove} />
+      <Link href={`/feed/${post?._id}`}>
+        <p className="text-gray-700 flex-1 mb-3">
+          {post?.content?.split(/(\s+)/).map((word, index) => {
+            const isHashtag = word.match(/^#\w+/);
+            return (
+              <span
+                key={index}
+                className={isHashtag ? "text-blue-500 font-bold" : ""}
+              >
+                {word}
+              </span>
+            );
+          })}
+        </p>
+        <UserTimelineContentRender data={post.media || []} />
+      </Link>
       <div className="mt-5">
         {nonZeroReactions?.length > 0 && (
           <div className="relative mb-2 mt-2">
-            <div onClick={() => setShowReactionDetails(true)} className="w-fit flex items-center gap-1 cursor-pointer">
+            <div
+              onClick={() => setShowReactionDetails(true)}
+              className="w-fit flex items-center gap-1 cursor-pointer"
+            >
               <div className="flex -space-x-1 cursor-pointer">
                 {nonZeroReactions.slice(0, 3).map((reaction) => (
                   <div key={reaction.type}>
@@ -116,7 +123,9 @@ const UserTimelineCard = ({ post, onRemove }: PostCardProps) => {
             <CustomModal
               header={
                 <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 rounded-t-xl">
-                  <h2 className="text-xl font-semibold text-gray-800">All Reactions</h2>
+                  <h2 className="text-xl font-semibold text-gray-800">
+                    All Reactions
+                  </h2>
                   <button
                     className="text-gray-600 border-gray-400 cursor-pointer size-10 bg-[#EEFDFB] rounded-full border flex justify-center items-center"
                     onClick={() => setShowReactionDetails(false)}
@@ -143,11 +152,19 @@ const UserTimelineCard = ({ post, onRemove }: PostCardProps) => {
                             className="size-[40px] rounded-full"
                           />
                           <div className="flex flex-col mt-2">
-                            <h1 className="font-semibold">{reaction?.userId?.fullName}</h1>
-                            <span className="text-gray-500">{reaction?.userId?.username}</span>
+                            <h1 className="font-semibold">
+                              {reaction?.userId?.fullName}
+                            </h1>
+                            <span className="text-gray-500">
+                              {reaction?.userId?.username}
+                            </span>
                           </div>
                         </div>
-                        <span className={`${reactionColors[reaction?.reactionType]}`}>
+                        <span
+                          className={`${
+                            reactionColors[reaction?.reactionType]
+                          }`}
+                        >
                           {reactionIcons[reaction?.reactionType]}
                         </span>
                       </div>
@@ -174,11 +191,15 @@ const UserTimelineCard = ({ post, onRemove }: PostCardProps) => {
             >
               {userReaction ? (
                 <>
-                  <span className={`${reactionColors[userReaction.reactionType]}`}>
+                  <span
+                    className={`${reactionColors[userReaction.reactionType]}`}
+                  >
                     {reactionIcons[userReaction.reactionType]}
                   </span>
                   <span
-                    className={`font-semibold capitalize ${reactionColors[userReaction.reactionType]}`}
+                    className={`font-semibold capitalize ${
+                      reactionColors[userReaction.reactionType]
+                    }`}
                   >
                     <span>{userReaction.reactionType}</span>
                   </span>
@@ -200,7 +221,10 @@ const UserTimelineCard = ({ post, onRemove }: PostCardProps) => {
                   className="absolute -top-12 -left-2 bg-white border border-gray-200 rounded-full shadow-lg px-3 py-2 flex space-x-3 z-10"
                 >
                   {Object.keys(ReactionType).map((reactionKey) => {
-                    const reaction = ReactionType[reactionKey as keyof typeof ReactionType].toLowerCase();
+                    const reaction =
+                      ReactionType[
+                        reactionKey as keyof typeof ReactionType
+                      ].toLowerCase();
                     return (
                       <motion.button
                         key={reaction}
@@ -213,7 +237,11 @@ const UserTimelineCard = ({ post, onRemove }: PostCardProps) => {
                             : "text-gray-500 hover:text-secondary"
                         }`}
                       >
-                        <Tooltip title={reaction.charAt(0).toUpperCase() + reaction.slice(1)}>
+                        <Tooltip
+                          title={
+                            reaction.charAt(0).toUpperCase() + reaction.slice(1)
+                          }
+                        >
                           {reactionIcons[reaction]}
                         </Tooltip>
                       </motion.button>
@@ -237,12 +265,16 @@ const UserTimelineCard = ({ post, onRemove }: PostCardProps) => {
                 fill="currentColor"
               ></path>
             </svg>
-            <span className="font-semibold">{formatNumber(post?.comments?.length || 0)}</span>
+            <span className="font-semibold">
+              {formatNumber(post?.comments?.length || 0)}
+            </span>
           </div>
           {post?.itinerary && (
             <div className="flex items-center space-x-2 cursor-pointer">
               <FaCalendarCheck className="h-5 w-5 text-primary" />
-              <span className="font-semibold">{formatNumber(post?.itineraryViewCount)}</span>
+              <span className="font-semibold">
+                {formatNumber(post?.itineraryViewCount)}
+              </span>
             </div>
           )}
         </div>
