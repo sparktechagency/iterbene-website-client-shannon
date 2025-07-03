@@ -38,13 +38,29 @@ import {
   useGoogleLocationSearch,
 } from "@/hooks/useGoogleLocationSearch";
 import ShowItineraryModal from "./ShowItineraryModal";
+
 export interface FilePreview {
   name: string;
   preview: string;
   type: string;
 }
 
-const CreatePost = () => {
+// Define post types
+export type PostType = "User" | "Group" | "Event";
+
+interface CreatePostProps {
+  postType?: PostType;
+  groupId?: string;
+  eventId?: string;
+  onPostCreated?: () => void;
+}
+
+const CreatePost = ({
+  postType = "User",
+  groupId,
+  eventId,
+  onPostCreated,
+}: CreatePostProps) => {
   const user = useUser();
   // State for post content
   const [post, setPost] = useState<string>("");
@@ -115,6 +131,38 @@ const CreatePost = () => {
   const [showPdfModal, setShowPdfModal] = useState(false);
   const pdfInputRef = useRef<HTMLInputElement>(null);
 
+  // Different configurations based on post type
+  const getPostConfig = () => {
+    switch (postType) {
+      case "Group":
+        return {
+          placeholder: "Share something with your group...",
+          showPrivacy: false,
+          showLocation: true,
+          showItinerary: true,
+          showHeaderContext: false,
+        };
+      case "Event":
+        return {
+          placeholder: "Share about this event...",
+          showPrivacy: false,
+          showLocation: true,
+          showItinerary: true,
+          showHeaderContext: false,
+        };
+      default: // timeline
+        return {
+          placeholder: `What's new, ${user?.fullName || "User"}?`,
+          showPrivacy: true,
+          showLocation: true,
+          showItinerary: true,
+          showHeaderContext: false,
+        };
+    }
+  };
+
+  const config = getPostConfig();
+
   // Auto-resize textarea
   useEffect(() => {
     const textarea = textareaRef.current;
@@ -158,18 +206,21 @@ const CreatePost = () => {
     const value = e.target.value;
     setPost(value);
 
-    // Detect hashtag input (e.g., #nic)
-    const cursorPosition = e.target.selectionStart || 0;
-    const textBeforeCursor = value.slice(0, cursorPosition);
-    const lastWord = textBeforeCursor.split(/\s+/).pop() || "";
+    // Only show hashtag suggestions for timeline posts
+    if (postType === "User") {
+      // Detect hashtag input (e.g., #nic)
+      const cursorPosition = e.target.selectionStart || 0;
+      const textBeforeCursor = value.slice(0, cursorPosition);
+      const lastWord = textBeforeCursor.split(/\s+/).pop() || "";
 
-    if (lastWord.startsWith("#") && lastWord.length > 1) {
-      const query = lastWord.slice(1).toLowerCase(); // Remove # and normalize
-      setHashtagQuery(query);
-      setShowHashtagSuggestions(true);
-    } else {
-      setHashtagQuery("");
-      setShowHashtagSuggestions(false);
+      if (lastWord.startsWith("#") && lastWord.length > 1) {
+        const query = lastWord.slice(1).toLowerCase(); // Remove # and normalize
+        setHashtagQuery(query);
+        setShowHashtagSuggestions(true);
+      } else {
+        setHashtagQuery("");
+        setShowHashtagSuggestions(false);
+      }
     }
   };
 
@@ -293,27 +344,61 @@ const CreatePost = () => {
       const formData = new FormData();
       formData.append("content", post);
       formData.append(
-        "visitedLocation",
-        JSON.stringify({
-          latitude: selectedLocation?.latitude,
-          longitude: selectedLocation?.longitude,
-        })
+        "sourceId",
+        postType === "Group"
+          ? groupId
+          : postType === "Event"
+          ? eventId
+          : user?._id
       );
-      formData.append("sourceId", user?._id || "");
-      formData.append("itineraryId", itinerary?._id || "");
-      formData.append("postType", "User");
-      formData.append("visitedLocationName", selectedLocation?.name || "");
-      formData.append("privacy", privacy || "");
+      formData.append("postType", postType === "User" ? "User" : postType);
+      // Add timeline-specific data
+      if (postType === "User") {
+        formData.append("privacy", privacy || "public");
+        formData.append(
+          "visitedLocation",
+          JSON.stringify({
+            latitude: selectedLocation?.latitude,
+            longitude: selectedLocation?.longitude,
+          })
+        );
+        formData.append("visitedLocationName", selectedLocation?.name || "");
+        formData.append("itineraryId", itinerary?._id || "");
+      }
+
+      // Add group-specific data
+      if (postType === "Group") {
+        if (selectedLocation) {
+          formData.append(
+            "visitedLocation",
+            JSON.stringify({
+              latitude: selectedLocation?.latitude,
+              longitude: selectedLocation?.longitude,
+            })
+          );
+          formData.append("visitedLocationName", selectedLocation?.name || "");
+        }
+        formData.append("itineraryId", itinerary?._id || "");
+      }
+
+      // Add media files
       media?.forEach((file) => {
         formData.append("postFiles", file);
       });
+
       await createPost(formData).unwrap();
       toast.success("Post created successfully!");
+
+      // Reset form
       setMedia([]);
       setMediaPreviews([]);
       setPost("");
       setSelectedLocation(null);
+      setItinerary(null);
       setShowHashtagSuggestions(false);
+
+      // Optional callback
+      onPostCreated?.();
     } catch (error) {
       const err = error as TError;
       toast.error(err?.data?.message || "Something went wrong!");
@@ -325,13 +410,14 @@ const CreatePost = () => {
     setLocationQuery(defaultLocation);
     searchLocations(defaultLocation); // Trigger search with default value
   };
+
   return (
     <section className="w-full bg-white rounded-xl">
       {/* Post Input Section */}
       <div className="w-full flex px-4 pt-4 pb-2 gap-3">
         {user && (
           <Image
-            src={user.profileImage}
+            src={user?.profileImage}
             alt="User Profile"
             width={50}
             height={50}
@@ -341,10 +427,10 @@ const CreatePost = () => {
         <div className="relative w-full">
           <textarea
             ref={textareaRef}
-            placeholder={`What's new, ${user?.fullName || "User"}?`}
+            placeholder={config.placeholder}
             value={post}
             onChange={postChangeHandler}
-            className={`w-full bg-transparent border-none text-justify mt-3 text-base focus:outline-none ${
+            className={`w-full bg-transparent border-none text-justify mt-4 text-base focus:outline-none ${
               post.includes("#") ? "color-[#3B82F6]" : ""
             } placeholder-gray-400 resize-none`}
           />
@@ -386,7 +472,7 @@ const CreatePost = () => {
         <button
           onClick={handleCreatePost}
           disabled={!post && media.length === 0}
-          className={`w-[140px] cursor-pointer flex justify-center items-center h-[50px] ${
+          className={`w-[140px] cursor-pointer flex justify-center items-center h-[45px] mt-1 ${
             post || media.length > 0
               ? "bg-secondary text-white"
               : "border border-[#9194A9] text-[#9194A9]"
@@ -414,7 +500,6 @@ const CreatePost = () => {
                   d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                 ></path>
               </svg>
-              Loading...
             </>
           ) : (
             "Post It!"
@@ -424,7 +509,7 @@ const CreatePost = () => {
 
       {/* Media Preview Section */}
       <div className="w-full px-6 relative">
-        {mediaPreviews.length > 0 && (
+        {mediaPreviews?.length > 0 && (
           <>
             <Swiper
               modules={[Pagination]}
@@ -433,23 +518,23 @@ const CreatePost = () => {
                 swiperRef.current = swiper;
               }}
               spaceBetween={10}
-              slidesPerView={mediaPreviews.length === 1 ? 1 : 2}
+              slidesPerView={mediaPreviews?.length === 1 ? 1 : 2}
               className="w-full"
             >
-              {mediaPreviews.map((item, index) => (
+              {mediaPreviews?.map((item, index) => (
                 <SwiperSlide key={index}>
                   <div className="relative">
                     {item.type === "image" ? (
                       <Image
-                        src={item.preview}
-                        alt={item.name}
+                        src={item?.preview}
+                        alt={item?.name}
                         width={500}
                         height={500}
                         className="w-full h-56 md:h-72 lg:h-96 object-cover rounded-lg"
                       />
                     ) : (
                       <video
-                        src={item.preview}
+                        src={item?.preview}
                         controls
                         className="w-full h-56 md:h-72 lg:h-96 object-cover rounded-lg"
                       />
@@ -515,12 +600,14 @@ const CreatePost = () => {
                 </motion.div>
               )}
             </AnimatePresence>
-            <div className="flex items-center gap-2">
-              <Globe className="w-5 h-5 text-primary" />
-              <span className="text-sm text-gray-700 capitalize">
-                {privacy}
-              </span>
-            </div>
+            {config.showPrivacy && (
+              <div className="flex items-center gap-2">
+                <Globe className="w-5 h-5 text-primary" />
+                <span className="text-sm text-gray-700 capitalize">
+                  {privacy}
+                </span>
+              </div>
+            )}
             {itinerary && (
               <div
                 onClick={() => setShowItineraryModal(true)}
@@ -531,77 +618,10 @@ const CreatePost = () => {
               </div>
             )}
           </div>
+
           {/* Icons for Additional Functionalities */}
           <div className="flex items-center gap-5 bg-[#E7E8EC] px-4 py-1.5 rounded-b-xl">
-            {/* Location Icon with Popup */}
-            <div className="relative" ref={locationPopupRef}>
-              <Tooltip title="Add a location" placement="bottom">
-                <button onClick={handleMapIconClick} className="cursor-pointer">
-                  <MapPin
-                    className={`w-6 h-6 mt-2 ${
-                      selectedLocation ? "text-primary" : "text-[#9194A9]"
-                    } hover:text-primary transition-colors`}
-                  />
-                </button>
-              </Tooltip>
-              <AnimatePresence>
-                {showLocationPopup && (
-                  <motion.div
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    className="absolute top-10 left-0 bg-white rounded-2xl shadow-xl p-5 w-80 z-20"
-                  >
-                    <div className="relative">
-                      <input
-                        ref={locationInputRef}
-                        type="text"
-                        value={locationQuery}
-                        onChange={handleLocationInputChange}
-                        placeholder={
-                          !isInitialized
-                            ? "Loading location services..."
-                            : "Search for a location..."
-                        }
-                        disabled={!isInitialized}
-                        className="w-full px-4 py-2 border rounded-full border-gray-200 focus:outline-none "
-                        onFocus={() => {
-                          if (predictions.length > 0) {
-                            setShowLocationPopup(true);
-                          }
-                        }}
-                      />
-                      <Search className="w-5 h-5 text-[#9194A9] absolute top-3 right-4" />
-                      {isSearchingLocation && (
-                        <div className="absolute right-4 top-1/2 transform -translate-y-1/2">
-                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500"></div>
-                        </div>
-                      )}
-                    </div>
-                    <div className="mt-4 max-h-56 overflow-y-auto">
-                      {predictions?.map((prediction) => (
-                        <div
-                          key={prediction?.place_id}
-                          onClick={() => handleLocationSelect(prediction)}
-                          className="flex items-center gap-3 p-3 hover:bg-gray-50 cursor-pointer rounded-md transition-colors"
-                        >
-                          <MapPin className="size-5 text-[#9194A9]" />
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium text-gray-900 truncate">
-                              {prediction.structured_formatting.main_text}
-                            </p>
-                            <p className="text-xs text-gray-500 truncate">
-                              {prediction.structured_formatting.secondary_text}
-                            </p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
-            {/* Media Upload Icon */}
+            {/* Media Upload Icon - Always available */}
             <Tooltip title="Upload media" placement="bottom">
               <button
                 onClick={() => mediaInputRef.current?.click()}
@@ -623,71 +643,153 @@ const CreatePost = () => {
               className="hidden"
             />
 
-            {/* Itinerary Icon */}
-            <Tooltip title="Add Itinerary" placement="bottom">
-              <button
-                onClick={() => setShowPdfModal(true)}
-                className="cursor-pointer"
-              >
-                <CalendarCheck className="w-6 h-6 text-[#9194A9] hover:text-primary transition-colors" />
-              </button>
-            </Tooltip>
+            {/* Location Icon - Only for timeline and group posts */}
+            {config.showLocation && (
+              <div className="relative" ref={locationPopupRef}>
+                <Tooltip title="Add a location" placement="bottom">
+                  <button
+                    onClick={handleMapIconClick}
+                    className="cursor-pointer"
+                  >
+                    <MapPin
+                      className={`w-6 h-6 mt-2 ${
+                        selectedLocation ? "text-primary" : "text-[#9194A9]"
+                      } hover:text-primary transition-colors`}
+                    />
+                  </button>
+                </Tooltip>
+                <AnimatePresence>
+                  {showLocationPopup && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      className="absolute top-10 left-0 bg-white rounded-2xl shadow-xl p-5 w-80 z-20"
+                    >
+                      <div className="relative">
+                        <input
+                          ref={locationInputRef}
+                          type="text"
+                          value={locationQuery}
+                          onChange={handleLocationInputChange}
+                          placeholder={
+                            !isInitialized
+                              ? "Loading location services..."
+                              : "Search for a location..."
+                          }
+                          disabled={!isInitialized}
+                          className="w-full px-4 py-2 border rounded-full border-gray-200 focus:outline-none "
+                          onFocus={() => {
+                            if (predictions.length > 0) {
+                              setShowLocationPopup(true);
+                            }
+                          }}
+                        />
+                        <Search className="w-5 h-5 text-[#9194A9] absolute top-3 right-4" />
+                        {isSearchingLocation && (
+                          <div className="absolute right-4 top-1/2 transform -translate-y-1/2">
+                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500"></div>
+                          </div>
+                        )}
+                      </div>
+                      <div className="mt-4 max-h-56 overflow-y-auto">
+                        {predictions?.map((prediction) => (
+                          <div
+                            key={prediction?.place_id}
+                            onClick={() => handleLocationSelect(prediction)}
+                            className="flex items-center gap-3 p-3 hover:bg-gray-50 cursor-pointer rounded-md transition-colors"
+                          >
+                            <MapPin className="size-5 text-[#9194A9]" />
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-medium text-gray-900 truncate">
+                                {prediction.structured_formatting.main_text}
+                              </p>
+                              <p className="text-xs text-gray-500 truncate">
+                                {
+                                  prediction.structured_formatting
+                                    .secondary_text
+                                }
+                              </p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            )}
 
-            {/* Privacy Icon with Popup */}
-            <div className="relative" ref={privacyPopupRef}>
-              <Tooltip title="Set privacy" placement="bottom">
+            {/* Itinerary Icon - Only for timeline and group posts */}
+            {config.showItinerary && (
+              <Tooltip title="Add Itinerary" placement="bottom">
                 <button
-                  onClick={() => setShowPrivacyPopup(true)}
+                  onClick={() => setShowPdfModal(true)}
                   className="cursor-pointer"
                 >
-                  <Globe
-                    className={`w-6 h-6 mt-2 ${
-                      privacy !== "public" ? "text-primary" : "text-[#9194A9]"
-                    } hover:text-primary transition-colors`}
-                  />
+                  <CalendarCheck className="w-6 h-6 text-[#9194A9] hover:text-primary transition-colors" />
                 </button>
               </Tooltip>
-              <AnimatePresence>
-                {showPrivacyPopup && (
-                  <motion.div
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    className="absolute top-10 left-0 bg-white rounded-2xl shadow-xl p-5 w-80 z-20"
+            )}
+
+            {/* Privacy Icon - Only for timeline posts */}
+            {config.showPrivacy && (
+              <div className="relative" ref={privacyPopupRef}>
+                <Tooltip title="Set privacy" placement="bottom">
+                  <button
+                    onClick={() => setShowPrivacyPopup(true)}
+                    className="cursor-pointer"
                   >
-                    <div className="flex justify-between items-center mb-4">
-                      <div>
-                        <h4 className="text-lg font-semibold text-gray-800">
-                          Who can see this post
-                        </h4>
-                        <p className="text-sm text-[#9194A9]">
-                          Choose who can reply to this post.
-                        </p>
+                    <Globe
+                      className={`w-6 h-6 mt-2 ${
+                        privacy !== "public" ? "text-primary" : "text-[#9194A9]"
+                      } hover:text-primary transition-colors`}
+                    />
+                  </button>
+                </Tooltip>
+                <AnimatePresence>
+                  {showPrivacyPopup && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      className="absolute top-10 left-0 bg-white rounded-2xl shadow-xl p-5 w-80 z-20"
+                    >
+                      <div className="flex justify-between items-center mb-4">
+                        <div>
+                          <h4 className="text-lg font-semibold text-gray-800">
+                            Who can see this post
+                          </h4>
+                          <p className="text-sm text-[#9194A9]">
+                            Choose who can see this post
+                          </p>
+                        </div>
                       </div>
-                    </div>
-                    {[
-                      { value: "public", icon: Globe, label: "Public" },
-                      { value: "friends", icon: Users, label: "Friends" },
-                      { value: "private", icon: Lock, label: "Private" },
-                    ].map((option) => (
-                      <div
-                        key={option.value}
-                        onClick={() => handlePrivacySelect(option.value)}
-                        className="flex items-center gap-3 p-3 hover:bg-gray-50 cursor-pointer rounded-md transition-colors"
-                      >
-                        <option.icon className="size-5 text-[#9194A9]" />
-                        <span className="text-sm text-gray-700">
-                          {option.label}
-                        </span>
-                      </div>
-                    ))}
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
+                      {[
+                        { value: "public", icon: Globe, label: "Public" },
+                        { value: "friends", icon: Users, label: "Friends" },
+                        { value: "private", icon: Lock, label: "Private" },
+                      ].map((option) => (
+                        <div
+                          key={option.value}
+                          onClick={() => handlePrivacySelect(option.value)}
+                          className="flex items-center gap-3 p-3 hover:bg-gray-50 cursor-pointer rounded-md transition-colors"
+                        >
+                          <option.icon className="size-5 text-[#9194A9]" />
+                          <span className="text-sm text-gray-700">
+                            {option.label}
+                          </span>
+                        </div>
+                      ))}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            )}
           </div>
         </div>
       )}
+
       <CustomModal
         isOpen={showPdfModal}
         onClose={() => setShowPdfModal(false)}

@@ -1,14 +1,18 @@
-import CreatePost from '@/components/pages/home/create-post/create-post'
-import Posts from '@/components/pages/home/posts/posts'
-import React from 'react'
+"use client";
+import CreatePost from "@/components/pages/home/create-post/create-post";
+import { useParams } from "next/navigation";
+import React from "react";
+import EventPost from "./EventPost";
 
 const GroupDiscussion = () => {
-  return (
-    <section className='w-full space-y-5'>
-      <CreatePost/>
-      <Posts/>
-    </section>
-  )
-}
+  const { eventId } = useParams();
 
-export default GroupDiscussion
+  return (
+    <section className="w-full space-y-5">
+      <CreatePost postType="Event" eventId={eventId as string} />
+      <EventPost />
+    </section>
+  );
+};
+
+export default GroupDiscussion;
