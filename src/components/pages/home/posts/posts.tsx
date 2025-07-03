@@ -3,8 +3,10 @@ import { useFeedPostsQuery } from "@/redux/features/post/postApi";
 import { IPost } from "@/types/post.types";
 import PostCard from "./post-card";
 import { useState, useEffect, useMemo, useCallback } from "react";
+import useUser from "@/hooks/useUser";
 
 const Posts = () => {
+  const user = useUser();
   const [currentPage, setCurrentPage] = useState(1);
   const [allPosts, setAllPosts] = useState<IPost[]>([]);
   const [loading, setLoading] = useState(false);
@@ -19,6 +21,7 @@ const Posts = () => {
     [
       { key: "page", value: currentPage }, // Use actual page number
       { key: "limit", value: 10 }, // Keep limit constant at 10
+      ...(user?._id ? [{ key: "userId", value: user._id }] : []),
     ],
     {
       refetchOnMountOrArgChange: true,

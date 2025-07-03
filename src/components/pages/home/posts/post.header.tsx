@@ -118,7 +118,6 @@ const PostHeader = ({
         <div>
           <div className="flex items-center gap-2">
             <Link href={`/${post?.userId?.username}`}>
-              {" "}
               <p className="font-medium text-gray-800 text-lg hover:underline">
                 {post?.userId?.fullName}
               </p>
@@ -130,18 +129,18 @@ const PostHeader = ({
           <div className="text-sm text-gray-900 flex items-center gap-2 -ml-1 mt-1">
             {post?.visitedLocationName && (
               <>
-                <TiLocation size={28} className="text-primary" />
+                <TiLocation size={23} className="text-primary" />
                 <span className="flex items-center">
                   {post?.visitedLocationName}
                 </span>
               </>
             )}
             {post?.privacy === "public" ? (
-              <HiGlobe size={25} className="text-primary" />
+              <HiGlobe size={23} className="text-primary" />
             ) : post?.privacy === "friends" ? (
-              <Users size={28} className="text-primary" />
+              <Users size={23} className="text-primary" />
             ) : (
-              <Lock size={28} className="text-primary" />
+              <Lock size={23} className="text-primary" />
             )}
           </div>
         </div>
