@@ -94,6 +94,7 @@ const JoinedGroupCard = ({ group }: { group: IGroup }) => {
             </button>
           </div>
         }
+           className="w-full p-2"
       >
         <div className="p-6 space-y-4">
           <p className="text-gray-600 text-lg">

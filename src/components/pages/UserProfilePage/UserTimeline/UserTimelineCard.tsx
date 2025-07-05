@@ -137,6 +137,7 @@ const UserTimelineCard = ({ post, onRemove }: PostCardProps) => {
               isOpen={showReactionDetails}
               onClose={() => setShowReactionDetails(false)}
               maxHeight="h-[50vh]"
+              className="w-full p-2"
             >
               {post?.reactions?.length > 0 && (
                 <div className="w-full space-y-2">

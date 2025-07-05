@@ -804,6 +804,7 @@ const CreatePost = ({
             </button>
           </div>
         }
+           className="w-full p-2"
       >
         <div className="w-full bg-white rounded-xl p-5 max-w-2xl">
           <div className="border-2 border-dashed border-gray-300 p-6 text-center">

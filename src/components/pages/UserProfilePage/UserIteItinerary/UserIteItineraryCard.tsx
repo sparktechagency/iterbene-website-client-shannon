@@ -41,7 +41,7 @@ const formatNumber = (num: number): string => {
   return num.toString();
 };
 
-const UserIteItineraryCard = ({ post,onRemove }: PostCardProps) => {
+const UserIteItineraryCard = ({ post, onRemove }: PostCardProps) => {
   const user = useUser();
   const currentUserId = user?._id;
   const [showReactions, setShowReactions] = useState<boolean>(false);
@@ -88,7 +88,6 @@ const UserIteItineraryCard = ({ post,onRemove }: PostCardProps) => {
     }
   };
 
-
   return (
     <div className="w-full flex flex-col bg-white rounded-xl p-4 mb-4 relative">
       <PostHeader post={post} onRemove={onRemove} />
@@ -110,10 +109,11 @@ const UserIteItineraryCard = ({ post,onRemove }: PostCardProps) => {
       <div className="mt-5">
         {nonZeroReactions?.length > 0 && (
           <div className="relative mb-2 mt-2">
-            <div onClick={() => setShowReactionDetails(true)} className="w-fit flex items-center gap-1 cursor-pointer">
-              <div
-                className="flex -space-x-1 cursor-pointer "
-              >
+            <div
+              onClick={() => setShowReactionDetails(true)}
+              className="w-fit flex items-center gap-1 cursor-pointer"
+            >
+              <div className="flex -space-x-1 cursor-pointer ">
                 {/* Show up to 3 reaction types */}
                 {nonZeroReactions.slice(0, 3).map((reaction) => (
                   <div key={reaction.type}>
@@ -146,6 +146,7 @@ const UserIteItineraryCard = ({ post,onRemove }: PostCardProps) => {
               isOpen={showReactionDetails}
               onClose={() => setShowReactionDetails(false)}
               maxHeight="h-[50vh]"
+              className="w-full p-2"
             >
               {post?.reactions?.length > 0 && (
                 <div className="w-full space-y-2 ">
@@ -170,7 +171,9 @@ const UserIteItineraryCard = ({ post,onRemove }: PostCardProps) => {
                           </div>
                         </div>
                         <span
-                          className={`${reactionColors[reaction?.reactionType]}`}
+                          className={`${
+                            reactionColors[reaction?.reactionType]
+                          }`}
                         >
                           {reactionIcons[reaction?.reactionType]}
                         </span>
@@ -205,8 +208,9 @@ const UserIteItineraryCard = ({ post,onRemove }: PostCardProps) => {
                     {reactionIcons[userReaction.reactionType]}
                   </span>
                   <span
-                    className={`font-semibold capitalize  ${reactionColors[userReaction.reactionType]
-                      }`}
+                    className={`font-semibold capitalize  ${
+                      reactionColors[userReaction.reactionType]
+                    }`}
                   >
                     <span> {userReaction.reactionType}</span>
                   </span>
@@ -238,10 +242,11 @@ const UserIteItineraryCard = ({ post,onRemove }: PostCardProps) => {
                         onClick={() => handleReaction(reaction)}
                         whileHover={{ scale: 1.25 }}
                         whileTap={{ scale: 0.9 }}
-                        className={`text-2xl cursor-pointer ${userReaction?.reactionType === reaction
+                        className={`text-2xl cursor-pointer ${
+                          userReaction?.reactionType === reaction
                             ? reactionColors[reaction]
                             : "text-gray-500 hover:text-secondary"
-                          }`}
+                        }`}
                       >
                         <Tooltip
                           title={

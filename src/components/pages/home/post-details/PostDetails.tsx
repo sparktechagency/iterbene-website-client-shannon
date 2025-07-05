@@ -74,6 +74,7 @@ const PostDetails = ({ isOpen, onClose, post }: PostDetailsProps) => {
       onClose={onClose}
       header={null}
       maxHeight="max-h-[80vh] md:max-h-[90vh]"
+         className="w-full p-2"
     >
       <section className="w-full grid grid-cols-1 md:grid-cols-12 gap-5">
         <div className="w-full h-full  col-span-full md:col-span-8">

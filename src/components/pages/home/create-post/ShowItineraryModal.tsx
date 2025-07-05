@@ -94,6 +94,7 @@ const ShowItineraryModal = ({
           </button>
         </div>
       }
+         className="w-full p-2"
     >
       {/* Content */}
       <div className="flex-1 overflow-y-auto">

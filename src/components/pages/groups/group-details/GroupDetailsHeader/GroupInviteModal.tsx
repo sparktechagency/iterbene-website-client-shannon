@@ -171,6 +171,7 @@ const GroupInviteModal = ({
           </button>
         </div>
       }
+         className="w-full p-2"
     >
       <div className="space-y-4">
         <div className="relative">

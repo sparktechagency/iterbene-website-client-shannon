@@ -40,6 +40,7 @@ const ItineraryModal = ({
       }
       isOpen={visible}
       onClose={onClose}
+      className="w-full p-2"
     >
       <CustomForm onSubmit={handleCreateItinerary}>
         <div className="w-full space-y-2">

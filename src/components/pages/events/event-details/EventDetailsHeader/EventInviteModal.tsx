@@ -166,6 +166,7 @@ const EventInviteModal = ({
           </button>
         </div>
       }
+      className="w-full p-2"
     >
       <div className="space-y-4">
         <div className="relative">
@@ -348,11 +349,10 @@ const EventInviteModal = ({
             onClick={handleInviteConnections}
             loading={isInviteLoading}
             disabled={invitedPeople.length === 0}
-            className={`flex-1 px-4 py-2 rounded-lg transition-colors ${
-              invitedPeople.length > 0
-                ? "bg-primary text-white hover:bg-primary/90"
-                : "bg-gray-300 text-gray-500 cursor-not-allowed"
-            }`}
+            className={`flex-1 px-4 py-2 rounded-lg transition-colors ${invitedPeople.length > 0
+              ? "bg-primary text-white hover:bg-primary/90"
+              : "bg-gray-300 text-gray-500 cursor-not-allowed"
+              }`}
           >
             Invite ({invitedPeople.length})
           </CustomButton>

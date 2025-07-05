@@ -13,10 +13,7 @@ interface PostModalProps {
   onOpenItinerary: () => void;
 }
 
-export default function PostModal({
-  visible,
-  onClose,
-}: PostModalProps) {
+export default function PostModal({ visible, onClose }: PostModalProps) {
   const [postContent, setPostContent] = useState("");
   const [selectedFiles, setSelectedFiles] = useState<FilePreview[]>([]);
   const [visitedLocation, setVisitedLocation] = useState<Location | null>(null);
@@ -40,18 +37,18 @@ export default function PostModal({
     onClose();
   };
 
-//   const renderPrivacyIcon = () => {
-//     switch (privacyOption) {
-//       case "PUBLIC":
-//         return <GlobalOutlined />;
-//       case "FRIENDS":
-//         return <UsergroupAddOutlined />;
-//       case "PRIVATE":
-//         return <LockOutlined />;
-//       default:
-//         return <GlobalOutlined />;
-//     }
-//   };
+  //   const renderPrivacyIcon = () => {
+  //     switch (privacyOption) {
+  //       case "PUBLIC":
+  //         return <GlobalOutlined />;
+  //       case "FRIENDS":
+  //         return <UsergroupAddOutlined />;
+  //       case "PRIVATE":
+  //         return <LockOutlined />;
+  //       default:
+  //         return <GlobalOutlined />;
+  //     }
+  //   };
 
   return (
     <CustomModal
@@ -68,6 +65,7 @@ export default function PostModal({
       }
       isOpen={visible}
       onClose={onClose}
+      className="w-full p-2"
     >
       <div className="flex items-center mb-4">
         <div className="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold mr-2">
@@ -126,7 +124,7 @@ export default function PostModal({
         </div>
       )}
       <CustomButton
-       variant="default"
+        variant="default"
         className="px-5 py-3"
         onClick={handleCreatePost}
         fullWidth
