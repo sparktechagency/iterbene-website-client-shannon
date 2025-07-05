@@ -1,10 +1,10 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
-import { HiGlobe } from "react-icons/hi";
+import { HiGlobe, HiLockClosed, HiUsers } from "react-icons/hi";
 import { TiLocation } from "react-icons/ti";
 import { IPost } from "@/types/post.types";
-import { Lock, MoreHorizontal, Users } from "lucide-react";
+import {MoreHorizontal } from "lucide-react";
 import useUser from "@/hooks/useUser";
 import { motion, AnimatePresence } from "framer-motion"; // Import Framer Motion
 import { useDeletePostMutation } from "@/redux/features/post/postApi";
@@ -111,9 +111,9 @@ const PostHeader = ({
         <Image
           src={post?.userId?.profileImage}
           alt={post?.userId?.fullName}
-          width={60}
-          height={60}
-          className="size-[60px] object-cover rounded-full mr-3 ring-2 ring-gray-200"
+          width={50}
+          height={50}
+          className="size-[50px] object-cover rounded-full mr-3 ring-2 ring-gray-200"
         />
         <div>
           <div className="flex items-center gap-2">
@@ -138,9 +138,9 @@ const PostHeader = ({
             {post?.privacy === "public" ? (
               <HiGlobe size={23} className="text-primary" />
             ) : post?.privacy === "friends" ? (
-              <Users size={23} className="text-primary" />
+              <HiUsers size={23} className="text-primary" />
             ) : (
-              <Lock size={23} className="text-primary" />
+              <HiLockClosed size={23} className="text-primary" />
             )}
           </div>
         </div>

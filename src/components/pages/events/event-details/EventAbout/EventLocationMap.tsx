@@ -71,7 +71,7 @@ const EventLocationMap = ({
 
   return (
     <div className="w-full col-span-full md:col-span-5 bg-white p-4 rounded-xl space-y-2">
-      <div className="rounded-xl shadow-md h-[272px] overflow-hidden z-20">
+      <div className="rounded-xl shadow-md h-[350px] overflow-hidden z-20">
         <GoogleMap
           mapContainerStyle={mapContainerStyle}
           center={groupLocation}

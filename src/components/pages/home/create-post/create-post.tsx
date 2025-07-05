@@ -1,5 +1,19 @@
 "use client";
+import CustomButton from "@/components/custom/custom-button";
+import CustomModal from "@/components/custom/custom-modal";
+import {
+  LocationDetails,
+  LocationPrediction,
+  useGoogleLocationSearch,
+} from "@/hooks/useGoogleLocationSearch";
 import useUser from "@/hooks/useUser";
+import { useGetHashtagPostsQuery } from "@/redux/features/hashtag/hashtagApi";
+import { useCreateItineraryMutation } from "@/redux/features/itinerary/itineraryApi";
+import { useCreatePostMutation } from "@/redux/features/post/postApi";
+import { TError } from "@/types/error";
+import { IActivity, IDay, IItinerary } from "@/types/itinerary.types";
+import { Tooltip } from "antd";
+import { AnimatePresence, motion } from "framer-motion";
 import {
   CalendarCheck,
   ChevronLeft,
@@ -14,29 +28,15 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import React, { useEffect, useRef, useState } from "react";
+import { FieldValues, useForm } from "react-hook-form";
+import toast from "react-hot-toast";
+import { BsUpload } from "react-icons/bs";
+import { IoMdClose } from "react-icons/io";
 import "swiper/css";
 import "swiper/css/pagination";
 import { Pagination } from "swiper/modules";
 import { Swiper, SwiperClass, SwiperSlide } from "swiper/react";
-import ItineraryModal from "./ItineraryModal";
-import { motion, AnimatePresence } from "framer-motion";
-import { Tooltip } from "antd";
-import CustomButton from "@/components/custom/custom-button";
-import CustomModal from "@/components/custom/custom-modal";
-import { IoMdClose } from "react-icons/io";
-import { BsUpload } from "react-icons/bs";
-import { FieldValues, useForm } from "react-hook-form";
-import { IActivity, IDay, IItinerary } from "@/types/itinerary.types";
-import { useCreateItineraryMutation } from "@/redux/features/itinerary/itineraryApi";
-import toast from "react-hot-toast";
-import { TError } from "@/types/error";
-import { useCreatePostMutation } from "@/redux/features/post/postApi";
-import { useGetHashtagPostsQuery } from "@/redux/features/hashtag/hashtagApi";
-import {
-  LocationDetails,
-  LocationPrediction,
-  useGoogleLocationSearch,
-} from "@/hooks/useGoogleLocationSearch";
+import CreateItineraryModal from "./CreateItineraryModal";
 import ShowItineraryModal from "./ShowItineraryModal";
 
 export interface FilePreview {
@@ -348,8 +348,8 @@ const CreatePost = ({
         postType === "Group"
           ? groupId
           : postType === "Event"
-          ? eventId
-          : user?._id
+            ? eventId
+            : user?._id
       );
       formData.append("postType", postType === "User" ? "User" : postType);
       // Add timeline-specific data
@@ -430,9 +430,8 @@ const CreatePost = ({
             placeholder={config.placeholder}
             value={post}
             onChange={postChangeHandler}
-            className={`w-full bg-transparent border-none text-justify mt-4 text-base focus:outline-none ${
-              post.includes("#") ? "color-[#3B82F6]" : ""
-            } placeholder-gray-400 resize-none`}
+            className={`w-full bg-transparent border-none text-justify mt-4 text-base focus:outline-none ${post.includes("#") ? "color-[#3B82F6]" : ""
+              } placeholder-gray-400 resize-none`}
           />
           {/* Hashtag Suggestions Popup */}
           <AnimatePresence>
@@ -472,11 +471,10 @@ const CreatePost = ({
         <button
           onClick={handleCreatePost}
           disabled={!post && media.length === 0}
-          className={`w-[140px] cursor-pointer flex justify-center items-center h-[45px] mt-1 ${
-            post || media.length > 0
+          className={`w-[140px] cursor-pointer flex justify-center items-center h-[45px] mt-1 ${post || media.length > 0
               ? "bg-secondary text-white"
               : "border border-[#9194A9] text-[#9194A9]"
-          } rounded-xl`}
+            } rounded-xl`}
         >
           {isCreatingPost ? (
             <>
@@ -628,9 +626,8 @@ const CreatePost = ({
                 className="cursor-pointer"
               >
                 <ImageIcon
-                  className={`w-6 h-6 ${
-                    media.length > 0 ? "text-primary" : "text-[#9194A9]"
-                  } hover:text-primary transition-colors`}
+                  className={`w-6 h-6 ${media.length > 0 ? "text-primary" : "text-[#9194A9]"
+                    } hover:text-primary transition-colors`}
                 />
               </button>
             </Tooltip>
@@ -652,9 +649,8 @@ const CreatePost = ({
                     className="cursor-pointer"
                   >
                     <MapPin
-                      className={`w-6 h-6 mt-2 ${
-                        selectedLocation ? "text-primary" : "text-[#9194A9]"
-                      } hover:text-primary transition-colors`}
+                      className={`w-6 h-6 mt-2 ${selectedLocation ? "text-primary" : "text-[#9194A9]"
+                        } hover:text-primary transition-colors`}
                     />
                   </button>
                 </Tooltip>
@@ -741,9 +737,8 @@ const CreatePost = ({
                     className="cursor-pointer"
                   >
                     <Globe
-                      className={`w-6 h-6 mt-2 ${
-                        privacy !== "public" ? "text-primary" : "text-[#9194A9]"
-                      } hover:text-primary transition-colors`}
+                      className={`w-6 h-6 mt-2 ${privacy !== "public" ? "text-primary" : "text-[#9194A9]"
+                        } hover:text-primary transition-colors`}
                     />
                   </button>
                 </Tooltip>
@@ -804,7 +799,7 @@ const CreatePost = ({
             </button>
           </div>
         }
-           className="w-full p-2"
+        className="w-full p-2"
       >
         <div className="w-full bg-white rounded-xl p-5 max-w-2xl">
           <div className="border-2 border-dashed border-gray-300 p-6 text-center">
@@ -842,7 +837,7 @@ const CreatePost = ({
           </CustomButton>
         </div>
       </CustomModal>
-      <ItineraryModal
+      <CreateItineraryModal
         visible={itineraryModalOpen}
         onClose={() => setItineraryModalOpen(false)}
         handleCreateItinerary={handleCreateItinerary}

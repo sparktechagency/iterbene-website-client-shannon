@@ -5,7 +5,6 @@ import {
   Clock,
   MapPin,
   Plane,
-  Bookmark,
   Download,
   Train,
   Bus,
@@ -78,9 +77,7 @@ const ShowItineraryModal = ({
       header={
         <div className="flex items-center justify-between px-4 py-4 border-b border-gray-200 rounded-t-xl">
           <div className="flex items-center gap-5">
-            <button className="text-gray-600 border-gray-400 cursor-pointer size-10 bg-[#EEFDFB] rounded-full border flex justify-center items-center">
-              <Bookmark size={20} />
-            </button>
+            <h1>Itinerary Details</h1>
             {/* Download icon */}
             <button className="text-gray-600 border-gray-400 cursor-pointer size-10 bg-[#EEFDFB] rounded-full border flex justify-center items-center">
               <Download size={20} />
@@ -94,7 +91,7 @@ const ShowItineraryModal = ({
           </button>
         </div>
       }
-         className="w-full p-2"
+      className="w-full p-2"
     >
       {/* Content */}
       <div className="flex-1 overflow-y-auto">
@@ -160,14 +157,16 @@ const ShowItineraryModal = ({
                       <p className="text-base text-gray-600 ml-6">
                         {activity?.description?.split("\n")[0]}
                       </p>
-                      <Link
-                        href={activity?.link || ""}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-base text-blue-600 hover:underline"
-                      >
-                        Link
-                      </Link>
+                      {activity?.link && (
+                        <Link
+                          href={activity?.link || ""}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-base text-blue-600 hover:underline"
+                        >
+                          Link
+                        </Link>
+                      )}
                     </div>
                     <div className="flex items-center justify-between ml-6">
                       <div className="flex items-center gap-4">
@@ -184,7 +183,7 @@ const ShowItineraryModal = ({
                         )}
                         {day?.comment && (
                           <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
-                            {day.comment}
+                            {day?.comment}
                           </span>
                         )}
                       </div>
