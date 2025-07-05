@@ -25,13 +25,14 @@ const EditItineraryModal = ({
   itineraryId,
 }: EditItineraryModalProps) => {
   const {
-    data: itinerary,
+    data: responseData,
     isLoading: isFetching,
     isError,
   } = useGetItineraryByIdQuery(itineraryId, {
     skip: !visible || !itineraryId, // Skip query if modal is not visible or no ID is provided
   });
 
+  const itinerary = responseData?.data?.attributes;
   const [editItinerary, { isLoading: isUpdating }] =
     useUpdateItineraryMutation();
 
@@ -51,17 +52,18 @@ const EditItineraryModal = ({
   useEffect(() => {
     if (itinerary) {
       reset({
-        tripName: itinerary.tripName || "",
-        travelMode: itinerary.travelMode || "",
-        departure: itinerary.departure || "",
-        arrival: itinerary.arrival || "",
-        days: itinerary.days || [],
+        tripName: itinerary?.tripName || "",
+        travelMode: itinerary?.travelMode || "",
+        departure: itinerary?.departure || "",
+        arrival: itinerary?.arrival || "",
+        days: itinerary?.days || [],
       });
     }
   }, [itinerary, reset]);
 
   // Handle form submission to update itinerary
   const handleUpdateItinerary = async (values: FieldValues) => {
+    return console.log("Editing Itinerary:", values);
     try {
       await editItinerary({ id: itineraryId, data: values }).unwrap();
       onClose(); // Close modal on successful update
@@ -79,6 +81,10 @@ const EditItineraryModal = ({
   if (isError) {
     return <div>Error loading itinerary. Please try again.</div>;
   }
+
+  console.log("Itinerary ID:", visible, itineraryId);
+
+  console.log("Itinerary data:", itinerary);
 
   return (
     <CustomModal
@@ -99,7 +105,7 @@ const EditItineraryModal = ({
       onClose={onClose}
       className="w-full p-2"
     >
-      <CustomForm onSubmit={handleUpdateItinerary}>
+      <CustomForm onSubmit={handleUpdateItinerary} defaultValues={itinerary}>
         <div className="w-full space-y-2">
           <CustomInput
             name="tripName"

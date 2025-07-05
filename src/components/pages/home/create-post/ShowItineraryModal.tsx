@@ -22,6 +22,8 @@ interface ShowItineraryModalProps {
   visible: boolean;
   onClose: () => void;
   itinerary: IItinerary;
+  isEditing?: boolean;
+  handleEdit?: () => void;
 }
 
 const StarRating = ({ rating }: { rating: number }) => {
@@ -40,6 +42,8 @@ const ShowItineraryModal = ({
   visible,
   onClose,
   itinerary,
+  isEditing = false,
+  handleEdit,
 }: ShowItineraryModalProps) => {
   if (!visible) return null;
 
@@ -195,6 +199,16 @@ const ShowItineraryModal = ({
           ))}
         </div>
       </div>
+      {isEditing && (
+        <div className="w-full mt-5 flex justify-end">
+          <button
+            className="px-5 py-2 bg-primary text-white rounded-xl cursor-pointer"
+            onClick={handleEdit}
+          >
+            Edit Itinerary
+          </button>
+        </div>
+      )}
     </CustomModal>
   );
 };

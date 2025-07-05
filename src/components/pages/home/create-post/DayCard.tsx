@@ -17,7 +17,10 @@ const DayCard = ({ control }: DayCardProps) => {
     name: "days",
   });
 
-  const { setValue } = useFormContext();
+  const { setValue, watch } = useFormContext();
+  
+  // Watch all days to get current values
+  const watchedDays = watch("days");
 
   const addDay = () => {
     append({
@@ -43,13 +46,22 @@ const DayCard = ({ control }: DayCardProps) => {
   if (fields.length === 0) {
     addDay();
   }
-  const handleLocationSelect = (location: LocationDetails) => {
-    setValue(`days.${fields.length - 1}.locationName`, location.name);
-    setValue(`days.${fields.length - 1}.location`, {
+
+  // Handle location select for specific day
+  const handleLocationSelect = (location: LocationDetails, dayIndex: number) => {
+    setValue(`days.${dayIndex}.locationName`, location.name);
+    setValue(`days.${dayIndex}.location`, {
       latitude: location.latitude,
       longitude: location.longitude,
     });
   };
+
+  // Handle input change for location search
+  const handleLocationInputChange = (value: string, dayIndex: number) => {
+    setValue(`days.${dayIndex}.locationName`, value);
+  };
+
+  console.log("Watched Days:", watchedDays);
 
   return (
     <div>
@@ -81,8 +93,10 @@ const DayCard = ({ control }: DayCardProps) => {
             <LocationSearchInput
               label="Location"
               required
+              value={watchedDays?.[dayIndex]?.locationName || ""}
               showSelectedInfo={false}
-              onLocationSelect={handleLocationSelect}
+              onLocationSelect={(location) => handleLocationSelect(location, dayIndex)}
+              onInputChange={(value) => handleLocationInputChange(value, dayIndex)}
               placeholder="Where are you exploring? (e.g., Rome, Italy)"
             />
           </div>

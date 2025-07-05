@@ -38,6 +38,7 @@ import { Pagination } from "swiper/modules";
 import { Swiper, SwiperClass, SwiperSlide } from "swiper/react";
 import CreateItineraryModal from "./CreateItineraryModal";
 import ShowItineraryModal from "./ShowItineraryModal";
+import EditItineraryModal from "./EditItineraryModal";
 
 export interface FilePreview {
   name: string;
@@ -110,6 +111,7 @@ const CreatePost = ({
   const [showItineraryModal, setShowItineraryModal] = useState(false);
   const [itineraryModalOpen, setItineraryModalOpen] = useState<boolean>(false);
   const [itinerary, setItinerary] = useState<IItinerary | null>(null);
+  const [editItineraryModal, setEditItineraryModal] = useState(false);
   const [createItinerary, { isLoading }] = useCreateItineraryMutation();
 
   // Post
@@ -313,6 +315,12 @@ const CreatePost = ({
     }
   };
 
+  // handle itinerary modal open
+  const handleItineraryModalOpen = () => {
+    setEditItineraryModal(true);
+    setShowItineraryModal(false);
+  };
+
   const handleLocationInputChange = (
     e: React.ChangeEvent<HTMLInputElement>
   ) => {
@@ -348,8 +356,8 @@ const CreatePost = ({
         postType === "Group"
           ? groupId
           : postType === "Event"
-            ? eventId
-            : user?._id
+          ? eventId
+          : user?._id
       );
       formData.append("postType", postType === "User" ? "User" : postType);
       // Add timeline-specific data
@@ -430,8 +438,9 @@ const CreatePost = ({
             placeholder={config.placeholder}
             value={post}
             onChange={postChangeHandler}
-            className={`w-full bg-transparent border-none text-justify mt-4 text-base focus:outline-none ${post.includes("#") ? "color-[#3B82F6]" : ""
-              } placeholder-gray-400 resize-none`}
+            className={`w-full bg-transparent border-none text-justify mt-4 text-base focus:outline-none ${
+              post.includes("#") ? "color-[#3B82F6]" : ""
+            } placeholder-gray-400 resize-none`}
           />
           {/* Hashtag Suggestions Popup */}
           <AnimatePresence>
@@ -471,10 +480,11 @@ const CreatePost = ({
         <button
           onClick={handleCreatePost}
           disabled={!post && media.length === 0}
-          className={`w-[140px] cursor-pointer flex justify-center items-center h-[45px] mt-1 ${post || media.length > 0
+          className={`w-[140px] cursor-pointer flex justify-center items-center h-[45px] mt-1 ${
+            post || media.length > 0
               ? "bg-secondary text-white"
               : "border border-[#9194A9] text-[#9194A9]"
-            } rounded-xl`}
+          } rounded-xl`}
         >
           {isCreatingPost ? (
             <>
@@ -626,8 +636,9 @@ const CreatePost = ({
                 className="cursor-pointer"
               >
                 <ImageIcon
-                  className={`w-6 h-6 ${media.length > 0 ? "text-primary" : "text-[#9194A9]"
-                    } hover:text-primary transition-colors`}
+                  className={`w-6 h-6 ${
+                    media.length > 0 ? "text-primary" : "text-[#9194A9]"
+                  } hover:text-primary transition-colors`}
                 />
               </button>
             </Tooltip>
@@ -649,8 +660,9 @@ const CreatePost = ({
                     className="cursor-pointer"
                   >
                     <MapPin
-                      className={`w-6 h-6 mt-2 ${selectedLocation ? "text-primary" : "text-[#9194A9]"
-                        } hover:text-primary transition-colors`}
+                      className={`w-6 h-6 mt-2 ${
+                        selectedLocation ? "text-primary" : "text-[#9194A9]"
+                      } hover:text-primary transition-colors`}
                     />
                   </button>
                 </Tooltip>
@@ -737,8 +749,9 @@ const CreatePost = ({
                     className="cursor-pointer"
                   >
                     <Globe
-                      className={`w-6 h-6 mt-2 ${privacy !== "public" ? "text-primary" : "text-[#9194A9]"
-                        } hover:text-primary transition-colors`}
+                      className={`w-6 h-6 mt-2 ${
+                        privacy !== "public" ? "text-primary" : "text-[#9194A9]"
+                      } hover:text-primary transition-colors`}
                     />
                   </button>
                 </Tooltip>
@@ -847,6 +860,13 @@ const CreatePost = ({
         visible={showItineraryModal}
         onClose={() => setShowItineraryModal(false)}
         itinerary={itinerary as IItinerary}
+        isEditing={true}
+        handleEdit={handleItineraryModalOpen}
+      />
+      <EditItineraryModal
+        visible={editItineraryModal}
+        onClose={() => setEditItineraryModal(false)}
+        itineraryId={itinerary?._id || ""}
       />
     </section>
   );
