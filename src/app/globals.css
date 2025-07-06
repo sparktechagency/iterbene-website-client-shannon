@@ -19,7 +19,6 @@ body::-webkit-scrollbar {
   /* Colors (unchanged) */
   --color-primary: oklch(80.5% 0.135 192.5); /* #40E0D0 (turquoise) */
   --color-secondary: oklch(67.85% 0.202 40.38); /* Supports opacity */
-
 }
 /* OTP Input Styles (unchanged) */
 .otp-input {
@@ -59,12 +58,22 @@ body::-webkit-scrollbar {
   }
 }
 
+/* container */
+@layer utilities {
+  .container {
+    width: 100%;
+    max-width: 1536px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
 .scrollbar-hide {
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;  /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
 }
 .scrollbar-hide::-webkit-scrollbar {
-  display: none;  /* Chrome, Safari, Opera */
+  display: none; /* Chrome, Safari, Opera */
 }
 
 /* Global CSS file এ add করুন */
@@ -122,12 +131,12 @@ html.modal-open {
 
 /* Hide scrollbar completely */
 .scrollbar-hide {
-  -ms-overflow-style: none;  /* Internet Explorer 10+ */
-  scrollbar-width: none;     /* Firefox */
+  -ms-overflow-style: none; /* Internet Explorer 10+ */
+  scrollbar-width: none; /* Firefox */
 }
 
 .scrollbar-hide::-webkit-scrollbar {
-  display: none;             /* WebKit browsers */
+  display: none; /* WebKit browsers */
 }
 
 /* Or customize scrollbar appearance */
@@ -140,12 +149,12 @@ html.modal-open {
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: #CBD5E0;
+  background: #cbd5e0;
   border-radius: 10px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: #A0AEC0;
+  background: #a0aec0;
 }
 
 /* High z-index for elements that need to be on top */

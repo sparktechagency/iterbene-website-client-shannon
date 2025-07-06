@@ -863,11 +863,14 @@ const CreatePost = ({
         isEditing={true}
         handleEdit={handleItineraryModalOpen}
       />
-      <EditItineraryModal
-        visible={editItineraryModal}
-        onClose={() => setEditItineraryModal(false)}
-        itineraryId={itinerary?._id || ""}
-      />
+      {editItineraryModal && (
+        <EditItineraryModal
+          visible={editItineraryModal}
+          onClose={() => setEditItineraryModal(false)}
+          itineraryId={itinerary?._id || ""}
+          setItinerary={setItinerary}
+        />
+      )}
     </section>
   );
 };

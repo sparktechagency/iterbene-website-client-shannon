@@ -30,7 +30,7 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
     <section className="w-full h-full">
       <Header />
       {/* Mobile & Tablet Layout - Only show main content */}
-      <section className="w-full 2xl:container mx-auto px-3 sm:px-5 pt-[90px] md:pt-[130px] block lg:hidden">
+      <section className="w-full container mx-auto px-3 sm:px-5 pt-[90px] md:pt-[130px] block lg:hidden">
         <div className="w-full pb-10">
           {children}
         </div>
@@ -39,7 +39,7 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
       {/* Desktop Layout */}
       <section className="w-full container mx-auto px-5 hidden lg:flex gap-5 pt-[130px]">
         {/* Section 1 - Fixed/Static with max width */}
-        <div className="w-full max-w-[280px] md:max-w-[320px] lg:max-w-[340px] xl:max-w-[382px] space-y-5 pb-10 sticky top-[130px] h-fit max-h-[calc(100vh-130px)] overflow-y-auto scrollbar-hide">
+        <div className="w-full hidden xl:block max-w-[260px] md:max-w-[280px] xl:max-w-[320px] 2xl:max-w-[382px] space-y-5 pb-10 sticky top-[130px] h-fit max-h-[calc(100vh-130px)] overflow-y-auto scrollbar-hide">
           <AuthorBio />
           <MainNavigation />
           {user ? <Invitations /> : <UpcomingEvent />}
@@ -52,7 +52,7 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
         
         {/* Section 3 - Fixed/Static with max width - Conditionally hidden */}
         {!shouldHideSection3 && (
-          <div className="w-full max-w-[280px] md:max-w-[320px] lg:max-w-[340px] xl:max-w-[382px] sticky top-[130px] h-fit scrollbar-hide">
+          <div className="w-full max-w-[260px] md:max-w-[280px] xl:max-w-[320px] 2xl:max-w-[382px] sticky top-[130px] h-fit scrollbar-hide">
             <FriendRequest />
             <ContactList />
           </div>

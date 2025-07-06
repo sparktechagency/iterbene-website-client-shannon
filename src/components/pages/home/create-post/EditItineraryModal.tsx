@@ -12,17 +12,22 @@ import {
   useGetItineraryByIdQuery,
   useUpdateItineraryMutation,
 } from "@/redux/features/itinerary/itineraryApi";
+import { TError } from "@/types/error";
+import toast from "react-hot-toast";
+import { IItinerary } from "@/types/itinerary.types";
 
 interface EditItineraryModalProps {
   visible: boolean;
   onClose: () => void;
-  itineraryId: string; // Prop to receive the itinerary ID
+  itineraryId: string;
+  setItinerary: (itinerary: IItinerary) => void;
 }
 
 const EditItineraryModal = ({
   visible,
   onClose,
   itineraryId,
+  setItinerary,
 }: EditItineraryModalProps) => {
   const {
     data: responseData,
@@ -63,13 +68,18 @@ const EditItineraryModal = ({
 
   // Handle form submission to update itinerary
   const handleUpdateItinerary = async (values: FieldValues) => {
-    return console.log("Editing Itinerary:", values);
     try {
-      await editItinerary({ id: itineraryId, data: values }).unwrap();
-      onClose(); // Close modal on successful update
+      const response = await editItinerary({
+        id: itineraryId,
+        data: values,
+      }).unwrap();
+      const responseData = response?.data?.attributes;
+      setItinerary(responseData);
+      toast.success("Itinerary updated successfully!");
+      onClose();
     } catch (error) {
-      console.error("Failed to update itinerary:", error);
-      // Optionally, show an error message to the user
+      const err = error as TError;
+      toast.error(err?.data?.message || "Something went wrong!");
     }
   };
 
@@ -81,10 +91,6 @@ const EditItineraryModal = ({
   if (isError) {
     return <div>Error loading itinerary. Please try again.</div>;
   }
-
-  console.log("Itinerary ID:", visible, itineraryId);
-
-  console.log("Itinerary data:", itinerary);
 
   return (
     <CustomModal
@@ -105,7 +111,16 @@ const EditItineraryModal = ({
       onClose={onClose}
       className="w-full p-2"
     >
-      <CustomForm onSubmit={handleUpdateItinerary} defaultValues={itinerary}>
+      <CustomForm
+        onSubmit={handleUpdateItinerary}
+        defaultValues={{
+          tripName: itinerary?.tripName || "",
+          travelMode: itinerary?.travelMode || "",
+          departure: itinerary?.departure || "",
+          arrival: itinerary?.arrival || "",
+          days: itinerary?.days || [],
+        }}
+      >
         <div className="w-full space-y-2">
           <CustomInput
             name="tripName"
