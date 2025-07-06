@@ -11,13 +11,10 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import StoryCard from "./stories.card";
 import { useGetFeedStoriesQuery } from "@/redux/features/stories/storiesApi";
 import { IStory } from "@/types/stories.types";
-import useUser from "@/hooks/useUser";
 
 const Stories = () => {
-  //user
-  const user = useUser();
-  const { data: storiesData } = useGetFeedStoriesQuery(undefined,{
-    refetchOnMountOrArgChange: true
+  const { data: storiesData } = useGetFeedStoriesQuery(undefined, {
+    refetchOnMountOrArgChange: true,
   });
   const router = useRouter();
   const [stories, setStories] = useState<IStory[]>([]);
@@ -57,23 +54,13 @@ const Stories = () => {
             className="relative w-full h-[210px] md:h-[240px] rounded-xl overflow-hidden shadow-lg cursor-pointer"
             onClick={handleAddJourney}
           >
-            {user ? (
-              <Image
-                src={user?.profileImage}
-                alt="Add Journey"
-                width={200}
-                height={380}
-                className="object-cover w-full h-full rounded-xl"
-              />
-            ) : (
-              <Image
-                src="https://i.postimg.cc/dVP9Fh3N/2588a7b47b42d6dddfdfa08bb9300d00.jpg"
-                alt="Add Journey"
-                width={200}
-                height={380}
-                className="object-cover w-full h-full rounded-xl"
-              />
-            )}
+            <Image
+              src="https://iter-bene.s3.eu-north-1.amazonaws.com/uploads/users/a62e7936-b779-4b00-bbcb-99371f3b79ad.jpg"
+              alt="Add Journey"
+              width={200}
+              height={380}
+              className="object-cover w-full h-full rounded-xl"
+            />
 
             <div className="absolute p-4 rounded-xl top-0 left-0 right-0 bottom-0 bg-white/30 flex flex-col justify-end">
               <div className="flex flex-col items-center gap-5">
@@ -91,9 +78,7 @@ const Stories = () => {
         {stories?.map((story) => (
           <SwiperSlide key={story._id}>
             <div onClick={() => handleStoryClick(story._id)}>
-              <StoryCard
-                story={story}
-              />
+              <StoryCard story={story} />
             </div>
           </SwiperSlide>
         ))}
