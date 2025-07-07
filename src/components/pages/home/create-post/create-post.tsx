@@ -480,9 +480,9 @@ const CreatePost = ({
         <button
           onClick={handleCreatePost}
           disabled={!post && media.length === 0}
-          className={`w-[140px] cursor-pointer flex justify-center items-center h-[45px] mt-1 ${
+          className={`w-[140px]  flex justify-center items-center h-[45px] mt-1 ${
             post || media.length > 0
-              ? "bg-secondary text-white"
+              ? "bg-secondary text-white cursor-pointer"
               : "border border-[#9194A9] text-[#9194A9]"
           } rounded-xl`}
         >
@@ -688,7 +688,7 @@ const CreatePost = ({
                           disabled={!isInitialized}
                           className="w-full px-4 py-2 border rounded-full border-gray-200 focus:outline-none "
                           onFocus={() => {
-                            if (predictions.length > 0) {
+                            if (predictions?.length > 0) {
                               setShowLocationPopup(true);
                             }
                           }}
