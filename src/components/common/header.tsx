@@ -379,13 +379,13 @@ const Header: React.FC = () => {
         <div className="hidden lg:flex flex-1 max-w-3xl mx-auto relative">
           <form
             onSubmit={handleSearchSubmit}
-            className="w-[600px] 2xl:w-[700px] mx-auto flex items-center bg-white rounded-xl border border-gray-100"
+            className="w-full max-w-[720px] mx-auto flex items-center bg-white rounded-xl border border-gray-100"
           >
             <input
               type="text"
               name="search"
               id="search"
-              className="w-full px-4 py-4 outline-none text-base rounded-l-xl"
+              className="w-full px-4 py-3 outline-none text-base rounded-l-xl"
               placeholder="Search"
               value={searchValue}
               onChange={handleSearchChange}
@@ -505,7 +505,7 @@ const Header: React.FC = () => {
             <div ref={searchRef} className="relative">
               <form
                 onSubmit={handleSearchSubmit}
-                className="w-full flex items-center bg-white rounded-xl border border-gray-100"
+                className="w-full max-w-[720px] mx-auto flex items-center bg-white rounded-xl border border-gray-100"
               >
                 <input
                   ref={searchInputRef}

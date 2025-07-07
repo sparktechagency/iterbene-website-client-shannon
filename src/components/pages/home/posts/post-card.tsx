@@ -131,9 +131,6 @@ const PostCard = ({ post }: PostCardProps) => {
   // Function to handle post update (e.g., refetching posts)
   const handlePostUpdated = () => {
     setShowEditModal(false);
-    // You might want to refetch the posts here or update the specific post in your state
-    // For example, if you have a refetch function from a parent component or RTK Query hook:
-    // refetchPosts();
   };
 
   return (
@@ -158,7 +155,7 @@ const PostCard = ({ post }: PostCardProps) => {
       <PostContentRender data={post?.media || []} isVisible={isVisible} />
       {/* if post itineray is avaialbe */}
       {post?.itinerary && (
-        <div onClick={() => setShowItineraryModal(true)} className="p-2 cursor-pointer  rounded-full border-gray-200 flex items-center justify-between text-sm text-gray-500">
+        <div onClick={() => setShowItineraryModal(true)} className="px-4 py-2 mt-5 border cursor-pointer  rounded-full text-gray-600  border-gray-200 flex items-center justify-between text-sm">
           <span>Click to view full itinerary</span>
           <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs">
             PDF View Available

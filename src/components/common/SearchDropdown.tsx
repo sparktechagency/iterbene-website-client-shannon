@@ -32,7 +32,7 @@ const SearchDropdown: React.FC<SearchDropdownProps> = ({
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -10 }}
       transition={{ duration: 0.2 }}
-      className="w-full absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-lg border border-gray-200 max-h-96 overflow-y-auto z-50"
+      className="w-full max-w-[720px] mx-auto scrollbar-hide  absolute top-full left-0  right-0 mt-2 bg-white rounded-xl shadow-lg border border-gray-200 max-h-96 overflow-y-auto z-50"
     >
       <div className="w-full p-3 md:p-4">
         {loading ? (
