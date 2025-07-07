@@ -1,5 +1,4 @@
 "use client";
-
 import logo from "@/asset/logo/logo2.png";
 import { AnimatePresence, motion } from "framer-motion";
 import { LucideCalendarCheck, Search, Menu, X } from "lucide-react";
@@ -51,7 +50,7 @@ const MobileMenu: React.FC<{
       closable={false}
       onClose={onClose}
       open={isOpen}
-      width="100%"
+      width="60%"
       className="mobile-drawer"
       styles={{
         body: { padding: 0 },
@@ -518,14 +517,14 @@ const Header: React.FC = () => {
 
         {/* Mobile Actions */}
         <motion.div
-          className="block md:hidden items-center gap-3"
+          className="flex justify-end md:hidden  items-center gap-3"
           animate={{
             marginLeft: isSearchOpen ? "8px" : "0px",
           }}
           transition={{ duration: 0.3 }}
         >
           {user ? (
-            <>
+            <div className="flex items-center">
               {!isSearchOpen && (
                 <motion.button
                   onClick={toggleSearch}
@@ -558,7 +557,7 @@ const Header: React.FC = () => {
                   <Menu size={24} />
                 </motion.button>
               )}
-            </>
+            </div>
           ) : (
             <Link href="/login">
               <motion.div
