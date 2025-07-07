@@ -2,7 +2,7 @@
 import CustomModal from "@/components/custom/custom-modal";
 import { IPost } from "@/types/post.types";
 import { IoMdClose } from "react-icons/io";
-import CreatePost from "./create-post";
+import CreatePost, { PostType } from "./create-post";
 
 interface PostEditModalProps {
   isOpen: boolean;
@@ -17,6 +17,11 @@ const PostEditModal: React.FC<PostEditModalProps> = ({
   post,
   onPostUpdated,
 }) => {
+  const handlePostUpdated = () => {
+    onPostUpdated();
+    onClose();
+  };
+
   return (
     <CustomModal
       isOpen={isOpen}
@@ -34,7 +39,13 @@ const PostEditModal: React.FC<PostEditModalProps> = ({
       }
       className="w-full p-0"
     >
-      <CreatePost initialPostData={post} onPostCreated={onPostUpdated} />
+      <CreatePost 
+        postType={post?.postType as PostType} 
+        groupId={post?.postType === "Group" ? post?.sourceId : undefined}
+        eventId={post?.postType === "Event" ? post?.sourceId : undefined}
+        initialPostData={post} 
+        onPostCreated={handlePostUpdated} 
+      />
     </CustomModal>
   );
 };

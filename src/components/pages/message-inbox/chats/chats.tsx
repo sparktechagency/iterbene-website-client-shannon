@@ -109,7 +109,7 @@ const Chats = () => {
   let content = null;
   if (chatLoading && page === 1 && sortedChats?.length === 0) {
     content = (
-      <div className="w-full flex flex-col gap-6 scrollbar-hide overflow-y-auto p-4">
+      <div className="w-full flex flex-col gap-6 scrollbar-hide overflow-y-auto p-3 md:p-4">
         {[...Array(8)].map((_, index) => (
           <ChatListCardSkeleton key={index} />
         ))}
@@ -125,7 +125,7 @@ const Chats = () => {
     content = (
       <div
         ref={chatContainerRef}
-        className="w-full h-full flex flex-col gap-2 scrollbar-hide overflow-y-auto  md:p-4"
+        className="w-full h-full flex flex-col gap-2 scrollbar-hide overflow-y-auto p-3 md:p-4"
       >
         {sortedChats.map((chat: IChat, index: number) => {
           if (sortedChats?.length === index + 1) {

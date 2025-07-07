@@ -28,7 +28,7 @@ const Stories = () => {
   }, [storiesData]);
 
   const handleAddJourney = () => {
-    router.push("/stories/create");
+    router.push("/stories");
   };
 
   const handleStoryClick = (storyId: number | string) => {
