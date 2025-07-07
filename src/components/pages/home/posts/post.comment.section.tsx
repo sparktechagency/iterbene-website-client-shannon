@@ -93,8 +93,7 @@ const PostCommentSection = ({
         commentId,
         reactionType,
       };
-      const result = await addOrRemoveCommentReaction(payload).unwrap();
-      console.log("Comment reaction result:", result);
+      await addOrRemoveCommentReaction(payload).unwrap();
     } catch (error) {
       const err = error as TError;
       toast.error(err?.data?.message || "Something went wrong!");
@@ -190,7 +189,7 @@ const PostCommentSection = ({
       ? topLevelComments?.slice(0, 4)
       : topLevelComments;
   return (
-    <section className="mt-4 px-3">
+    <section className="mt-4">
       <AnimatePresence>
         {showConditionBaseComment?.map((comment: IComment) => {
           const isReactionAdded = comment?.reactions?.some(

@@ -143,7 +143,7 @@ const PostCommentInput = ({
   };
 
   return (
-    <section className="mt-3 flex flex-col space-y-2 pt-5 px-3">
+    <section className="mt-3 flex flex-col space-y-2 pt-5 ">
       <div className="flex space-x-2">
         {user && (
           <Image

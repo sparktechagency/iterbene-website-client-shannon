@@ -12,7 +12,7 @@ import { Tooltip } from "antd";
 import { AnimatePresence, motion } from "framer-motion";
 import { JSX, useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
-import { FaBan, FaCalendarCheck, FaHeart, FaRegHeart } from "react-icons/fa";
+import { FaBan, FaHeart, FaRegHeart } from "react-icons/fa";
 import { FaFaceSmile } from "react-icons/fa6";
 import { MdOutlineLuggage } from "react-icons/md";
 import PostCommentInput from "./post.comment.input";
@@ -24,6 +24,8 @@ import Image from "next/image";
 import { IoMdClose } from "react-icons/io";
 import PostDetails from "../post-details/PostDetails";
 import formatPostReactionNumber from "@/utils/formatPostReactionNumber";
+import { CalendarCheck } from "lucide-react";
+import ShowItineraryModal from "../create-post/ShowItineraryModal";
 
 interface PostCardProps {
   post: IPost;
@@ -39,6 +41,7 @@ const PostCard = ({ post }: PostCardProps) => {
   const [editCommentId, setEditCommentId] = useState<string | null>(null);
   const [editCommentText, setEditCommentText] = useState<string>("");
   const [showPostDetails, setShowPostDetails] = useState<boolean>(false);
+  const [showItineraryModal, setShowItineraryModal] = useState<boolean>(false);
 
   // define intersection observer
   useEffect(() => {
@@ -143,6 +146,15 @@ const PostCard = ({ post }: PostCardProps) => {
         })}
       </p>
       <PostContentRender data={post?.media || []} isVisible={isVisible} />
+      {/* if post itineray is avaialbe */}
+      {post?.itinerary && (
+        <div onClick={() => setShowItineraryModal(true)} className="p-2 cursor-pointer  rounded-full border-gray-200 flex items-center justify-between text-sm text-gray-500">
+          <span>Click to view full itinerary</span>
+          <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs">
+            PDF View Available
+          </span>
+        </div>
+      )}
       {/* Show reactions summary */}
       <div className="mt-5">
         {nonZeroReactions?.length > 0 && (
@@ -300,9 +312,7 @@ const PostCard = ({ post }: PostCardProps) => {
               )}
             </AnimatePresence>
           </div>
-          <div
-            className="flex items-center space-x-2"
-          >
+          <div className="flex items-center space-x-2">
             <svg
               width="26"
               height="26"
@@ -322,7 +332,7 @@ const PostCard = ({ post }: PostCardProps) => {
           </div>
           {post?.itinerary && (
             <div className="flex items-center space-x-2 cursor-pointer">
-              <FaCalendarCheck className="h-5 w-5 text-primary" />
+              <CalendarCheck className="size-6 text-gray-600" />
               <span className="font-semibold">
                 {formatPostReactionNumber(post?.itineraryViewCount)}
               </span>
@@ -337,12 +347,25 @@ const PostCard = ({ post }: PostCardProps) => {
         setEditCommentId={setEditCommentId}
         setEditCommentText={setEditCommentText}
       />
-      <PostCommentSection post={post} onEdit={handleEdit}  setShowPostDetails={setShowPostDetails} />
+      <PostCommentSection
+        post={post}
+        onEdit={handleEdit}
+        setShowPostDetails={setShowPostDetails}
+      />
       <PostDetails
         post={post}
         isOpen={showPostDetails}
         onClose={() => setShowPostDetails(false)}
       />
+      {
+        // Show itinerary modal
+        post?.itinerary && <ShowItineraryModal
+        itinerary={post?.itinerary}
+        visible={showItineraryModal}
+        onClose={() => setShowItineraryModal(false)}
+      />
+      }
+     
     </div>
   );
 };

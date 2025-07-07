@@ -21,42 +21,32 @@ import { IoMdClose } from "react-icons/io";
 import UserTimelineContentRender from "./UserTimelineContentRender";
 import PostHeader from "../../home/posts/post.header";
 import Link from "next/link";
+import formatPostReactionNumber from "@/utils/formatPostReactionNumber";
 
 interface PostCardProps {
   post: IPost;
   onRemove?: () => void;
 }
-
-const formatNumber = (num: number): string => {
-  if (num < 1000) return num.toString();
-  if (num >= 1000 && num < 1000000) {
-    const value = (num / 1000).toFixed(1);
-    return value.endsWith(".0") ? `${Math.floor(num / 1000)}k` : `${value}k`;
-  }
-  if (num >= 1000000) {
-    const value = (num / 1000000).toFixed(1);
-    return value.endsWith(".0") ? `${Math.floor(num / 1000000)}m` : `${value}m`;
-  }
-  return num.toString();
-};
-
 const UserTimelineCard = ({ post, onRemove }: PostCardProps) => {
   const user = useUser();
   const currentUserId = user?._id;
   const [showReactions, setShowReactions] = useState<boolean>(false);
   const [showReactionDetails, setShowReactionDetails] =
     useState<boolean>(false);
-
-  const userReaction = post.reactions?.find(
+  // Find the user's reaction, if any
+  const userReaction = post?.reactions?.find(
     (reaction: IReaction) => reaction?.userId?._id === currentUserId
   );
 
+  // Get reactions with non-zero counts
   const nonZeroReactions = post?.sortedReactions?.filter(
     (reaction: ISortedReaction) => reaction?.count > 0
   );
 
+  // Add or remove reactions
   const [addOrRemoveReaction] = useAddOrRemoveReactionMutation();
 
+  // Reaction icon mapping
   const reactionIcons: { [key: string]: JSX.Element } = {
     love: <FaHeart size={23} className="text-red-500" />,
     luggage: <MdOutlineLuggage size={25} className="text-blue-500 -mt-0.5" />,
@@ -64,13 +54,15 @@ const UserTimelineCard = ({ post, onRemove }: PostCardProps) => {
     smile: <FaFaceSmile size={23} className="text-yellow-500" />,
   };
 
+  // Reaction colors
   const reactionColors: { [key: string]: string } = {
-    love: "text-red-500",
+    love: "text-red-500 ",
     luggage: "text-blue-500",
     ban: "text-orange-500",
     smile: "text-yellow-500",
   };
 
+  // handle reaction function
   const handleReaction = async (reactionType: string) => {
     try {
       await addOrRemoveReaction({ postId: post._id, reactionType }).unwrap();
@@ -84,20 +76,20 @@ const UserTimelineCard = ({ post, onRemove }: PostCardProps) => {
   return (
     <div className="w-full flex flex-col bg-white rounded-xl p-4 mb-4 relative">
       <PostHeader post={post} onRemove={onRemove} />
+      <p className="text-gray-700 flex-1 mb-3">
+        {post?.content?.split(/(\s+)/).map((word, index) => {
+          const isHashtag = word.match(/^#\w+/);
+          return (
+            <span
+              key={index}
+              className={isHashtag ? "text-blue-500 font-bold" : ""}
+            >
+              {word}
+            </span>
+          );
+        })}
+      </p>
       <Link href={`/feed/${post?._id}`}>
-        <p className="text-gray-700 flex-1 mb-3">
-          {post?.content?.split(/(\s+)/).map((word, index) => {
-            const isHashtag = word.match(/^#\w+/);
-            return (
-              <span
-                key={index}
-                className={isHashtag ? "text-blue-500 font-bold" : ""}
-              >
-                {word}
-              </span>
-            );
-          })}
-        </p>
         <UserTimelineContentRender data={post.media || []} />
       </Link>
       <div className="mt-5">
@@ -117,7 +109,7 @@ const UserTimelineCard = ({ post, onRemove }: PostCardProps) => {
                 ))}
               </div>
               <span className="text-[18px] hover:underline cursor-pointer font-semibold text-gray-500">
-                {formatNumber(post?.reactions?.length || 0)}
+                {formatPostReactionNumber(post?.reactions?.length || 0)}
               </span>
             </div>
             <CustomModal
@@ -267,14 +259,14 @@ const UserTimelineCard = ({ post, onRemove }: PostCardProps) => {
               ></path>
             </svg>
             <span className="font-semibold">
-              {formatNumber(post?.comments?.length || 0)}
+              {formatPostReactionNumber(post?.comments?.length || 0)}
             </span>
           </div>
           {post?.itinerary && (
             <div className="flex items-center space-x-2 cursor-pointer">
               <FaCalendarCheck className="h-5 w-5 text-primary" />
               <span className="font-semibold">
-                {formatNumber(post?.itineraryViewCount)}
+                {formatPostReactionNumber(post?.itineraryViewCount)}
               </span>
             </div>
           )}

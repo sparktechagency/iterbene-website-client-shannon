@@ -19,8 +19,8 @@ const Posts = () => {
     refetch,
   } = useFeedPostsQuery(
     [
-      { key: "page", value: currentPage }, // Use actual page number
-      { key: "limit", value: 10 }, // Keep limit constant at 10
+      { key: "page", value: currentPage },
+      { key: "limit", value: 10 },
       ...(user?._id ? [{ key: "userId", value: user._id }] : []),
     ],
     {

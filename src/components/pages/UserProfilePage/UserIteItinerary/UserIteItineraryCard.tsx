@@ -19,27 +19,15 @@ import CustomModal from "@/components/custom/custom-modal";
 import Image from "next/image";
 import { IoMdClose } from "react-icons/io";
 import UserIteItineraryContent from "./UserIteItineraryContent";
-import { Calendar } from "lucide-react";
+import {CalendarCheck } from "lucide-react";
 import PostHeader from "../../home/posts/post.header";
+import formatPostReactionNumber from "@/utils/formatPostReactionNumber";
 
 interface PostCardProps {
   post: IPost;
   onRemove?: () => void;
 }
 
-// Utility function to format numbers (e.g., 1000 → 1k, 1100 → 1.1k, 41500 → 41.5k, 1000000 → 1m)
-const formatNumber = (num: number): string => {
-  if (num < 1000) return num.toString();
-  if (num >= 1000 && num < 1000000) {
-    const value = (num / 1000).toFixed(1);
-    return value.endsWith(".0") ? `${Math.floor(num / 1000)}k` : `${value}k`;
-  }
-  if (num >= 1000000) {
-    const value = (num / 1000000).toFixed(1);
-    return value.endsWith(".0") ? `${Math.floor(num / 1000000)}m` : `${value}m`;
-  }
-  return num.toString();
-};
 
 const UserIteItineraryCard = ({ post, onRemove }: PostCardProps) => {
   const user = useUser();
@@ -124,7 +112,7 @@ const UserIteItineraryCard = ({ post, onRemove }: PostCardProps) => {
                 ))}
               </div>
               <span className="text-[18px] hover:underline cursor-pointer font-semibold text-gray-500 ">
-                {formatNumber(post?.reactions?.length || 0)}
+                {formatPostReactionNumber(post?.reactions?.length || 0)}
               </span>
             </div>
 
@@ -277,14 +265,14 @@ const UserIteItineraryCard = ({ post, onRemove }: PostCardProps) => {
               ></path>
             </svg>
             <span className="font-semibold">
-              {formatNumber(post?.comments?.length || 0)}
+              {formatPostReactionNumber(post?.comments?.length || 0)}
             </span>
           </div>
           {post?.itinerary && (
             <div className="flex items-center space-x-2 cursor-pointer">
-              <Calendar className="size-6 text-gray-600" />
+              <CalendarCheck className="size-6 text-gray-600" />
               <span className="font-semibold">
-                {formatNumber(post?.itineraryViewCount)}
+                {formatPostReactionNumber(post?.itineraryViewCount)}
               </span>
             </div>
           )}
