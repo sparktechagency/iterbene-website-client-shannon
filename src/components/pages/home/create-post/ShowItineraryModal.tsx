@@ -10,6 +10,7 @@ import {
   Bus,
   Car,
   Ship,
+  Bookmark,
 } from "lucide-react";
 import CustomModal from "@/components/custom/custom-modal";
 import moment from "moment";
@@ -163,25 +164,26 @@ const PrintableItinerary = React.forwardRef<
                         </p>
                       )}
                     </div>
-
-                    <div className="flex items-center gap-6 text-sm">
-                      <div className="flex items-center gap-2">
-                        <span className="text-gray-600">Rating:</span>
-                        {activity?.rating && (
-                          <StarRating rating={activity.rating} />
-                        )}
+                      <div className="flex items-center justify-between ml-6">
+                        <div className="flex flex-wrap items-center gap-4">
+                          <div className="flex items-center gap-1">
+                            <span className="text-sm text-gray-600">Rate:</span>
+                            {activity?.rating && (
+                              <StarRating rating={activity.rating} />
+                            )}
+                          </div>
+                          {activity?.duration && (
+                            <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
+                              Duration: {activity.duration}
+                            </span>
+                          )}
+                          {day?.comment && (
+                            <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
+                              {day?.comment}
+                            </span>
+                          )}
+                        </div>
                       </div>
-                      {activity?.duration && (
-                        <span className="text-gray-600 bg-gray-100 px-3 py-1 rounded">
-                          Duration: {activity.duration}
-                        </span>
-                      )}
-                      {day?.comment && (
-                        <span className="text-gray-600 bg-gray-100 px-3 py-1 rounded">
-                          {day?.comment}
-                        </span>
-                      )}
-                    </div>
                   </div>
                 ))}
               </div>
@@ -257,7 +259,12 @@ const ShowItineraryModal = ({
         header={
           <div className="flex items-center justify-between px-4 py-4 border-b border-gray-200 rounded-t-xl">
             <div className="flex items-center gap-5">
-              <h1>Itinerary Details</h1>
+                <button
+                className="text-gray-600 border-gray-400 cursor-pointer size-10 bg-[#EEFDFB] rounded-full border flex justify-center items-center hover:bg-[#E0F7F0] transition-colors"
+  
+              >
+                <Bookmark size={20} />
+              </button>
               {/* Download icon */}
               <button
                 className="text-gray-600 border-gray-400 cursor-pointer size-10 bg-[#EEFDFB] rounded-full border flex justify-center items-center hover:bg-[#E0F7F0] transition-colors"
@@ -356,7 +363,7 @@ const ShowItineraryModal = ({
                         )}
                       </div>
                       <div className="flex items-center justify-between ml-6">
-                        <div className="flex items-center gap-4">
+                        <div className="flex flex-wrap items-center gap-4">
                           <div className="flex items-center gap-1">
                             <span className="text-sm text-gray-600">Rate:</span>
                             {activity?.rating && (
