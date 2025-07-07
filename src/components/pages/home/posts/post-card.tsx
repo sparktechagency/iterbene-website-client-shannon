@@ -1,4 +1,4 @@
-"use client";
+'use client';
 import useUser from "@/hooks/useUser";
 import { useAddOrRemoveReactionMutation } from "@/redux/features/post/postApi";
 import { TError } from "@/types/error";
@@ -26,6 +26,7 @@ import PostDetails from "../post-details/PostDetails";
 import formatPostReactionNumber from "@/utils/formatPostReactionNumber";
 import { CalendarCheck } from "lucide-react";
 import ShowItineraryModal from "../create-post/ShowItineraryModal";
+import PostEditModal from "../create-post/PostEditModal"; // Import the new modal
 
 interface PostCardProps {
   post: IPost;
@@ -42,6 +43,7 @@ const PostCard = ({ post }: PostCardProps) => {
   const [editCommentText, setEditCommentText] = useState<string>("");
   const [showPostDetails, setShowPostDetails] = useState<boolean>(false);
   const [showItineraryModal, setShowItineraryModal] = useState<boolean>(false);
+  const [showEditModal, setShowEditModal] = useState<boolean>(false); // State for edit modal
 
   // define intersection observer
   useEffect(() => {
@@ -126,12 +128,20 @@ const PostCard = ({ post }: PostCardProps) => {
     }
   };
 
+  // Function to handle post update (e.g., refetching posts)
+  const handlePostUpdated = () => {
+    setShowEditModal(false);
+    // You might want to refetch the posts here or update the specific post in your state
+    // For example, if you have a refetch function from a parent component or RTK Query hook:
+    // refetchPosts();
+  };
+
   return (
     <div
       ref={postRef}
       className="w-full  bg-white rounded-xl p-4 mb-4 relative"
     >
-      <PostHeader post={post} />
+      <PostHeader post={post} onEditClick={() => setShowEditModal(true)} />
       <p className="text-gray-700 mb-4">
         {post?.content?.split(/(\s+)/).map((word, index) => {
           const isHashtag = word?.match(/^#\w+/);
@@ -276,7 +286,7 @@ const PostCard = ({ post }: PostCardProps) => {
               {showReactions && (
                 <motion.div
                   initial={{ opacity: 0, y: 0 }}
-                  animate={{ opacity: 1, y: -9 }}
+                  animate={{ opacity: 1, y: -9 }} // Adjusted y for better positioning
                   exit={{ opacity: 0, y: 0 }}
                   transition={{ duration: 0.2 }}
                   className="absolute -top-12 -left-2 bg-white border border-gray-50 rounded-full shadow-lg px-3 py-2 flex space-x-3 z-10"
@@ -290,8 +300,8 @@ const PostCard = ({ post }: PostCardProps) => {
                       <motion.button
                         key={reaction}
                         onClick={() => handleReaction(reaction)}
-                        whileHover={{ scale: 1.25 }}
-                        whileTap={{ scale: 0.9 }}
+                        whileHover={{ scale: 1.25 }} // Scale up on hover
+                        whileTap={{ scale: 0.9 }} // Scale down on click
                         className={`text-2xl cursor-pointer ${
                           userReaction?.reactionType === reaction
                             ? reactionColors[reaction]
@@ -365,7 +375,14 @@ const PostCard = ({ post }: PostCardProps) => {
         onClose={() => setShowItineraryModal(false)}
       />
       }
-     
+      {showEditModal && (
+        <PostEditModal
+          isOpen={showEditModal}
+          onClose={() => setShowEditModal(false)}
+          post={post}
+          onPostUpdated={handlePostUpdated}
+        />
+      )}
     </div>
   );
 };

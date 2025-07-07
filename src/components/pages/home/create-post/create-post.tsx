@@ -9,7 +9,10 @@ import {
 import useUser from "@/hooks/useUser";
 import { useGetHashtagPostsQuery } from "@/redux/features/hashtag/hashtagApi";
 import { useCreateItineraryMutation } from "@/redux/features/itinerary/itineraryApi";
-import { useCreatePostMutation } from "@/redux/features/post/postApi";
+import {
+  useCreatePostMutation,
+  useUpdatePostMutation,
+} from "@/redux/features/post/postApi";
 import { TError } from "@/types/error";
 import { IActivity, IDay, IItinerary } from "@/types/itinerary.types";
 import { Tooltip } from "antd";
@@ -39,11 +42,13 @@ import { Swiper, SwiperClass, SwiperSlide } from "swiper/react";
 import CreateItineraryModal from "./CreateItineraryModal";
 import ShowItineraryModal from "./ShowItineraryModal";
 import EditItineraryModal from "./EditItineraryModal";
+import { IPost } from "@/types/post.types";
 
 export interface FilePreview {
   name: string;
   preview: string;
   type: string;
+  file?: File; // Add file property for existing media
 }
 
 // Define post types
@@ -54,6 +59,7 @@ interface CreatePostProps {
   groupId?: string;
   eventId?: string;
   onPostCreated?: () => void;
+  initialPostData?: IPost; // New prop for editing
 }
 
 const CreatePost = ({
@@ -61,6 +67,7 @@ const CreatePost = ({
   groupId,
   eventId,
   onPostCreated,
+  initialPostData,
 }: CreatePostProps) => {
   const user = useUser();
   // State for post content
@@ -106,6 +113,7 @@ const CreatePost = ({
   // State for media
   const [media, setMedia] = useState<File[]>([]);
   const [mediaPreviews, setMediaPreviews] = useState<FilePreview[]>([]);
+  const [existingMedia, setExistingMedia] = useState<FilePreview[]>([]); // For existing media in edit mode
 
   // State for itinerary
   const [showItineraryModal, setShowItineraryModal] = useState(false);
@@ -116,6 +124,7 @@ const CreatePost = ({
 
   // Post
   const [createPost, { isLoading: isCreatingPost }] = useCreatePostMutation();
+  const [updatePost, { isLoading: isUpdatingPost }] = useUpdatePostMutation(); // New mutation for updating
 
   // Hashtag query
   const { data: hashtagData } = useGetHashtagPostsQuery(hashtagQuery, {
@@ -132,6 +141,39 @@ const CreatePost = ({
   // PDF modal
   const [showPdfModal, setShowPdfModal] = useState(false);
   const pdfInputRef = useRef<HTMLInputElement>(null);
+
+  // Populate form fields if initialPostData is provided (edit mode)
+  useEffect(() => {
+    if (initialPostData) {
+      setPost(initialPostData.content);
+      setPrivacy(initialPostData.privacy || "public");
+      if (
+        initialPostData.visitedLocationName &&
+        initialPostData.visitedLocation
+      ) {
+        setSelectedLocation({
+          name: initialPostData.visitedLocationName,
+          formatted_address: initialPostData.visitedLocationName,
+          latitude: initialPostData.visitedLocation.latitude,
+          longitude: initialPostData.visitedLocation.longitude,
+          place_id: "", // Not available from backend, but required by type
+        });
+      }
+      if (initialPostData.itinerary) {
+        setItinerary(initialPostData.itinerary);
+      }
+      if (initialPostData.media && initialPostData.media.length > 0) {
+        setExistingMedia(
+          initialPostData.media.map((m) => ({
+            name: m?.mediaUrl,
+            preview: m?.mediaUrl,
+            type: m?.mediaType,
+            file: undefined, // Mark as existing, not new File object
+          }))
+        );
+      }
+    }
+  }, [initialPostData]);
 
   // Different configurations based on post type
   const getPostConfig = () => {
@@ -235,8 +277,10 @@ const CreatePost = ({
     const wordStartIndex = textBeforeCursor.length - lastWord.length;
 
     // Replace the partial hashtag with the selected one
-    const newPost =
-      post.slice(0, wordStartIndex) + `#${hashtag} ` + textAfterCursor;
+    const newPost = `${post.slice(
+      0,
+      wordStartIndex
+    )}#${hashtag} ${textAfterCursor}`;
     setPost(newPost);
     setHashtagQuery("");
     setShowHashtagSuggestions(false);
@@ -270,6 +314,7 @@ const CreatePost = ({
         name: file.name,
         preview: URL.createObjectURL(file),
         type: file.type.startsWith("image/") ? "image" : "video",
+        file: file, // Store the actual File object for new uploads
       }));
       setMedia((prev) => [...prev, ...newFiles]);
       setMediaPreviews((prev) => [...prev, ...newPreviews]);
@@ -277,9 +322,13 @@ const CreatePost = ({
   };
 
   // Remove media
-  const handleRemoveMedia = (index: number) => {
-    setMedia((prev) => prev.filter((_, i) => i !== index));
-    setMediaPreviews((prev) => prev.filter((_, i) => i !== index));
+  const handleRemoveMedia = (index: number, isExisting: boolean) => {
+    if (isExisting) {
+      setExistingMedia((prev) => prev.filter((_, i) => i !== index));
+    } else {
+      setMedia((prev) => prev.filter((_, i) => i !== index));
+      setMediaPreviews((prev) => prev.filter((_, i) => i !== index));
+    }
   };
 
   // Create new itinerary
@@ -346,60 +395,55 @@ const CreatePost = ({
     }
   };
 
-  // Create new post
-  const handleCreatePost = async () => {
-    try {
-      const formData = new FormData();
+  // Handle post creation or update
+  const handlePostAction = async () => {
+    const formData = new FormData();
+    if (post) {
       formData.append("content", post);
+    }
+    formData.append(
+      "sourceId",
+      postType === "Group"
+        ? groupId
+        : postType === "Event"
+        ? eventId
+        : user?._id
+    );
+    formData.append("postType", postType === "User" ? "User" : postType);
+    if (selectedLocation) {
       formData.append(
-        "sourceId",
-        postType === "Group"
-          ? groupId
-          : postType === "Event"
-          ? eventId
-          : user?._id
+        "visitedLocation",
+        JSON.stringify({
+          latitude: selectedLocation?.latitude,
+          longitude: selectedLocation?.longitude,
+        })
       );
-      formData.append("postType", postType === "User" ? "User" : postType);
-      // Add timeline-specific data
-      if (postType === "User") {
-        formData.append("privacy", privacy || "public");
-        formData.append(
-          "visitedLocation",
-          JSON.stringify({
-            latitude: selectedLocation?.latitude,
-            longitude: selectedLocation?.longitude,
-          })
-        );
-        formData.append("visitedLocationName", selectedLocation?.name || "");
-        formData.append("itineraryId", itinerary?._id || "");
+      formData.append("visitedLocationName", selectedLocation?.name || "");
+    }
+    if (privacy) {
+      formData.append("privacy", privacy);
+    }
+    if (itinerary) {
+      formData.append("itineraryId", itinerary?._id || "");
+    }
+    // Add new media files
+    media?.forEach((file) => {
+      formData.append("postFiles", file);
+    });
+
+    try {
+      if (initialPostData) {
+        await updatePost({ id: initialPostData?._id, data: formData }).unwrap();
+        toast.success("Post updated successfully!");
+      } else {
+        await createPost(formData).unwrap();
+        toast.success("Post created successfully!");
       }
-
-      // Add group-specific data
-      if (postType === "Group") {
-        if (selectedLocation) {
-          formData.append(
-            "visitedLocation",
-            JSON.stringify({
-              latitude: selectedLocation?.latitude,
-              longitude: selectedLocation?.longitude,
-            })
-          );
-          formData.append("visitedLocationName", selectedLocation?.name || "");
-        }
-        formData.append("itineraryId", itinerary?._id || "");
-      }
-
-      // Add media files
-      media?.forEach((file) => {
-        formData.append("postFiles", file);
-      });
-
-      await createPost(formData).unwrap();
-      toast.success("Post created successfully!");
 
       // Reset form
       setMedia([]);
       setMediaPreviews([]);
+      setExistingMedia([]);
       setPost("");
       setSelectedLocation(null);
       setItinerary(null);
@@ -418,6 +462,9 @@ const CreatePost = ({
     setLocationQuery(defaultLocation);
     searchLocations(defaultLocation); // Trigger search with default value
   };
+
+  const allMediaPreviews = [...existingMedia, ...mediaPreviews];
+  const isActionLoading = isCreatingPost || isUpdatingPost;
 
   return (
     <section className="w-full bg-white rounded-xl">
@@ -478,15 +525,15 @@ const CreatePost = ({
           </AnimatePresence>
         </div>
         <button
-          onClick={handleCreatePost}
-          disabled={!post && media.length === 0}
+          onClick={handlePostAction}
+          disabled={(!post && allMediaPreviews.length === 0) || isActionLoading}
           className={`w-[140px]  flex justify-center items-center h-[45px] mt-1 ${
-            post || media.length > 0
+            post || allMediaPreviews.length > 0
               ? "bg-secondary text-white cursor-pointer"
               : "border border-[#9194A9] text-[#9194A9]"
           } rounded-xl`}
         >
-          {isCreatingPost ? (
+          {isActionLoading ? (
             <>
               <svg
                 className="animate-spin h-5 w-5 text-current"
@@ -509,6 +556,8 @@ const CreatePost = ({
                 ></path>
               </svg>
             </>
+          ) : initialPostData ? (
+            "Update Post"
           ) : (
             "Post It!"
           )}
@@ -517,7 +566,7 @@ const CreatePost = ({
 
       {/* Media Preview Section */}
       <div className="w-full px-6 relative">
-        {mediaPreviews?.length > 0 && (
+        {allMediaPreviews?.length > 0 && (
           <>
             <Swiper
               modules={[Pagination]}
@@ -526,13 +575,13 @@ const CreatePost = ({
                 swiperRef.current = swiper;
               }}
               spaceBetween={10}
-              slidesPerView={mediaPreviews?.length === 1 ? 1 : 2}
+              slidesPerView={allMediaPreviews?.length === 1 ? 1 : 2}
               className="w-full"
             >
-              {mediaPreviews?.map((item, index) => (
-                <SwiperSlide key={index}>
+              {allMediaPreviews?.map((item, index) => (
+                <SwiperSlide key={item.preview}>
                   <div className="relative">
-                    {item.type === "image" ? (
+                    {item.type.startsWith("image") ? (
                       <Image
                         src={item?.preview}
                         alt={item?.name}
@@ -548,7 +597,7 @@ const CreatePost = ({
                       />
                     )}
                     <button
-                      onClick={() => handleRemoveMedia(index)}
+                      onClick={() => handleRemoveMedia(index, !item.file)} // Pass true if it's an existing media (no file object)
                       className="absolute top-2 right-2 bg-black/50 text-white rounded-full p-2 cursor-pointer"
                     >
                       <X className="w-5 h-5" />
@@ -559,7 +608,7 @@ const CreatePost = ({
             </Swiper>
 
             {/* Custom navigation buttons */}
-            {mediaPreviews.length > 2 && (
+            {allMediaPreviews.length > 2 && (
               <>
                 <button
                   onClick={() => swiperRef.current?.slidePrev()}
@@ -582,7 +631,10 @@ const CreatePost = ({
       </div>
 
       {/* Additional Options Section */}
-      {(post || media.length > 0 || selectedLocation) && (
+      {(post ||
+        allMediaPreviews.length > 0 ||
+        selectedLocation ||
+        initialPostData) && (
         <div className="flex flex-col gap-4 mt-4">
           {/* Selected Location and Privacy Display */}
           <div className="flex items-center gap-4 px-4">
@@ -608,7 +660,7 @@ const CreatePost = ({
                 </motion.div>
               )}
             </AnimatePresence>
-            {config.showPrivacy && (
+            {(config?.showPrivacy || initialPostData) && ( // Show privacy for user posts or when editing any post
               <div className="flex items-center gap-2">
                 <Globe className="w-5 h-5 text-primary" />
                 <span className="text-sm text-gray-700 capitalize">
@@ -637,7 +689,9 @@ const CreatePost = ({
               >
                 <ImageIcon
                   className={`w-6 h-6 ${
-                    media.length > 0 ? "text-primary" : "text-[#9194A9]"
+                    allMediaPreviews.length > 0
+                      ? "text-primary"
+                      : "text-[#9194A9]"
                   } hover:text-primary transition-colors`}
                 />
               </button>
@@ -652,7 +706,7 @@ const CreatePost = ({
             />
 
             {/* Location Icon - Only for timeline and group posts */}
-            {config.showLocation && (
+            {(config.showLocation || initialPostData) && ( // Show location for user/group posts or when editing any post
               <div className="relative" ref={locationPopupRef}>
                 <Tooltip title="Add a location" placement="bottom">
                   <button
@@ -728,8 +782,8 @@ const CreatePost = ({
               </div>
             )}
 
-            {/* Itinerary Icon - Only for timeline and group posts */}
-            {config.showItinerary && (
+            {/* Itinerary Icon*/}
+            {(config.showItinerary || initialPostData) && ( // Show itinerary for user/group posts or when editing any post
               <Tooltip title="Add Itinerary" placement="bottom">
                 <button
                   onClick={() => setShowPdfModal(true)}
@@ -740,8 +794,8 @@ const CreatePost = ({
               </Tooltip>
             )}
 
-            {/* Privacy Icon - Only for timeline posts */}
-            {config.showPrivacy && (
+            {/* Privacy Icon */}
+            {(config.showPrivacy || initialPostData) && ( // Show privacy for user posts or when editing any post
               <div className="relative" ref={privacyPopupRef}>
                 <Tooltip title="Set privacy" placement="bottom">
                   <button

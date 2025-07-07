@@ -71,7 +71,11 @@ export interface IPost {
   media: IMedia[];
   itinerary: IItinerary;
   sortedReactions: ISortedReaction[];
-  visitedLocationName: string;
+  visitedLocation?: {
+    latitude: number;
+    longitude: number;
+  };
+  visitedLocationName?: string;
   privacy: string;
   hashtags: string[];
   shareCount: number;

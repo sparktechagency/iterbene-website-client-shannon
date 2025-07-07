@@ -15,8 +15,8 @@ const postApi = baseApi.injectEndpoints({
       invalidatesTags: ["Post", "Hashtag"],
     }),
     updatePost: builder.mutation({
-      query: (data) => ({
-        url: "/posts",
+      query: ({ id, data }) => ({
+        url: `/posts/${id}`,
         method: "PATCH",
         body: data,
       }),

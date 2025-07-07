@@ -14,13 +14,17 @@ import { TError } from "@/types/error";
 import formatTimeAgo from "@/utils/formatTimeAgo";
 import Link from "next/link";
 
+interface PostHeaderProps {
+  post: IPost;
+  onRemove?: () => void;
+  onEditClick?: () => void; // New prop for edit functionality
+}
+
 const PostHeader = ({
   post,
   onRemove,
-}: {
-  post: IPost;
-  onRemove?: () => void;
-}) => {
+  onEditClick,
+}: PostHeaderProps) => {
   const user = useUser();
   const [isOpen, setIsOpen] = useState(false);
   const triggerRef = useRef<HTMLButtonElement>(null);
@@ -33,8 +37,8 @@ const PostHeader = ({
   const toggleDropdown = () => setIsOpen(!isOpen);
 
   const handleEdit = () => {
-    console.log("Edit post:", post?._id);
     setIsOpen(false);
+    onEditClick?.(); // Call the passed onEditClick prop
   };
 
   const handleDelete = () => {
@@ -54,16 +58,6 @@ const PostHeader = ({
       toast.error(err?.data?.message || "Something went wrong!");
     }
   };
-
-  // const handleSave = () => {
-  //   console.log("Save post:", post?._id);
-  //   setIsOpen(false);
-  // };
-
-  // const handleReport = () => {
-  //   console.log("Report post:", post?._id);
-  //   setIsOpen(false);
-  // };
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -165,41 +159,10 @@ const PostHeader = ({
                 animate="visible"
                 exit="exit"
               >
-                {/* {isOwnPost ? (
-                <>
-                  <button
-                    onClick={handleEdit}
-                    className="block w-full text-left px-4 py-3 text-gray-800 hover:bg-gray-100 rounded-t-xl cursor-pointer"
-                  >
-                    Edit
-                  </button>
-                  <button
-                    onClick={handleDelete}
-                    className="block w-full text-left px-4 py-3 text-rose-500 hover:bg-gray-100 rounded-b-xl cursor-pointer"
-                  >
-                    Delete
-                  </button>
-                </>
-              ) : (
-                <>
-                  <button
-                    onClick={handleSave}
-                   className="block w-full text-left px-4 py-3 text-gray-800 hover:bg-gray-100 rounded-t-xl cursor-pointer"
-                  >
-                    Save
-                  </button>
-                  <button
-                    onClick={handleReport}
-                    className="block w-full text-left px-4 py-3 text-rose-500 hover:bg-gray-100"
-                  >
-                    Report
-                  </button>
-                </>
-              )} */}
                 {isOwnPost && (
                   <>
                     <button
-                      onClick={handleEdit}
+                      onClick={handleEdit} // This will now call onEditClick from parent
                       className="block w-full text-left px-4 py-3 text-gray-800 hover:bg-gray-100 rounded-t-xl cursor-pointer"
                     >
                       Edit
