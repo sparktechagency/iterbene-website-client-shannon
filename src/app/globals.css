@@ -17,8 +17,8 @@ body::-webkit-scrollbar {
 
 @theme {
   /* Colors (unchanged) */
-  --color-primary: oklch(80.5% 0.135 192.5); /* #40E0D0 (turquoise) */
-  --color-secondary: oklch(67.85% 0.202 40.38); /* Supports opacity */
+  --color-primary: #40E0D0; /* turquoise */
+  --color-secondary: #FF6347; /* Tomato - Placeholder, please replace with actual hex if different */
 }
 /* OTP Input Styles (unchanged) */
 .otp-input {

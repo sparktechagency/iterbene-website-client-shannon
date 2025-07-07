@@ -49,7 +49,7 @@ const Stories = () => {
           // lg
           1024: { slidesPerView: 5.5, spaceBetween: 16 },
           // xl
-          1280: { slidesPerView: 6.5, spaceBetween: 16 },
+          1280: { slidesPerView: 5, spaceBetween: 16 },
           // 2xl
           1536: { slidesPerView: 4.5, spaceBetween: 16 },
         }}
