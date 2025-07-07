@@ -67,7 +67,7 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
         {/* Section 3: Right Sidebar (Static & Conditionally Hidden) */}
         {/* This section shows friend requests and contact list, but is hidden on certain pages to provide more content space. */}
         {!shouldHideSection3 && (
-          <div className="w-full max-w-[260px] md:max-w-[280px] xl:max-w-[320px] 2xl:max-w-[382px] sticky top-[130px] h-fit scrollbar-hide">
+          <div className="w-full max-w-[260px] md:max-w-[280px] xl:max-w-[320px] 2xl:max-w-[382px] space-y-5 pb-10 sticky top-[130px] h-fit max-h-[calc(100vh-130px)] overflow-y-auto scrollbar-hide">
             <FriendRequest />
             <ContactList />
           </div>

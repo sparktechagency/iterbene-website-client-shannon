@@ -24,7 +24,7 @@ const MainNavigation = () => {
     },
     {
       icon: <Images size={24} />,
-      name: "Photo",
+      name: "Photos",
       href: "/photos",
     },
   ];
@@ -56,7 +56,7 @@ const MainNavigation = () => {
     },
     {
       icon: <Images size={24} />,
-      name: "Photo",
+      name: "Photos",
       href: "/photos",
     },
   ];
