@@ -193,7 +193,7 @@ const MessageFooter = () => {
   };
 
   return (
-    <div className="w-full p-5">
+    <div className="w-full p-3 md:p-5">
       {/* Selected Files Preview */}
       {selectedFiles?.length > 0 && (
         <div className="mb-3">
@@ -255,9 +255,8 @@ const MessageFooter = () => {
 
       {/* Message Input Area */}
       <div
-        className={`px-4 py-1.5 border border-[#CAD1CF] flex items-center space-x-2 ${message?.length > 0 ? "rounded-2xl" : "rounded-full"
-          }`}
-      >
+        className={`px-2 py-1.5 md:px-4 border border-[#CAD1CF] flex items-center space-x-2 ${message?.length > 0 ? "rounded-2xl" : "rounded-full"
+          }`}>
         {/* Hidden file inputs */}
         <input
           type="file"
@@ -307,7 +306,7 @@ const MessageFooter = () => {
           onChange={hasOnlyNonImageAttachments ? () => { } : handleChange}
           onKeyPress={hasOnlyNonImageAttachments ? () => { } : handleKeyPress}
           rows={1}
-          className={`w-full p-2 focus:outline-none resize-none overflow-hidden ${hasOnlyNonImageAttachments
+          className={`w-full p-2 focus:outline-none resize-none overflow-y-auto bg-transparent ${hasOnlyNonImageAttachments
               ? "text-gray-800 placeholder-gray-500 cursor-not-allowed "
               : "text-gray-800 placeholder-gray-500"
             }`}

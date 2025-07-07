@@ -21,7 +21,7 @@ const Chats = () => {
       },
       {
         key: "limit",
-        value: 100,
+        value: 15,
       },
       {
         key: "userName",
@@ -51,7 +51,7 @@ const Chats = () => {
 
   useEffect(() => {
     if (chats?.length > 0) {
-      const totalLoaded = page * 8;
+      const totalLoaded = page * 15;
       setHasMore(totalLoaded < totalResults);
     }
   }, [chats, page, totalResults]);
@@ -110,15 +110,15 @@ const Chats = () => {
   let content = null;
   if (chatLoading && page === 1 && sortedChats?.length === 0) {
     content = (
-      <div className="w-full flex flex-col gap-6 overflow-y-auto">
-        {[...Array(6)].map((_, index) => (
+      <div className="w-full flex flex-col gap-6 overflow-y-auto p-4">
+        {[...Array(8)].map((_, index) => (
           <ChatListCardSkeleton key={index} />
         ))}
       </div>
     );
   } else if (!chatLoading && sortedChats?.length === 0 && page === 1) {
     content = (
-      <div className="w-full flex items-center justify-center">
+      <div className="w-full h-full flex items-center justify-center">
         <h1 className="text-2xl font-semibold">No Chats Found</h1>
       </div>
     );
@@ -126,7 +126,7 @@ const Chats = () => {
     content = (
       <div
         ref={chatContainerRef}
-        className="w-full flex flex-col h-[calc(85vh-130px)] gap-2 overflow-y-auto"
+        className="w-full h-full flex flex-col gap-2 overflow-y-auto p-1 md:p-4"
       >
         {sortedChats.map((chat: IChat, index: number) => {
           if (sortedChats?.length === index + 1) {
@@ -140,7 +140,7 @@ const Chats = () => {
           }
         })}
         {chatLoading && page > 1 && (
-          <div className="w-full flex flex-col gap-2">
+          <div className="w-full flex flex-col gap-2 p-4">
             {[...Array(3)].map((_, index) => (
               <ChatListCardSkeleton key={`loading-${index}`} />
             ))}
@@ -151,8 +151,8 @@ const Chats = () => {
   }
 
   return (
-    <section>
-      <div className="mb-6">
+    <section className="h-full flex flex-col">
+      <div className="p-4">
         <input
           type="text"
           name="search"
@@ -162,7 +162,7 @@ const Chats = () => {
           placeholder="Search"
         />
       </div>
-      {content}
+      <div className="flex-1 overflow-y-auto">{content}</div>
     </section>
   );
 };

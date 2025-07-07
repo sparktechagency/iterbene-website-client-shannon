@@ -38,7 +38,7 @@ const MessageBody = () => {
   const [shouldScrollToBottom, setShouldScrollToBottom] = useState(true);
   const [showScrollToBottom, setShowScrollToBottom] = useState(false);
 
-  const limit = 10;
+  const limit = 15;
 
   const { data: result } = useGetSingleByUserIdQuery(receiverId, {
     refetchOnMountOrArgChange: true,
@@ -58,7 +58,7 @@ const MessageBody = () => {
       },
       {
         refetchOnMountOrArgChange: true,
-        pollingInterval: currentPage === 1 ? 30000 : 0, // Only poll for latest messages
+        pollingInterval: currentPage === 1 ? 5000 : 0, // Only poll for latest messages
         skip: !receiverId,
       }
     );
@@ -263,7 +263,7 @@ const MessageBody = () => {
   const isLoading = messagesLoading && isInitialLoad;
 
   return (
-    <div className="w-full relative h-[calc(85vh-200px)] ">
+    <div className="w-full h-full relative">
       <div
         ref={scrollRef}
         className="w-full h-full overflow-x-hidden overflow-y-auto p-4 space-y-5 messages-box"

@@ -5,9 +5,9 @@ import MessageFooter from "./message-footer";
 
 const Messages = () => {
   return (
-    <section className="flex flex-col h-[80vh] bg-white shadow">
+    <section className="flex flex-col h-full bg-white shadow-lg rounded-xl">
       <MessageHeader />
-      <div className="flex-1 overflow-y-hidden">
+      <div className="flex-1 overflow-y-auto">
         <MessageBody />
       </div>
       <MessageFooter />
