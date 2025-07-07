@@ -25,12 +25,15 @@ const MessagesDropdown: React.FC<DropdownProps> = ({ isOpen, user }) => {
   const [viewSingleNotification] = useViewSingleNotificationMutation();
 
   // Get all message notifications
-  const { data: responseData, isLoading: isNotificationsLoading, refetch } =
-    useGetAllNotificationsQuery([
-      { key: "page", value: 1 },
-      { key: "limit", value: 10 },
-      { key: "type", value: "message" },
-    ]);
+  const {
+    data: responseData,
+    isLoading: isNotificationsLoading,
+    refetch,
+  } = useGetAllNotificationsQuery([
+    { key: "page", value: 1 },
+    { key: "limit", value: 10 },
+    { key: "type", value: "message" },
+  ]);
 
   // Local state to manage notifications
   const [localNotifications, setLocalNotifications] = useState<INotification[]>(
@@ -65,7 +68,9 @@ const MessagesDropdown: React.FC<DropdownProps> = ({ isOpen, user }) => {
   useEffect(() => {
     if (socket && user?._id) {
       const notificationEvent = `notification::${user._id}`;
-      const handleNotification = (notificationData: { data: INotification }) => {
+      const handleNotification = (notificationData: {
+        data: INotification;
+      }) => {
         const notification = notificationData.data;
         if (notification.type === "message") {
           // Add new notification to local state
@@ -116,7 +121,7 @@ const MessagesDropdown: React.FC<DropdownProps> = ({ isOpen, user }) => {
           <div className="flex justify-between items-center mb-2">
             <h3 className="font-semibold text-lg">Messages</h3>
           </div>
-          <div className="space-y-3 max-h-80 overflow-y-auto">
+          <div className="space-y-3 max-h-8 scrollbar-hide overflow-y-auto">
             {isNotificationsLoading ? (
               <div className="text-center text-gray-500">
                 Loading notifications...
@@ -126,44 +131,53 @@ const MessagesDropdown: React.FC<DropdownProps> = ({ isOpen, user }) => {
                 No message notifications
               </div>
             ) : (
-              localNotifications.map((notification: INotification, index: number) => (
-                <div
-                  key={notification._id?.toString() || index}
-                  onClick={() => handleNotificationClick(notification)}
-                  className="text-gray-800 hover:bg-[#ECFCFA] px-4 py-3 rounded-xl cursor-pointer flex items-center gap-4"
-                >
-                  {notification?.image && (
-                    <Image
-                      src={notification.image}
-                      width={60}
-                      height={60}
-                      className="size-14 rounded-full flex-shrink-0"
-                      alt="user"
-                    />
-                  )}
-                  <div className="flex-1 min-w-0">
-                    <h1 className="font-medium truncate">{notification?.title}</h1>
-                    <p className="text-sm text-gray-500">
-                      {moment(notification?.createdAt).fromNow()}
-                    </p>
-                  </div>
-                  {!notification.viewStatus && (
-                    <div className="flex-shrink-0">
-                      <span className="w-3 h-3 bg-primary rounded-full block"></span>
+              localNotifications.map(
+                (notification: INotification, index: number) => (
+                  <div
+                    key={notification._id?.toString() || index}
+                    onClick={() => handleNotificationClick(notification)}
+                    className="text-gray-800 hover:bg-[#ECFCFA] px-4 py-3 rounded-xl cursor-pointer flex items-center gap-4"
+                  >
+                    {notification?.image && (
+                      <Image
+                        src={notification.image}
+                        width={60}
+                        height={60}
+                        className="size-14 rounded-full flex-shrink-0"
+                        alt="user"
+                      />
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <h1 className="font-medium truncate">
+                        {notification?.title}
+                      </h1>
+                      <p className="text-sm text-gray-500">
+                        {moment(notification?.createdAt).fromNow()}
+                      </p>
                     </div>
-                  )}
-                </div>
-              ))
+                    {!notification.viewStatus && (
+                      <div className="flex-shrink-0">
+                        <span className="w-3 h-3 bg-primary rounded-full block"></span>
+                      </div>
+                    )}
+                  </div>
+                )
+              )
             )}
           </div>
-          <div className="mt-3 border-t border-[#E2E8F0] pt-5 flex justify-center items-center">
-            <h1
-              className="text-primary text-sm cursor-pointer"
-              onClick={() => router.push("/messages")}
-            >
-              View all messages
-            </h1>
-          </div>
+          {
+            // Show "See all notifications" button when there are more than 3 notifications
+            localNotifications.length > 4 && (
+              <div className="mt-3 border-t border-[#E2E8F0] pt-5 flex justify-center items-center">
+                <h1
+                  className="text-primary text-sm cursor-pointer"
+                  onClick={() => router.push("/messages")}
+                >
+                  View all messages
+                </h1>
+              </div>
+            )
+          }
         </motion.div>
       )}
     </AnimatePresence>

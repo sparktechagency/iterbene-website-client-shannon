@@ -17,7 +17,7 @@ const EventParticipantsList = ({
       </div>
 
       {/* Participants list */}
-      <div className="w-full max-h-[300px] overflow-y-auto space-y-4">
+      <div className="w-full max-h-[300px] scrollbar-hide overflow-y-auto space-y-4">
         {eventDetailsData?.interestedUsers?.length > 0 ? (
           eventDetailsData?.interestedUsers?.map((participant) => (
             <div key={participant._id} className="flex items-center gap-4">

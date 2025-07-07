@@ -385,7 +385,7 @@ const Header: React.FC = () => {
               type="text"
               name="search"
               id="search"
-              className="w-full px-4 py-3 outline-none text-base rounded-l-xl"
+              className="w-full px-4 py-4 outline-none text-base rounded-l-xl"
               placeholder="Search"
               value={searchValue}
               onChange={handleSearchChange}

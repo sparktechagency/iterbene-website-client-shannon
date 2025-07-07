@@ -199,7 +199,7 @@ const MessageFooter = () => {
         <div className="mb-3">
           <div
             ref={attachmentScrollRef}
-            className="flex space-x-2 overflow-x-auto p-2 scrollbar-thin bg-white scrollbar-thumb-gray-300 scrollbar-track-gray-100"
+            className="flex space-x-2 overflow-x-auto p-2 scrollbar-thin bg-white scrollbar-thumb-gray-300 scrollbar-track-gray-100 scrollbar-hide"
             style={{ scrollbarWidth: "thin" }}
           >
             {selectedFiles?.map((selectedFile) => (
@@ -306,7 +306,7 @@ const MessageFooter = () => {
           onChange={hasOnlyNonImageAttachments ? () => { } : handleChange}
           onKeyPress={hasOnlyNonImageAttachments ? () => { } : handleKeyPress}
           rows={1}
-          className={`w-full p-2 focus:outline-none resize-none overflow-y-auto bg-transparent ${hasOnlyNonImageAttachments
+          className={`w-full p-2 focus:outline-none resize-none overflow-y-auto bg-transparent scrollbar-hide ${hasOnlyNonImageAttachments
               ? "text-gray-800 placeholder-gray-500 cursor-not-allowed "
               : "text-gray-800 placeholder-gray-500"
             }`}

@@ -16,7 +16,7 @@ const GroupParticipantsList = ({
       </div>
 
       {/* Participants list */}
-      <div className="w-full max-h-[300px] overflow-y-auto space-y-4">
+      <div className="w-full max-h-[300px] scrollbar-hide overflow-y-auto space-y-4">
         {groupDetailsData?.members?.length > 0 ? (
           groupDetailsData?.members?.map((participant) => (
             <div key={participant._id} className="flex items-center gap-4">

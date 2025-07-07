@@ -58,7 +58,7 @@ const MessageBody = () => {
       },
       {
         refetchOnMountOrArgChange: true,
-        pollingInterval: currentPage === 1 ? 5000 : 0, // Only poll for latest messages
+        pollingInterval: 5000, // Poll for new messages every 5 seconds
         skip: !receiverId,
       }
     );
@@ -266,7 +266,7 @@ const MessageBody = () => {
     <div className="w-full h-full relative">
       <div
         ref={scrollRef}
-        className="w-full h-full overflow-x-hidden overflow-y-auto p-4 space-y-5 messages-box"
+        className="w-full h-full overflow-x-hidden  scrollbar-hide overflow-y-auto p-4 space-y-5 messages-box scrollbar-hide"
         style={{ scrollBehavior: "smooth" }}
       >
         {/* Intersection Observer trigger element for loading older messages at top */}
