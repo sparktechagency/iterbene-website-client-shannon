@@ -379,7 +379,7 @@ const Header: React.FC = () => {
         <div className="hidden lg:flex flex-1 max-w-3xl mx-auto relative">
           <form
             onSubmit={handleSearchSubmit}
-            className="w-full flex items-center bg-white rounded-xl border border-gray-100"
+            className="w-[600px] 2xl:w-[700px] mx-auto flex items-center bg-white rounded-xl border border-gray-100"
           >
             <input
               type="text"
