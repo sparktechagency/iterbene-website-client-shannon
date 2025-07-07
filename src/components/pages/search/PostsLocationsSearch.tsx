@@ -2,7 +2,7 @@ import React from 'react'
 import SearchLocationData from './SearchLocationData'
 import SearchPostData from './SearchPostData'
 
-const Search = () => {
+const PostsLocationsSearch = () => {
   return (
     <section className='w-full space-y-5 md:space-y-8'>
     <SearchLocationData />
@@ -11,4 +11,4 @@ const Search = () => {
   )
 }
 
-export default Search
+export default PostsLocationsSearch

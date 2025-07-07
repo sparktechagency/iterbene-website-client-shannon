@@ -10,7 +10,7 @@ type SearchDropdownProps = {
   searchResults: ISearchResult;
   loading: boolean;
   onResultClick: (result: TUser | IHashtag, type: string) => void;
-  onSearchPosts: (query: string) => void;
+  onSearch: (query: string) => void;
 };
 
 const SearchDropdown: React.FC<SearchDropdownProps> = ({
@@ -19,7 +19,7 @@ const SearchDropdown: React.FC<SearchDropdownProps> = ({
   searchResults,
   loading,
   onResultClick,
-  onSearchPosts,
+  onSearch,
 }) => {
   if (!isOpen) return null;
 
@@ -46,7 +46,7 @@ const SearchDropdown: React.FC<SearchDropdownProps> = ({
             {searchValue && (
               <div
                 className="flex items-center gap-3 p-3 hover:bg-gray-50 rounded-lg cursor-pointer transition-colors"
-                onClick={() => onSearchPosts(searchValue)}
+                onClick={() => onSearch(searchValue)}
               >
                 <div className="flex-shrink-0">
                   <div className="size-8 rounded-full flex items-center justify-center">

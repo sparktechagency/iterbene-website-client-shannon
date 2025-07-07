@@ -22,7 +22,7 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
   // This is used to create more space for content on specific pages.
   const shouldHideSection3 = React.useMemo(() => {
     // Paths where the third section (friend requests, contact list) should be hidden
-    const hiddenPaths = ['/connections', '/groups', '/events','/stories'];
+    const hiddenPaths = ['/connections', '/groups', '/events','/stories','/search/posts-locations'];
     
     // Check if the current path matches any of the hidden paths or is a sub-path of them
     return hiddenPaths.some(path => {

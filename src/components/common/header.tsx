@@ -323,13 +323,13 @@ const Header: React.FC = () => {
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchValue.trim()) {
-      handleSearchPosts(searchValue.trim());
+      handleSearch(searchValue.trim());
     }
   };
 
   // Navigate to posts search page
-  const handleSearchPosts = useCallback((query: string) => {
-    router.push(`/search/posts?q=${encodeURIComponent(query)}`);
+  const handleSearch = useCallback((query: string) => {
+    router.push(`/search/posts-locations?q=${encodeURIComponent(query)}`);
     // Reset search state after navigation
     setIsSearchDropdownOpen(false);
     setSearchValue("");
@@ -346,7 +346,7 @@ const Header: React.FC = () => {
         break;
       case "hashtag":
         const hashtagResult = result as IHashtag;
-        router.push(`/hashtag/${hashtagResult?.name}`);
+        router.push(`/search/hashtag?q=${hashtagResult?.name}`);
         break;
       default:
         console.log("Unknown result type");
@@ -401,7 +401,7 @@ const Header: React.FC = () => {
             searchResults={searchResults}
             loading={searchLoading}
             onResultClick={handleSearchResultClick}
-            onSearchPosts={handleSearchPosts}
+            onSearch={handleSearch}
           />
         </div>
 
@@ -528,7 +528,7 @@ const Header: React.FC = () => {
                 searchResults={searchResults}
                 loading={searchLoading}
                 onResultClick={handleSearchResultClick}
-                onSearchPosts={handleSearchPosts}
+                onSearch={handleSearch}
               />
             </div>
           </motion.div>
