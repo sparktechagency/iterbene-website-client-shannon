@@ -53,6 +53,22 @@ const postApi = baseApi.injectEndpoints({
       },
       providesTags: ["Post"],
     }),
+    getVisitedPostsWithDistance: builder.query({
+      query: (filters) => {
+        const params = new URLSearchParams();
+        if (filters?.length > 0) {
+          filters?.forEach((filter: { key: string; value: string }) =>
+            params.append(filter.key, filter.value)
+          );
+        }
+        return {
+          url: "/posts/visited-posts",
+          method: "GET",
+          params,
+        };
+      },
+      providesTags: ["Post"],
+    }),
     getSinglePost: builder.query({
       query: (id) => ({
         url: `/posts/${id}`,
@@ -95,7 +111,7 @@ const postApi = baseApi.injectEndpoints({
       providesTags: ["Post"],
     }),
     getEventPosts: builder.query({
-      query: ({eventId, filters}) => {
+      query: ({ eventId, filters }) => {
         const params = new URLSearchParams();
         if (filters?.length > 0) {
           filters?.forEach(
@@ -166,6 +182,7 @@ export const {
   useUpdatePostMutation,
   useAddOrRemoveReactionMutation,
   useCreateCommentMutation,
+  useGetVisitedPostsWithDistanceQuery,
   useAddOrRemoveCommentReactionMutation,
   useUpdateCommentMutation,
   useDeleteCommentMutation,

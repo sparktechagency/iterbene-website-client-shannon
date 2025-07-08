@@ -1,58 +1,143 @@
-import React from 'react';
-import TripCard from './TripCard';
+"use client";
+import { useGetVisitedPostsWithDistanceQuery } from "@/redux/features/post/postApi";
+import TripCard from "./TripCard";
+import ITrip from "@/types/trip.types";
+import { useState } from "react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
-interface Trip {
-  location: string;
-  image: string;
-  distance: string;
-  rating: number;
-  duration: string;
-}
+const TripList = ({
+  mapHide,
+  showFullMap,
+}: {
+  mapHide: boolean;
+  showFullMap: boolean;
+}) => {
+  const [currentPage, setCurrentPage] = useState(1);
+  const limit = 4;
 
-const TripList = ({ mapHide, showFullMap }: { mapHide: boolean, showFullMap: boolean }) => {
-  const trips: Trip[] = [
+  const { data: responseData, isLoading } = useGetVisitedPostsWithDistanceQuery(
     {
-      location: 'Kyoto, Japan',
-      image: 'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?q=80&w=2000&auto=format&fit=crop', // Kyoto culture
-      distance: '12,000 miles away',
-      rating: 4.9,
-      duration: '12 days & 11 nights',
+      page: currentPage,
+      limit: limit,
     },
-    {
-      location: 'Santorini, Greece',
-      image: 'https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff?q=80&w=2000&auto=format&fit=crop', // Santorini scenery
-      distance: '12,000 miles away',
-      rating: 4.9,
-      duration: '12 days & 11 nights',
-    },
-    {
-      location: 'Banff, Canada',
-      image: 'https://images.pexels.com/photos/2064827/pexels-photo-2064827.jpeg', // Banff mountains
-      distance: '12,000 miles away',
-      rating: 4.9,
-      duration: '12 days & 11 nights',
-    },
-    {
-      location: 'Marrakech, Morocco',
-      image: 'https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff?q=80&w=2000&auto=format&fit=crop', // Marrakech market
-      distance: '12,000 miles away',
-      rating: 4.9,
-      duration: '12 days & 11 nights',
-    },
-  ];
+    { refetchOnMountOrArgChange: true }
+  );
+
+  const tripsData = responseData?.data?.attributes?.results;
+  const totalPages = responseData?.data?.attributes?.totalPages;
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  const handlePreviousPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+
+  const handleNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
+  // Generate page numbers for pagination
+  const getPageNumbers = () => {
+    const pages = [];
+    const maxVisiblePages = 5;
+
+    let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+    const endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+
+    if (endPage - startPage + 1 < maxVisiblePages) {
+      startPage = Math.max(1, endPage - maxVisiblePages + 1);
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+      pages.push(i);
+    }
+
+    return pages;
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+      </div>
+    );
+  }
 
   return (
-    <div className={`w-full p-1 md:p-4 grid grid-cols-1 gap-5 ${mapHide ? 'col-span-full md:grid-cols-3 lg:grid-cols-4' : showFullMap ? 'hidden' : 'col-span-1 md:grid-cols-2'}`}>
-      {trips.map((trip, index) => (
-        <TripCard
-          key={index}
-          location={trip.location}
-          image={trip.image}
-          distance={trip.distance}
-          rating={trip.rating}
-          duration={trip.duration}
-        />
-      ))}
+    <div
+      className={`w-full p-1 md:p-4 flex flex-col gap-5 ${
+        mapHide ? "col-span-full" : showFullMap ? "hidden" : "col-span-1"
+      }`}
+    >
+      {/* Trip Cards Grid */}
+      <div
+        className={`grid grid-cols-1 gap-5 ${
+          mapHide ? "md:grid-cols-3 lg:grid-cols-4" : "md:grid-cols-2"
+        }`}
+      >
+        {tripsData?.map((trip: ITrip, index: number) => (
+          <TripCard key={trip._id || index} trip={trip} />
+        ))}
+      </div>
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="flex justify-center items-center gap-2 mt-6">
+          {/* Previous Button */}
+          <button
+            onClick={handlePreviousPage}
+            disabled={currentPage === 1}
+            className={`p-2 rounded-lg border transition-colors ${
+              currentPage === 1
+                ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                : "bg-white text-gray-700 hover:bg-gray-50 border-gray-300"
+            }`}
+          >
+            <ChevronLeft size={20} />
+          </button>
+
+          {/* Page Numbers */}
+          {getPageNumbers().map((page) => (
+            <button
+              key={page}
+              onClick={() => handlePageChange(page)}
+              className={`px-3 py-2 rounded-lg border transition-colors ${
+                currentPage === page
+                  ? "bg-blue-500 text-white border-blue-500"
+                  : "bg-white text-gray-700 hover:bg-gray-50 border-gray-300"
+              }`}
+            >
+              {page}
+            </button>
+          ))}
+
+          {/* Next Button */}
+          <button
+            onClick={handleNextPage}
+            disabled={currentPage === totalPages}
+            className={`p-2 rounded-lg border transition-colors ${
+              currentPage === totalPages
+                ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                : "bg-white text-gray-700 hover:bg-gray-50 border-gray-300"
+            }`}
+          >
+            <ChevronRight size={20} />
+          </button>
+        </div>
+      )}
+
+      {/* No Results */}
+      {!isLoading && (!tripsData || tripsData.length === 0) && (
+        <div className="text-center text-gray-500 py-8">
+          No trips found. Start exploring and share your adventures!
+        </div>
+      )}
     </div>
   );
 };
