@@ -3,7 +3,7 @@ interface ITripMedia {
   mediaType: string;
   mediaUrl: string;
 }
-interface ITripVisitedLocation {
+export interface ITripVisitedLocation {
   latitude: number;
   longitude: number;
 }

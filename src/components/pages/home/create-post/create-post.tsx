@@ -648,7 +648,7 @@ const CreatePost = ({
                 >
                   <MapPin className="w-5 h-5 text-primary" />
                   <span className="text-sm text-gray-700">
-                    {selectedLocation?.formatted_address}
+                    {selectedLocation?.name}
                   </span>
                   <button
                     onClick={handleRemoveLocation}

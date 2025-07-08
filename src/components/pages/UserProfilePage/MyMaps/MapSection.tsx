@@ -1,7 +1,9 @@
 "use client";
+import { useGetMyMapsQuery } from "@/redux/features/maps/mapsApi";
+import { ITripVisitedLocation } from "@/types/trip.types";
 import { GoogleMap, Marker, useJsApiLoader } from "@react-google-maps/api";
 
-// Define the map container mx-auto style
+// Define the map container style
 const mapContainerStyle: React.CSSProperties = {
   width: "100%",
   height: "100%",
@@ -13,12 +15,6 @@ interface Location {
   lng: number;
 }
 
-// Default center (Dhaka, Bangladesh as shown in your screenshot)
-const defaultCenter: Location = {
-  lat: 23.8103, // Dhaka latitude
-  lng: 90.4125, // Dhaka longitude
-};
-
 const MapSection = ({
   mapHide,
   showFullMap,
@@ -27,45 +23,59 @@ const MapSection = ({
   showFullMap: boolean;
   setShowFullMap: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
-  // Replace with your actual Google Maps API key
+  const { data: responseData } = useGetMyMapsQuery(undefined, { refetchOnMountOrArgChange: true });
   const apiKey: string = process.env.NEXT_PUBLIC_GOOGLE_MAP_API_KEY || "";
 
-  // Use useJsApiLoader to ensure the Google Maps API is loaded
   // Only load the libraries you actually need
   const { isLoaded } = useJsApiLoader({
     googleMapsApiKey: apiKey,
-    libraries: [], // Empty array since you're not using places, geometry, etc.
+    libraries: [],
   });
 
-  // Define locations using TripList locations
-  const interestedPlaces: Location[] = [{ lat: 35.0116, lng: 135.7681 }];
+  // Set default center to user's current location from API
+  const defaultCenter: Location = responseData?.data?.attributes?.userCurrentLocation
+    ? {
+        lat: responseData.data.attributes.userCurrentLocation.latitude,
+        lng: responseData.data.attributes.userCurrentLocation.longitude,
+      }
+    : {
+        lat: 40.7128, // Fallback to New York if API data is unavailable
+        lng: -74.006,
+      };
 
-  const visitedPlaces: Location[] = [
-    { lat: 32.219042, lng: 76.3234037 },
-    { lat: 23.7329724, lng: 90.417231 },
-  ];
+  // Get locations from API data
+  const interestedPlaces: Location[] = responseData?.data?.attributes?.interestedLocations
+    ? responseData.data.attributes.interestedLocations.map((loc: ITripVisitedLocation) => ({
+        lat: loc.latitude,
+        lng: loc.longitude,
+      }))
+    : [];
 
-  const homeLocation: Location = {
-    lat: 23.8103, // Dhaka, Bangladesh (your current location)
-    lng: 90.4125,
-  };
+  const visitedPlaces: Location[] = responseData?.data?.attributes?.visitedLocations
+    ? responseData.data.attributes.visitedLocations.map((loc: ITripVisitedLocation) => ({
+        lat: loc.latitude,
+        lng: loc.longitude,
+      }))
+    : [];
 
-  // Custom marker icons - create them only when Google Maps is loaded
+  const homeLocation: Location = defaultCenter;
+
+  // Custom marker icons
   const getCustomIcons = () => {
     if (!window.google || !window.google.maps) return null;
 
     return {
       interested: {
         url: "https://i.ibb.co.com/BVgNBSG8/interested.png",
-        scaledSize: new window.google.maps.Size(40, 40),
+        scaledSize: new window.google.maps.Size(40,40),
       },
       visited: {
         url: "https://i.ibb.co.com/60gHYs1m/visit.png",
-        scaledSize: new window.google.maps.Size(40, 40),
+        scaledSize: new window.google.maps.Size(40,40),
       },
       home: {
         url: "https://i.ibb.co.com/5xxKK494/home.png",
-        scaledSize: new window.google.maps.Size(40, 40),
+        scaledSize: new window.google.maps.Size(40,40),
       },
     };
   };
@@ -89,7 +99,7 @@ const MapSection = ({
         mapHide ? "hidden" : showFullMap ? "col-span-full" : ""
       }`}
     >
-      <div className="rounded-2xl shadow-md h-full min-h-[600px] overflow-hidden z-20">
+      <div className="rounded-2xl shadow-md h-full min-h-[200px] md:min-h-[450px] max-h-[720px] overflow-hidden z-20">
         <GoogleMap
           mapContainerStyle={mapContainerStyle}
           center={defaultCenter}
@@ -141,7 +151,7 @@ const MapSection = ({
             <Marker
               position={homeLocation}
               icon={customIcons.home}
-              title="Home - Dhaka, Bangladesh"
+              title="Home - Current Location"
             />
           )}
         </GoogleMap>

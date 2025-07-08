@@ -16,10 +16,16 @@ const TripList = ({
   const limit = 4;
 
   const { data: responseData, isLoading } = useGetVisitedPostsWithDistanceQuery(
-    {
-      page: currentPage,
-      limit: limit,
-    },
+    [
+      {
+        key: "page",
+        value: currentPage,
+      },
+      {
+        key: "limit",
+        value: limit,
+      },
+    ],
     { refetchOnMountOrArgChange: true }
   );
 
@@ -71,7 +77,7 @@ const TripList = ({
 
   return (
     <div
-      className={`w-full p-1 md:p-4 flex flex-col gap-5 ${
+      className={`w-full p-2 flex flex-col gap-5 ${
         mapHide ? "col-span-full" : showFullMap ? "hidden" : "col-span-1"
       }`}
     >
@@ -81,9 +87,11 @@ const TripList = ({
           mapHide ? "md:grid-cols-3 lg:grid-cols-4" : "md:grid-cols-2"
         }`}
       >
-        {tripsData?.map((trip: ITrip, index: number) => (
-          <TripCard key={trip._id || index} trip={trip} />
-        ))}
+        {tripsData
+          ?.filter((trip: ITrip) => trip?.media[0]?.mediaType)
+          .map((trip: ITrip, index: number) => (
+            <TripCard key={trip._id || index} trip={trip} />
+          ))}
       </div>
 
       {/* Pagination */}
@@ -93,10 +101,10 @@ const TripList = ({
           <button
             onClick={handlePreviousPage}
             disabled={currentPage === 1}
-            className={`p-2 rounded-lg border transition-colors ${
+            className={`size-8 flex justify-center items-center cursor-pointer rounded-full border transition-colors ${
               currentPage === 1
                 ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                : "bg-white text-gray-700 hover:bg-gray-50 border-gray-300"
+                : "bg-white text-gray-700 hover:bg-gray-50 border-gray-300 cursor-pointer"
             }`}
           >
             <ChevronLeft size={20} />
@@ -107,9 +115,9 @@ const TripList = ({
             <button
               key={page}
               onClick={() => handlePageChange(page)}
-              className={`px-3 py-2 rounded-lg border transition-colors ${
+              className={`size-8 cursor-pointer rounded-full border transition-colors ${
                 currentPage === page
-                  ? "bg-blue-500 text-white border-blue-500"
+                  ? "bg-primary text-white"
                   : "bg-white text-gray-700 hover:bg-gray-50 border-gray-300"
               }`}
             >
@@ -121,10 +129,10 @@ const TripList = ({
           <button
             onClick={handleNextPage}
             disabled={currentPage === totalPages}
-            className={`p-2 rounded-lg border transition-colors ${
+            className={`size-8 flex justify-center items-center rounded-full border transition-colors ${
               currentPage === totalPages
                 ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                : "bg-white text-gray-700 hover:bg-gray-50 border-gray-300"
+                : "bg-white text-gray-700 hover:bg-gray-50 border-gray-300 cursor-pointer"
             }`}
           >
             <ChevronRight size={20} />

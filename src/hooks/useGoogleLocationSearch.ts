@@ -365,7 +365,7 @@ export const useGoogleLocationSearch = (
           placesService.current!.getDetails(request, (place, status) => {
             if (status === google.maps.places.PlacesServiceStatus.OK && place) {
               const locationDetails: LocationDetails = {
-                name: place.formatted_address || place.name || "",
+                name: place?.name || "",
                 latitude: place.geometry?.location?.lat() || 0,
                 longitude: place.geometry?.location?.lng() || 0,
                 formatted_address: place.formatted_address || "",

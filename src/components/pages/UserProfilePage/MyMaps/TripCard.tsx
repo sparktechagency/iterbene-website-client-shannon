@@ -57,12 +57,12 @@ const TripCard = ({ trip }: { trip: ITrip }) => {
                 height={250}
                 className="w-full h-full object-cover rounded-xl"
               />
-            ) : (
+            ) : trip?.media[0]?.mediaType === "video" ? (
               <VideoCard
                 url={trip?.media[0]?.mediaUrl}
                 className="w-full h-full rounded-xl"
               />
-            )}
+            ) : null}
           </div>
         )}
       </div>
