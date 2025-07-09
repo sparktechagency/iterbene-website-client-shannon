@@ -71,18 +71,20 @@ const PostsLocationsSearch = () => {
     };
   }, [hasMore, isFetching, isLoading]);
 
-  if (isLoading && currentPage === 1) {
-    return (
-      <div className="flex items-center justify-center py-8">
-        <Loader2 className="animate-spin text-primary" size={28} />
-      </div>
-    );
-  }
-
   return (
     <section className="w-full space-y-5 md:space-y-8">
-      <SearchLocationData locationsData={locationsData} hasMore={hasMore} />
-      <SearchPostData postsData={allPosts} hasMore={hasMore} />
+      <SearchLocationData
+        locationsData={locationsData}
+        hasMore={hasMore}
+        isLoading={isLoading}
+        currentPage={currentPage}
+      />
+      <SearchPostData
+        postsData={allPosts}
+        hasMore={hasMore}
+        isLoading={isLoading}
+        currentPage={currentPage}
+      />
       {hasMore && (
         <div
           className="flex items-center justify-center py-4"
