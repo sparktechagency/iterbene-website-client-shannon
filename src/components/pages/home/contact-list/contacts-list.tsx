@@ -3,8 +3,9 @@ import { useGetChatsQuery } from "@/redux/features/inbox/inboxApi";
 import ContactListCard from "./contact-list-card";
 import { useEffect, useState } from "react";
 import { IChat } from "@/types/chatTypes";
+import ContactListCardSkeleton from "./ContactListCardSkeleton";
 const ContactList: React.FC = () => {
-  const { data: responseData } = useGetChatsQuery(
+  const { data: responseData, isLoading } = useGetChatsQuery(
     [
       {
         key: "page",
@@ -13,7 +14,7 @@ const ContactList: React.FC = () => {
       {
         key: "limit",
         value: 6,
-      }
+      },
     ],
     {
       refetchOnMountOrArgChange: true,
@@ -35,19 +36,36 @@ const ContactList: React.FC = () => {
     }
   }, [responseData]);
 
-  return (
-    <section className="w-full hidden md:block">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold uppercase">Contacts</h1>
-        <div className="size-8 rounded-full bg-primary flex items-center justify-center text-white">
-          <span>{totalResults || 0}</span>
-        </div>
-      </div>
-      <div className="w-full flex flex-col gap-2 mt-4">
+  let content = null;
+  if (isLoading) {
+    content = (
+      <section className="w-full flex flex-col gap-2 mt-4">
+        {Array.from({ length: 6 }).map((_, index) => (
+          <ContactListCardSkeleton key={index} />
+        ))}
+      </section>
+    );
+  } else if (contacts?.length > 0) {
+    content = (
+      <section className="w-full flex flex-col gap-2 mt-4">
         {contacts?.map((contact) => (
           <ContactListCard key={contact._id} contact={contact} />
         ))}
-      </div>
+      </section>
+    );
+  }
+
+  return (
+    <section className={`w-full hidden  md:block`}>
+      {contacts?.length > 0 && (
+        <div className="flex items-center justify-between">
+          <h1 className="text-2xl font-semibold uppercase">Contacts</h1>
+          <div className="size-8 rounded-full bg-primary flex items-center justify-center text-white">
+            <span>{totalResults || 0}</span>
+          </div>
+        </div>
+      )}
+      {content}
     </section>
   );
 };
