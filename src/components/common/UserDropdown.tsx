@@ -60,7 +60,7 @@ const UserDropdown: React.FC<DropdownProps> = ({ user, isOpen }) => {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 10 }}
           transition={{ duration: 0.2 }}
-          className="absolute top-16 right-0 bg-white rounded-xl shadow-md p-6 w-[min(430px,90vw)] z-50"
+          className="absolute  top-16 right-0 bg-white rounded-xl shadow-md p-6 w-[min(430px,90vw)] z-50"
         >
           <Link href={`/${user?.username}`}>
             <div className="flex items-center gap-3 mb-4 bg-[#ECFCFA] p-4 rounded-xl">
@@ -81,7 +81,7 @@ const UserDropdown: React.FC<DropdownProps> = ({ user, isOpen }) => {
               </div>
             </div>
           </Link>
-          <div className="space-y-3 overflow-y-auto">
+          <div className="space-y-3 min-h-48 max-h-[400px] overflow-y-auto">
             <Link
               href={`/${user?.username}`}
               className="text-gray-800 hover:bg-[#ECFCFA] px-4 py-3 rounded-xl flex items-center gap-4"

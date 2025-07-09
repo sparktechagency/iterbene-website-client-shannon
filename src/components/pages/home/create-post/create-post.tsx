@@ -467,465 +467,481 @@ const CreatePost = ({
   const isActionLoading = isCreatingPost || isUpdatingPost;
 
   return (
-    <section className="w-full bg-white rounded-xl">
-      {/* Post Input Section */}
-      <div className="w-full flex px-4 pt-4 pb-2 gap-3">
-        {user && (
-          <Image
-            src={user?.profileImage}
-            alt="User Profile"
-            width={50}
-            height={50}
-            className="size-[50px] rounded-full object-cover flex-shrink-0"
-          />
-        )}
-        <div className="relative w-full">
-          <textarea
-            ref={textareaRef}
-            placeholder={config.placeholder}
-            value={post}
-            onChange={postChangeHandler}
-            className={`w-full bg-transparent border-none text-justify mt-4 text-base focus:outline-none ${
-              post.includes("#") ? "color-[#3B82F6]" : ""
-            } placeholder-gray-400 resize-none`}
-          />
-          {/* Hashtag Suggestions Popup */}
-          <AnimatePresence>
-            {showHashtagSuggestions &&
-              hashtagData?.data?.attributes?.results?.length > 0 && (
-                <motion.div
-                  ref={hashtagPopupRef}
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  className="absolute top-full left-0 bg-white rounded-2xl shadow-xl p-4 border border-gray-200 w-80 z-20 max-h-56 overflow-y-auto"
-                >
-                  {hashtagData?.data?.attributes?.results?.length > 0 &&
-                    hashtagData?.data?.attributes?.results?.map(
-                      (
-                        hashtag: { name: string; postCount: number },
-                        index: number
-                      ) => (
-                        <div
-                          key={index}
-                          onClick={() => handleHashtagSelect(hashtag?.name)}
-                          className="flex flex-col px-3 py-1 hover:bg-gray-50 cursor-pointer rounded-md transition-colors"
-                        >
-                          <span className="text-base text-gray-900 font-semibold">
-                            #{hashtag?.name}
-                          </span>
-                          <p className="text-sm text-[#9194A9]">
-                            {hashtag?.postCount} posts
-                          </p>
-                        </div>
-                      )
-                    )}
-                </motion.div>
-              )}
-          </AnimatePresence>
-        </div>
-        <button
-          onClick={handlePostAction}
-          disabled={(!post && allMediaPreviews.length === 0) || isActionLoading}
-          className={`w-[140px]  flex justify-center items-center h-[45px] mt-1 ${
-            post || allMediaPreviews.length > 0
-              ? "bg-secondary text-white cursor-pointer"
-              : "border border-[#9194A9] text-[#9194A9]"
-          } rounded-xl`}
-        >
-          {isActionLoading ? (
-            <>
-              <svg
-                className="animate-spin h-5 w-5 text-current"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-              >
-                <circle
-                  className="opacity-25"
-                  cx="12"
-                  cy="12"
-                  r="10"
-                  stroke="currentColor"
-                  strokeWidth="4"
-                ></circle>
-                <path
-                  className="opacity-75"
-                  fill="currentColor"
-                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                ></path>
-              </svg>
-            </>
-          ) : initialPostData ? (
-            "Update Post"
-          ) : (
-            "Post It!"
-          )}
-        </button>
-      </div>
-
-      {/* Media Preview Section */}
-      <div className="w-full px-6 relative">
-        {allMediaPreviews?.length > 0 && (
-          <>
-            <Swiper
-              modules={[Pagination]}
-              pagination={{ clickable: false }}
-              onSwiper={(swiper) => {
-                swiperRef.current = swiper;
-              }}
-              spaceBetween={10}
-              slidesPerView={allMediaPreviews?.length === 1 ? 1 : 2}
-              className="w-full"
-            >
-              {allMediaPreviews?.map((item, index) => (
-                <SwiperSlide key={item.preview}>
-                  <div className="relative">
-                    {item.type.startsWith("image") ? (
-                      <Image
-                        src={item?.preview}
-                        alt={item?.name}
-                        width={500}
-                        height={500}
-                        className="w-full h-56 md:h-72 lg:h-96 object-cover rounded-lg"
-                      />
-                    ) : (
-                      <video
-                        src={item?.preview}
-                        controls
-                        className="w-full h-56 md:h-72 lg:h-96 object-cover rounded-lg"
-                      />
-                    )}
-                    <button
-                      onClick={() => handleRemoveMedia(index, !item.file)} // Pass true if it's an existing media (no file object)
-                      className="absolute top-2 right-2 bg-black/50 text-white rounded-full p-2 cursor-pointer"
+    <>
+      {user && (
+        <section className="w-full bg-white rounded-xl">
+          {/* Post Input Section */}
+          <div className="w-full flex px-4 pt-4 pb-2 gap-3">
+            {user && (
+              <Image
+                src={user?.profileImage}
+                alt="User Profile"
+                width={50}
+                height={50}
+                className="size-[50px] rounded-full object-cover flex-shrink-0"
+              />
+            )}
+            <div className="relative w-full">
+              <textarea
+                ref={textareaRef}
+                placeholder={config.placeholder}
+                value={post}
+                onChange={postChangeHandler}
+                className={`w-full bg-transparent border-none text-justify mt-4 text-base focus:outline-none ${
+                  post.includes("#") ? "color-[#3B82F6]" : ""
+                } placeholder-gray-400 resize-none`}
+              />
+              {/* Hashtag Suggestions Popup */}
+              <AnimatePresence>
+                {showHashtagSuggestions &&
+                  hashtagData?.data?.attributes?.results?.length > 0 && (
+                    <motion.div
+                      ref={hashtagPopupRef}
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      className="absolute top-full left-0 bg-white rounded-2xl shadow-xl p-4 border border-gray-200 w-80 z-20 max-h-56 overflow-y-auto"
                     >
-                      <X className="w-5 h-5" />
-                    </button>
-                  </div>
-                </SwiperSlide>
-              ))}
-            </Swiper>
-
-            {/* Custom navigation buttons */}
-            {allMediaPreviews.length > 2 && (
-              <>
-                <button
-                  onClick={() => swiperRef.current?.slidePrev()}
-                  className="absolute top-1/2 left-7 cursor-pointer -translate-y-1/2 bg-black/50 text-white rounded-full p-2 z-20 hover:bg-black/70 transition"
-                  aria-label="Previous slide"
-                >
-                  <ChevronLeft className="w-6 h-6" />
-                </button>
-                <button
-                  onClick={() => swiperRef.current?.slideNext()}
-                  className="absolute top-1/2 right-7 cursor-pointer -translate-y-1/2 bg-black/50 text-white rounded-full p-2 z-20 hover:bg-black/70 transition"
-                  aria-label="Next slide"
-                >
-                  <ChevronRight className="w-6 h-6" />
-                </button>
-              </>
-            )}
-          </>
-        )}
-      </div>
-
-      {/* Additional Options Section */}
-      {(post ||
-        allMediaPreviews.length > 0 ||
-        selectedLocation ||
-        initialPostData) && (
-        <div className="flex flex-col gap-4 mt-4">
-          {/* Selected Location and Privacy Display */}
-          <div className="flex items-center gap-4 px-4">
-            <AnimatePresence>
-              {selectedLocation && (
-                <motion.div
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -20 }}
-                  className="flex items-center gap-2"
-                >
-                  <MapPin className="w-5 h-5 text-primary" />
-                  <span className="text-sm text-gray-700">
-                    {selectedLocation?.name}
-                  </span>
-                  <button
-                    onClick={handleRemoveLocation}
-                    className="text-[#9194A9] hover:text-red-500 cursor-pointer"
-                    aria-label="Remove location"
+                      {hashtagData?.data?.attributes?.results?.length > 0 &&
+                        hashtagData?.data?.attributes?.results?.map(
+                          (
+                            hashtag: { name: string; postCount: number },
+                            index: number
+                          ) => (
+                            <div
+                              key={index}
+                              onClick={() => handleHashtagSelect(hashtag?.name)}
+                              className="flex flex-col px-3 py-1 hover:bg-gray-50 cursor-pointer rounded-md transition-colors"
+                            >
+                              <span className="text-base text-gray-900 font-semibold">
+                                #{hashtag?.name}
+                              </span>
+                              <p className="text-sm text-[#9194A9]">
+                                {hashtag?.postCount} posts
+                              </p>
+                            </div>
+                          )
+                        )}
+                    </motion.div>
+                  )}
+              </AnimatePresence>
+            </div>
+            <button
+              onClick={handlePostAction}
+              disabled={
+                (!post && allMediaPreviews.length === 0) || isActionLoading
+              }
+              className={`w-[140px]  flex justify-center items-center h-[45px] mt-1 ${
+                post || allMediaPreviews.length > 0
+                  ? "bg-secondary text-white cursor-pointer"
+                  : "border border-[#9194A9] text-[#9194A9]"
+              } rounded-xl`}
+            >
+              {isActionLoading ? (
+                <>
+                  <svg
+                    className="animate-spin h-5 w-5 text-current"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
                   >
-                    <X className="size-4" />
-                  </button>
-                </motion.div>
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    ></path>
+                  </svg>
+                </>
+              ) : initialPostData ? (
+                "Update Post"
+              ) : (
+                "Post It!"
               )}
-            </AnimatePresence>
-            {(config?.showPrivacy || initialPostData) && ( // Show privacy for user posts or when editing any post
-              <div className="flex items-center gap-2">
-                <Globe className="w-5 h-5 text-primary" />
-                <span className="text-sm text-gray-700 capitalize">
-                  {privacy}
-                </span>
-              </div>
-            )}
-            {itinerary && (
-              <div
-                onClick={() => setShowItineraryModal(true)}
-                className="flex items-center gap-2 cursor-pointer"
-              >
-                <CalendarCheck className="w-5 h-5 text-primary" />
-                <span className="text-sm text-gray-700">View Itinerary</span>
-              </div>
+            </button>
+          </div>
+
+          {/* Media Preview Section */}
+          <div className="w-full px-6 relative">
+            {allMediaPreviews?.length > 0 && (
+              <>
+                <Swiper
+                  modules={[Pagination]}
+                  pagination={{ clickable: false }}
+                  onSwiper={(swiper) => {
+                    swiperRef.current = swiper;
+                  }}
+                  spaceBetween={10}
+                  slidesPerView={allMediaPreviews?.length === 1 ? 1 : 2}
+                  className="w-full"
+                >
+                  {allMediaPreviews?.map((item, index) => (
+                    <SwiperSlide key={item.preview}>
+                      <div className="relative">
+                        {item.type.startsWith("image") ? (
+                          <Image
+                            src={item?.preview}
+                            alt={item?.name}
+                            width={500}
+                            height={500}
+                            className="w-full h-56 md:h-72 lg:h-96 object-cover rounded-lg"
+                          />
+                        ) : (
+                          <video
+                            src={item?.preview}
+                            controls
+                            className="w-full h-56 md:h-72 lg:h-96 object-cover rounded-lg"
+                          />
+                        )}
+                        <button
+                          onClick={() => handleRemoveMedia(index, !item.file)} // Pass true if it's an existing media (no file object)
+                          className="absolute top-2 right-2 bg-black/50 text-white rounded-full p-2 cursor-pointer"
+                        >
+                          <X className="w-5 h-5" />
+                        </button>
+                      </div>
+                    </SwiperSlide>
+                  ))}
+                </Swiper>
+
+                {/* Custom navigation buttons */}
+                {allMediaPreviews.length > 2 && (
+                  <>
+                    <button
+                      onClick={() => swiperRef.current?.slidePrev()}
+                      className="absolute top-1/2 left-7 cursor-pointer -translate-y-1/2 bg-black/50 text-white rounded-full p-2 z-20 hover:bg-black/70 transition"
+                      aria-label="Previous slide"
+                    >
+                      <ChevronLeft className="w-6 h-6" />
+                    </button>
+                    <button
+                      onClick={() => swiperRef.current?.slideNext()}
+                      className="absolute top-1/2 right-7 cursor-pointer -translate-y-1/2 bg-black/50 text-white rounded-full p-2 z-20 hover:bg-black/70 transition"
+                      aria-label="Next slide"
+                    >
+                      <ChevronRight className="w-6 h-6" />
+                    </button>
+                  </>
+                )}
+              </>
             )}
           </div>
 
-          {/* Icons for Additional Functionalities */}
-          <div className="flex items-center gap-5 bg-[#E7E8EC] px-4 py-1.5 rounded-b-xl">
-            {/* Media Upload Icon - Always available */}
-            <Tooltip title="Upload media" placement="bottom">
-              <button
-                onClick={() => mediaInputRef.current?.click()}
-                className="cursor-pointer"
-              >
-                <ImageIcon
-                  className={`w-6 h-6 ${
-                    allMediaPreviews.length > 0
-                      ? "text-primary"
-                      : "text-[#9194A9]"
-                  } hover:text-primary transition-colors`}
-                />
-              </button>
-            </Tooltip>
-            <input
-              type="file"
-              accept="image/*,video/*"
-              multiple
-              ref={mediaInputRef}
-              onChange={handleMediaUpload}
-              className="hidden"
-            />
+          {/* Additional Options Section */}
+          {(post ||
+            allMediaPreviews.length > 0 ||
+            selectedLocation ||
+            initialPostData) && (
+            <div className="flex flex-col gap-4 mt-4">
+              {/* Selected Location and Privacy Display */}
+              <div className="flex items-center gap-4 px-4">
+                <AnimatePresence>
+                  {selectedLocation && (
+                    <motion.div
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: -20 }}
+                      className="flex items-center gap-2"
+                    >
+                      <MapPin className="w-5 h-5 text-primary" />
+                      <span className="text-sm text-gray-700">
+                        {selectedLocation?.name}
+                      </span>
+                      <button
+                        onClick={handleRemoveLocation}
+                        className="text-[#9194A9] hover:text-red-500 cursor-pointer"
+                        aria-label="Remove location"
+                      >
+                        <X className="size-4" />
+                      </button>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+                {(config?.showPrivacy || initialPostData) && ( // Show privacy for user posts or when editing any post
+                  <div className="flex items-center gap-2">
+                    <Globe className="w-5 h-5 text-primary" />
+                    <span className="text-sm text-gray-700 capitalize">
+                      {privacy}
+                    </span>
+                  </div>
+                )}
+                {itinerary && (
+                  <div
+                    onClick={() => setShowItineraryModal(true)}
+                    className="flex items-center gap-2 cursor-pointer"
+                  >
+                    <CalendarCheck className="w-5 h-5 text-primary" />
+                    <span className="text-sm text-gray-700">
+                      View Itinerary
+                    </span>
+                  </div>
+                )}
+              </div>
 
-            {/* Location Icon - Only for timeline and group posts */}
-            {(config.showLocation || initialPostData) && ( // Show location for user/group posts or when editing any post
-              <div className="relative" ref={locationPopupRef}>
-                <Tooltip title="Add a location" placement="bottom">
+              {/* Icons for Additional Functionalities */}
+              <div className="flex items-center gap-5 bg-[#E7E8EC] px-4 py-1.5 rounded-b-xl">
+                {/* Media Upload Icon - Always available */}
+                <Tooltip title="Upload media" placement="bottom">
                   <button
-                    onClick={handleMapIconClick}
+                    onClick={() => mediaInputRef.current?.click()}
                     className="cursor-pointer"
                   >
-                    <MapPin
-                      className={`w-6 h-6 mt-2 ${
-                        selectedLocation ? "text-primary" : "text-[#9194A9]"
+                    <ImageIcon
+                      className={`w-6 h-6 ${
+                        allMediaPreviews.length > 0
+                          ? "text-primary"
+                          : "text-[#9194A9]"
                       } hover:text-primary transition-colors`}
                     />
                   </button>
                 </Tooltip>
-                <AnimatePresence>
-                  {showLocationPopup && (
-                    <motion.div
-                      initial={{ opacity: 0, y: -10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -10 }}
-                      className="absolute top-10 left-0 bg-white rounded-2xl shadow-xl p-5 w-80 z-20"
-                    >
-                      <div className="relative">
-                        <input
-                          ref={locationInputRef}
-                          type="text"
-                          value={locationQuery}
-                          onChange={handleLocationInputChange}
-                          placeholder={
-                            !isInitialized
-                              ? "Loading location services..."
-                              : "Search for a location..."
-                          }
-                          disabled={!isInitialized}
-                          className="w-full px-4 py-2 border rounded-full border-gray-200 focus:outline-none "
-                          onFocus={() => {
-                            if (predictions?.length > 0) {
-                              setShowLocationPopup(true);
-                            }
-                          }}
+                <input
+                  type="file"
+                  accept="image/*,video/*"
+                  multiple
+                  ref={mediaInputRef}
+                  onChange={handleMediaUpload}
+                  className="hidden"
+                />
+
+                {/* Location Icon - Only for timeline and group posts */}
+                {(config.showLocation || initialPostData) && ( // Show location for user/group posts or when editing any post
+                  <div className="relative" ref={locationPopupRef}>
+                    <Tooltip title="Add a location" placement="bottom">
+                      <button
+                        onClick={handleMapIconClick}
+                        className="cursor-pointer"
+                      >
+                        <MapPin
+                          className={`w-6 h-6 mt-2 ${
+                            selectedLocation ? "text-primary" : "text-[#9194A9]"
+                          } hover:text-primary transition-colors`}
                         />
-                        <Search className="w-5 h-5 text-[#9194A9] absolute top-3 right-4" />
-                        {isSearchingLocation && (
-                          <div className="absolute right-4 top-1/2 transform -translate-y-1/2">
-                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500"></div>
-                          </div>
-                        )}
-                      </div>
-                      <div className="mt-4 max-h-56 overflow-y-auto">
-                        {predictions?.map((prediction) => (
-                          <div
-                            key={prediction?.place_id}
-                            onClick={() => handleLocationSelect(prediction)}
-                            className="flex items-center gap-3 p-3 hover:bg-gray-50 cursor-pointer rounded-md transition-colors"
-                          >
-                            <MapPin className="size-5 text-[#9194A9]" />
-                            <div className="flex-1 min-w-0">
-                              <p className="text-sm font-medium text-gray-900 truncate">
-                                {prediction.structured_formatting.main_text}
-                              </p>
-                              <p className="text-xs text-gray-500 truncate">
-                                {
-                                  prediction.structured_formatting
-                                    .secondary_text
+                      </button>
+                    </Tooltip>
+                    <AnimatePresence>
+                      {showLocationPopup && (
+                        <motion.div
+                          initial={{ opacity: 0, y: -10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -10 }}
+                          className="absolute top-10 left-0 bg-white rounded-2xl shadow-xl p-5 w-80 z-20"
+                        >
+                          <div className="relative">
+                            <input
+                              ref={locationInputRef}
+                              type="text"
+                              value={locationQuery}
+                              onChange={handleLocationInputChange}
+                              placeholder={
+                                !isInitialized
+                                  ? "Loading location services..."
+                                  : "Search for a location..."
+                              }
+                              disabled={!isInitialized}
+                              className="w-full px-4 py-2 border rounded-full border-gray-200 focus:outline-none "
+                              onFocus={() => {
+                                if (predictions?.length > 0) {
+                                  setShowLocationPopup(true);
                                 }
+                              }}
+                            />
+                            <Search className="w-5 h-5 text-[#9194A9] absolute top-3 right-4" />
+                            {isSearchingLocation && (
+                              <div className="absolute right-4 top-1/2 transform -translate-y-1/2">
+                                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500"></div>
+                              </div>
+                            )}
+                          </div>
+                          <div className="mt-4 max-h-56 overflow-y-auto">
+                            {predictions?.map((prediction) => (
+                              <div
+                                key={prediction?.place_id}
+                                onClick={() => handleLocationSelect(prediction)}
+                                className="flex items-center gap-3 p-3 hover:bg-gray-50 cursor-pointer rounded-md transition-colors"
+                              >
+                                <MapPin className="size-5 text-[#9194A9]" />
+                                <div className="flex-1 min-w-0">
+                                  <p className="text-sm font-medium text-gray-900 truncate">
+                                    {prediction.structured_formatting.main_text}
+                                  </p>
+                                  <p className="text-xs text-gray-500 truncate">
+                                    {
+                                      prediction.structured_formatting
+                                        .secondary_text
+                                    }
+                                  </p>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                )}
+
+                {/* Itinerary Icon*/}
+                {(config.showItinerary || initialPostData) && ( // Show itinerary for user/group posts or when editing any post
+                  <Tooltip title="Add Itinerary" placement="bottom">
+                    <button
+                      onClick={() => setShowPdfModal(true)}
+                      className="cursor-pointer"
+                    >
+                      <CalendarCheck className="w-6 h-6 text-[#9194A9] hover:text-primary transition-colors" />
+                    </button>
+                  </Tooltip>
+                )}
+
+                {/* Privacy Icon */}
+                {(config.showPrivacy || initialPostData) && ( // Show privacy for user posts or when editing any post
+                  <div className="relative" ref={privacyPopupRef}>
+                    <Tooltip title="Set privacy" placement="bottom">
+                      <button
+                        onClick={() => setShowPrivacyPopup(true)}
+                        className="cursor-pointer"
+                      >
+                        <Globe
+                          className={`w-6 h-6 mt-2 ${
+                            privacy !== "public"
+                              ? "text-primary"
+                              : "text-[#9194A9]"
+                          } hover:text-primary transition-colors`}
+                        />
+                      </button>
+                    </Tooltip>
+                    <AnimatePresence>
+                      {showPrivacyPopup && (
+                        <motion.div
+                          initial={{ opacity: 0, y: -10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -10 }}
+                          className="absolute top-10 left-0 bg-white rounded-2xl shadow-xl p-5 w-80 z-20"
+                        >
+                          <div className="flex justify-between items-center mb-4">
+                            <div>
+                              <h4 className="text-lg font-semibold text-gray-800">
+                                Who can see this post
+                              </h4>
+                              <p className="text-sm text-[#9194A9]">
+                                Choose who can see this post
                               </p>
                             </div>
                           </div>
-                        ))}
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
+                          {[
+                            { value: "public", icon: Globe, label: "Public" },
+                            { value: "friends", icon: Users, label: "Friends" },
+                            { value: "private", icon: Lock, label: "Private" },
+                          ].map((option) => (
+                            <div
+                              key={option.value}
+                              onClick={() => handlePrivacySelect(option.value)}
+                              className="flex items-center gap-3 p-3 hover:bg-gray-50 cursor-pointer rounded-md transition-colors"
+                            >
+                              <option.icon className="size-5 text-[#9194A9]" />
+                              <span className="text-sm text-gray-700">
+                                {option.label}
+                              </span>
+                            </div>
+                          ))}
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                )}
               </div>
-            )}
+            </div>
+          )}
 
-            {/* Itinerary Icon*/}
-            {(config.showItinerary || initialPostData) && ( // Show itinerary for user/group posts or when editing any post
-              <Tooltip title="Add Itinerary" placement="bottom">
+          <CustomModal
+            isOpen={showPdfModal}
+            onClose={() => setShowPdfModal(false)}
+            header={
+              <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 rounded-t-xl">
+                <h2 className="text-xl font-semibold text-gray-800">
+                  Itinerary
+                </h2>
                 <button
-                  onClick={() => setShowPdfModal(true)}
-                  className="cursor-pointer"
+                  className="text-gray-600 border-gray-400 cursor-pointer size-10 bg-[#EEFDFB] rounded-full border flex justify-center items-center"
+                  onClick={() => setShowPdfModal(false)}
                 >
-                  <CalendarCheck className="w-6 h-6 text-[#9194A9] hover:text-primary transition-colors" />
+                  <IoMdClose size={18} />
                 </button>
-              </Tooltip>
-            )}
-
-            {/* Privacy Icon */}
-            {(config.showPrivacy || initialPostData) && ( // Show privacy for user posts or when editing any post
-              <div className="relative" ref={privacyPopupRef}>
-                <Tooltip title="Set privacy" placement="bottom">
-                  <button
-                    onClick={() => setShowPrivacyPopup(true)}
-                    className="cursor-pointer"
-                  >
-                    <Globe
-                      className={`w-6 h-6 mt-2 ${
-                        privacy !== "public" ? "text-primary" : "text-[#9194A9]"
-                      } hover:text-primary transition-colors`}
-                    />
-                  </button>
-                </Tooltip>
-                <AnimatePresence>
-                  {showPrivacyPopup && (
-                    <motion.div
-                      initial={{ opacity: 0, y: -10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -10 }}
-                      className="absolute top-10 left-0 bg-white rounded-2xl shadow-xl p-5 w-80 z-20"
-                    >
-                      <div className="flex justify-between items-center mb-4">
-                        <div>
-                          <h4 className="text-lg font-semibold text-gray-800">
-                            Who can see this post
-                          </h4>
-                          <p className="text-sm text-[#9194A9]">
-                            Choose who can see this post
-                          </p>
-                        </div>
-                      </div>
-                      {[
-                        { value: "public", icon: Globe, label: "Public" },
-                        { value: "friends", icon: Users, label: "Friends" },
-                        { value: "private", icon: Lock, label: "Private" },
-                      ].map((option) => (
-                        <div
-                          key={option.value}
-                          onClick={() => handlePrivacySelect(option.value)}
-                          className="flex items-center gap-3 p-3 hover:bg-gray-50 cursor-pointer rounded-md transition-colors"
-                        >
-                          <option.icon className="size-5 text-[#9194A9]" />
-                          <span className="text-sm text-gray-700">
-                            {option.label}
-                          </span>
-                        </div>
-                      ))}
-                    </motion.div>
-                  )}
-                </AnimatePresence>
               </div>
-            )}
-          </div>
-        </div>
-      )}
-
-      <CustomModal
-        isOpen={showPdfModal}
-        onClose={() => setShowPdfModal(false)}
-        header={
-          <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 rounded-t-xl">
-            <h2 className="text-xl font-semibold text-gray-800">Itinerary</h2>
-            <button
-              className="text-gray-600 border-gray-400 cursor-pointer size-10 bg-[#EEFDFB] rounded-full border flex justify-center items-center"
-              onClick={() => setShowPdfModal(false)}
-            >
-              <IoMdClose size={18} />
-            </button>
-          </div>
-        }
-        className="w-full p-2"
-      >
-        <div className="w-full bg-white rounded-xl p-5 max-w-2xl">
-          <div className="border-2 border-dashed border-gray-300 p-6 text-center">
-            <input
-              type="file"
-              accept="application/pdf"
-              ref={pdfInputRef}
-              className="hidden"
-            />
-            <BsUpload size={28} className="text-secondary mx-auto my-2" />
-            <p className="text-gray-500 mb-2">
-              Click to upload or drag and drop
-            </p>
-            <p className="text-gray-400 text-sm">(PDF, max 1mb)</p>
-            <button
-              onClick={() => pdfInputRef.current?.click()}
-              className="mt-4 text-primary underline"
-            >
-              Browse Files
-            </button>
-          </div>
-          <CustomButton
-            fullWidth
-            className="mt-6 px-5 py-3"
-            variant="default"
-            onClick={() => {
-              setShowPdfModal(false);
-              setItineraryModalOpen(true);
-            }}
+            }
+            className="w-full p-2"
           >
-            Create One
-          </CustomButton>
-          <CustomButton fullWidth className="mt-7 px-5 py-3" variant="outline">
-            Save
-          </CustomButton>
-        </div>
-      </CustomModal>
-      <CreateItineraryModal
-        visible={itineraryModalOpen}
-        onClose={() => setItineraryModalOpen(false)}
-        handleCreateItinerary={handleCreateItinerary}
-        isLoading={isLoading}
-      />
-      <ShowItineraryModal
-        visible={showItineraryModal}
-        onClose={() => setShowItineraryModal(false)}
-        itinerary={itinerary as IItinerary}
-        isEditing={true}
-        handleEdit={handleItineraryModalOpen}
-      />
-      {editItineraryModal && (
-        <EditItineraryModal
-          visible={editItineraryModal}
-          onClose={() => setEditItineraryModal(false)}
-          itineraryId={itinerary?._id || ""}
-          setItinerary={setItinerary}
-        />
+            <div className="w-full bg-white rounded-xl p-5 max-w-2xl">
+              <div className="border-2 border-dashed border-gray-300 p-6 text-center">
+                <input
+                  type="file"
+                  accept="application/pdf"
+                  ref={pdfInputRef}
+                  className="hidden"
+                />
+                <BsUpload size={28} className="text-secondary mx-auto my-2" />
+                <p className="text-gray-500 mb-2">
+                  Click to upload or drag and drop
+                </p>
+                <p className="text-gray-400 text-sm">(PDF, max 1mb)</p>
+                <button
+                  onClick={() => pdfInputRef.current?.click()}
+                  className="mt-4 text-primary underline"
+                >
+                  Browse Files
+                </button>
+              </div>
+              <CustomButton
+                fullWidth
+                className="mt-6 px-5 py-3"
+                variant="default"
+                onClick={() => {
+                  setShowPdfModal(false);
+                  setItineraryModalOpen(true);
+                }}
+              >
+                Create One
+              </CustomButton>
+              <CustomButton
+                fullWidth
+                className="mt-7 px-5 py-3"
+                variant="outline"
+              >
+                Save
+              </CustomButton>
+            </div>
+          </CustomModal>
+          <CreateItineraryModal
+            visible={itineraryModalOpen}
+            onClose={() => setItineraryModalOpen(false)}
+            handleCreateItinerary={handleCreateItinerary}
+            isLoading={isLoading}
+          />
+          <ShowItineraryModal
+            visible={showItineraryModal}
+            onClose={() => setShowItineraryModal(false)}
+            itinerary={itinerary as IItinerary}
+            isEditing={true}
+            handleEdit={handleItineraryModalOpen}
+          />
+          {editItineraryModal && (
+            <EditItineraryModal
+              visible={editItineraryModal}
+              onClose={() => setEditItineraryModal(false)}
+              itineraryId={itinerary?._id || ""}
+              setItinerary={setItinerary}
+            />
+          )}
+        </section>
       )}
-    </section>
+    </>
   );
 };
 

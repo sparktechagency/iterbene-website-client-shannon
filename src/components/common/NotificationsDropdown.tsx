@@ -40,9 +40,8 @@ const NotificationsDropdown: React.FC<DropdownProps> = ({ isOpen }) => {
         >
           <div className="flex justify-between items-center mb-2">
             <h3 className="font-semibold text-lg">Notifications</h3>
-            <button className="text-sm text-primary">Mark all as read</button>
           </div>
-          <div className="space-y-3 max-h-80 scrollbar-hide overflow-y-auto">
+          <div className="space-y-3 min-h-48 max-h-[400px] scrollbar-hide overflow-y-auto">
             {Array(6)
               .fill(null)
               .map((_, index) => (

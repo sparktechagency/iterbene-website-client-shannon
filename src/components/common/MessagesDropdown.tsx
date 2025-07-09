@@ -121,17 +121,23 @@ const MessagesDropdown: React.FC<DropdownProps> = ({ isOpen, user }) => {
           <div className="flex justify-between items-center mb-2">
             <h3 className="font-semibold text-lg">Messages</h3>
           </div>
-          <div className="space-y-3 max-h-8 scrollbar-hide overflow-y-auto">
+          <div
+            className={`flex flex-col ${
+              localNotifications?.length > 0
+                ? "justify-start"
+                : "justify-center"
+            } gap-3 min-h-48 max-h-[400px] scrollbar-hide overflow-y-auto`}
+          >
             {isNotificationsLoading ? (
               <div className="text-center text-gray-500">
                 Loading notifications...
               </div>
-            ) : localNotifications.length === 0 ? (
+            ) : localNotifications?.length === 0 ? (
               <div className="text-center text-gray-500">
                 No message notifications
               </div>
             ) : (
-              localNotifications.map(
+              localNotifications?.map(
                 (notification: INotification, index: number) => (
                   <div
                     key={notification._id?.toString() || index}
@@ -140,7 +146,7 @@ const MessagesDropdown: React.FC<DropdownProps> = ({ isOpen, user }) => {
                   >
                     {notification?.image && (
                       <Image
-                        src={notification.image}
+                        src={notification?.image}
                         width={60}
                         height={60}
                         className="size-14 rounded-full flex-shrink-0"
@@ -155,7 +161,7 @@ const MessagesDropdown: React.FC<DropdownProps> = ({ isOpen, user }) => {
                         {moment(notification?.createdAt).fromNow()}
                       </p>
                     </div>
-                    {!notification.viewStatus && (
+                    {!notification?.viewStatus && (
                       <div className="flex-shrink-0">
                         <span className="w-3 h-3 bg-primary rounded-full block"></span>
                       </div>
@@ -165,19 +171,16 @@ const MessagesDropdown: React.FC<DropdownProps> = ({ isOpen, user }) => {
               )
             )}
           </div>
-          {
-            // Show "See all notifications" button when there are more than 3 notifications
-            localNotifications.length > 4 && (
-              <div className="mt-3 border-t border-[#E2E8F0] pt-5 flex justify-center items-center">
-                <h1
-                  className="text-primary text-sm cursor-pointer"
-                  onClick={() => router.push("/messages")}
-                >
-                  View all messages
-                </h1>
-              </div>
-            )
-          }
+          {localNotifications?.length > 4 && (
+            <div className="mt-3 border-t border-[#E2E8F0] pt-5 flex justify-center items-center">
+              <h1
+                className="text-primary text-sm cursor-pointer"
+                onClick={() => router.push("/messages")}
+              >
+                View all messages
+              </h1>
+            </div>
+          )}
         </motion.div>
       )}
     </AnimatePresence>
