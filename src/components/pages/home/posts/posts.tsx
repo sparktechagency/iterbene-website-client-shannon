@@ -4,6 +4,7 @@ import { IPost } from "@/types/post.types";
 import PostCard from "./post-card";
 import { useState, useEffect, useMemo, useCallback } from "react";
 import useUser from "@/hooks/useUser";
+import PostCardSkeleton from "./PostCardSkeleton";
 
 const Posts = () => {
   const user = useUser();
@@ -14,9 +15,7 @@ const Posts = () => {
 
   const {
     data: responseData,
-    isLoading,
-    isError,
-    refetch,
+    isLoading
   } = useFeedPostsQuery(
     [
       { key: "page", value: currentPage },
@@ -113,31 +112,18 @@ const Posts = () => {
     };
   }, [loadMore, loading, hasMore]);
 
-  if (isLoading && allPosts.length === 0) {
-    return <div className="w-full text-center py-4">Loading posts...</div>;
-  }
-
-  if (isError) {
+  if (isLoading) {
     return (
-      <div className="w-full text-center py-4 text-red-500">
-        Failed to load posts. Please try again.
-        <button
-          onClick={() => refetch()}
-          className="ml-2 px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
-        >
-          Retry
-        </button>
+      <div className="w-full text-center py-4">
+        {Array.from({ length: 4 }).map((_, index) => (
+          <PostCardSkeleton key={index} />
+        ))}
       </div>
     );
   }
-
-  if (allPosts.length === 0) {
-    return <div className="w-full text-center py-4">No posts available.</div>;
-  }
-
   return (
     <div className="space-y-4">
-      {allPosts.map((post) => (
+      {allPosts?.map((post) => (
         <PostCard key={post._id} post={post} />
       ))}
 
