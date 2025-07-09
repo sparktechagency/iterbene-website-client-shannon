@@ -10,7 +10,15 @@ const mapsApi = baseApi.injectEndpoints({
       }),
       providesTags: ["Maps"],
     }),
+    addInterstedLocation: builder.mutation({
+      query: (data) => ({
+        url: "/maps/add-interested-location",
+        method: "POST",
+        body: data,
+      }),
+      invalidatesTags: ["Maps"],
+    }),
   }),
 });
 
-export const { useGetMyMapsQuery } = mapsApi;
+export const { useGetMyMapsQuery, useAddInterstedLocationMutation } = mapsApi;

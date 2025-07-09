@@ -14,7 +14,7 @@ const SearchLocationDataCard = ({
 
   const handleClick = () => {
     router.push(
-      `/search/posts-locations/location-place?locationName=${locationData?.locationName}&locationId=${locationData?.locationId}`
+      `/search/posts-locations/location-place?locationName=${locationData?.locationName}&locationId=${locationData?.locationId}&latitude=${locationData?.latitude}&longitude=${locationData?.longitude}`
     );
   };
   return (

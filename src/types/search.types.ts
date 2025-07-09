@@ -22,6 +22,8 @@ export interface ISearchVisitedLocationDatas {
   imageUrl: string;
   visitedPlacesCount: number;
   locationId: string;
+  latitude: number;
+  longitude: number;
 }
 
 export interface IVisitedPlace {
@@ -34,8 +36,8 @@ export interface IVisitedPlace {
 }
 
 export interface ISearchPost {
-  _id : string;
-  media : IMedia[];
+  _id: string;
+  media: IMedia[];
   visitedLocationName: string;
   distance: number;
   itinerary: IItinerary;

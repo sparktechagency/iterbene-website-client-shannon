@@ -258,11 +258,11 @@ const MessageItem: React.FC<MessageItemProps> = ({
               {moment(message.createdAt).format("h:mm A")}
             </span>
             {/* user friendly message for story */}
-            {isMyMessage ? (
-              <h1 className="text-sm text-gray-500">You repiled on a story</h1>
-            ) : (
-              ""
-            )}
+            <div className="text-xs text-gray-500 mb-1">
+              {isMyMessage
+                ? `You replied to ${receiverInfo?.fullName}'s journey`
+                : `${receiverInfo?.fullName} replied to your journey`}
+            </div>
             {/* Image */}
             <div>
               {message?.storyMedia?.mediaUrl ? (
@@ -274,7 +274,7 @@ const MessageItem: React.FC<MessageItemProps> = ({
                   className="w-[120px] h-[120px] object-cover rounded-lg"
                 />
               ) : (
-                "No media longer available"
+                "Journey no longer available"
               )}
 
               {/* Text */}
