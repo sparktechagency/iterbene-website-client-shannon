@@ -7,66 +7,51 @@ import {
   ZoomIn,
   ZoomOut,
   RotateCw,
-  Palette,
-  AlignCenter,
-  AlignLeft,
-  AlignRight,
-  Bold,
-  Italic,
-  Underline,
-  Settings,
+  Plus,
+  Minus
 } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { useCreateStoryMutation } from "@/redux/features/stories/storiesApi";
 import toast from "react-hot-toast";
 import { TError } from "@/types/error";
 import { useRouter } from "next/navigation";
+import SelectField from "@/components/custom/SelectField";
 
 type ViewType = "selection" | "text" | "photo";
-type TextStyleType = "Clean" | "Bold" | "Typewriter" | "Modern";
+type TextStyleType = "Clean" | "Bold" | "Typewriter" | "Modern" | "Serif" | "Cursive" | "Fantasy" | "Monospace" | "Impact" | "Comic";
 type PrivacyType = "public" | "followers" | "custom";
-type TextAlign = "left" | "center" | "right";
-
-interface TextLayer {
-  id: string;
-  text: string;
-  x: number;
-  y: number;
-  color: string;
-  backgroundColor: string;
-  fontSize: number;
-  fontFamily: string;
-  textAlign: TextAlign;
-  isBold: boolean;
-  isItalic: boolean;
-  isUnderline: boolean;
-  hasBackground: boolean;
-}
 
 const CreateStories: React.FC = () => {
   const [currentView, setCurrentView] = useState<ViewType>("selection");
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [textContent, setTextContent] = useState<string>("");
+  const [imageText, setImageText] = useState<string>("");
+  const [textPosition, setTextPosition] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
   const [selectedBackground, setSelectedBackground] = useState<string>("#3B82F6");
   const [textStyle, setTextStyle] = useState<TextStyleType>("Clean");
   const [privacy, setPrivacy] = useState<PrivacyType>("public");
   const [scale, setScale] = useState<number>(1);
   const [rotate, setRotate] = useState<number>(0);
-  const [textLayers, setTextLayers] = useState<TextLayer[]>([]);
-  const [selectedTextLayer, setSelectedTextLayer] = useState<string | null>(null);
-  const [showTextColorPalette, setShowTextColorPalette] = useState<boolean>(false);
-  const [showTextBackgroundPalette, setShowTextBackgroundPalette] = useState<boolean>(false);
-  const [showSettings, setShowSettings] = useState<boolean>(false);
-  const [isDragging, setIsDragging] = useState<boolean>(false);
-  const [dragOffset, setDragOffset] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
+  
+  // New states for enhanced text features
+  const [textFontSize, setTextFontSize] = useState<number>(24);
+  const [textBackgroundColor, setTextBackgroundColor] = useState<string>("transparent");
+  const [textColor, setTextColor] = useState<string>("#FFFFFF");
+  const [textConstraints, setTextConstraints] = useState<{
+    left: number;
+    right: number;
+    top: number;
+    bottom: number;
+  }>({ left: 0, right: 0, top: 0, bottom: 0 });
 
   const router = useRouter();
+
   const fileInputRef = useRef<HTMLInputElement>(null);
   const imgRef = useRef<HTMLImageElement>(null);
-  const textInputRef = useRef<HTMLTextAreaElement>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
   const settingsRef = useRef<HTMLDivElement>(null);
+  const textRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   const [createStory, { isLoading }] = useCreateStoryMutation();
 
@@ -77,107 +62,25 @@ const CreateStories: React.FC = () => {
   ];
 
   const textColors: string[] = [
-    "#FFFFFF", "#000000", "#FF0000", "#00FF00", "#0000FF", "#FFFF00",
-    "#FF00FF", "#00FFFF", "#FFA500", "#800080", "#FFC0CB", "#A52A2A",
-    "#808080", "#FFD700", "#90EE90", "#FF69B4", "#87CEEB", "#DDA0DD",
-    "#F0E68C", "#98FB98", "#F5DEB3", "#C0C0C0", "#8FBC8F", "#D2691E",
+    "#FFFFFF", "#000000", "#3B82F6", "#EC4899", "#F97316", "#EF4444",
+    "#8B5CF6", "#10B981", "#F59E0B", "#F472B6", "#7C3AED", "#BE185D",
   ];
 
-  const textStyles: TextStyleType[] = ["Clean", "Bold", "Typewriter", "Modern"];
-  const privacyOptions: PrivacyType[] = ["public", "followers", "custom"];
+  const textBackgroundColors: string[] = [
+    "transparent", "#000000", "#FFFFFF", "#3B82F6", "#EC4899", "#F97316",
+    "#EF4444", "#8B5CF6", "#10B981", "#F59E0B", "#F472B6", "#7C3AED",
+  ];
 
-  // Add new text layer
-  const addTextLayer = () => {
-    const newLayer: TextLayer = {
-      id: Date.now().toString(),
-      text: "",
-      x: 0,
-      y: 0,
-      color: "#FFFFFF",
-      backgroundColor: "transparent",
-      fontSize: 24,
-      fontFamily: getFontFamily(textStyle),
-      textAlign: "center",
-      isBold: false,
-      isItalic: false,
-      isUnderline: false,
-      hasBackground: false,
-    };
-    setTextLayers([...textLayers, newLayer]);
-    setSelectedTextLayer(newLayer.id);
-    setTimeout(() => textInputRef.current?.focus(), 100);
-  };
+  const textStyles: TextStyleType[] = ["Clean", "Bold", "Typewriter", "Modern", "Serif", "Cursive", "Fantasy", "Monospace", "Impact", "Comic"];
 
-  // Update selected text layer
-  const updateTextLayer = (updates: Partial<TextLayer>) => {
-    if (!selectedTextLayer) return;
-    setTextLayers((layers) =>
-      layers.map((layer) =>
-        layer.id === selectedTextLayer ? { ...layer, ...updates } : layer
-      )
-    );
-  };
-
-  // Delete text layer
-  const deleteTextLayer = (layerId: string) => {
-    setTextLayers((layers) => layers.filter((layer) => layer.id !== layerId));
-    if (selectedTextLayer === layerId) {
-      setSelectedTextLayer(null);
-    }
-  };
-
-  // Handle text drag
-  const handleMouseDown = (e: React.MouseEvent, layerId: string) => {
-    e.preventDefault();
-    setSelectedTextLayer(layerId);
-    setIsDragging(true);
-    const layer = textLayers.find((l) => l.id === layerId);
-    if (layer && containerRef.current) {
-      const rect = containerRef.current.getBoundingClientRect();
-      setDragOffset({
-        x: e.clientX - rect.left - layer.x,
-        y: e.clientY - rect.top - layer.y,
-      });
-    }
-  };
-
-  const handleMouseMove = useCallback(
-    (e: MouseEvent) => {
-      if (!isDragging || !selectedTextLayer || !containerRef.current) return;
-      const container = containerRef.current;
-      const rect = container.getBoundingClientRect();
-      const newX = e.clientX - rect.left - dragOffset.x;
-      const newY = e.clientY - rect.top - dragOffset.y;
-      updateTextLayer({ x: newX, y: newY });
-    },
-    [isDragging, selectedTextLayer, dragOffset]
-  );
-
-  const handleMouseUp = useCallback(() => {
-    setIsDragging(false);
-  }, []);
-
+  // Handle click outside settings
   useEffect(() => {
-    if (isDragging) {
-      document.addEventListener("mousemove", handleMouseMove);
-      document.addEventListener("mouseup", handleMouseUp);
-      return () => {
-        document.removeEventListener("mousemove", handleMouseMove);
-        document.removeEventListener("mouseup", handleMouseUp);
-      };
-    }
-  }, [isDragging, handleMouseMove, handleMouseUp]);
-
-  // Handle click outside for settings and text layer deselection
-  useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      if (settingsRef.current && !settingsRef.current.contains(e.target as Node)) {
-        setShowSettings(false);
-      }
-      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
-        setSelectedTextLayer(null);
-        setShowTextColorPalette(false);
-        setShowTextBackgroundPalette(false);
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        settingsRef.current &&
+        !settingsRef.current.contains(event.target as Node)
+      ) {
+        // setShowSettings(false);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
@@ -193,16 +96,34 @@ const CreateStories: React.FC = () => {
         return Math.max(0.5, Math.min(newScale, 3));
       });
     };
+
     const container = imgRef.current?.parentElement;
     if (container) {
       container.addEventListener("wheel", handleWheel, { passive: false });
     }
+
     return () => {
       if (container) {
         container.removeEventListener("wheel", handleWheel);
       }
     };
   }, []);
+
+  // Calculate text constraints based on container size
+  useEffect(() => {
+    if (containerRef.current && imageText) {
+      const containerRect = containerRef.current.getBoundingClientRect();
+      const textWidth = imageText.length * (textFontSize * 0.6); // Approximate text width
+      const textHeight = textFontSize + 20; // Text height with padding
+      
+      setTextConstraints({
+        left: -(containerRect.width / 2) + (textWidth / 2),
+        right: (containerRect.width / 2) - (textWidth / 2),
+        top: -(containerRect.height / 2) + (textHeight / 2),
+        bottom: (containerRect.height / 2) - (textHeight / 2),
+      });
+    }
+  }, [imageText, textFontSize, containerRef.current]);
 
   const handleImageSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -215,8 +136,10 @@ const CreateStories: React.FC = () => {
           setCurrentView("photo");
           setScale(1);
           setRotate(0);
-          setTextLayers([]);
-          setSelectedTextLayer(null);
+          setTextPosition({ x: 0, y: 0 });
+          setTextFontSize(24);
+          setTextBackgroundColor("transparent");
+          setTextColor("#FFFFFF");
         }
       };
       reader.readAsDataURL(file);
@@ -232,15 +155,25 @@ const CreateStories: React.FC = () => {
     setSelectedImage(null);
     setPreviewUrl(null);
     setTextContent("");
+    setImageText("");
+    setTextPosition({ x: 0, y: 0 });
     setSelectedBackground("#3B82F6");
     setPrivacy("public");
     setScale(1);
     setRotate(0);
-    setTextLayers([]);
-    setSelectedTextLayer(null);
-    setShowTextColorPalette(false);
-    setShowTextBackgroundPalette(false);
-    setShowSettings(false);
+    setTextFontSize(24);
+    setTextBackgroundColor("transparent");
+    setTextColor("#FFFFFF");
+    setTextConstraints({ left: 0, right: 0, top: 0, bottom: 0 });
+  };
+
+
+  const increaseFontSize = () => {
+    setTextFontSize(prev => Math.min(prev + 2, 48));
+  };
+
+  const decreaseFontSize = () => {
+    setTextFontSize(prev => Math.max(prev - 2, 12));
   };
 
   const getProcessedImage = useCallback(
@@ -248,7 +181,12 @@ const CreateStories: React.FC = () => {
       image: HTMLImageElement,
       scale: number,
       rotate: number,
-      textLayers: TextLayer[]
+      overlayText: string,
+      fontFamily: string,
+      textPos: { x: number; y: number },
+      fontSize: number,
+      textBgColor: string,
+      textFgColor: string
     ): Promise<File> => {
       const canvas = document.createElement("canvas");
       const ctx = canvas.getContext("2d");
@@ -271,54 +209,46 @@ const CreateStories: React.FC = () => {
       ctx.translate(-image.naturalWidth / 2, -image.naturalHeight / 2);
       ctx.drawImage(image, 0, 0);
 
-      textLayers.forEach((layer) => {
-        if (layer.text) {
-          ctx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
-          const fontSize = layer.fontSize * pixelRatio;
-          let fontStyle = `${fontSize}px ${layer.fontFamily}`;
-          if (layer.isBold) fontStyle = `bold ${fontStyle}`;
-          if (layer.isItalic) fontStyle = `italic ${fontStyle}`;
-          ctx.font = fontStyle;
-          ctx.textAlign = layer.textAlign;
-          ctx.textBaseline = "middle";
-
-          const x = (canvas.width / 2 + layer.x * pixelRatio);
-          const y = (canvas.height / 2 + layer.y * pixelRatio);
-
-          if (layer.hasBackground && layer.backgroundColor !== "transparent") {
-            const textMetrics = ctx.measureText(layer.text);
-            const textWidth = textMetrics.width;
-            const textHeight = fontSize;
-            ctx.fillStyle = layer.backgroundColor;
-            ctx.fillRect(
-              x - (layer.textAlign === "center" ? textWidth / 2 : layer.textAlign === "left" ? 0 : textWidth) - 10,
-              y - textHeight / 2 - 5,
-              textWidth + 20,
-              textHeight + 10
-            );
-          }
-
-          ctx.fillStyle = layer.color;
-          ctx.fillText(layer.text, x, y);
-
-          if (layer.isUnderline) {
-            const textMetrics = ctx.measureText(layer.text);
-            ctx.strokeStyle = layer.color;
-            ctx.lineWidth = 2;
-            ctx.beginPath();
-            const underlineXStart = x - (layer.textAlign === "center" ? textMetrics.width / 2 : layer.textAlign === "left" ? 0 : textMetrics.width);
-            ctx.moveTo(underlineXStart, y + fontSize / 3);
-            ctx.lineTo(underlineXStart + textMetrics.width, y + fontSize / 3);
-            ctx.stroke();
-          }
+      // Draw text overlay with background and styling
+      if (overlayText) {
+        ctx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
+        ctx.font = `${fontSize * pixelRatio}px ${fontFamily}`;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        
+        const textX = canvas.width / 2 + textPos.x * pixelRatio;
+        const textY = canvas.height / 2 + textPos.y * pixelRatio;
+        
+        // Draw text background if not transparent
+        if (textBgColor !== "transparent") {
+          const textMetrics = ctx.measureText(overlayText);
+          const textWidth = textMetrics.width;
+          const textHeight = fontSize * pixelRatio;
+          
+          ctx.fillStyle = textBgColor;
+          ctx.fillRect(
+            textX - textWidth / 2 - 10,
+            textY - textHeight / 2 - 5,
+            textWidth + 20,
+            textHeight + 10
+          );
         }
-      });
+        
+        // Draw text
+        ctx.fillStyle = textFgColor;
+        ctx.fillText(overlayText, textX, textY);
+      }
 
       return new Promise((resolve, reject) => {
         canvas.toBlob(
           (blob) => {
-            if (!blob) reject(new Error("Failed to create blob"));
-            else resolve(new File([blob], "processed-image.jpg", { type: "image/jpeg" }));
+            if (!blob) {
+              reject(new Error("Failed to create blob"));
+              return;
+            }
+            resolve(
+              new File([blob], "processed-image.jpg", { type: "image/jpeg" })
+            );
           },
           "image/jpeg",
           0.8
@@ -330,10 +260,22 @@ const CreateStories: React.FC = () => {
 
   const handleShareStory = async (): Promise<void> => {
     const formData = new FormData();
+
     if (currentView === "photo" && selectedImage && imgRef.current) {
       try {
-        const processedImage = await getProcessedImage(imgRef.current, scale, rotate, textLayers);
+        const processedImage = await getProcessedImage(
+          imgRef.current,
+          scale,
+          rotate,
+          imageText,
+          getFontFamily(textStyle),
+          textPosition,
+          textFontSize,
+          textBackgroundColor,
+          textColor
+        );
         formData.append("storyFiles", processedImage);
+        if (imageText) formData.append("textContent", imageText);
         formData.append("privacy", privacy);
       } catch (err) {
         console.error("Failed to process image:", err);
@@ -367,24 +309,27 @@ const CreateStories: React.FC = () => {
 
   const getFontFamily = (style: TextStyleType): string => {
     switch (style) {
-      case "Bold": return "Arial Black";
-      case "Typewriter": return "Courier New";
-      case "Modern": return "Helvetica";
-      default: return "Arial";
+      case "Bold":
+        return "Arial Black, sans-serif";
+      case "Typewriter":
+        return "Courier New, monospace";
+      case "Modern":
+        return "Helvetica, Arial, sans-serif";
+      case "Serif":
+        return "Georgia, Times New Roman, serif";
+      case "Cursive":
+        return "Brush Script MT, cursive";
+      case "Fantasy":
+        return "Papyrus, fantasy";
+      case "Monospace":
+        return "Monaco, Consolas, monospace";
+      case "Impact":
+        return "Impact, Arial Black, sans-serif";
+      case "Comic":
+        return "Comic Sans MS, cursive";
+      default:
+        return "Arial, sans-serif";
     }
-  };
-
-  const getSelectedLayer = () => textLayers.find((layer) => layer.id === selectedTextLayer);
-
-  const settingsVariants = {
-    hidden: { opacity: 0, scale: 0.8, y: -10 },
-    visible: {
-      opacity: 1,
-      scale: 1,
-      y: 0,
-      transition: { type: "spring", stiffness: 300, damping: 20 },
-    },
-    exit: { opacity: 0, scale: 0.8, y: -10, transition: { duration: 0.2 } },
   };
 
   // Selection View
@@ -398,7 +343,6 @@ const CreateStories: React.FC = () => {
               onClick={handlePhotoStoryClick}
               className="relative h-80 rounded-3xl cursor-pointer"
               style={{ background: "linear-gradient(135deg, #10B981 0%, #3B82F6 100%)" }}
-              whileHover={{ scale: 1.05 }}
             >
               <div className="absolute inset-0 flex flex-col items-center justify-center">
                 <div className="w-16 h-16 bg-white bg-opacity-20 rounded-full flex items-center justify-center mb-4">
@@ -411,7 +355,6 @@ const CreateStories: React.FC = () => {
               onClick={() => setCurrentView("text")}
               className="relative h-80 rounded-3xl cursor-pointer"
               style={{ background: "linear-gradient(135deg, #EC4899 0%, #8B5CF6 100%)" }}
-              whileHover={{ scale: 1.05 }}
             >
               <div className="absolute inset-0 flex flex-col items-center justify-center">
                 <div className="w-16 h-16 bg-white bg-opacity-20 rounded-full flex items-center justify-center mb-4">
@@ -436,7 +379,7 @@ const CreateStories: React.FC = () => {
   // Text Story Editor
   if (currentView === "text") {
     return (
-      <section className="w-full bg-gray-50 rounded-2xl">
+      <section className="w-full bg-gray-50 text-white rounded-2xl">
         <div className="flex flex-row-reverse">
           <div className="w-80 rounded-r-2xl p-6 text-gray-800 border-l flex flex-col border-gray-200">
             <div className="flex items-center mb-8">
@@ -444,58 +387,15 @@ const CreateStories: React.FC = () => {
                 <ArrowLeft size={24} />
               </button>
               <h2 className="text-xl font-bold">Your story</h2>
-              <div className="relative ml-auto" ref={settingsRef}>
-                <motion.button
-                  onClick={() => setShowSettings(!showSettings)}
-                  whileHover={{ rotate: 90 }}
-                  transition={{ duration: 0.2 }}
-                  className="cursor-pointer"
-                >
-                  <Settings size={20} />
-                </motion.button>
-                <AnimatePresence>
-                  {showSettings && (
-                    <motion.div
-                      className="absolute right-0 mt-2 w-40 bg-white rounded-lg shadow-lg z-10 overflow-hidden"
-                      variants={settingsVariants}
-                      initial="hidden"
-                      animate="visible"
-                      exit="exit"
-                    >
-                      {privacyOptions.map((option) => (
-                        <motion.button
-                          key={option}
-                          className={`w-full text-left px-4 py-2.5 text-sm cursor-pointer ${
-                            privacy === option ? "bg-gray-300" : "hover:bg-gray-100"
-                          }`}
-                          onClick={() => {
-                            setPrivacy(option);
-                            setShowSettings(false);
-                          }}
-                          initial={{ opacity: 0, x: -10 }}
-                          animate={{ opacity: 1, x: 0 }}
-                        >
-                          {option.charAt(0).toUpperCase() + option.slice(1)}
-                        </motion.button>
-                      ))}
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
             </div>
             <div className="mb-6">
-              <label className="text-sm font-medium mb-3 block">Font Style</label>
-              <select
+              <SelectField
+                name="textStyle"
+                placeholder="Select text style"
                 value={textStyle}
                 onChange={(e) => setTextStyle(e.target.value as TextStyleType)}
-                className="w-full bg-white border border-gray-300 p-3 cursor-pointer focus:outline-none rounded-lg"
-              >
-                {textStyles.map((style) => (
-                  <option key={style} value={style}>
-                    {style}
-                  </option>
-                ))}
-              </select>
+                items={textStyles.map((style) => ({ value: style, label: style }))}
+              />
             </div>
             <div className="mb-6">
               <h3 className="text-sm font-medium mb-3">Backgrounds</h3>
@@ -523,7 +423,7 @@ const CreateStories: React.FC = () => {
               </button>
               <motion.button
                 onClick={handleShareStory}
-                className="px-6 py-2 bg-blue-500 text-white rounded-lg cursor-pointer"
+                className="px-6 py-2 bg-primary rounded-lg text-white cursor-pointer"
                 disabled={isLoading}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
@@ -562,55 +462,18 @@ const CreateStories: React.FC = () => {
 
   // Photo Story Editor
   if (currentView === "photo") {
-    const selectedLayer = getSelectedLayer();
     return (
-      <section className="w-full bg-gray-50 rounded-2xl">
+      <section className="w-full bg-gray-50 text-white rounded-2xl">
         <div className="flex flex-row-reverse">
-          <div className="w-80 rounded-r-2xl p-6 text-gray-800 border-l flex flex-col border-gray-200 max-h-[600px] overflow-y-auto">
-            <div className="flex items-center mb-8">
+          <div className="w-80 rounded-r-2xl p-6 text-gray-800 border-l flex flex-col border-gray-200 max-h-screen overflow-y-auto">
+            <div className="flex items-center mb-6">
               <button onClick={resetToSelection} className="mr-4 cursor-pointer">
                 <ArrowLeft size={24} />
               </button>
               <h2 className="text-xl font-bold">Your story</h2>
-              <div className="relative ml-auto" ref={settingsRef}>
-                <motion.button
-                  onClick={() => setShowSettings(!showSettings)}
-                  whileHover={{ rotate: 90 }}
-                  transition={{ duration: 0.2 }}
-                  className="cursor-pointer"
-                >
-                  <Settings size={20} />
-                </motion.button>
-                <AnimatePresence>
-                  {showSettings && (
-                    <motion.div
-                      className="absolute right-0 mt-2 w-40 bg-white rounded-lg shadow-lg z-10 overflow-hidden"
-                      variants={settingsVariants}
-                      initial="hidden"
-                      animate="visible"
-                      exit="exit"
-                    >
-                      {privacyOptions.map((option) => (
-                        <motion.button
-                          key={option}
-                          className={`w-full text-left px-4 py-2.5 text-sm cursor-pointer ${
-                            privacy === option ? "bg-gray-300" : "hover:bg-gray-100"
-                          }`}
-                          onClick={() => {
-                            setPrivacy(option);
-                            setShowSettings(false);
-                          }}
-                          initial={{ opacity: 0, x: -10 }}
-                          animate={{ opacity: 1, x: 0 }}
-                        >
-                          {option.charAt(0).toUpperCase() + option.slice(1)}
-                        </motion.button>
-                      ))}
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
             </div>
+
+            {/* Image Controls */}
             <div className="mb-6">
               <h3 className="text-sm font-medium mb-3">Adjust Image</h3>
               <div className="flex gap-2 mb-3">
@@ -644,181 +507,101 @@ const CreateStories: React.FC = () => {
               </div>
               <label className="text-sm font-medium">Zoom: {scale.toFixed(1)}x</label>
             </div>
+
+            {/* Text Input */}
             <div className="mb-6">
-              <button
-                onClick={addTextLayer}
-                className="w-full p-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
-              >
-                Add Text
-              </button>
+              <h3 className="text-sm font-medium mb-3">Add Text</h3>
+              <textarea
+                value={imageText}
+                onChange={(e) => setImageText(e.target.value)}
+                placeholder="Add text to image"
+                className="w-full bg-white border outline-none border-gray-300 p-3 rounded-lg resize-none"
+                rows={3}
+              />
             </div>
-            {selectedLayer && (
-              <div className="mb-6">
-                <h3 className="text-sm font-medium mb-3">Edit Text</h3>
-                <textarea
-                  ref={textInputRef}
-                  value={selectedLayer.text}
-                  onChange={(e) => updateTextLayer({ text: e.target.value })}
-                  placeholder="Enter your text"
-                  className="w-full bg-white border border-gray-300 p-3 rounded-lg resize-none mb-3"
-                  rows={3}
-                />
-                <div className="space-y-3">
-                  <div>
-                    <label className="text-xs font-medium block mb-1">Font Size</label>
-                    <input
-                      type="range"
-                      min="12"
-                      max="48"
-                      value={selectedLayer.fontSize}
-                      onChange={(e) => updateTextLayer({ fontSize: parseInt(e.target.value) })}
-                      className="w-full"
-                    />
-                    <span className="text-xs text-gray-500">{selectedLayer.fontSize}px</span>
-                  </div>
-                  <div>
-                    <label className="text-xs font-medium block mb-1">Font Style</label>
-                    <select
-                      value={selectedLayer.fontFamily}
-                      onChange={(e) => updateTextLayer({ fontFamily: e.target.value })}
-                      className="w-full bg-white border border-gray-300 p-2 rounded text-sm"
-                    >
-                      <option value="Arial">Arial</option>
-                      <option value="Arial Black">Arial Black</option>
-                      <option value="Courier New">Courier New</option>
-                      <option value="Helvetica">Helvetica</option>
-                      <option value="Georgia">Georgia</option>
-                      <option value="Times New Roman">Times New Roman</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="text-xs font-medium block mb-1">Text Alignment</label>
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => updateTextLayer({ textAlign: "left" })}
-                        className={`p-2 rounded ${selectedLayer.textAlign === "left" ? "bg-blue-500 text-white" : "bg-gray-200"}`}
-                      >
-                        <AlignLeft size={16} />
-                      </button>
-                      <button
-                        onClick={() => updateTextLayer({ textAlign: "center" })}
-                        className={`p-2 rounded ${selectedLayer.textAlign === "center" ? "bg-blue-500 text-white" : "bg-gray-200"}`}
-                      >
-                        <AlignCenter size={16} />
-                      </button>
-                      <button
-                        onClick={() => updateTextLayer({ textAlign: "right" })}
-                        className={`p-2 rounded ${selectedLayer.textAlign === "right" ? "bg-blue-500 text-white" : "bg-gray-200"}`}
-                      >
-                        <AlignRight size={16} />
-                      </button>
-                    </div>
-                  </div>
-                  <div>
-                    <label className="text-xs font-medium block mb-1">Text Style</label>
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => updateTextLayer({ isBold: !selectedLayer.isBold })}
-                        className={`p-2 rounded ${selectedLayer.isBold ? "bg-blue-500 text-white" : "bg-gray-200"}`}
-                      >
-                        <Bold size={16} />
-                      </button>
-                      <button
-                        onClick={() => updateTextLayer({ isItalic: !selectedLayer.isItalic })}
-                        className={`p-2 rounded ${selectedLayer.isItalic ? "bg-blue-500 text-white" : "bg-gray-200"}`}
-                      >
-                        <Italic size={16} />
-                      </button>
-                      <button
-                        onClick={() => updateTextLayer({ isUnderline: !selectedLayer.isUnderline })}
-                        className={`p-2 rounded ${selectedLayer.isUnderline ? "bg-blue-500 text-white" : "bg-gray-200"}`}
-                      >
-                        <Underline size={16} />
-                      </button>
-                    </div>
-                  </div>
-                  <div>
-                    <label className="text-xs font-medium block mb-1">Text Color</label>
-                    <div className="flex items-center gap-2">
-                      <button
-                        onClick={() => setShowTextColorPalette(!showTextColorPalette)}
-                        className="p-2 bg-gray-200 rounded"
-                      >
-                        <Palette size={16} />
-                      </button>
-                      <div
-                        className="w-8 h-8 rounded border-2 border-gray-300"
-                        style={{ backgroundColor: selectedLayer.color }}
-                      />
-                    </div>
-                    {showTextColorPalette && (
-                      <div className="grid grid-cols-6 gap-1 mt-2 p-2 bg-white border rounded">
-                        {textColors.map((color, index) => (
-                          <button
-                            key={index}
-                            className="w-6 h-6 rounded border"
-                            style={{ backgroundColor: color }}
-                            onClick={() => {
-                              updateTextLayer({ color });
-                              setShowTextColorPalette(false);
-                            }}
-                          />
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                  <div>
-                    <label className="text-xs font-medium block mb-1">Text Background</label>
-                    <div className="flex items-center gap-2 mb-2">
-                      <input
-                        type="checkbox"
-                        checked={selectedLayer.hasBackground}
-                        onChange={(e) => updateTextLayer({ hasBackground: e.target.checked })}
-                        className="rounded"
-                      />
-                      <span className="text-xs">Enable background</span>
-                    </div>
-                    {selectedLayer.hasBackground && (
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <button
-                            onClick={() => setShowTextBackgroundPalette(!showTextBackgroundPalette)}
-                            className="p-2 bg-gray-200 rounded"
-                          >
-                            <Palette size={16} />
-                          </button>
-                          <div
-                            className="w-8 h-8 rounded border-2 border-gray-300"
-                            style={{ backgroundColor: selectedLayer.backgroundColor }}
-                          />
-                        </div>
-                        {showTextBackgroundPalette && (
-                          <div className="grid grid-cols-6 gap-1 mt-2 p-2 bg-white border rounded">
-                            {textColors.map((color, index) => (
-                              <button
-                                key={index}
-                                className="w-6 h-6 rounded border"
-                                style={{ backgroundColor: color }}
-                                onClick={() => {
-                                  updateTextLayer({ backgroundColor: color });
-                                  setShowTextBackgroundPalette(false);
-                                }}
-                              />
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                  <button
-                    onClick={() => deleteTextLayer(selectedLayer.id)}
-                    className="w-full p-2 bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
-                  >
-                    Delete Text
-                  </button>
-                </div>
+
+            {/* Font Style */}
+            <div className="mb-6">
+              <SelectField
+                name="textStyle"
+                placeholder="Select text style"
+                value={textStyle}
+                onChange={(e) => setTextStyle(e.target.value as TextStyleType)}
+                items={textStyles.map((style) => ({ value: style, label: style }))}
+              />
+            </div>
+
+            {/* Font Size Controls */}
+            <div className="mb-6">
+              <h3 className="text-sm font-medium mb-3">Font Size</h3>
+              <div className="flex items-center gap-3">
+                <motion.button
+                  onClick={decreaseFontSize}
+                  className="p-2 bg-gray-300 rounded-lg cursor-pointer"
+                  title="Decrease Font Size"
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                >
+                  <Minus size={16} />
+                </motion.button>
+                <span className="text-sm font-medium min-w-12 text-center">{textFontSize}px</span>
+                <motion.button
+                  onClick={increaseFontSize}
+                  className="p-2 bg-gray-300 rounded-lg cursor-pointer"
+                  title="Increase Font Size"
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                >
+                  <Plus size={16} />
+                </motion.button>
               </div>
-            )}
+            </div>
+
+            {/* Text Color */}
+            <div className="mb-6">
+              <h3 className="text-sm font-medium mb-3">Text Color</h3>
+              <div className="grid grid-cols-6 gap-2">
+                {textColors.map((color, index) => (
+                  <motion.button
+                    key={index}
+                    className={`w-8 h-8 rounded-full cursor-pointer border-2 ${
+                      textColor === color ? "border-gray-800" : "border-transparent"
+                    }`}
+                    style={{ backgroundColor: color }}
+                    onClick={() => setTextColor(color)}
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                  />
+                ))}
+              </div>
+            </div>
+
+            {/* Text Background Color */}
+            <div className="mb-6">
+              <h3 className="text-sm font-medium mb-3">Text Background</h3>
+              <div className="grid grid-cols-6 gap-2">
+                {textBackgroundColors.map((color, index) => (
+                  <motion.button
+                    key={index}
+                    className={`w-8 h-8 rounded-full cursor-pointer border-2 ${
+                      textBackgroundColor === color ? "border-gray-800" : "border-transparent"
+                    } ${color === "transparent" ? "bg-gradient-to-br from-red-500 to-transparent" : ""}`}
+                    style={{ backgroundColor: color === "transparent" ? "transparent" : color }}
+                    onClick={() => setTextBackgroundColor(color)}
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                  >
+                    {color === "transparent" && (
+                      <div className="w-full h-full rounded-full border border-gray-400" style={{
+                        background: "linear-gradient(45deg, transparent 45%, #ff0000 45%, #ff0000 55%, transparent 55%)"
+                      }} />
+                    )}
+                  </motion.button>
+                ))}
+              </div>
+            </div>
+
+            {/* Action Buttons */}
             <div className="flex justify-between mt-auto">
               <button
                 onClick={resetToSelection}
@@ -828,7 +611,7 @@ const CreateStories: React.FC = () => {
               </button>
               <motion.button
                 onClick={handleShareStory}
-                className="px-6 py-2 bg-blue-500 text-white rounded-lg cursor-pointer"
+                className="px-6 py-2 bg-primary rounded-lg text-white cursor-pointer"
                 disabled={isLoading}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
@@ -837,12 +620,11 @@ const CreateStories: React.FC = () => {
               </motion.button>
             </div>
           </div>
+
+          {/* Image Preview */}
           <div className="flex-1 flex items-center justify-center p-8">
             <div className="relative">
-              <div
-                ref={containerRef}
-                className="w-96 h-[550px] rounded-3xl overflow-hidden relative bg-gray-200"
-              >
+              <div ref={containerRef} className="w-96 h-[550px] rounded-3xl overflow-hidden relative bg-gray-200">
                 {previewUrl && (
                   <div style={{ position: "relative", width: "100%", height: "550px" }}>
                     <img
@@ -856,43 +638,55 @@ const CreateStories: React.FC = () => {
                         transform: `scale(${scale}) rotate(${rotate}deg)`,
                       }}
                     />
-                    {textLayers.map((layer) => (
-                      <div
-                        key={layer.id}
-                        onMouseDown={(e) => handleMouseDown(e, layer.id)}
+                    {imageText && (
+                      <motion.div
+                        ref={textRef}
+                        drag
+                        dragMomentum={false}
+                        dragConstraints={textConstraints}
+                        dragElastic={0.1}
+                        onDrag={(event, info) => {
+                          setTextPosition({ x: info.point.x, y: info.point.y });
+                        }}
                         style={{
                           position: "absolute",
-                          left: `calc(50% + ${layer.x}px)`,
-                          top: `calc(50% + ${layer.y}px)`,
-                          transform: "translate(-50%, -50%)",
-                          color: layer.color,
-                          fontSize: `${layer.fontSize}px`,
-                          fontFamily: layer.fontFamily,
-                          textAlign: layer.textAlign,
-                          fontWeight: layer.isBold ? "bold" : "normal",
-                          fontStyle: layer.isItalic ? "italic" : "normal",
-                          textDecoration: layer.isUnderline ? "underline" : "none",
-                          backgroundColor: layer.hasBackground ? layer.backgroundColor : "transparent",
-                          padding: layer.hasBackground ? "8px 12px" : "0",
-                          borderRadius: layer.hasBackground ? "8px" : "0",
-                          cursor: selectedTextLayer === layer.id ? "move" : "pointer",
+                          top: "50%",
+                          left: "50%",
+                          x: textPosition.x,
+                          y: textPosition.y,
+                          color: textColor,
+                          fontSize: `${textFontSize}px`,
+                          fontFamily: getFontFamily(textStyle),
+                          textAlign: "center",
+                          textShadow: "0 0 5px rgba(0,0,0,0.5)",
+                          backgroundColor: textBackgroundColor,
+                          padding: textBackgroundColor !== "transparent" ? "8px 12px" : "0",
+                          borderRadius: textBackgroundColor !== "transparent" ? "4px" : "0",
+                          maxWidth: "80%",
+                          cursor: "grab",
                           userSelect: "none",
-                          textShadow: "0 0 4px rgba(0,0,0,0.5)",
-                          whiteSpace: "pre-wrap",
                           wordWrap: "break-word",
-                          maxWidth: "300px",
-                          minWidth: "100px",
-                          border: selectedTextLayer === layer.id ? "2px dashed #3B82F6" : "none",
-                          boxSizing: "border-box",
-                          zIndex: selectedTextLayer === layer.id ? 10 : 1,
                         }}
+                        whileDrag={{ 
+                          cursor: "grabbing",
+                          scale: 1.05,
+                          zIndex: 10
+                        }}
+                        initial={{ scale: 1 }}
+                        animate={{ scale: 1 }}
+                        transition={{ type: "spring", stiffness: 300, damping: 30 }}
                       >
-                        {layer.text || "Tap to type"}
-                      </div>
-                    ))}
+                        {imageText}
+                      </motion.div>
+                    )}
                   </div>
                 )}
               </div>
+              {imageText && (
+                <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-50 text-white px-3 py-1 rounded-full text-sm">
+                  Drag text to reposition
+                </div>
+              )}
             </div>
           </div>
         </div>

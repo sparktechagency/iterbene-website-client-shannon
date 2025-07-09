@@ -57,7 +57,7 @@ const UserIteItinerary = () => {
   };
   const renderLoading = () => (
     <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-      {Array.from({ length: 8 }).map((_, index) => (
+      {Array?.from({ length: 8 }).map((_, index) => (
         <UserTimelineSkeletonCard key={`skeleton-${index}`} />
       ))}
     </div>
@@ -71,7 +71,7 @@ const UserIteItinerary = () => {
       hasMore={userItineraryData?.length + (currentPage - 1) * 9 < totalResults}
       renderItem={(post: IPost) => (
         <UserIteItineraryCard
-          key={post._id}
+          key={post?._id}
           post={post}
           onRemove={() => handleRemovePost(post._id)}
         />

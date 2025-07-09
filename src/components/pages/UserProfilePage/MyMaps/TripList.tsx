@@ -1,9 +1,9 @@
 "use client";
 import { useGetVisitedPostsWithDistanceQuery } from "@/redux/features/post/postApi";
 import TripCard from "./TripCard";
-import ITrip from "@/types/trip.types";
 import { useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ISearchPost } from "@/types/search.types";
 
 const TripList = ({
   mapHide,
@@ -88,8 +88,8 @@ const TripList = ({
         }`}
       >
         {tripsData
-          ?.filter((trip: ITrip) => trip?.media[0]?.mediaType)
-          .map((trip: ITrip, index: number) => (
+          ?.filter((trip: ISearchPost) => trip?.media[0]?.mediaType)
+          .map((trip: ISearchPost, index: number) => (
             <TripCard key={trip._id || index} trip={trip} />
           ))}
       </div>
