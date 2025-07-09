@@ -4,7 +4,7 @@ import { IVisitedPlace } from "@/types/search.types";
 import { useSearchParams } from "next/navigation";
 import { useState, useEffect, useRef } from "react";
 import LocationPlaceCard from "./LocationPlaceCard";
-import { Loader2 } from "lucide-react";
+import LocationPlaceCardSkeleton from "./LocationPlaceCardSkeleton";
 
 const LocationPlaces = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -75,7 +75,7 @@ const LocationPlaces = () => {
 
   return (
     <section className="w-full">
-      <div className="w-full bg-white px-6 py-5 rounded-2xl flex justify-between items-center">
+      <div className="w-full bg-white px-6 py-5 rounded-2xl flex flex-col md:flex-row gap-5 justify-between items-center">
         <h1 className="text-lg font-semibold text-gray-800">
           Are you interested to visit {locationName}?
         </h1>
@@ -88,7 +88,7 @@ const LocationPlaces = () => {
           </button>
         </div>
       </div>
-      <div className="w-full grid grid-cols-3 gap-4 mt-10 md:mt-14">
+      <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-10 md:mt-14">
         {allPlaces?.map((place: IVisitedPlace) => (
           <LocationPlaceCard key={place?.placeId} place={place} />
         ))}
@@ -96,8 +96,13 @@ const LocationPlaces = () => {
       {hasMore && (
         <div ref={observerRef} className="w-full flex justify-center py-4">
           {isFetching || isLoading ? (
-            <div className="flex items-center justify-center py-8">
-              <Loader2 className="animate-spin text-primary" size={28} />
+            <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <LocationPlaceCardSkeleton />
+              <LocationPlaceCardSkeleton />
+              <LocationPlaceCardSkeleton />
+              <LocationPlaceCardSkeleton />
+              <LocationPlaceCardSkeleton />
+              <LocationPlaceCardSkeleton />
             </div>
           ) : (
             <p>Scroll to load more</p>
