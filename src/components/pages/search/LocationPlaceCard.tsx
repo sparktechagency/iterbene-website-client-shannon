@@ -12,8 +12,7 @@ import { IVisitedPlace } from "@/types/search.types";
 const LocationPlaceCard = ({ place }: { place: IVisitedPlace }) => {
   const hasMultipleImages = place?.imageUrls && place?.imageUrls?.length > 1;
   return (
-    <div className="w-full h-full max-h-96 bg-white rounded-xl p-4 flex flex-col border border-[#E7E8EC] hover:shadow-xl transition-all duration-300 cursor-pointer">
-      {/* posot header */}
+    <div className="w-full h-full max-h-[400px] bg-white rounded-xl p-4 flex flex-col border border-[#E7E8EC] hover:shadow-xl transition-all duration-300 cursor-pointer">
       {/* Media Section */}
       <div className="relative mb-4">
         {hasMultipleImages ? (
@@ -67,12 +66,10 @@ const LocationPlaceCard = ({ place }: { place: IVisitedPlace }) => {
               </h1>
             )}
           </div>
-          <p className="text-base text-gray-400">
-            {place?.distance} miles away
-          </p>
+
           {/* direaction */}
           <Link href={place?.directionsUrl} target="_blank">
-            <button className="bg-secondary px-5 py-2 rounded-2xl text-white">
+            <button className="bg-secondary px-5 py-2 rounded-xl text-white cursor-pointer mt-2">
               Direaction
             </button>
           </Link>

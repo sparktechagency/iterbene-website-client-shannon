@@ -13,7 +13,6 @@ const SearchPostDataCard = ({ post }: { post: ISearchPost }) => {
   const hasMultipleMedia = post?.media && post?.media?.length > 1;
   return (
     <div className="w-full h-full max-h-96 bg-white rounded-xl p-4 flex flex-col border border-[#E7E8EC] hover:shadow-xl transition-all duration-300 cursor-pointer">
-      {/* posot header */}
       {/* Media Section */}
       <div className="relative mb-4">
         {hasMultipleMedia ? (
