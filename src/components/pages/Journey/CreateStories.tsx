@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useRef, useCallback, useEffect } from "react";
+import React, { useState, useRef, useCallback } from "react";
 import {
   Camera,
   Type,
@@ -7,8 +7,6 @@ import {
   ZoomIn,
   ZoomOut,
   RotateCw,
-  Plus,
-  Minus
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { useCreateStoryMutation } from "@/redux/features/stories/storiesApi";
@@ -18,7 +16,7 @@ import { useRouter } from "next/navigation";
 import SelectField from "@/components/custom/SelectField";
 
 type ViewType = "selection" | "text" | "photo";
-type TextStyleType = "Clean" | "Bold" | "Typewriter" | "Modern" | "Serif" | "Cursive" | "Fantasy" | "Monospace" | "Impact" | "Comic";
+type TextStyleType = "Clean" | "Bold" | "Typewriter" | "Modern";
 type PrivacyType = "public" | "followers" | "custom";
 
 const CreateStories: React.FC = () => {
@@ -31,19 +29,9 @@ const CreateStories: React.FC = () => {
   const [selectedBackground, setSelectedBackground] = useState<string>("#3B82F6");
   const [textStyle, setTextStyle] = useState<TextStyleType>("Clean");
   const [privacy, setPrivacy] = useState<PrivacyType>("public");
+  // const [showSettings, setShowSettings] = useState<boolean>(false);
   const [scale, setScale] = useState<number>(1);
   const [rotate, setRotate] = useState<number>(0);
-  
-  // New states for enhanced text features
-  const [textFontSize, setTextFontSize] = useState<number>(24);
-  const [textBackgroundColor, setTextBackgroundColor] = useState<string>("transparent");
-  const [textColor, setTextColor] = useState<string>("#FFFFFF");
-  const [textConstraints, setTextConstraints] = useState<{
-    left: number;
-    right: number;
-    top: number;
-    bottom: number;
-  }>({ left: 0, right: 0, top: 0, bottom: 0 });
 
   const router = useRouter();
 
@@ -51,9 +39,8 @@ const CreateStories: React.FC = () => {
   const imgRef = useRef<HTMLImageElement>(null);
   const settingsRef = useRef<HTMLDivElement>(null);
   const textRef = useRef<HTMLDivElement>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
 
-  const [createStory, { isLoading }] = useCreateStoryMutation();
+  const [createJourney, { isLoading }] = useCreateStoryMutation();
 
   const backgroundColors: string[] = [
     "#3B82F6", "#EC4899", "#F97316", "#EF4444", "#8B5CF6", "#000000",
@@ -61,20 +48,11 @@ const CreateStories: React.FC = () => {
     "#6B7280", "#10B981", "#F59E0B", "#F472B6",
   ];
 
-  const textColors: string[] = [
-    "#FFFFFF", "#000000", "#3B82F6", "#EC4899", "#F97316", "#EF4444",
-    "#8B5CF6", "#10B981", "#F59E0B", "#F472B6", "#7C3AED", "#BE185D",
-  ];
-
-  const textBackgroundColors: string[] = [
-    "transparent", "#000000", "#FFFFFF", "#3B82F6", "#EC4899", "#F97316",
-    "#EF4444", "#8B5CF6", "#10B981", "#F59E0B", "#F472B6", "#7C3AED",
-  ];
-
-  const textStyles: TextStyleType[] = ["Clean", "Bold", "Typewriter", "Modern", "Serif", "Cursive", "Fantasy", "Monospace", "Impact", "Comic"];
+  const textStyles: TextStyleType[] = ["Clean", "Bold", "Typewriter", "Modern"];
+  // const privacyOptions: PrivacyType[] = ["public", "followers", "custom"];
 
   // Handle click outside settings
-  useEffect(() => {
+  React.useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
         settingsRef.current &&
@@ -88,7 +66,7 @@ const CreateStories: React.FC = () => {
   }, []);
 
   // Handle mouse scroll for zoom
-  useEffect(() => {
+  React.useEffect(() => {
     const handleWheel = (event: WheelEvent) => {
       event.preventDefault();
       setScale((prev) => {
@@ -109,22 +87,6 @@ const CreateStories: React.FC = () => {
     };
   }, []);
 
-  // Calculate text constraints based on container size
-  useEffect(() => {
-    if (containerRef.current && imageText) {
-      const containerRect = containerRef.current.getBoundingClientRect();
-      const textWidth = imageText.length * (textFontSize * 0.6); // Approximate text width
-      const textHeight = textFontSize + 20; // Text height with padding
-      
-      setTextConstraints({
-        left: -(containerRect.width / 2) + (textWidth / 2),
-        right: (containerRect.width / 2) - (textWidth / 2),
-        top: -(containerRect.height / 2) + (textHeight / 2),
-        bottom: (containerRect.height / 2) - (textHeight / 2),
-      });
-    }
-  }, [imageText, textFontSize, containerRef.current]);
-
   const handleImageSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
@@ -137,16 +99,13 @@ const CreateStories: React.FC = () => {
           setScale(1);
           setRotate(0);
           setTextPosition({ x: 0, y: 0 });
-          setTextFontSize(24);
-          setTextBackgroundColor("transparent");
-          setTextColor("#FFFFFF");
         }
       };
       reader.readAsDataURL(file);
     }
   };
 
-  const handlePhotoStoryClick = (): void => {
+  const handlePhotoJourneyClick = (): void => {
     fileInputRef.current?.click();
   };
 
@@ -161,19 +120,50 @@ const CreateStories: React.FC = () => {
     setPrivacy("public");
     setScale(1);
     setRotate(0);
-    setTextFontSize(24);
-    setTextBackgroundColor("transparent");
-    setTextColor("#FFFFFF");
-    setTextConstraints({ left: 0, right: 0, top: 0, bottom: 0 });
+    // setShowSettings(false);
   };
 
+  // Handle text drag
+  const handleDrag = () => {
+    if (!textRef.current) return;
 
-  const increaseFontSize = () => {
-    setTextFontSize(prev => Math.min(prev + 2, 48));
-  };
+    let isDragging = false;
+    let currentX: number;
+    let currentY: number;
+    let initialX: number;
+    let initialY: number;
 
-  const decreaseFontSize = () => {
-    setTextFontSize(prev => Math.max(prev - 2, 12));
+    const startDragging = (e: MouseEvent) => {
+      initialX = e.clientX - currentX;
+      initialY = e.clientY - currentY;
+      isDragging = true;
+    };
+
+    const drag = (e: MouseEvent) => {
+      if (isDragging) {
+        e.preventDefault();
+        currentX = e.clientX - initialX;
+        currentY = e.clientY - initialY;
+        setTextPosition({ x: currentX, y: currentY });
+      }
+    };
+
+    const stopDragging = () => {
+      isDragging = false;
+    };
+
+    currentX = textPosition.x;
+    currentY = textPosition.y;
+
+    textRef.current.addEventListener("mousedown", startDragging);
+    document.addEventListener("mousemove", drag);
+    document.addEventListener("mouseup", stopDragging);
+
+    return () => {
+      textRef.current?.removeEventListener("mousedown", startDragging);
+      document.removeEventListener("mousemove", drag);
+      document.removeEventListener("mouseup", stopDragging);
+    };
   };
 
   const getProcessedImage = useCallback(
@@ -183,10 +173,7 @@ const CreateStories: React.FC = () => {
       rotate: number,
       overlayText: string,
       fontFamily: string,
-      textPos: { x: number; y: number },
-      fontSize: number,
-      textBgColor: string,
-      textFgColor: string
+      textPos: { x: number; y: number }
     ): Promise<File> => {
       const canvas = document.createElement("canvas");
       const ctx = canvas.getContext("2d");
@@ -209,34 +196,18 @@ const CreateStories: React.FC = () => {
       ctx.translate(-image.naturalWidth / 2, -image.naturalHeight / 2);
       ctx.drawImage(image, 0, 0);
 
-      // Draw text overlay with background and styling
+      // Draw text overlay
       if (overlayText) {
         ctx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
-        ctx.font = `${fontSize * pixelRatio}px ${fontFamily}`;
+        ctx.font = `${40 * pixelRatio}px ${fontFamily}`;
+        ctx.fillStyle = "white";
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
-        
-        const textX = canvas.width / 2 + textPos.x * pixelRatio;
-        const textY = canvas.height / 2 + textPos.y * pixelRatio;
-        
-        // Draw text background if not transparent
-        if (textBgColor !== "transparent") {
-          const textMetrics = ctx.measureText(overlayText);
-          const textWidth = textMetrics.width;
-          const textHeight = fontSize * pixelRatio;
-          
-          ctx.fillStyle = textBgColor;
-          ctx.fillRect(
-            textX - textWidth / 2 - 10,
-            textY - textHeight / 2 - 5,
-            textWidth + 20,
-            textHeight + 10
-          );
-        }
-        
-        // Draw text
-        ctx.fillStyle = textFgColor;
-        ctx.fillText(overlayText, textX, textY);
+        ctx.fillText(
+          overlayText,
+          canvas.width / 2 + textPos.x * pixelRatio,
+          canvas.height / 2 + textPos.y * pixelRatio
+        );
       }
 
       return new Promise((resolve, reject) => {
@@ -258,7 +229,7 @@ const CreateStories: React.FC = () => {
     []
   );
 
-  const handleShareStory = async (): Promise<void> => {
+  const handleShareJourney = async (): Promise<void> => {
     const formData = new FormData();
 
     if (currentView === "photo" && selectedImage && imgRef.current) {
@@ -269,10 +240,7 @@ const CreateStories: React.FC = () => {
           rotate,
           imageText,
           getFontFamily(textStyle),
-          textPosition,
-          textFontSize,
-          textBackgroundColor,
-          textColor
+          textPosition
         );
         formData.append("storyFiles", processedImage);
         if (imageText) formData.append("textContent", imageText);
@@ -288,14 +256,14 @@ const CreateStories: React.FC = () => {
       formData.append("privacy", privacy);
       formData.append("textFontFamily", getFontFamily(textStyle));
     } else {
-      toast.error("Please provide content for the story.");
+      toast.error("Please provide content for the journey.");
       return;
     }
 
     try {
-      await createStory(formData).unwrap();
+      await createJourney(formData).unwrap();
       router.push("/");
-      toast.success("Story created successfully!");
+      toast.success("Journey created successfully!");
       resetToSelection();
     } catch (err) {
       const error = err as TError;
@@ -310,37 +278,36 @@ const CreateStories: React.FC = () => {
   const getFontFamily = (style: TextStyleType): string => {
     switch (style) {
       case "Bold":
-        return "Arial Black, sans-serif";
+        return "Arial Black";
       case "Typewriter":
-        return "Courier New, monospace";
+        return "Courier New";
       case "Modern":
-        return "Helvetica, Arial, sans-serif";
-      case "Serif":
-        return "Georgia, Times New Roman, serif";
-      case "Cursive":
-        return "Brush Script MT, cursive";
-      case "Fantasy":
-        return "Papyrus, fantasy";
-      case "Monospace":
-        return "Monaco, Consolas, monospace";
-      case "Impact":
-        return "Impact, Arial Black, sans-serif";
-      case "Comic":
-        return "Comic Sans MS, cursive";
+        return "Helvetica";
       default:
-        return "Arial, sans-serif";
+        return "Arial";
     }
   };
+
+  // const settingsVariants = {
+  //   hidden: { opacity: 0, scale: 0.8, y: -10 },
+  //   visible: {
+  //     opacity: 1,
+  //     scale: 1,
+  //     y: 0,
+  //     transition: { type: "spring", stiffness: 300, damping: 20 },
+  //   },
+  //   exit: { opacity: 0, scale: 0.8, y: -10, transition: { duration: 0.2 } },
+  // };
 
   // Selection View
   if (currentView === "selection") {
     return (
       <section className="w-full bg-white p-6 rounded-2xl">
         <div>
-          <h2 className="text-2xl font-bold text-gray-800 mb-8">Create Your Story</h2>
+          <h2 className="text-2xl font-bold text-gray-800 mb-8">Create Your Journey</h2>
           <div className="grid md:grid-cols-2 gap-6">
             <motion.div
-              onClick={handlePhotoStoryClick}
+              onClick={handlePhotoJourneyClick}
               className="relative h-80 rounded-3xl cursor-pointer"
               style={{ background: "linear-gradient(135deg, #10B981 0%, #3B82F6 100%)" }}
             >
@@ -348,7 +315,7 @@ const CreateStories: React.FC = () => {
                 <div className="w-16 h-16 bg-white bg-opacity-20 rounded-full flex items-center justify-center mb-4">
                   <Camera size={24} />
                 </div>
-                <h3 className="text-xl font-semibold text-white">Create a photo story</h3>
+                <h3 className="text-xl font-semibold text-white">Create a photo Journey</h3>
               </div>
             </motion.div>
             <motion.div
@@ -360,7 +327,7 @@ const CreateStories: React.FC = () => {
                 <div className="w-16 h-16 bg-white bg-opacity-20 rounded-full flex items-center justify-center mb-4">
                   <Type size={24} />
                 </div>
-                <h3 className="text-xl font-semibold text-white">Create a text story</h3>
+                <h3 className="text-xl font-semibold text-white">Create a text journey</h3>
               </div>
             </motion.div>
           </div>
@@ -386,7 +353,45 @@ const CreateStories: React.FC = () => {
               <button onClick={resetToSelection} className="mr-4 cursor-pointer">
                 <ArrowLeft size={24} />
               </button>
-              <h2 className="text-xl font-bold">Your story</h2>
+              <h2 className="text-xl font-bold">Your Journey</h2>
+              {/* <div className="relative ml-auto" ref={settingsRef}>
+                <motion.button
+                  onClick={() => setShowSettings(!showSettings)}
+                  whileHover={{ rotate: 90 }}
+                  transition={{ duration: 0.2 }}
+                  className="cursor-pointer"
+                >
+                  <Settings size={20} />
+                </motion.button>
+                <AnimatePresence>
+                  {showSettings && (
+                    <motion.div
+                      className="absolute right-0 mt-2 w-40 bg-white rounded-lg shadow-lg z-10 overflow-hidden"
+                      variants={settingsVariants}
+                      initial="hidden"
+                      animate="visible"
+                      exit="exit"
+                    >
+                      {privacyOptions.map((option) => (
+                        <motion.button
+                          key={option}
+                          className={`w-full text-left px-4 py-2.5 text-sm cursor-pointer ${
+                            privacy === option ? "bg-gray-300" : ""
+                          }`}
+                          onClick={() => {
+                            setPrivacy(option);
+                            setShowSettings(false);
+                          }}
+                          initial={{ opacity: 0, x: -10 }}
+                          animate={{ opacity: 1, x: 0 }}
+                        >
+                          {option}
+                        </motion.button>
+                      ))}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div> */}
             </div>
             <div className="mb-6">
               <SelectField
@@ -422,13 +427,13 @@ const CreateStories: React.FC = () => {
                 Cancel
               </button>
               <motion.button
-                onClick={handleShareStory}
+                onClick={handleShareJourney}
                 className="px-6 py-2 bg-primary rounded-lg text-white cursor-pointer"
                 disabled={isLoading}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
-                {isLoading ? "Uploading..." : "Upload Story"}
+                {isLoading ? "Uploading..." : "Upload Journey"}
               </motion.button>
             </div>
           </div>
@@ -465,15 +470,51 @@ const CreateStories: React.FC = () => {
     return (
       <section className="w-full bg-gray-50 text-white rounded-2xl">
         <div className="flex flex-row-reverse">
-          <div className="w-80 rounded-r-2xl p-6 text-gray-800 border-l flex flex-col border-gray-200 max-h-screen overflow-y-auto">
-            <div className="flex items-center mb-6">
+          <div className="w-80 rounded-r-2xl p-6 text-gray-800 border-l flex flex-col border-gray-200">
+            <div className="flex items-center mb-8">
               <button onClick={resetToSelection} className="mr-4 cursor-pointer">
                 <ArrowLeft size={24} />
               </button>
-              <h2 className="text-xl font-bold">Your story</h2>
+              <h2 className="text-xl font-bold">Your Journey</h2>
+              {/* <div className="relative ml-auto" ref={settingsRef}>
+                <motion.button
+                  onClick={() => setShowSettings(!showSettings)}
+                  whileHover={{ rotate: 90 }}
+                  transition={{ duration: 0.2 }}
+                  className="cursor-pointer"
+                >
+                  <Settings size={20} />
+                </motion.button>
+                <AnimatePresence>
+                  {showSettings && (
+                    <motion.div
+                      className="absolute right-0 mt-2 w-40 bg-white rounded-lg shadow-lg z-10 overflow-hidden"
+                      variants={settingsVariants}
+                      initial="hidden"
+                      animate="visible"
+                      exit="exit"
+                    >
+                      {privacyOptions.map((option) => (
+                        <motion.button
+                          key={option}
+                          className={`w-full text-left px-4 py-2.5 text-sm cursor-pointer ${
+                            privacy === option ? "bg-gray-300" : ""
+                          }`}
+                          onClick={() => {
+                            setPrivacy(option);
+                            setShowSettings(false);
+                          }}
+                          initial={{ opacity: 0, x: -10 }}
+                          animate={{ opacity: 1, x: 0 }}
+                        >
+                          {option}
+                        </motion.button>
+                      ))}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div> */}
             </div>
-
-            {/* Image Controls */}
             <div className="mb-6">
               <h3 className="text-sm font-medium mb-3">Adjust Image</h3>
               <div className="flex gap-2 mb-3">
@@ -507,8 +548,6 @@ const CreateStories: React.FC = () => {
               </div>
               <label className="text-sm font-medium">Zoom: {scale.toFixed(1)}x</label>
             </div>
-
-            {/* Text Input */}
             <div className="mb-6">
               <h3 className="text-sm font-medium mb-3">Add Text</h3>
               <textarea
@@ -518,10 +557,6 @@ const CreateStories: React.FC = () => {
                 className="w-full bg-white border outline-none border-gray-300 p-3 rounded-lg resize-none"
                 rows={3}
               />
-            </div>
-
-            {/* Font Style */}
-            <div className="mb-6">
               <SelectField
                 name="textStyle"
                 placeholder="Select text style"
@@ -529,79 +564,8 @@ const CreateStories: React.FC = () => {
                 onChange={(e) => setTextStyle(e.target.value as TextStyleType)}
                 items={textStyles.map((style) => ({ value: style, label: style }))}
               />
-            </div>
 
-            {/* Font Size Controls */}
-            <div className="mb-6">
-              <h3 className="text-sm font-medium mb-3">Font Size</h3>
-              <div className="flex items-center gap-3">
-                <motion.button
-                  onClick={decreaseFontSize}
-                  className="p-2 bg-gray-300 rounded-lg cursor-pointer"
-                  title="Decrease Font Size"
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.9 }}
-                >
-                  <Minus size={16} />
-                </motion.button>
-                <span className="text-sm font-medium min-w-12 text-center">{textFontSize}px</span>
-                <motion.button
-                  onClick={increaseFontSize}
-                  className="p-2 bg-gray-300 rounded-lg cursor-pointer"
-                  title="Increase Font Size"
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.9 }}
-                >
-                  <Plus size={16} />
-                </motion.button>
-              </div>
             </div>
-
-            {/* Text Color */}
-            <div className="mb-6">
-              <h3 className="text-sm font-medium mb-3">Text Color</h3>
-              <div className="grid grid-cols-6 gap-2">
-                {textColors.map((color, index) => (
-                  <motion.button
-                    key={index}
-                    className={`w-8 h-8 rounded-full cursor-pointer border-2 ${
-                      textColor === color ? "border-gray-800" : "border-transparent"
-                    }`}
-                    style={{ backgroundColor: color }}
-                    onClick={() => setTextColor(color)}
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
-                  />
-                ))}
-              </div>
-            </div>
-
-            {/* Text Background Color */}
-            <div className="mb-6">
-              <h3 className="text-sm font-medium mb-3">Text Background</h3>
-              <div className="grid grid-cols-6 gap-2">
-                {textBackgroundColors.map((color, index) => (
-                  <motion.button
-                    key={index}
-                    className={`w-8 h-8 rounded-full cursor-pointer border-2 ${
-                      textBackgroundColor === color ? "border-gray-800" : "border-transparent"
-                    } ${color === "transparent" ? "bg-gradient-to-br from-red-500 to-transparent" : ""}`}
-                    style={{ backgroundColor: color === "transparent" ? "transparent" : color }}
-                    onClick={() => setTextBackgroundColor(color)}
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
-                  >
-                    {color === "transparent" && (
-                      <div className="w-full h-full rounded-full border border-gray-400" style={{
-                        background: "linear-gradient(45deg, transparent 45%, #ff0000 45%, #ff0000 55%, transparent 55%)"
-                      }} />
-                    )}
-                  </motion.button>
-                ))}
-              </div>
-            </div>
-
-            {/* Action Buttons */}
             <div className="flex justify-between mt-auto">
               <button
                 onClick={resetToSelection}
@@ -610,27 +574,25 @@ const CreateStories: React.FC = () => {
                 Cancel
               </button>
               <motion.button
-                onClick={handleShareStory}
+                onClick={handleShareJourney}
                 className="px-6 py-2 bg-primary rounded-lg text-white cursor-pointer"
                 disabled={isLoading}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
-                {isLoading ? "Uploading..." : "Upload Story"}
+                {isLoading ? "Uploading..." : "Upload Journey"}
               </motion.button>
             </div>
           </div>
-
-          {/* Image Preview */}
           <div className="flex-1 flex items-center justify-center p-8">
             <div className="relative">
-              <div ref={containerRef} className="w-96 h-[550px] rounded-3xl overflow-hidden relative bg-gray-200">
+              <div className="w-96 h-[550px] rounded-3xl overflow-hidden relative bg-gray-200">
                 {previewUrl && (
                   <div style={{ position: "relative", width: "100%", height: "550px" }}>
                     <img
                       ref={imgRef}
                       src={previewUrl}
-                      alt="Story preview"
+                      alt="Journey preview"
                       style={{
                         width: "100%",
                         height: "100%",
@@ -639,54 +601,30 @@ const CreateStories: React.FC = () => {
                       }}
                     />
                     {imageText && (
-                      <motion.div
+                      <div
                         ref={textRef}
-                        drag
-                        dragMomentum={false}
-                        dragConstraints={textConstraints}
-                        dragElastic={0.1}
-                        onDrag={(event, info) => {
-                          setTextPosition({ x: info.point.x, y: info.point.y });
-                        }}
+                        onMouseDown={handleDrag}
                         style={{
                           position: "absolute",
                           top: "50%",
                           left: "50%",
-                          x: textPosition.x,
-                          y: textPosition.y,
-                          color: textColor,
-                          fontSize: `${textFontSize}px`,
+                          transform: `translate(-50%, -50%) translate(${textPosition.x}px, ${textPosition.y}px)`,
+                          color: "white",
+                          fontSize: "24px",
                           fontFamily: getFontFamily(textStyle),
                           textAlign: "center",
                           textShadow: "0 0 5px rgba(0,0,0,0.5)",
-                          backgroundColor: textBackgroundColor,
-                          padding: textBackgroundColor !== "transparent" ? "8px 12px" : "0",
-                          borderRadius: textBackgroundColor !== "transparent" ? "4px" : "0",
-                          maxWidth: "80%",
-                          cursor: "grab",
+                          width: "80%",
+                          cursor: "move",
                           userSelect: "none",
-                          wordWrap: "break-word",
                         }}
-                        whileDrag={{ 
-                          cursor: "grabbing",
-                          scale: 1.05,
-                          zIndex: 10
-                        }}
-                        initial={{ scale: 1 }}
-                        animate={{ scale: 1 }}
-                        transition={{ type: "spring", stiffness: 300, damping: 30 }}
                       >
                         {imageText}
-                      </motion.div>
+                      </div>
                     )}
                   </div>
                 )}
               </div>
-              {imageText && (
-                <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-50 text-white px-3 py-1 rounded-full text-sm">
-                  Drag text to reposition
-                </div>
-              )}
             </div>
           </div>
         </div>

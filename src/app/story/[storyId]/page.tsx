@@ -1,8 +1,8 @@
-import StoryView from '@/components/pages/Stories/StoryView'
+import JourneyView from '@/components/pages/Journey/JourneyView'
 import React from 'react'
 
 const page = () => {
-  return <StoryView/>
+  return <JourneyView/>
 }
 
 export default page

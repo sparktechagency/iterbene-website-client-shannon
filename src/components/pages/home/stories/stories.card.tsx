@@ -64,13 +64,13 @@ const StoryCard = ({ story }: { story: IStory }) => {
         <div className="w-full h-full flex flex-col justify-between">
           <Image
             src={story?.userId?.profileImage}
-            alt={isOwnStory ? "Your Story" : story?.userId?.username || "Author"}
+            alt={isOwnStory ? "Your Journey" : story?.userId?.username || "Author"}
             width={40}
             height={40}
             className="size-10 rounded-full object-cover ring-2 ring-primary"
           />
           <span className="text-white text-xs md:text-sm font-semibold">
-            {isOwnStory ? "Your Story" : story?.userId?.username}
+            {isOwnStory ? "Your Journey" : story?.userId?.username}
           </span>
         </div>
       </div>

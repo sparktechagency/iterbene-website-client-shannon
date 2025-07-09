@@ -28,8 +28,9 @@ const MessageItem: React.FC<MessageItemProps> = ({
 
   return (
     <div
-      className={`flex ${isMyMessage ? "justify-end" : "justify-start"
-        } items-end gap-3 mb-3`}
+      className={`flex ${
+        isMyMessage ? "justify-end" : "justify-start"
+      } items-end gap-3 mb-3`}
     >
       {/* Sender/Receiver Image */}
       {!isMyMessage && receiverInfo?.profileImage && (
@@ -44,18 +45,21 @@ const MessageItem: React.FC<MessageItemProps> = ({
 
       {/* Message Content */}
       <div
-        className={`w-full max-w-[300px] sm:max-w-[400px] md:max-w-[500px] flex flex-col ${isMyMessage ? "items-end" : "items-start"
-          } flex-shrink-0`}
+        className={`w-full max-w-[300px] sm:max-w-[400px] md:max-w-[500px] flex flex-col ${
+          isMyMessage ? "items-end" : "items-start"
+        } flex-shrink-0`}
       >
         {/* Mixed Content */}
         {message?.content?.messageType === MessageType.MIXED && (
           <div
-            className={`flex flex-col space-y-1 ${isMyMessage ? "items-end" : "items-start"
-              }`}
+            className={`flex flex-col space-y-1 ${
+              isMyMessage ? "items-end" : "items-start"
+            }`}
           >
             <span
-              className={`text-xs text-gray-500 ${isMyMessage ? "mr-2 mb-1" : "ml-2 mb-1"
-                }`}
+              className={`text-xs text-gray-500 ${
+                isMyMessage ? "mr-2 mb-1" : "ml-2 mb-1"
+              }`}
             >
               {moment(message.createdAt).format("h:mm A")}
             </span>
@@ -87,10 +91,11 @@ const MessageItem: React.FC<MessageItemProps> = ({
               </div>
             )}
             <div
-              className={`max-w-fit p-3 rounded-xl mt-2 ${isMyMessage
-                ? "bg-[#E6E6E6] text-gray-800"
-                : "bg-[#ECFCFA] text-[#1A1A1A]"
-                }`}
+              className={`max-w-fit p-3 rounded-xl mt-2 ${
+                isMyMessage
+                  ? "bg-[#E6E6E6] text-gray-800"
+                  : "bg-[#ECFCFA] text-[#1A1A1A]"
+              }`}
             >
               {message.content.text}
             </div>
@@ -100,20 +105,23 @@ const MessageItem: React.FC<MessageItemProps> = ({
         {/* Text Message */}
         {message?.content?.messageType === MessageType.TEXT && (
           <div
-            className={`flex flex-col space-y-1 ${isMyMessage ? "items-end" : "items-start"
-              }`}
+            className={`flex flex-col space-y-1 ${
+              isMyMessage ? "items-end" : "items-start"
+            }`}
           >
             <span
-              className={`text-xs text-gray-500 ${isMyMessage ? "mr-2 mb-1" : "ml-2 mb-1"
-                }`}
+              className={`text-xs text-gray-500 ${
+                isMyMessage ? "mr-2 mb-1" : "ml-2 mb-1"
+              }`}
             >
               {moment(message.createdAt).format("h:mm A")}
             </span>
             <div
-              className={`max-w-fit p-3 rounded-xl ${isMyMessage
-                ? "bg-[#E6E6E6] text-gray-800"
-                : "bg-[#ECFCFA] text-[#1A1A1A]"
-                }`}
+              className={`max-w-fit p-3 rounded-xl ${
+                isMyMessage
+                  ? "bg-[#E6E6E6] text-gray-800"
+                  : "bg-[#ECFCFA] text-[#1A1A1A]"
+              }`}
             >
               {message.content.text}
             </div>
@@ -123,12 +131,14 @@ const MessageItem: React.FC<MessageItemProps> = ({
         {/* Image Message */}
         {message?.content?.messageType === MessageType.IMAGE && (
           <div
-            className={`flex flex-col space-y-1 ${isMyMessage ? "items-end" : "items-start"
-              }`}
+            className={`flex flex-col space-y-1 ${
+              isMyMessage ? "items-end" : "items-start"
+            }`}
           >
             <span
-              className={`text-xs text-gray-500 ${isMyMessage ? "mr-2 mb-1" : "ml-2 mb-1"
-                }`}
+              className={`text-xs text-gray-500 ${
+                isMyMessage ? "mr-2 mb-1" : "ml-2 mb-1"
+              }`}
             >
               {moment(message.createdAt).format("h:mm A")}
             </span>
@@ -164,8 +174,9 @@ const MessageItem: React.FC<MessageItemProps> = ({
         {message?.content?.messageType === MessageType.AUDIO && (
           <div className="flex flex-col space-y-1">
             <span
-              className={`text-xs text-gray-500 ${isMyMessage ? "mr-2 mb-1" : "ml-2 mb-1"
-                }`}
+              className={`text-xs text-gray-500 ${
+                isMyMessage ? "mr-2 mb-1" : "ml-2 mb-1"
+              }`}
             >
               {moment(message.createdAt).format("h:mm A")}
             </span>
@@ -180,8 +191,9 @@ const MessageItem: React.FC<MessageItemProps> = ({
         {message?.content?.messageType === MessageType.VIDEO && (
           <div className="flex flex-col space-y-1">
             <span
-              className={`text-xs text-gray-500 ${isMyMessage ? "mr-2 mb-1" : "ml-2 mb-1"
-                }`}
+              className={`text-xs text-gray-500 ${
+                isMyMessage ? "mr-2 mb-1" : "ml-2 mb-1"
+              }`}
             >
               {moment(message.createdAt).format("h:mm A")}
             </span>
@@ -194,12 +206,14 @@ const MessageItem: React.FC<MessageItemProps> = ({
         {/* Document Message */}
         {message?.content?.messageType === MessageType.DOCUMENT && (
           <div
-            className={`flex flex-col space-y-1 ${isMyMessage ? "items-end" : "items-start"
-              }`}
+            className={`flex flex-col space-y-1 ${
+              isMyMessage ? "items-end" : "items-start"
+            }`}
           >
             <span
-              className={`text-xs text-gray-500 ${isMyMessage ? "mr-2 mb-1" : "ml-2 mb-1"
-                }`}
+              className={`text-xs text-gray-500 ${
+                isMyMessage ? "mr-2 mb-1" : "ml-2 mb-1"
+              }`}
             >
               {moment(message.createdAt).format("h:mm A")}
             </span>
@@ -210,8 +224,9 @@ const MessageItem: React.FC<MessageItemProps> = ({
               return (
                 <div
                   key={index}
-                  className={`w-56 bg-[#E6E6E6] border border-gray-300 rounded-lg p-2 flex items-center gap-2 ${isMyMessage ? "flex-row-reverse" : "flex-row"
-                    }`}
+                  className={`w-56 bg-[#E6E6E6] border border-gray-300 rounded-lg p-2 flex items-center gap-2 ${
+                    isMyMessage ? "flex-row-reverse" : "flex-row"
+                  }`}
                 >
                   <Image src={pdf} width={32} height={32} alt="pdf" />
                   <Link
@@ -231,30 +246,45 @@ const MessageItem: React.FC<MessageItemProps> = ({
         {/* Story Message */}
         {message?.content?.messageType === MessageType.STORYMESSAGE && (
           <div
-            className={`flex flex-col space-y-1 ${isMyMessage ? "items-end" : "items-start"
-              }`}
+            className={`flex flex-col space-y-1 ${
+              isMyMessage ? "items-end" : "items-start"
+            }`}
           >
             <span
-              className={`text-xs text-gray-500 ${isMyMessage ? "mr-2 mb-1" : "ml-2 mb-1"
-                }`}
+              className={`text-xs text-gray-500 ${
+                isMyMessage ? "mr-2 mb-1" : "ml-2 mb-1"
+              }`}
             >
               {moment(message.createdAt).format("h:mm A")}
             </span>
+            {/* user friendly message for story */}
+            {isMyMessage ? (
+              <h1 className="text-sm text-gray-500">You repiled on a story</h1>
+            ) : (
+              ""
+            )}
+            {/* Image */}
             <div>
-              <Image
-                src={message?.storyMedia?.mediaUrl || ""}
-                alt={`Story Image`}
-                width={150}
-                height={150}
-                className="w-[120px] h-[120px] object-cover rounded-lg"
-              />
+              {message?.storyMedia?.mediaUrl ? (
+                <Image
+                  src={message?.storyMedia?.mediaUrl || ""}
+                  alt={`Story Image`}
+                  width={150}
+                  height={150}
+                  className="w-[120px] h-[120px] object-cover rounded-lg"
+                />
+              ) : (
+                "No media longer available"
+              )}
+
               {/* Text */}
               {message.content.text && (
                 <div
-                  className={`max-w-fit p-3 rounded-xl mt-2 ${isMyMessage
-                    ? "bg-[#E6E6E6] text-gray-800"
-                    : "bg-[#ECFCFA] text-[#1A1A1A]"
-                    }`}
+                  className={`max-w-fit p-3 rounded-xl mt-2 ${
+                    isMyMessage
+                      ? "bg-[#E6E6E6] text-gray-800"
+                      : "bg-[#ECFCFA] text-[#1A1A1A]"
+                  }`}
                 >
                   {message.content.text}
                 </div>

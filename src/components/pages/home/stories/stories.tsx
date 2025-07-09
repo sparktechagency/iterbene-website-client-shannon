@@ -90,7 +90,7 @@ const Stories = () => {
                       <Plus size={24} className="text-gray-800 font-bold" />
                     </div>
                     <h1 className="text-white text-sm font-semibold text-center">
-                      Create Story
+                      Add Journey
                     </h1>
                   </div>
                 </div>

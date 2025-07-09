@@ -24,7 +24,9 @@ import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
 import React, { useEffect, useRef, useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion"; // Import Framer Motion
-const StoryView = () => {
+import toast from "react-hot-toast";
+import { TError } from "@/types/error";
+const JourneyView = () => {
   const { storyId } = useParams();
   const router = useRouter();
   const user = useUser();
@@ -282,14 +284,17 @@ const StoryView = () => {
 
       const mediaId = currentStory.mediaIds[currentMediaIndex]._id;
       try {
-        await replyToStory({
+        const res = await replyToStory({
           mediaId,
           message: replyText.trim(),
         }).unwrap();
+        const receiverId = res?.data?.attributes?.receiverId?._id;
         setReplyText("");
-        console.log("Reply sent successfully!");
+        toast.success("Reply sent successfully!");
+        router.push(`/messages/${receiverId}`);
       } catch (error) {
-        console.error("Failed to send reply:", error);
+        const err = error as TError;
+        toast.error(err?.data?.message || "Something went wrong!");
       } finally {
         // Resume story if it wasn't paused before
         if (!wasPaused) {
@@ -309,7 +314,8 @@ const StoryView = () => {
         router.push("/");
       }
     } catch (error) {
-      console.error("Failed to delete story:", error);
+      const err = error as TError;
+      toast.error(err?.data?.message || "Something went wrong!");
     }
   };
 
@@ -331,7 +337,7 @@ const StoryView = () => {
   if (storyLoading || feedLoading) {
     return (
       <div className="fixed inset-0 bg-black z-50 flex items-center justify-center">
-        <div className="text-white text-lg">Loading story...</div>
+        <div className="text-white text-lg">Loading Journey...</div>
       </div>
     );
   }
@@ -339,7 +345,7 @@ const StoryView = () => {
   if (!currentStory) {
     return (
       <div className="fixed inset-0 bg-black z-50 flex items-center justify-center">
-        <div className="text-white text-lg">Story not found</div>
+        <div className="text-white text-lg">Journey not found</div>
       </div>
     );
   }
@@ -530,7 +536,7 @@ const StoryView = () => {
                     ))}
                     {currentMedia?.viewedBy?.length > 3 && (
                       <div className="text-white text-xs">
-                        +{currentMedia.viewedBy.length - 3} more
+                        +{currentMedia?.viewedBy.length - 3} more
                       </div>
                     )}
                   </div>
@@ -542,7 +548,7 @@ const StoryView = () => {
               <div className="flex-1 flex items-center bg-transparent border border-white rounded-full px-4 py-2">
                 <input
                   type="text"
-                  placeholder="Reply to story..."
+                  placeholder="Reply to journey..."
                   value={replyText}
                   onChange={(e) => setReplyText(e.target.value)}
                   onKeyPress={(e) => e.key === "Enter" && handleReply()}
@@ -584,7 +590,6 @@ const StoryView = () => {
             <ChevronRight className="w-6 h-6" />
           </button>
         </div>
-
       </div>
 
       {/* Desktop story list */}
@@ -652,4 +657,4 @@ const StoryView = () => {
   );
 };
 
-export default StoryView;
+export default JourneyView;

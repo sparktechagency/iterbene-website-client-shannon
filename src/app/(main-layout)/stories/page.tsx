@@ -1,4 +1,4 @@
-import CreateStories from '@/components/pages/Stories/CreateStories'
+import CreateStories from '@/components/pages/Journey/CreateStories'
 import React from 'react'
 
 const page = () => {

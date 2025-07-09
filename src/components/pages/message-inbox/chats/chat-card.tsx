@@ -50,6 +50,8 @@ const ChatCard = ({ chat }: ChatListCardProps) => {
             ? `${content.text.slice(0, 20)}...`
             : content.text
         }`;
+      case MessageType.STORYMESSAGE:
+        return myLastMessage ? "You replied to a story" : "replied to a story";
       default:
         return "";
     }
