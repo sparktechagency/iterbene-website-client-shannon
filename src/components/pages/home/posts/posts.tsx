@@ -13,10 +13,7 @@ const Posts = () => {
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
 
-  const {
-    data: responseData,
-    isLoading
-  } = useFeedPostsQuery(
+  const { data: responseData, isLoading } = useFeedPostsQuery(
     [
       { key: "page", value: currentPage },
       { key: "limit", value: 10 },
@@ -119,6 +116,14 @@ const Posts = () => {
           <PostCardSkeleton key={index} />
         ))}
       </div>
+    );
+  }
+  // Show "Not available" message if no posts
+  if (!isLoading && allPosts?.length === 0) {
+    return (
+      <section className="w-full text-center py-4">
+        <p className="text-gray-600 text-lg">Not posts available</p>
+      </section>
     );
   }
   return (
