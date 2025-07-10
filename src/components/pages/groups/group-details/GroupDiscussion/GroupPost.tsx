@@ -4,9 +4,9 @@ import { useGetGroupPostsQuery } from "@/redux/features/post/postApi";
 import { IPost } from "@/types/post.types";
 import { useParams } from "next/navigation";
 import { useState, useEffect, useMemo, useCallback } from "react";
+import PostCardSkeleton from "@/components/pages/home/posts/PostCardSkeleton";
 
 const GroupPost = () => {
-  //params
   const { groupId } = useParams();
   const [currentPage, setCurrentPage] = useState(1);
   const [allPosts, setAllPosts] = useState<IPost[]>([]);
@@ -22,8 +22,8 @@ const GroupPost = () => {
     {
       groupId,
       filters: [
-        { key: "page", value: currentPage }, // Use actual page number
-        { key: "limit", value: 10 }, // Keep limit constant at 10
+        { key: "page", value: currentPage },
+        { key: "limit", value: 10 },
       ],
     },
     {
@@ -34,7 +34,6 @@ const GroupPost = () => {
     }
   );
 
-  // Get current page posts from RTK Query cache
   const currentPagePosts = useMemo(
     () =>
       Array.isArray(responseData?.data?.attributes?.results)
@@ -45,14 +44,11 @@ const GroupPost = () => {
 
   const totalPages = responseData?.data?.attributes?.totalPages;
 
-  // Add new posts to allPosts when currentPagePosts changes
   useEffect(() => {
     if (currentPagePosts?.length > 0) {
       if (currentPage === 1) {
-        // Reset posts for first page (handles refreshes/updates)
         setAllPosts(currentPagePosts);
       } else {
-        // Append new posts for subsequent pages, avoiding duplicates
         setAllPosts((prevPosts) => {
           const existingIds = new Set(prevPosts?.map((post) => post?._id));
           const newPosts = currentPagePosts?.filter(
@@ -64,10 +60,8 @@ const GroupPost = () => {
     }
   }, [currentPagePosts, currentPage]);
 
-  // Handle real-time updates: merge updated posts from RTK Query cache
   useEffect(() => {
     if (currentPagePosts?.length > 0 && allPosts?.length > 0) {
-      // Update existing posts with fresh data from current page
       setAllPosts((prevPosts) => {
         return prevPosts?.map((existingPost) => {
           const updatedPost = currentPagePosts?.find(
@@ -79,7 +73,6 @@ const GroupPost = () => {
     }
   }, [allPosts?.length, currentPagePosts]);
 
-  // Update loading and hasMore states
   useEffect(() => {
     if (isLoading) {
       setLoading(true);
@@ -89,14 +82,12 @@ const GroupPost = () => {
     }
   }, [isLoading, currentPage, totalPages]);
 
-  // Load more posts function
   const loadMore = useCallback(() => {
     if (!loading && hasMore) {
       setCurrentPage((prev) => prev + 1);
     }
   }, [loading, hasMore]);
 
-  // Infinite scroll with IntersectionObserver
   useEffect(() => {
     if (!hasMore || loading) return;
 
@@ -118,7 +109,12 @@ const GroupPost = () => {
   }, [loadMore, loading, hasMore]);
 
   if (isLoading && allPosts.length === 0) {
-    return <div className="w-full text-center py-4">Loading posts...</div>;
+    return (
+      <div className="space-y-4">
+        <PostCardSkeleton />
+        <PostCardSkeleton />
+      </div>
+    );
   }
 
   if (isError) {
@@ -146,12 +142,8 @@ const GroupPost = () => {
       ))}
 
       {loading && (
-        <div
-          className="flex justify-center items-center py-4"
-          aria-live="polite"
-          aria-busy="true"
-        >
-          <div className="w-8 h-8 border-2 border-primary rounded-full animate-spin"></div>
+        <div className="space-y-4">
+          <PostCardSkeleton />
         </div>
       )}
 
