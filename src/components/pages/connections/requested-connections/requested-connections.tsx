@@ -8,7 +8,9 @@ import SuggestionConnectionsCardSkeleton from "../suggestion-connections/Suggest
 const RequestedConnections: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [isLoadingMore, setIsLoadingMore] = useState<boolean>(false);
-  const [allConnectionRequests, setAllConnectionRequests] = useState<IConnectionRequest[]>([]);
+  const [allConnectionRequests, setAllConnectionRequests] = useState<
+    IConnectionRequest[]
+  >([]);
   const { data: responseData, isLoading } = useGetConnectionRequestsQuery(
     [
       {
@@ -62,7 +64,7 @@ const RequestedConnections: React.FC = () => {
   if (isLoading || isLoadingMore) {
     content = (
       <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-        {Array.from({ length: 3 }).map((_, index) => (
+        {Array.from({ length: 8 }).map((_, index) => (
           <SuggestionConnectionsCardSkeleton key={`skeleton-${index}`} />
         ))}
       </div>
@@ -85,7 +87,7 @@ const RequestedConnections: React.FC = () => {
   }
 
   return (
-    <section className="w-full">
+    <section className="w-full border-b border-gray-400">
       {/* Header Section */}
       <div className="w-full flex items-center justify-between mb-6 px-2">
         <div className="flex items-center gap-4">
