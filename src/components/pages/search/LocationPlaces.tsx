@@ -58,10 +58,12 @@ const LocationPlaces = () => {
       const totalPages = responseData?.data?.attributes?.totalPages || 0;
       setHasMore(currentPage < totalPages);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [responseData]);
 
   // Intersection Observer for infinite scrolling
   useEffect(() => {
+    const currentObserverRef = observerRef.current;
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting && hasMore && !isFetching && !isLoading) {
@@ -71,13 +73,13 @@ const LocationPlaces = () => {
       { threshold: 0.1 } // Trigger when 10% of the observer element is visible
     );
 
-    if (observerRef.current) {
-      observer.observe(observerRef.current);
+    if (currentObserverRef) {
+      observer.observe(currentObserverRef);
     }
 
     return () => {
-      if (observerRef.current) {
-        observer.unobserve(observerRef.current);
+      if (currentObserverRef) {
+        observer.unobserve(currentObserverRef);
       }
     };
   }, [hasMore, isFetching, isLoading]);

@@ -83,18 +83,14 @@ const EventDetailsHeader = ({
   return (
     <>
       <div className="w-full bg-white rounded-xl relative">
-        {eventDetailsData?.eventImage ? (
+        {eventDetailsData?.eventName && (
           <Image
-            src={eventDetailsData.eventImage}
+            src={eventDetailsData?.eventImage}
             alt="background"
             width={1600}
             height={360}
             className="w-full h-[200px] sm:h-[280px] md:h-[360px] object-cover rounded-t-2xl"
           />
-        ) : (
-          <div className="w-full h-[200px] sm:h-[280px] md:h-[360px] bg-gray-200 rounded-t-2xl flex items-center justify-center text-gray-500">
-            No Image Available
-          </div>
         )}
 
         <div className="w-full flex flex-col md:flex-row justify-between items-center gap-4 md:gap-8 px-[24px] pt-[16px] pb-[20px]">

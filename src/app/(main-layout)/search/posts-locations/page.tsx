@@ -1,8 +1,12 @@
 import PostsLocationsSearch from '@/components/pages/search/PostsLocationsSearch'
-import React from 'react'
+import React, { Suspense } from 'react'
 
 const page = () => {
-  return <PostsLocationsSearch/>
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <PostsLocationsSearch/>
+    </Suspense>
+  )
 }
 
 export default page

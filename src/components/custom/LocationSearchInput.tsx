@@ -116,6 +116,7 @@ const LocationSearchInput: React.FC<LocationSearchInputProps> = ({
     if (value !== inputValue) {
       setInputValue(value);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value]);
 
   return (

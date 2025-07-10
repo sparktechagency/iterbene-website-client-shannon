@@ -28,10 +28,10 @@ const PostsLocationsSearch = () => {
     }
   );
 
-  const postsLocationsDatas = responseData?.data?.attributes;
-  const locationsData = postsLocationsDatas?.locations || [];
-  const postsData = postsLocationsDatas?.posts || [];
-  const totalPages = postsLocationsDatas?.totalPages || 1;
+  const postsLocationsDatas = React.useMemo(() => responseData?.data?.attributes, [responseData]);
+  const locationsData = React.useMemo(() => postsLocationsDatas?.locations || [], [postsLocationsDatas]);
+  const postsData = React.useMemo(() => postsLocationsDatas?.posts || [], [postsLocationsDatas]);
+  const totalPages = React.useMemo(() => postsLocationsDatas?.totalPages || 1, [postsLocationsDatas]);
 
   // Update posts and hasMore state
   useEffect(() => {
@@ -51,6 +51,7 @@ const PostsLocationsSearch = () => {
 
   // Intersection Observer for infinite scroll
   useEffect(() => {
+    const currentObserverRef = observerRef.current;
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting && hasMore && !isFetching && !isLoading) {
@@ -60,13 +61,13 @@ const PostsLocationsSearch = () => {
       { threshold: 1.0 }
     );
 
-    if (observerRef.current) {
-      observer.observe(observerRef.current);
+    if (currentObserverRef) {
+      observer.observe(currentObserverRef);
     }
 
     return () => {
-      if (observerRef.current) {
-        observer.unobserve(observerRef.current);
+      if (currentObserverRef) {
+        observer.unobserve(currentObserverRef);
       }
     };
   }, [hasMore, isFetching, isLoading]);

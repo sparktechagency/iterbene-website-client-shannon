@@ -9,13 +9,16 @@ const EventAuthorDetails = ({
     <div className="w-full col-span-full md:col-span-7 bg-white p-6 md:p-9 rounded-xl">
       <h1 className="text-2xl font-semibold">Meet Your Leader</h1>
       <div className="py-5">
-        <Image
-          src={eventDetailsData?.creatorId?.profileImage}
-          alt="leader"
-          width={174}
-          height={174}
-          className="size-[174px] object-cover rounded-full mx-auto"
-        />
+        {eventDetailsData?.creatorId?.profileImage && (
+          <Image
+            src={eventDetailsData?.creatorId?.profileImage}
+            alt="leader"
+            width={174}
+            height={174}
+            className="size-[174px] object-cover rounded-full mx-auto"
+          />
+        )}
+
         <div className="mt-5">
           <h1 className="text-xl md:text-2xl xl:text-3xl font-semibold text-center text-gray-950">
             {eventDetailsData?.creatorId?.fullName}

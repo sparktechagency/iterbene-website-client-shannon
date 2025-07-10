@@ -166,6 +166,23 @@ const CreateStories: React.FC = () => {
     };
   };
 
+  const handleZoomIn = (): void => setScale((prev) => Math.min(prev + 0.1, 3));
+  const handleZoomOut = (): void => setScale((prev) => Math.max(prev - 0.1, 0.5));
+  const handleRotate = (): void => setRotate((prev) => (prev + 90) % 360);
+
+  const getFontFamily = (style: TextStyleType): string => {
+    switch (style) {
+      case "Bold":
+        return "Arial Black";
+      case "Typewriter":
+        return "Courier New";
+      case "Modern":
+        return "Helvetica";
+      default:
+        return "Arial";
+    }
+  };
+
   const getProcessedImage = useCallback(
     async (
       image: HTMLImageElement,
@@ -226,7 +243,8 @@ const CreateStories: React.FC = () => {
         );
       });
     },
-    []
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [scale, rotate, imageText, textPosition]
   );
 
   const handleShareJourney = async (): Promise<void> => {
@@ -270,34 +288,6 @@ const CreateStories: React.FC = () => {
       toast.error(error?.data?.message || "Something went wrong!");
     }
   };
-
-  const handleZoomIn = (): void => setScale((prev) => Math.min(prev + 0.1, 3));
-  const handleZoomOut = (): void => setScale((prev) => Math.max(prev - 0.1, 0.5));
-  const handleRotate = (): void => setRotate((prev) => (prev + 90) % 360);
-
-  const getFontFamily = (style: TextStyleType): string => {
-    switch (style) {
-      case "Bold":
-        return "Arial Black";
-      case "Typewriter":
-        return "Courier New";
-      case "Modern":
-        return "Helvetica";
-      default:
-        return "Arial";
-    }
-  };
-
-  // const settingsVariants = {
-  //   hidden: { opacity: 0, scale: 0.8, y: -10 },
-  //   visible: {
-  //     opacity: 1,
-  //     scale: 1,
-  //     y: 0,
-  //     transition: { type: "spring", stiffness: 300, damping: 20 },
-  //   },
-  //   exit: { opacity: 0, scale: 0.8, y: -10, transition: { duration: 0.2 } },
-  // };
 
   // Selection View
   if (currentView === "selection") {

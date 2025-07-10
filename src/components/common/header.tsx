@@ -25,6 +25,7 @@ import { useSocket } from "@/lib/socket";
 import { IHashtag, ISearchResult } from "@/types/search.types";
 import SearchDropdown from "./SearchDropdown";
 import { useGetSearchHashtagAndUsersQuery } from "@/redux/features/search/searchApi";
+import LocationPermission from "./LocationPermission";
 
 // Mobile Menu Component
 const MobileMenu: React.FC<{
@@ -157,10 +158,11 @@ const MobileMenu: React.FC<{
 const Header: React.FC = () => {
   const user = useUser();
   const router = useRouter();
-  
+
   // Desktop/Tablet dropdown states
   const [isMessagesOpen, setIsMessagesOpen] = useState<boolean>(false);
-  const [isNotificationsOpen, setIsNotificationsOpen] = useState<boolean>(false);
+  const [isNotificationsOpen, setIsNotificationsOpen] =
+    useState<boolean>(false);
   const [isUserOpen, setIsUserOpen] = useState<boolean>(false);
 
   // Mobile drawer state
@@ -172,8 +174,9 @@ const Header: React.FC = () => {
   const [debouncedSearchValue, setDebouncedSearchValue] = useState<string>("");
 
   // Search dropdown states
-  const [isSearchDropdownOpen, setIsSearchDropdownOpen] = useState<boolean>(false);
-  
+  const [isSearchDropdownOpen, setIsSearchDropdownOpen] =
+    useState<boolean>(false);
+
   // Search results
   const [searchResults, setSearchResults] = useState<ISearchResult>({
     users: [],
@@ -302,7 +305,7 @@ const Header: React.FC = () => {
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setSearchValue(value);
-    
+
     // Show dropdown if there's a value
     if (value.trim()) {
       setIsSearchDropdownOpen(true);
@@ -328,36 +331,42 @@ const Header: React.FC = () => {
   };
 
   // Navigate to posts search page
-  const handleSearch = useCallback((query: string) => {
-    router.push(`/search/posts-locations?q=${encodeURIComponent(query)}`);
-    // Reset search state after navigation
-    setIsSearchDropdownOpen(false);
-    setSearchValue("");
-    setDebouncedSearchValue("");
-    setIsSearchOpen(false);
-  }, [router]);
+  const handleSearch = useCallback(
+    (query: string) => {
+      router.push(`/search/posts-locations?q=${encodeURIComponent(query)}`);
+      // Reset search state after navigation
+      setIsSearchDropdownOpen(false);
+      setSearchValue("");
+      setDebouncedSearchValue("");
+      setIsSearchOpen(false);
+    },
+    [router]
+  );
 
   // Handle search result clicks
-  const handleSearchResultClick = useCallback((result: IUser | IHashtag, type: string) => {
-    switch (type) {
-      case "user":
-        const userResult = result as IUser;
-        router.push(`/${userResult?.username}`);
-        break;
-      case "hashtag":
-        const hashtagResult = result as IHashtag;
-        router.push(`/search/hashtag?q=${hashtagResult?.name}`);
-        break;
-      default:
-        console.log("Unknown result type");
-    }
+  const handleSearchResultClick = useCallback(
+    (result: IUser | IHashtag, type: string) => {
+      switch (type) {
+        case "user":
+          const userResult = result as IUser;
+          router.push(`/${userResult?.username}`);
+          break;
+        case "hashtag":
+          const hashtagResult = result as IHashtag;
+          router.push(`/search/hashtag?q=${hashtagResult?.name}`);
+          break;
+        default:
+          console.log("Unknown result type");
+      }
 
-    // Reset search state after navigation
-    setIsSearchDropdownOpen(false);
-    setSearchValue("");
-    setDebouncedSearchValue("");
-    setIsSearchOpen(false);
-  }, [router]);
+      // Reset search state after navigation
+      setIsSearchDropdownOpen(false);
+      setSearchValue("");
+      setDebouncedSearchValue("");
+      setIsSearchOpen(false);
+    },
+    [router]
+  );
 
   return (
     <nav className="w-full bg-[#F0FAF9] h-[72px] md:h-[88px] lg:h-[112px] fixed top-0 left-0 z-40">
@@ -541,6 +550,8 @@ const Header: React.FC = () => {
         isOpen={isMobileMenuOpen}
         onClose={() => setIsMobileMenuOpen(false)}
       />
+      {/* Location Permission */}
+      <LocationPermission />
     </nav>
   );
 };
