@@ -57,10 +57,9 @@ const MyGroups: React.FC = () => {
   const showViewMoreButton =
     !isLoading && hasMoreData && groupsData?.length > 0;
 
-  // If no data and not loading, return null to hide the component
-  if (!isLoading && !isLoadingMore && allMyGroups?.length === 0) {
-    return null;
-  }
+  const handleOptimisticRemoveGroup = (groupId: string) => {
+    setAllMyGroups((prev) => prev.filter((group) => group._id !== groupId));
+  };
 
   let content = null;
   if (isLoading || isLoadingMore) {
@@ -77,12 +76,16 @@ const MyGroups: React.FC = () => {
     content = (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {allMyGroups?.map((group: IGroup) => (
-          <MyGroupCard key={group?._id} group={group} />
+          <MyGroupCard key={group?._id} group={group} handleOptimisticRemoveGroup={handleOptimisticRemoveGroup} />
         ))}
       </div>
     );
   }
 
+  // If no data and not loading, return null to hide the component
+  if (!isLoading && !isLoadingMore && allMyGroups?.length === 0) {
+    return null;
+  }
   return (
     <section className="w-full border-b pb-7 border-gray-400">
       {/* Header Section */}

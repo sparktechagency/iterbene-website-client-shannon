@@ -100,7 +100,7 @@ const RequestedConnections: React.FC = () => {
   }
 
   return (
-    <section className="w-full border-b border-gray-400">
+    <section className="w-full border-b border-gray-400 pb-8">
       {/* Header Section */}
       <div className="w-full flex items-center justify-between mb-6 px-2">
         <div className="flex items-center gap-4">
@@ -108,7 +108,7 @@ const RequestedConnections: React.FC = () => {
             Requests Connection
           </h1>
           {requestCount > 0 && (
-            <div className="size-6 rounded-full bg-primary flex items-center justify-center text-white">
+            <div className="size-8 rounded-full bg-primary flex items-center justify-center text-white">
               <h1 className="text-sm font-semibold">{requestCount}</h1>
             </div>
           )}
