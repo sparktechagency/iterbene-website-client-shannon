@@ -4,11 +4,19 @@ import Image from "next/image";
 import { HiGlobe, HiLockClosed, HiUsers } from "react-icons/hi";
 import { TiLocation } from "react-icons/ti";
 import { IPost } from "@/types/post.types";
-import {MoreHorizontal } from "lucide-react";
+import {
+  MoreHorizontal,
+  Bookmark,
+  Flag,
+  BookmarkCheck,
+  Pencil,
+  Trash2,
+} from "lucide-react";
 import useUser from "@/hooks/useUser";
-import { motion, AnimatePresence } from "framer-motion"; // Import Framer Motion
+import { motion, AnimatePresence } from "framer-motion";
 import { useDeletePostMutation } from "@/redux/features/post/postApi";
 import ConfirmationPopup from "@/components/custom/custom-popup";
+import ReportModal, { ReportType } from "@/components/custom/ReportModal"; // Adjust path as needed
 import toast from "react-hot-toast";
 import { TError } from "@/types/error";
 import formatTimeAgo from "@/utils/formatTimeAgo";
@@ -17,13 +25,17 @@ import Link from "next/link";
 interface PostHeaderProps {
   post: IPost;
   onRemove?: () => void;
-  onEditClick?: () => void; // New prop for edit functionality
+  onEditClick?: () => void;
+  isSaved?: boolean; // To track if post is saved
+  onSaveToggle?: (postId: string, isSaved: boolean) => void; // Callback for save/unsave
 }
 
 const PostHeader = ({
   post,
   onRemove,
   onEditClick,
+  isSaved = false,
+  onSaveToggle,
 }: PostHeaderProps) => {
   const user = useUser();
   const [isOpen, setIsOpen] = useState(false);
@@ -32,13 +44,14 @@ const PostHeader = ({
   const isOwnPost = post?.userId?._id == user?._id;
 
   const [isDeletePopupOpen, setIsDeletePopupOpen] = useState<boolean>(false);
+  const [isReportModalOpen, setIsReportModalOpen] = useState<boolean>(false);
   const [deletePost, { isLoading: isDeleting }] = useDeletePostMutation();
 
   const toggleDropdown = () => setIsOpen(!isOpen);
 
   const handleEdit = () => {
     setIsOpen(false);
-    onEditClick?.(); // Call the passed onEditClick prop
+    onEditClick?.();
   };
 
   const handleDelete = () => {
@@ -46,12 +59,21 @@ const PostHeader = ({
     setIsDeletePopupOpen(true);
   };
 
+  const handleSaveToggle = () => {
+    setIsOpen(false);
+    onSaveToggle?.(post._id, !isSaved);
+  };
+
+  const handleReport = () => {
+    setIsOpen(false);
+    setIsReportModalOpen(true);
+  };
+
   const handleConfirmDelete = async () => {
     try {
       await deletePost(post._id).unwrap();
       setIsDeletePopupOpen(false);
       toast.success("Post deleted successfully!");
-      // Call onRemove to update UI immediately
       onRemove?.();
     } catch (error) {
       const err = error as TError;
@@ -75,7 +97,7 @@ const PostHeader = ({
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
-  // Define animation variants for the dropdown
+
   const dropdownVariants = {
     hidden: {
       opacity: 0,
@@ -99,6 +121,7 @@ const PostHeader = ({
       },
     },
   };
+
   return (
     <section className="w-full flex justify-between items-center gap-4">
       <div className="flex items-center mb-3">
@@ -140,47 +163,78 @@ const PostHeader = ({
         </div>
       </div>
 
-      {isOwnPost && (
-        <div className="relative">
-          <button
-            ref={triggerRef}
-            onClick={toggleDropdown}
-            className="cursor-pointer p-3 hover:bg-gray-100 rounded-full transition-colors"
-          >
-            <MoreHorizontal size={23} />
-          </button>
-          <AnimatePresence>
-            {isOpen && (
-              <motion.div
-                ref={dropdownRef}
-                className="absolute right-0 mt-1 w-48 bg-white rounded-xl border border-gray-50 shadow-md z-50"
-                variants={dropdownVariants}
-                initial="hidden"
-                animate="visible"
-                exit="exit"
+      <div className="relative">
+        <button
+          ref={triggerRef}
+          onClick={toggleDropdown}
+          className="cursor-pointer p-3 hover:bg-gray-100 rounded-full transition-colors"
+        >
+          <MoreHorizontal size={23} />
+        </button>
+        <AnimatePresence>
+          {isOpen && (
+            <motion.div
+              ref={dropdownRef}
+              className="absolute right-0 mt-1 w-48 bg-white rounded-xl border border-gray-50 shadow-md z-50"
+              variants={dropdownVariants}
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+            >
+              {/* Save/Unsave Option - Available for all posts */}
+              <button
+                onClick={handleSaveToggle}
+                className="flex items-center gap-3 w-full text-left px-4 py-3 text-gray-800 hover:bg-gray-100 transition-colors cursor-pointer rounded-t-xl"
               >
-                {isOwnPost && (
+                {isSaved ? (
                   <>
-                    <button
-                      onClick={handleEdit} // This will now call onEditClick from parent
-                      className="block w-full text-left px-4 py-3 text-gray-800 hover:bg-gray-100 rounded-t-xl cursor-pointer"
-                    >
-                      Edit
-                    </button>
-                    <button
-                      onClick={handleDelete}
-                      className="block w-full text-left px-4 py-3 text-rose-500 hover:bg-gray-100 rounded-b-xl cursor-pointer"
-                    >
-                      Delete
-                    </button>
+                    <BookmarkCheck size={16} className="text-blue-600" />
+                    <span>Saved</span>
+                  </>
+                ) : (
+                  <>
+                    <Bookmark size={16} />
+                    <span>Save Post</span>
                   </>
                 )}
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
-      )}
+              </button>
 
+              {/* Own Post Options */}
+              {isOwnPost && (
+                <>
+                  <button
+                    onClick={handleEdit}
+                    className="flex items-center w-full gap-3  text-left px-4 py-3 text-gray-800 hover:bg-gray-100 border-t border-gray-100 transition-colors cursor-pointer"
+                  >
+                    <Pencil size={16} />
+                    Edit
+                  </button>
+                  <button
+                    onClick={handleDelete}
+                    className="flex items-center w-full gap-3  text-left px-4 py-3 text-rose-500 hover:bg-gray-100 transition-colors border-t border-gray-100 rounded-b-xl cursor-pointer"
+                  >
+                    <Trash2 size={16} />
+                    Delete
+                  </button>
+                </>
+              )}
+
+              {/* Report Option - Available for other users' posts */}
+              {!isOwnPost && (
+                <button
+                  onClick={handleReport}
+                  className="flex items-center gap-3 w-full text-left px-4 py-3 text-red-600 hover:bg-gray-100 transition-colors border-t rounded-b-xl cursor-pointer border-gray-100"
+                >
+                  <Flag size={16} />
+                  <span>Report Post</span>
+                </button>
+              )}
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+
+      {/* Delete Confirmation Popup */}
       <ConfirmationPopup
         isOpen={isDeletePopupOpen}
         onClose={() => setIsDeletePopupOpen(false)}
@@ -191,6 +245,15 @@ const PostHeader = ({
         confirmText="Delete"
         cancelText="Cancel"
         isLoading={isDeleting}
+      />
+
+      {/* Report Modal */}
+      <ReportModal
+        isOpen={isReportModalOpen}
+        onClose={() => setIsReportModalOpen(false)}
+        reportType={ReportType.POST}
+        reportedUserId={post?.userId?._id}
+        reportedEntityId={post._id}
       />
     </section>
   );

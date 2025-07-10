@@ -82,6 +82,7 @@ export const baseApi = createApi({
     "Connections",
     "Itinerary",
     "Notifications",
+    "SavedPost",
   ],
   endpoints: () => ({}),
 });

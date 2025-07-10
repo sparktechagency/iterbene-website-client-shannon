@@ -1,8 +1,9 @@
 "use client";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, AlertTriangle, Trash2, Check } from "lucide-react";
+import { AlertTriangle, Trash2, Check } from "lucide-react";
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
+import { IoMdClose } from "react-icons/io";
 
 interface ConfirmationPopupProps {
   isOpen: boolean;
@@ -41,14 +42,14 @@ const ConfirmationPopup: React.FC<ConfirmationPopupProps> = ({
   useEffect(() => {
     if (isOpen) {
       // Prevent body scroll when modal is open
-      document.body.style.overflow = 'hidden';
+      document.body.style.overflow = "hidden";
     } else {
-      document.body.style.overflow = 'unset';
+      document.body.style.overflow = "unset";
     }
 
     // Cleanup function to reset body overflow
     return () => {
-      document.body.style.overflow = 'unset';
+      document.body.style.overflow = "unset";
     };
   }, [isOpen]);
 
@@ -128,12 +129,11 @@ const ConfirmationPopup: React.FC<ConfirmationPopupProps> = ({
           >
             {/* Close button */}
             <button
-              className="absolute top-4 right-4 text-gray-600 hover:text-gray-800 transition-colors cursor-pointer"
+              className="absolute top-4 right-4 text-gray-600 border-gray-400 cursor-pointer size-10 bg-[#EEFDFB] rounded-full border flex justify-center items-center"
               onClick={onClose}
             >
-              <X className="size-6" />
+              <IoMdClose size={18} />
             </button>
-
             {/* Content */}
             <div className="p-6">
               {/* Icon */}
