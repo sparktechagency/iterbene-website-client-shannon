@@ -9,8 +9,7 @@ import {
   Train,
   Bus,
   Car,
-  Ship,
-  Bookmark,
+  Ship
 } from "lucide-react";
 import CustomModal from "@/components/custom/custom-modal";
 import moment from "moment";
@@ -259,12 +258,6 @@ const ShowItineraryModal = ({
         header={
           <div className="flex items-center justify-between px-4 py-4 border-b border-gray-200 rounded-t-xl">
             <div className="flex items-center gap-5">
-                <button
-                className="text-gray-600 border-gray-400 cursor-pointer size-10 bg-[#EEFDFB] rounded-full border flex justify-center items-center hover:bg-[#E0F7F0] transition-colors"
-  
-              >
-                <Bookmark size={20} />
-              </button>
               {/* Download icon */}
               <button
                 className="text-gray-600 border-gray-400 cursor-pointer size-10 bg-[#EEFDFB] rounded-full border flex justify-center items-center hover:bg-[#E0F7F0] transition-colors"

@@ -35,6 +35,14 @@ const savedPostApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["SavedPost"],
     }),
+    isPostSaved: builder.query({
+      query: (id) => ({
+        url: `/saved-post-itinerary/already-saved/${id}`,
+        method: "GET",
+      }),
+      providesTags: ["SavedPost"],
+      transformResponse: (response) => response?.data,
+    }),
   }),
 });
 
@@ -42,4 +50,5 @@ export const {
   useGetSavedPostQuery,
   useSavePostMutation,
   useUnsavePostMutation,
+  useIsPostSavedQuery
 } = savedPostApi;

@@ -177,7 +177,7 @@ const ReportModal: React.FC<ReportModalProps> = ({
   };
 
   const renderHeader = () => (
-    <div className="flex items-center justify-between p-4 border-b">
+    <div className="flex items-center justify-between p-4 border-b border-gray-200">
       <div className="flex items-center gap-2">
         {getReportIcon()}
         <h2 className="text-xl font-semibold text-gray-900">

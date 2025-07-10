@@ -16,59 +16,94 @@ import useUser from "@/hooks/useUser";
 import { motion, AnimatePresence } from "framer-motion";
 import { useDeletePostMutation } from "@/redux/features/post/postApi";
 import ConfirmationPopup from "@/components/custom/custom-popup";
-import ReportModal, { ReportType } from "@/components/custom/ReportModal"; // Adjust path as needed
+import ReportModal, { ReportType } from "@/components/custom/ReportModal";
 import toast from "react-hot-toast";
 import { TError } from "@/types/error";
 import formatTimeAgo from "@/utils/formatTimeAgo";
 import Link from "next/link";
+import {
+  useIsPostSavedQuery,
+  useSavePostMutation,
+  useUnsavePostMutation, // Import unsave mutation
+} from "@/redux/features/savedPost/savedPost.api";
 
 interface PostHeaderProps {
   post: IPost;
   onRemove?: () => void;
   onEditClick?: () => void;
-  isSaved?: boolean; // To track if post is saved
-  onSaveToggle?: (postId: string, isSaved: boolean) => void; // Callback for save/unsave
 }
 
-const PostHeader = ({
-  post,
-  onRemove,
-  onEditClick,
-  isSaved = false,
-  onSaveToggle,
-}: PostHeaderProps) => {
+const PostHeader = ({ post, onRemove, onEditClick }: PostHeaderProps) => {
   const user = useUser();
   const [isOpen, setIsOpen] = useState(false);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const isOwnPost = post?.userId?._id == user?._id;
+  const isOwnPost = post?.userId?._id === user?._id;
 
   const [isDeletePopupOpen, setIsDeletePopupOpen] = useState<boolean>(false);
   const [isReportModalOpen, setIsReportModalOpen] = useState<boolean>(false);
+
+  // Delete post
   const [deletePost, { isLoading: isDeleting }] = useDeletePostMutation();
+
+  // Check if post is saved
+  const { data: isSaved, isLoading: isCheckingSaved } = useIsPostSavedQuery(
+    post?._id,
+    { skip: !post?._id }
+  );
+
+  // Save post
+  const [savePost, { isLoading: isSaving }] = useSavePostMutation();
+
+  // Unsave post
+  const [unsavePost, { isLoading: isUnsaving }] = useUnsavePostMutation();
 
   const toggleDropdown = () => setIsOpen(!isOpen);
 
+  // Handle edit
   const handleEdit = () => {
     setIsOpen(false);
     onEditClick?.();
   };
 
+  // Handle delete
   const handleDelete = () => {
     setIsOpen(false);
     setIsDeletePopupOpen(true);
   };
 
-  const handleSaveToggle = () => {
-    setIsOpen(false);
-    onSaveToggle?.(post._id, !isSaved);
+  // Handle save
+  const handleSave = async () => {
+    try {
+      const payload = { postId: post._id };
+      await savePost(payload).unwrap();
+      toast.success("Post saved successfully!");
+      setIsOpen(false);
+    } catch (error) {
+      const err = error as TError;
+      toast.error(err?.data?.message || "Failed to save post");
+    }
   };
 
+  // Handle unsave
+  const handleUnsave = async () => {
+    try {
+      await unsavePost(post?._id).unwrap();
+      toast.success("Post unsaved successfully!");
+      setIsOpen(false);
+    } catch (error) {
+      const err = error as TError;
+      toast.error(err?.data?.message || "Failed to unsave post");
+    }
+  };
+
+  // Handle report
   const handleReport = () => {
     setIsOpen(false);
     setIsReportModalOpen(true);
   };
 
+  // Handle confirm delete
   const handleConfirmDelete = async () => {
     try {
       await deletePost(post._id).unwrap();
@@ -77,7 +112,7 @@ const PostHeader = ({
       onRemove?.();
     } catch (error) {
       const err = error as TError;
-      toast.error(err?.data?.message || "Something went wrong!");
+      toast.error(err?.data?.message || "Failed to delete post");
     }
   };
 
@@ -99,44 +134,34 @@ const PostHeader = ({
   }, []);
 
   const dropdownVariants = {
-    hidden: {
-      opacity: 0,
-      y: -10,
-    },
+    hidden: { opacity: 0, y: -10 },
     visible: {
       opacity: 1,
       y: 0,
-      transition: {
-        duration: 0.2,
-        ease: "easeOut",
-      },
+      transition: { duration: 0.2, ease: "easeOut" },
     },
     exit: {
       opacity: 0,
       y: -10,
       scale: 0.95,
-      transition: {
-        duration: 0.15,
-        ease: "easeIn",
-      },
+      transition: { duration: 0.15, ease: "easeIn" },
     },
   };
-
   return (
     <section className="w-full flex justify-between items-center gap-4">
       <div className="flex items-center mb-3">
         <Image
-          src={post?.userId?.profileImage}
-          alt={post?.userId?.fullName}
+          src={post?.userId?.profileImage || "/default-profile.png"} // Fallback image
+          alt={post?.userId?.fullName || "User"}
           width={50}
           height={50}
           className="size-[50px] object-cover rounded-full mr-3 ring-2 ring-gray-200"
         />
         <div>
           <div className="flex items-center gap-2">
-            <Link href={`/${post?.userId?.username}`}>
+            <Link href={`/${post?.userId?.username || ""}`}>
               <p className="font-medium text-gray-800 text-lg hover:underline">
-                {post?.userId?.fullName}
+                {post?.userId?.fullName || "Unknown User"}
               </p>
             </Link>
             <span className="text-sm">
@@ -147,9 +172,7 @@ const PostHeader = ({
             {post?.visitedLocationName && (
               <>
                 <TiLocation size={23} className="text-primary" />
-                <span className="flex items-center">
-                  {post?.visitedLocationName}
-                </span>
+                <span>{post.visitedLocationName}</span>
               </>
             )}
             {post?.privacy === "public" ? (
@@ -168,6 +191,8 @@ const PostHeader = ({
           ref={triggerRef}
           onClick={toggleDropdown}
           className="cursor-pointer p-3 hover:bg-gray-100 rounded-full transition-colors"
+          aria-label="More options"
+          aria-expanded={isOpen}
         >
           <MoreHorizontal size={23} />
         </button>
@@ -181,22 +206,15 @@ const PostHeader = ({
               animate="visible"
               exit="exit"
             >
-              {/* Save/Unsave Option - Available for all posts */}
+              {/* Save/Unsave Option */}
               <button
-                onClick={handleSaveToggle}
-                className="flex items-center gap-3 w-full text-left px-4 py-3 text-gray-800 hover:bg-gray-100 transition-colors cursor-pointer rounded-t-xl"
+                onClick={isSaved ? handleUnsave : handleSave}
+                disabled={isSaving || isUnsaving || isCheckingSaved}
+                className="flex items-center gap-3 w-full text-left px-4 py-3 text-gray-800 hover:bg-gray-100 transition-colors cursor-pointer rounded-t-xl disabled:opacity-50"
+                aria-label={isSaved ? "Unsave post" : "Save post"}
               >
-                {isSaved ? (
-                  <>
-                    <BookmarkCheck size={16} className="text-blue-600" />
-                    <span>Saved</span>
-                  </>
-                ) : (
-                  <>
-                    <Bookmark size={16} />
-                    <span>Save Post</span>
-                  </>
-                )}
+                {isSaved ? <BookmarkCheck size={16} /> : <Bookmark size={16} />}
+                <span>{isSaved ? "Unsave Post" : "Save Post"}</span>
               </button>
 
               {/* Own Post Options */}
@@ -204,14 +222,16 @@ const PostHeader = ({
                 <>
                   <button
                     onClick={handleEdit}
-                    className="flex items-center w-full gap-3  text-left px-4 py-3 text-gray-800 hover:bg-gray-100 border-t border-gray-100 transition-colors cursor-pointer"
+                    className="flex items-center gap-3 w-full text-left px-4 py-3 text-gray-800 hover:bg-gray-100 border-t border-gray-100 transition-colors cursor-pointer"
+                    aria-label="Edit post"
                   >
                     <Pencil size={16} />
                     Edit
                   </button>
                   <button
                     onClick={handleDelete}
-                    className="flex items-center w-full gap-3  text-left px-4 py-3 text-rose-500 hover:bg-gray-100 transition-colors border-t border-gray-100 rounded-b-xl cursor-pointer"
+                    className="flex items-center gap-3 w-full text-left px-4 py-3 text-rose-500 hover:bg-gray-100 transition-colors border-t border-gray-100 rounded-b-xl cursor-pointer"
+                    aria-label="Delete post"
                   >
                     <Trash2 size={16} />
                     Delete
@@ -219,14 +239,15 @@ const PostHeader = ({
                 </>
               )}
 
-              {/* Report Option - Available for other users' posts */}
+              {/* Report Option */}
               {!isOwnPost && (
                 <button
                   onClick={handleReport}
-                  className="flex items-center gap-3 w-full text-left px-4 py-3 text-red-600 hover:bg-gray-100 transition-colors border-t rounded-b-xl cursor-pointer border-gray-100"
+                  className="flex items-center gap-3 w-full text-left px-4 py-3 text-red-600 hover:bg-gray-100 transition-colors border-t border-gray-100 rounded-b-xl cursor-pointer"
+                  aria-label="Report post"
                 >
                   <Flag size={16} />
-                  <span>Report Post</span>
+                  Report Post
                 </button>
               )}
             </motion.div>
@@ -252,7 +273,7 @@ const PostHeader = ({
         isOpen={isReportModalOpen}
         onClose={() => setIsReportModalOpen(false)}
         reportType={ReportType.POST}
-        reportedUserId={post?.userId?._id}
+        reportedUserId={post?.userId?._id || ""}
         reportedEntityId={post._id}
       />
     </section>
