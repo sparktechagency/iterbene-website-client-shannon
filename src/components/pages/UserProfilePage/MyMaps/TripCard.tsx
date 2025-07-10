@@ -77,7 +77,7 @@ const TripCard = ({ trip }: { trip: ISearchPost }) => {
             {trip?.itinerary && (
               <h1 className="flex items-center gap-1">
                 <FaStar className="text-primary" />
-                <h1>{trip?.itinerary?.overAllRating}</h1>
+                <span>{trip?.itinerary?.overAllRating}</span>
               </h1>
             )}
           </div>
