@@ -8,7 +8,7 @@ const AuthorBio = () => {
   return (
     <>
       {user && (
-        <Link href={`/${user?.username}`}>
+        <Link href={`/${user?.username}`} className="w-full block">
           <section className="w-full max-h-[108px] bg-white p-6 rounded-2xl">
             <div className="w-full h-full gap-3 flex items-center">
               {user && (
