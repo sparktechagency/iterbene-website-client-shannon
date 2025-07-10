@@ -12,9 +12,7 @@ import React from "react";
 import toast from "react-hot-toast";
 
 const UserProfileHeader = ({ userData }: { userData: IUser }) => {
-  //add connection
   const [addConnection, { isLoading }] = useAddConnectionMutation();
-  //cancel connection
   const [cancelConnection, { isLoading: isLoadingCancel }] =
     useCancelConnectionMutation();
   const { data: responseData } = useCheckIsSentConnectionExistsQuery(
@@ -38,6 +36,7 @@ const UserProfileHeader = ({ userData }: { userData: IUser }) => {
       toast.error(err?.data?.message || "Something went wrong!");
     }
   };
+
   const handleCancelRequest = async () => {
     try {
       await cancelConnection(userData?._id).unwrap();
@@ -47,9 +46,9 @@ const UserProfileHeader = ({ userData }: { userData: IUser }) => {
       toast.error(err?.data?.message || "Something went wrong!");
     }
   };
+
   return (
     <div className="w-full bg-white rounded-2xl relative mt-[112px]">
-      {/* Background Image */}
       {userData?.coverImage && (
         <Image
           src={userData?.coverImage}
@@ -57,6 +56,7 @@ const UserProfileHeader = ({ userData }: { userData: IUser }) => {
           width={1600}
           height={360}
           className="w-full h-[200px] sm:h-[280px] md:h-[360px] object-cover rounded-t-2xl"
+          priority
         />
       )}
 
@@ -66,13 +66,13 @@ const UserProfileHeader = ({ userData }: { userData: IUser }) => {
           alt="profile"
           width={174}
           height={174}
-          className="block lg:absolute left-8 size-[174px] mx-auto  -mt-[100px] object-cover rounded-full border-4 border-white flex-shrink-0"
+          className="block lg:absolute left-8 size-[174px] mx-auto -mt-[100px] object-cover rounded-full border-4 border-white flex-shrink-0"
+          priority
         />
       )}
-      {/* Profile Section */}
-      <div className="w-full flex flex-col md:flex-row justify-between items-center gap-4 md:gap-8  lg:pl-[240px] p-7 md:p-10 ">
-        <div className="space-y-1  flex-1">
-          {/* User full name */}
+
+      <div className="w-full flex flex-col md:flex-row justify-between items-center gap-4 md:gap-8 lg:pl-[240px] p-7 md:p-10 ">
+        <div className="space-y-1 flex-1">
           <h1 className="text-center md:text-left text-lg sm:text-xl md:text-2xl font-bold text-gray-800">
             {userData?.fullName}
           </h1>

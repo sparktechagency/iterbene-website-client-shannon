@@ -57,6 +57,14 @@ const MyEvents: React.FC = () => {
   const showViewMoreButton =
     !isLoading && hasMoreData && eventsData?.length > 0;
 
+    
+    // optimistic update ui
+  const handleOptimisticUiUpdate = (eventId: string) => {
+    setAllMyEvents((prev) =>
+      prev.filter((event) => event._id !== eventId)
+    );
+  };
+
   let content = null;
   if (isLoading || isLoadingMore) {
     content = (
@@ -72,10 +80,16 @@ const MyEvents: React.FC = () => {
     content = (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {allMyEvents?.map((event: IEvent) => (
-          <MyEventCard key={event?._id} event={event} />
+          <MyEventCard key={event?._id} event={event} handleOptimisticUiUpdate={handleOptimisticUiUpdate} />
         ))}
       </div>
     );
+  }
+
+
+  // If no data and not loading, return null to hide the component
+  if (!isLoading && !isLoadingMore && allMyEvents?.length === 0) {
+    return null;
   }
 
   return (

@@ -11,14 +11,21 @@ import { PiUserBold } from "react-icons/pi";
 
 interface UpcomingEventCardProps {
   event: IEvent;
+  handleOptimisticUiUpdate?: (eventId: string) => void;
 }
 
-const MyEventCard = ({ event }: UpcomingEventCardProps) => {
+const MyEventCard = ({
+  event,
+  handleOptimisticUiUpdate,
+}: UpcomingEventCardProps) => {
   const [removeEvent, { isLoading: isRemoving }] = useRemoveEventMutation();
   const [isRemoveModalOpen, setIsRemoveModalOpen] = useState<boolean>(false);
   const handleRemoveEvent = async () => {
     try {
       await removeEvent(event?._id).unwrap();
+      if (handleOptimisticUiUpdate) {
+        handleOptimisticUiUpdate(event?._id);
+      }
       toast.success("Event removed successfully.");
     } catch (error) {
       const err = error as TError;
@@ -40,9 +47,9 @@ const MyEventCard = ({ event }: UpcomingEventCardProps) => {
         <Image
           src={event?.eventImage}
           alt={event?.eventName}
-            width={248}
-            height={248}
-            className="w-full h-56 md:h-60 lg:h-[248px] object-cover rounded-2xl mb-4"
+          width={248}
+          height={248}
+          className="w-full h-56 md:h-60 lg:h-[248px] object-cover rounded-2xl mb-4"
         />
         <div className="absolute px-4 py-5 rounded-xl top-0 left-0 right-0 bottom-0 bg-gray-950/20">
           <div className="w-full h-full flex flex-col justify-between">

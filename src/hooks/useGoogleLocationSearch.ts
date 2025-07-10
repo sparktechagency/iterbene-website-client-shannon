@@ -37,7 +37,7 @@ interface UseGoogleLocationSearchReturn {
   searchLocations: (query: string) => Promise<void>;
   getLocationDetails: (placeId: string) => Promise<LocationDetails | null>;
   clearPredictions: () => void;
-  autocompleteService: React.MutableRefObject<google.maps.places.AutocompleteService | null>;
+  autocomplete: React.MutableRefObject<google.maps.places.Autocomplete | null>;
   placesService: React.MutableRefObject<google.maps.places.PlacesService | null>;
   initializeGoogleMaps: () => void;
   error: string | null;
@@ -60,16 +60,29 @@ export const useGoogleLocationSearch = (
   const [isInitialized, setIsInitialized] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const autocompleteService =
-    useRef<google.maps.places.AutocompleteService | null>(null);
+  const autocomplete = useRef<google.maps.places.Autocomplete | null>(null);
   const placesService = useRef<google.maps.places.PlacesService | null>(null);
   const debounceTimer = useRef<NodeJS.Timeout | null>(null);
+  const inputRef = useRef<HTMLInputElement | null>(null);
 
   const initializeServices = useCallback(() => {
     try {
       if (window.google && window.google.maps) {
-        autocompleteService.current =
-          new window.google.maps.places.AutocompleteService();
+        // Create a dummy input element for the Autocomplete constructor
+        const dummyInput = document.createElement("input");
+        dummyInput.type = "text";
+        dummyInput.style.display = "none";
+        document.body.appendChild(dummyInput);
+        inputRef.current = dummyInput;
+
+        autocomplete.current = new window.google.maps.places.Autocomplete(
+          inputRef.current,
+          {
+            types,
+            fields: ["place_id", "description", "structured_formatting"],
+          }
+        );
+
         const dummyDiv = document.createElement("div");
         placesService.current = new window.google.maps.places.PlacesService(
           dummyDiv
@@ -82,7 +95,7 @@ export const useGoogleLocationSearch = (
       setError("Failed to initialize location services");
       return false;
     }
-  }, []);
+  }, [types]);
 
   const initializeGoogleMaps = useCallback(async () => {
     if (isInitialized) return;
@@ -115,7 +128,7 @@ export const useGoogleLocationSearch = (
         return;
       }
 
-      if (!autocompleteService.current) {
+      if (!autocomplete.current || !inputRef.current) {
         return;
       }
 
@@ -127,23 +140,24 @@ export const useGoogleLocationSearch = (
       setError(null);
 
       debounceTimer.current = setTimeout(() => {
-        const request: google.maps.places.AutocompletionRequest = {
-          input: effectiveQuery,
-          types: types as string[],
-        };
-
-        autocompleteService.current!.getPlacePredictions(
-          request,
-          (predictions, status) => {
-            setIsLoading(false);
-
-            if (status === google.maps.places.PlacesServiceStatus.OK && predictions) {
-              setPredictions(predictions.slice(0, maxResults));
-            } else {
-              setPredictions([]);
+        if (inputRef.current) {
+          inputRef.current.value = effectiveQuery;
+          const service = new google.maps.places.AutocompleteService();
+          service.getPlacePredictions(
+            { input: effectiveQuery, types },
+            (predictions, status) => {
+              setIsLoading(false);
+              if (
+                status === google.maps.places.PlacesServiceStatus.OK &&
+                predictions
+              ) {
+                setPredictions(predictions.slice(0, maxResults));
+              } else {
+                setPredictions([]);
+              }
             }
-          }
-        );
+          );
+        }
       }, debounceMs);
     },
     [
@@ -204,6 +218,9 @@ export const useGoogleLocationSearch = (
       if (debounceTimer.current) {
         clearTimeout(debounceTimer.current);
       }
+      if (inputRef.current) {
+        inputRef.current.remove();
+      }
     };
   }, []);
 
@@ -214,7 +231,7 @@ export const useGoogleLocationSearch = (
     searchLocations,
     getLocationDetails,
     clearPredictions,
-    autocompleteService,
+    autocomplete,
     placesService,
     initializeGoogleMaps,
     error,

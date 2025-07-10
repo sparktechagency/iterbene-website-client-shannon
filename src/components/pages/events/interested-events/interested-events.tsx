@@ -57,6 +57,12 @@ const InterestedEvents: React.FC = () => {
   const showViewMoreButton =
     !isLoading && hasMoreData && eventsData?.length > 0;
 
+  // optimistic update ui
+  const handleOptimisticUiUpdate = (eventId: string) => {
+    setAllInterestedEvents((prev) =>
+      prev.filter((event) => event._id !== eventId)
+    );
+  };
   let content = null;
   if (isLoading || isLoadingMore) {
     content = (
@@ -72,7 +78,7 @@ const InterestedEvents: React.FC = () => {
     content = (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {allInterestedEvents?.map((event: IEvent) => (
-          <InterestedEventCard key={event?._id} event={event} />
+          <InterestedEventCard key={event?._id} event={event} handleOptimisticUiUpdate={handleOptimisticUiUpdate} />
         ))}
       </div>
     );

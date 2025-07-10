@@ -25,12 +25,10 @@ const PostContentRender = ({ data, isVisible }: PostContentRenderProps) => {
   const [open, setOpen] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  // Create a list of slides just for images, for the lightbox
   const imageSlides = data
     .filter((media) => media.mediaType === "image")
     .map((media) => ({ src: media.mediaUrl }));
 
-  // This function finds the correct index in the `imageSlides` array
   const handleImageClick = (clickedMedia: IMedia) => {
     const imageIndex = imageSlides.findIndex(
       (slide) => slide.src === clickedMedia.mediaUrl
@@ -42,7 +40,6 @@ const PostContentRender = ({ data, isVisible }: PostContentRenderProps) => {
   };
 
   const renderDesktopLayout = () => {
-    // Single media item
     if (mediaCount === 1) {
       const media = data[0];
       return (
@@ -55,6 +52,7 @@ const PostContentRender = ({ data, isVisible }: PostContentRenderProps) => {
               height={350}
               className="w-full object-contain cursor-pointer rounded-md"
               onClick={() => handleImageClick(media)}
+              priority
             />
           ) : (
             <VideoCard
@@ -67,7 +65,6 @@ const PostContentRender = ({ data, isVisible }: PostContentRenderProps) => {
       );
     }
 
-    // Two media items
     if (mediaCount === 2) {
       return (
         <div className="grid grid-cols-2 gap-3 mt-3">
@@ -81,6 +78,7 @@ const PostContentRender = ({ data, isVisible }: PostContentRenderProps) => {
                   height={350}
                   className="w-full h-[350px]  rounded-xl cursor-pointer"
                   onClick={() => handleImageClick(media)}
+                  priority={index === 0}
                 />
               ) : (
                 <VideoCard
@@ -95,7 +93,6 @@ const PostContentRender = ({ data, isVisible }: PostContentRenderProps) => {
       );
     }
 
-    // Three media items
     if (mediaCount === 3) {
       return (
         <div className="grid grid-cols-2 gap-3 mt-3">
@@ -108,6 +105,7 @@ const PostContentRender = ({ data, isVisible }: PostContentRenderProps) => {
                 height={350}
                 className="w-full h-[350px] object-cover rounded-xl cursor-pointer"
                 onClick={() => handleImageClick(data[0])}
+                priority
               />
             ) : (
               <VideoCard
@@ -152,7 +150,7 @@ const PostContentRender = ({ data, isVisible }: PostContentRenderProps) => {
         </div>
       );
     }
-    // Four media items
+
     if (mediaCount === 4) {
       return (
         <div className="grid grid-cols-3 gap-3 mt-3">
@@ -165,6 +163,7 @@ const PostContentRender = ({ data, isVisible }: PostContentRenderProps) => {
                 height={800}
                 className="w-full h-full object-cover rounded-xl cursor-pointer"
                 onClick={() => handleImageClick(data[0])}
+                priority
               />
             ) : (
               <VideoCard url={data[0]?.mediaUrl} isVisible={isVisible} />
@@ -215,7 +214,7 @@ const PostContentRender = ({ data, isVisible }: PostContentRenderProps) => {
         </div>
       );
     }
-    // Four media items ++
+
     if (mediaCount > 4) {
       return (
         <div className="grid grid-cols-3 gap-3 mt-3">
@@ -228,6 +227,7 @@ const PostContentRender = ({ data, isVisible }: PostContentRenderProps) => {
                 height={400}
                 className="w-full h-full object-cover rounded-xl cursor-pointer"
                 onClick={() => handleImageClick(data[0])}
+                priority
               />
             ) : (
               <VideoCard url={data[0]?.mediaUrl} isVisible={isVisible} />
@@ -312,6 +312,7 @@ const PostContentRender = ({ data, isVisible }: PostContentRenderProps) => {
                     height={350}
                     className="w-full h-full object-cover rounded-xl cursor-pointer"
                     onClick={() => handleImageClick(media)}
+                    priority={index === 0}
                   />
                 ) : (
                   <VideoCard

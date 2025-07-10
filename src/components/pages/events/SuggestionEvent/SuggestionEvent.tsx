@@ -57,6 +57,13 @@ const SuggestionEvent: React.FC = () => {
   const showViewMoreButton =
     !isLoading && hasMoreData && eventsData?.length > 0;
 
+  // optimistic update ui
+  const handleOptimisticUiUpdate = (eventId: string) => {
+    setAllSuggestedEvents((prev) =>
+      prev.filter((event) => event._id !== eventId)
+    );
+  };
+
   // If no data and not loading, return null to hide the component
   if (!isLoading && !isLoadingMore && allSuggestedEvents?.length === 0) {
     return null;
@@ -77,7 +84,7 @@ const SuggestionEvent: React.FC = () => {
     content = (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {allSuggestedEvents?.map((event: IEvent) => (
-          <SuggestionEventCard key={event?._id} event={event} />
+          <SuggestionEventCard key={event?._id} event={event} handleOptimisticUiUpdate={handleOptimisticUiUpdate} />
         ))}
       </div>
     );

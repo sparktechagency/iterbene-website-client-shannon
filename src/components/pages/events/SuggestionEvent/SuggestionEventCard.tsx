@@ -10,15 +10,22 @@ import { PiUserBold } from "react-icons/pi";
 
 interface UpcomingEventCardProps {
   event: IEvent;
+  handleOptimisticUiUpdate?: (eventId: string) => void;
 }
 
-const SuggestionEventCard = ({ event }: UpcomingEventCardProps) => {
+const SuggestionEventCard = ({
+  event,
+  handleOptimisticUiUpdate,
+}: UpcomingEventCardProps) => {
   const [interestEvent, { isLoading: isInterestLoading }] =
     useInterestEventMutation();
 
   const handleInterest = async () => {
     try {
       await interestEvent(event?._id).unwrap();
+      if (handleOptimisticUiUpdate) {
+        handleOptimisticUiUpdate(event?._id);
+      }
       toast.success("Marked as interested successfully.");
     } catch (error) {
       const err = error as TError;
@@ -31,13 +38,13 @@ const SuggestionEventCard = ({ event }: UpcomingEventCardProps) => {
   return (
     <div className="w-full bg-white rounded-2xl  p-4 flex flex-col items-center">
       {/* Group Image */}
-      <div className="w-full h-[350px] bg-gray-200 rounded-xl mb-4 relative">
+      <div className="w-full h-56 md:h-60 lg:h-[248px] bg-gray-200 rounded-xl mb-4 relative">
         <Image
           src={event?.eventImage}
           alt={event?.eventName}
-          width={350}
-          height={350}
-          className="w-full h-full object-cover rounded-2xl mb-4"
+          width={248}
+          height={248}
+          className="w-full h-56 md:h-60 lg:h-[248px] object-cover rounded-2xl mb-4"
         />
         <div className="absolute px-4 py-5 rounded-xl top-0 left-0 right-0 bottom-0 bg-gray-950/20">
           <div className="w-full h-full flex flex-col justify-between">
