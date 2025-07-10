@@ -167,6 +167,14 @@ const postApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["Post"],
     }),
+    incrementItineraryViewCount: builder.mutation({
+      query: (data) => ({
+        url: `/posts/increment-itinerary-view-count`,
+        method: "POST",
+        body: data,
+      }),
+      invalidatesTags: ["Post"],
+    }),
   }),
 });
 
@@ -186,6 +194,7 @@ export const {
   useAddOrRemoveCommentReactionMutation,
   useUpdateCommentMutation,
   useDeleteCommentMutation,
+  useIncrementItineraryViewCountMutation,
 } = postApi;
 
 export default postApi;

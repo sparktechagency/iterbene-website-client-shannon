@@ -1,6 +1,9 @@
-'use client';
+"use client";
 import useUser from "@/hooks/useUser";
-import { useAddOrRemoveReactionMutation } from "@/redux/features/post/postApi";
+import {
+  useAddOrRemoveReactionMutation,
+  useIncrementItineraryViewCountMutation,
+} from "@/redux/features/post/postApi";
 import { TError } from "@/types/error";
 import {
   IPost,
@@ -44,6 +47,8 @@ const PostCard = ({ post }: PostCardProps) => {
   const [showPostDetails, setShowPostDetails] = useState<boolean>(false);
   const [showItineraryModal, setShowItineraryModal] = useState<boolean>(false);
   const [showEditModal, setShowEditModal] = useState<boolean>(false); // State for edit modal
+
+  const [incrementItinerary] = useIncrementItineraryViewCountMutation();
 
   // define intersection observer
   useEffect(() => {
@@ -133,6 +138,21 @@ const PostCard = ({ post }: PostCardProps) => {
     setShowEditModal(false);
   };
 
+  const handleItineraryClick = async () => {
+    {
+      try {
+        setShowItineraryModal(true);
+        console.log("Post ID:", post._id);
+        console.log("Post Itinerary ID:", post?.itinerary?._id);
+        const payload = { postId: post._id, itineraryId: post?.itinerary?._id };
+        await incrementItinerary(payload).unwrap();
+      } catch (error) {
+        const err = error as TError;
+        toast.error(err?.data?.message || "Something went wrong!");
+      }
+    }
+  };
+
   return (
     <div
       ref={postRef}
@@ -155,7 +175,10 @@ const PostCard = ({ post }: PostCardProps) => {
       <PostContentRender data={post?.media || []} isVisible={isVisible} />
       {/* if post itineray is avaialbe */}
       {post?.itinerary && (
-        <div onClick={() => setShowItineraryModal(true)} className="px-4 py-2 mt-5 border cursor-pointer  rounded-full text-gray-600  border-gray-200 flex items-center justify-between text-sm">
+        <div
+          onClick={handleItineraryClick}
+          className="px-4 py-2 mt-5 border cursor-pointer  rounded-full text-gray-600  border-gray-200 flex items-center justify-between text-sm"
+        >
           <span>Click to view full itinerary</span>
           <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs">
             PDF View Available
@@ -366,11 +389,13 @@ const PostCard = ({ post }: PostCardProps) => {
       />
       {
         // Show itinerary modal
-        post?.itinerary && <ShowItineraryModal
-        itinerary={post?.itinerary}
-        visible={showItineraryModal}
-        onClose={() => setShowItineraryModal(false)}
-      />
+        post?.itinerary && (
+          <ShowItineraryModal
+            itinerary={post?.itinerary}
+            visible={showItineraryModal}
+            onClose={() => setShowItineraryModal(false)}
+          />
+        )
       }
       {showEditModal && (
         <PostEditModal
