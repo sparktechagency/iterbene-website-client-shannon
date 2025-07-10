@@ -1,5 +1,7 @@
-import CustomModal from "@/components/custom/custom-modal";
-import { useRemoveGroupMutation } from "@/redux/features/group/groupApi";
+import ConfirmationPopup from "@/components/custom/custom-popup";
+import {
+  useLeaveGroupMutation,
+} from "@/redux/features/group/groupApi";
 import { TError } from "@/types/error";
 import { IGroup } from "@/types/group.types";
 import Image from "next/image";
@@ -7,21 +9,28 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 import toast from "react-hot-toast";
-import { IoCloseSharp } from "react-icons/io5";
 import { PiUserBold } from "react-icons/pi";
 
 // Define the TypeScript interface for the card prop
-const JoinedGroupCard = ({ group }: { group: IGroup }) => {
+const JoinedGroupCard = ({
+  group,
+  handleOptimisticUpdateUi,
+}: {
+  group: IGroup;
+  handleOptimisticUpdateUi?: (groupId: string) => void;
+}) => {
+  const [isLeaveModalOpen, setIsLeaveModalOpen] = useState<boolean>(false);
   const router = useRouter();
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
-  // Remove Group
-  const [removeGroup, { isLoading: isRemoveLoading }] =
-    useRemoveGroupMutation();
-  // Handle Remove Group with Confirmation
-  const handleRemoveGroup = async () => {
+  // Leave Group
+  const [leaveGroup, { isLoading: isLeaveLoading }] = useLeaveGroupMutation();
+  // Leave Group
+  const handleLeaveGroup = async () => {
     try {
-      await removeGroup(group?._id).unwrap();
-      toast.success("Successfully removed the group!");
+      await leaveGroup(group?._id).unwrap();
+      toast.success("Successfully left the group!");
+      if (handleOptimisticUpdateUi) {
+        handleOptimisticUpdateUi(group?._id);
+      }
       router.push("/groups");
     } catch (error) {
       const err = error as TError;
@@ -29,13 +38,14 @@ const JoinedGroupCard = ({ group }: { group: IGroup }) => {
     }
   };
 
-  const openDeleteModal = () => {
-    setIsDeleteModalOpen(true);
+  const openLeaveModal = () => {
+    setIsLeaveModalOpen(true);
   };
 
-  const closeDeleteModal = () => {
-    setIsDeleteModalOpen(false);
+  const closeLeaveModal = () => {
+    setIsLeaveModalOpen(false);
   };
+
   return (
     <>
       <div className="w-full bg-white rounded-2xl  p-4 flex flex-col items-center">
@@ -69,63 +79,26 @@ const JoinedGroupCard = ({ group }: { group: IGroup }) => {
             </button>
           </Link>
           <button
-            onClick={openDeleteModal}
+            disabled={isLeaveLoading}
+            onClick={openLeaveModal}
             className="border border-[#9EA1B3] text-gray-900 px-5 py-3   rounded-xl cursor-pointer"
           >
-            Remove
+            Leave
           </button>
         </div>
       </div>
-      {/* Delete Group Confirmation Modal */}
-      <CustomModal
-        isOpen={isDeleteModalOpen}
-        onClose={closeDeleteModal}
-        maxWidth="max-w-md"
-        header={
-          <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 rounded-t-xl">
-            <h2 className="text-xl font-semibold text-gray-800">
-              Confirm Delete Group
-            </h2>
-            <button
-              className="text-gray-600 hover:text-gray-800 text-2xl cursor-pointer"
-              onClick={closeDeleteModal}
-            >
-              <IoCloseSharp size={18} />
-            </button>
-          </div>
-        }
-           className="w-full p-2"
-      >
-        <div className="p-6 space-y-4">
-          <p className="text-gray-600 text-lg">
-            Are you sure you want to delete this group? This action will
-            permanently remove the group and all its content for all members.
-            This cannot be undone.
-          </p>
-          <div className="flex gap-3 pt-4 border-t border-gray-200">
-            <button
-              onClick={closeDeleteModal}
-              className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
-            >
-              Cancel
-            </button>
-            <button
-              onClick={() => {
-                handleRemoveGroup();
-                closeDeleteModal();
-              }}
-              disabled={isRemoveLoading}
-              className={`flex-1 px-4 py-2 rounded-lg transition-colors cursor-pointer ${
-                isRemoveLoading
-                  ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                  : "bg-secondary text-white"
-              }`}
-            >
-              {isRemoveLoading ? "Deleting..." : "Delete"}
-            </button>
-          </div>
-        </div>
-      </CustomModal>
+      {/* Leave Group Confirmation Modal */}
+      <ConfirmationPopup
+        isOpen={isLeaveModalOpen}
+        onClose={closeLeaveModal}
+        onConfirm={handleLeaveGroup}
+        type="warning"
+        title="Leave Group"
+        message="Are you sure you want to leave this group? This action cannot be undone."
+        confirmText="Leave"
+        cancelText="Cancel"
+        isLoading={isLeaveLoading}
+      />
     </>
   );
 };

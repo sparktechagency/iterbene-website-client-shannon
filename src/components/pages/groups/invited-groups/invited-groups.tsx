@@ -53,6 +53,13 @@ const InvitedGroups: React.FC = () => {
     }
   };
 
+    const handleOptimisticUpdateUi = (invitedId: string) => {
+    setAllInvitedGroups((prev) =>
+      prev.filter((invited) => invited._id !== invitedId)
+    );
+  };
+
+
   const hasMoreData = currentPage < totalPages;
   const showViewMoreButton =
     !isLoading && hasMoreData && groupsData?.length > 0;
@@ -77,7 +84,7 @@ const InvitedGroups: React.FC = () => {
     content = (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {allInvitedGroups?.map((group: IGroupInvite) => (
-          <InvitedGroupCard key={group?._id} group={group} />
+          <InvitedGroupCard key={group?._id} group={group} handleOptimisticUpdateUi={handleOptimisticUpdateUi} />
         ))}
       </div>
     );

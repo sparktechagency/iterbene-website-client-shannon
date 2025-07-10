@@ -57,6 +57,12 @@ const SuggestionGroups: React.FC = () => {
   const showViewMoreButton =
     !isLoading && hasMoreData && groupsData?.length > 0;
 
+  const handleOptimisticUpdateUi = (groupId: string) => {
+    setAllSuggestedGroups((prev) =>
+      prev.filter((group) => group._id !== groupId)
+    );
+  };
+
   // If no data and not loading, return null to hide the component
   if (!isLoading && !isLoadingMore && allSuggestedGroups?.length === 0) {
     return null;
@@ -77,7 +83,7 @@ const SuggestionGroups: React.FC = () => {
     content = (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {allSuggestedGroups?.map((group: IGroup) => (
-          <SuggestionGroupCard key={group?._id} group={group} />
+          <SuggestionGroupCard key={group?._id} group={group} handleOptimisticUpdateUi={handleOptimisticUpdateUi} />
         ))}
       </div>
     );

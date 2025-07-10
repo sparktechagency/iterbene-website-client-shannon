@@ -8,7 +8,13 @@ import Image from "next/image";
 import React from "react";
 import toast from "react-hot-toast";
 import { PiUserBold } from "react-icons/pi";
-const InvitedGroupCard = ({ group }: { group: IGroupInvite }) => {
+const InvitedGroupCard = ({
+  group,
+  handleOptimisticUpdateUi,
+}: {
+  group: IGroupInvite;
+  handleOptimisticUpdateUi?: (groupId: string) => void;
+}) => {
   const [acceptInvite, { isLoading: isAcceptInviteLoading }] =
     useAcceptGroupInviteMutation();
   const [declineInvite, { isLoading: isDeclineInviteLoading }] =
@@ -16,7 +22,10 @@ const InvitedGroupCard = ({ group }: { group: IGroupInvite }) => {
 
   const handleAcceptInvite = async () => {
     try {
-      await acceptInvite({inviteId: group?._id}).unwrap();
+      await acceptInvite({ inviteId: group?._id }).unwrap();
+      if (handleOptimisticUpdateUi) {
+        handleOptimisticUpdateUi(group?._id);
+      }
       toast.success("Successfully accepted the group!");
     } catch (error) {
       const err = error as TError;
@@ -25,7 +34,10 @@ const InvitedGroupCard = ({ group }: { group: IGroupInvite }) => {
   };
   const handleDeclineInvite = async () => {
     try {
-      await declineInvite({inviteId: group?._id}).unwrap();
+      await declineInvite({ inviteId: group?._id }).unwrap();
+      if (handleOptimisticUpdateUi) {
+        handleOptimisticUpdateUi(group?._id);
+      }
       toast.success("Successfully declined the group!");
     } catch (error) {
       const err = error as TError;

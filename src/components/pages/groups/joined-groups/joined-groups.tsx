@@ -57,6 +57,12 @@ const JoinedGroups: React.FC = () => {
   const showViewMoreButton =
     !isLoading && hasMoreData && groupsData?.length > 0;
 
+  const handleOptimisticUpdateUi = (groupId: string) => {
+    setAllJoinedGroups((prev) =>
+      prev.filter((group) => group._id !== groupId)
+    );
+  };
+
   // If no data and not loading, return null to hide the component
   if (!isLoading && !isLoadingMore && allJoinedGroups?.length === 0) {
     return null;
@@ -77,7 +83,7 @@ const JoinedGroups: React.FC = () => {
     content = (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {allJoinedGroups?.map((group: IGroup) => (
-          <JoinedGroupCard key={group?._id} group={group} />
+          <JoinedGroupCard key={group?._id} group={group} handleOptimisticUpdateUi={handleOptimisticUpdateUi} />
         ))}
       </div>
     );

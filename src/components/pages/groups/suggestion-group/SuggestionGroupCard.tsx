@@ -4,12 +4,21 @@ import { IGroup } from "@/types/group.types";
 import Image from "next/image";
 import toast from "react-hot-toast";
 import { PiUserBold } from "react-icons/pi";
-const SuggestionGroupCard = ({ group }: { group: IGroup }) => {
+const SuggestionGroupCard = ({
+  group,
+  handleOptimisticUpdateUi,
+}: {
+  group: IGroup;
+  handleOptimisticUpdateUi?: (groupId: string) => void;
+}) => {
   const [joinGroup, { isLoading }] = useJoinGroupMutation();
   const handleJoinGroup = async () => {
     try {
       const payload = { groupId: group?._id };
       await joinGroup(payload).unwrap();
+      if (handleOptimisticUpdateUi) {
+        handleOptimisticUpdateUi(group?._id);
+      }
       toast.success("Successfully joined the group!");
     } catch (error) {
       const err = error as TError;
