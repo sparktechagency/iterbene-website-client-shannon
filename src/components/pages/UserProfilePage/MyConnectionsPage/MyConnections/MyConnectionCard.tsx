@@ -119,7 +119,7 @@ const MyConnectionCard = ({ connection, onRemove }: MyConnectionCardProps) => {
               onClick={handleRemoveConnection}
               className="block w-full text-left px-4 py-3 text-gray-800 hover:bg-gray-100 rounded-t-xl cursor-pointer"
             >
-              Remove Connection
+              Remove
             </button>
             <button
               onClick={handleBlockUser}
