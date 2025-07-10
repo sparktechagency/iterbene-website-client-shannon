@@ -276,7 +276,7 @@ const PostContentRender = ({ data, isVisible }: PostContentRenderProps) => {
             ) : (
               <VideoCard url={data[3]?.mediaUrl} isVisible={isVisible} />
             )}
-            <div className="absolute top-0 left-0 w-full h-full bg-black/30 rounded-xl">
+            <div className="absolute top-0 left-0 w-full h-full bg-black/30 rounded-xl cursor-pointer">
               <span className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white text-xl md:text-3xl">
                 {mediaCount - 3}+
               </span>
@@ -295,7 +295,8 @@ const PostContentRender = ({ data, isVisible }: PostContentRenderProps) => {
           modules={[Navigation, Pagination, Autoplay]}
           spaceBetween={10}
           slidesPerView={1}
-          navigation
+          navigation={{ prevEl: null, nextEl: null }}
+          loop
           pagination={{ clickable: true }}
           autoplay={{ delay: 3000 }}
           className="w-full mt-3"
