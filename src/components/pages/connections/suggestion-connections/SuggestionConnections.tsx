@@ -9,6 +9,7 @@ const SuggestionConnections: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [isLoadingMore, setIsLoadingMore] = useState<boolean>(false);
   const [allConnections, setAllConnections] = useState<IConnection[]>([]);
+  
   const { data: responseData, isLoading } = useGetSuggestionsConnectionsQuery(
     [
       {
@@ -24,6 +25,7 @@ const SuggestionConnections: React.FC = () => {
       refetchOnMountOrArgChange: true,
     }
   );
+  
   const suggestionsConnections = responseData?.data?.attributes?.results;
   const totalPages = responseData?.data?.attributes?.totalPages;
 
@@ -53,6 +55,13 @@ const SuggestionConnections: React.FC = () => {
     }
   };
 
+  // Handle connection added/removed - optimistically remove from UI
+  const handleConnectionAction = (connectionId: string) => {
+    setAllConnections((prev) => 
+      prev.filter((conn) => conn._id !== connectionId)
+    );
+  };
+
   const hasMoreData = currentPage < totalPages;
   const showViewMoreButton =
     !isLoading && hasMoreData && allConnections?.length > 0;
@@ -61,20 +70,21 @@ const SuggestionConnections: React.FC = () => {
   if (isLoading || isLoadingMore) {
     content = (
       <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-        {Array.from({ length: 8 }).map((_, index) => (
+        {Array?.from({ length: 8 }).map((_, index) => (
           <SuggestionConnectionsCardSkeleton key={`skeleton-${index}`} />
         ))}
       </div>
     );
-  } else if (allConnections.length === 0) {
+  } else if (allConnections?.length === 0) {
     content = null; // Don't render anything if no connections are found
   } else if (allConnections.length > 0) {
     content = (
       <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-        {allConnections.map((connection: IConnection) => (
+        {allConnections?.map((connection: IConnection) => (
           <SuggestionConnectionsCard
             key={connection?._id}
             connection={connection}
+            onConnectionAction={handleConnectionAction}
           />
         ))}
       </div>
@@ -82,12 +92,10 @@ const SuggestionConnections: React.FC = () => {
   }
 
   // Only render the section if there are connections or loading
-  if (!isLoading && !isLoadingMore && allConnections.length === 0) {
+  if (!isLoading && !isLoadingMore && allConnections?.length === 0) {
     return null;
   }
 
-
-  console.log("Has More Data:", hasMoreData);
   return (
     <section className="w-full">
       {/* Header Section */}

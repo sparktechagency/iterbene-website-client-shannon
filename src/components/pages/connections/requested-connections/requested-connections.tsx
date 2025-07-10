@@ -11,6 +11,7 @@ const RequestedConnections: React.FC = () => {
   const [allConnectionRequests, setAllConnectionRequests] = useState<
     IConnectionRequest[]
   >([]);
+
   const { data: responseData, isLoading } = useGetConnectionRequestsQuery(
     [
       {
@@ -26,6 +27,7 @@ const RequestedConnections: React.FC = () => {
       refetchOnMountOrArgChange: true,
     }
   );
+
   const connectionsRequestData = responseData?.data?.attributes?.results;
   const requestCount = responseData?.data?.attributes?.requestCount;
   const totalPages = responseData?.data?.attributes?.totalPages;
@@ -56,9 +58,16 @@ const RequestedConnections: React.FC = () => {
     }
   };
 
+  // Handle connection accepted/declined - optimistically remove from UI
+  const handleConnectionAction = (requestId: string) => {
+    setAllConnectionRequests((prev) =>
+      prev.filter((request) => request._id !== requestId)
+    );
+  };
+
   const hasMoreData = currentPage < totalPages;
   const showViewMoreButton =
-    !isLoading && hasMoreData && connectionsRequestData?.length > 0;
+    !isLoading && hasMoreData && allConnectionRequests?.length > 0;
 
   let content = null;
   if (isLoading || isLoadingMore) {
@@ -75,7 +84,11 @@ const RequestedConnections: React.FC = () => {
     content = (
       <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         {allConnectionRequests?.map((request: IConnectionRequest) => (
-          <RequestedConnectionCard key={request?._id} request={request} />
+          <RequestedConnectionCard
+            key={request?._id}
+            request={request}
+            onConnectionAction={handleConnectionAction}
+          />
         ))}
       </div>
     );

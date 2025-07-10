@@ -7,7 +7,16 @@ import { TError } from "@/types/error";
 import Image from "next/image";
 import Link from "next/link";
 import toast from "react-hot-toast";
-const SuggestionConnectionsCard = ({ connection }: { connection: IConnection }) => {
+
+interface SuggestionConnectionsCardProps {
+  connection: IConnection;
+  onConnectionAction?: (connectionId: string) => void; // New prop for callback
+}
+
+const SuggestionConnectionsCard = ({ 
+  connection, 
+  onConnectionAction 
+}: SuggestionConnectionsCardProps) => {
   const [addConnection] = useAddConnectionMutation();
   const [removeConnection] = useRemoveSuggestionConnectionMutation();
 
@@ -16,6 +25,11 @@ const SuggestionConnectionsCard = ({ connection }: { connection: IConnection }) 
       const payload = { receivedBy: connection?._id };
       await addConnection(payload).unwrap();
       toast.success("Connection sent successfully!");
+      
+      // Optimistically remove from UI
+      if (onConnectionAction) {
+        onConnectionAction(connection._id);
+      }
     } catch (error) {
       const err = error as TError;
       toast.error(err?.data?.message || "Something went wrong!");
@@ -26,13 +40,19 @@ const SuggestionConnectionsCard = ({ connection }: { connection: IConnection }) 
     try {
       await removeConnection(connection?._id).unwrap();
       toast.success("Connection removed successfully!");
+      
+      // Optimistically remove from UI
+      if (onConnectionAction) {
+        onConnectionAction(connection._id);
+      }
     } catch (error) {
       const err = error as TError;
       toast.error(err?.data?.message || "Something went wrong!");
     }
   };
+
   return (
-    <div className="w-full h-fit bg-white rounded-2xl  p-4 flex flex-col items-center">
+    <div className="w-full h-fit bg-white rounded-2xl p-4 flex flex-col items-center">
       {/* Profile Image */}
       <Link className="w-full" href={`/${connection?.username}`}>
         <Image
@@ -57,7 +77,7 @@ const SuggestionConnectionsCard = ({ connection }: { connection: IConnection }) 
         </button>
         <button
           onClick={handleRemoveConnection}
-          className="border border-[#9EA1B3] text-gray-900 px-5 py-3   rounded-xl hover:bg-gray-100 transition cursor-pointer"
+          className="border border-[#9EA1B3] text-gray-900 px-5 py-3 rounded-xl hover:bg-gray-100 transition cursor-pointer"
         >
           Remove
         </button>

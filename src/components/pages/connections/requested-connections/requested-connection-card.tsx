@@ -7,11 +7,16 @@ import { TError } from "@/types/error";
 import Image from "next/image";
 import Link from "next/link";
 import toast from "react-hot-toast";
+
+interface RequestedConnectionCardProps {
+  request: IConnectionRequest;
+  onConnectionAction?: (requestId: string) => void; // New prop for callback
+}
+
 const RequestedConnectionCard = ({
   request,
-}: {
-  request: IConnectionRequest;
-}) => {
+  onConnectionAction,
+}: RequestedConnectionCardProps) => {
   const [acceptConnection] = useAcceptConnectionMutation();
   const [declineConnection] = useDeclineConnectionMutation();
 
@@ -19,22 +24,34 @@ const RequestedConnectionCard = ({
     try {
       await acceptConnection(request?._id).unwrap();
       toast.success("Connection accepted successfully!");
+
+      // Optimistically remove from UI
+      if (onConnectionAction) {
+        onConnectionAction(request._id);
+      }
     } catch (error) {
       const err = error as TError;
       toast.error(err?.data?.message || "Something went wrong!");
     }
   };
+
   const handleDeclineConnection = async () => {
     try {
       await declineConnection(request?._id).unwrap();
       toast.success("Connection declined successfully!");
+
+      // Optimistically remove from UI
+      if (onConnectionAction) {
+        onConnectionAction(request._id);
+      }
     } catch (error) {
       const err = error as TError;
       toast.error(err?.data?.message || "Something went wrong!");
     }
   };
+
   return (
-    <div className="w-full bg-white rounded-2xl  p-4 flex flex-col items-center">
+    <div className="w-full bg-white rounded-2xl p-4 flex flex-col items-center">
       {/* Profile Image */}
       <Link className="w-full" href={`/${request?.sentBy?.username}`}>
         <Image
@@ -54,13 +71,13 @@ const RequestedConnectionCard = ({
       <div className="flex flex-col gap-4 w-full">
         <button
           onClick={handleAcceptConnection}
-          className="bg-secondary text-white px-5 py-3  rounded-xl cursor-pointer"
+          className="bg-secondary text-white px-5 py-3 rounded-xl cursor-pointer"
         >
           Accept
         </button>
         <button
           onClick={handleDeclineConnection}
-          className="border border-[#9EA1B3] text-gray-900 px-5 py-3  rounded-xl  hover:bg-gray-100 transition cursor-pointer"
+          className="border border-[#9EA1B3] text-gray-900 px-5 py-3 rounded-xl hover:bg-gray-100 transition cursor-pointer"
         >
           Decline
         </button>
