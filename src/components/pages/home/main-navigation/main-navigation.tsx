@@ -13,11 +13,6 @@ const MainNavigation = () => {
       href: "/feed",
     },
     {
-      icon: <Calendar size={24} />,
-      name: "Events",
-      href: "/events",
-    },
-    {
       icon: <FiPlayCircle size={24} />,
       name: "Watch Videos",
       href: "/watch-videos",

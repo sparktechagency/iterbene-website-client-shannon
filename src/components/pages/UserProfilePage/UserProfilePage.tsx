@@ -8,6 +8,7 @@ import NotFoundPage from "../not-found-page/not-found-page";
 import MyProfileHeader from "./MyProfileHeader/MyProfileHeader";
 import UserNavlinkTab from "./UserNavlinkTab/UserNavlinkTab";
 import UserProfileHeader from "./UserProfileHeader/UserProfileHeader";
+import UserProfileSkeleton from "./UserProfileSkeleton";
 
 const UserProfileInformationPage = ({
   children,
@@ -24,14 +25,21 @@ const UserProfileInformationPage = ({
   const isMyProfile = user?._id === userData?._id;
   let content = null;
   if (isLoading) {
-    content = <p>Loading...</p>;
+    content = (
+      <section className="w-full mx-auto">
+        <Header />
+        <div className="container mx-auto space-y-8 px-4 pb-10">
+          <UserProfileSkeleton />
+        </div>
+      </section>
+    );
   } else if (!isLoading && !userData) {
     content = <NotFoundPage />;
   } else if (!isLoading && userData) {
     content = (
       <section className="w-full mx-auto">
         <Header />
-        <div className="container mx-auto mx-auto space-y-8 px-4 pb-10">
+        <div className="container mx-auto space-y-8 px-4 pb-10">
           {isMyProfile ? (
             <MyProfileHeader userData={userData} />
           ) : (
