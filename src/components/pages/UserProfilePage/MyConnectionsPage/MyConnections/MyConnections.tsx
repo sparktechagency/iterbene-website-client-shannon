@@ -1,3 +1,4 @@
+
 "use client";
 import { IConnection } from "@/types/connection.types";
 import React, { useState, useEffect, useRef } from "react";
@@ -7,6 +8,7 @@ import MyConnectionsSkeleton from "./MyConnectionsSkeleton";
 
 const MyConnections = ({ sortBy }: { sortBy: string }) => {
   const [currentPage, setCurrentPage] = useState<number>(1);
+  const [removedItemIds, setRemovedItemIds] = useState<string[]>([]);
   const [connections, setConnections] = useState<IConnection[]>([]);
   const observerRef = useRef<HTMLDivElement | null>(null);
 
@@ -23,15 +25,20 @@ const MyConnections = ({ sortBy }: { sortBy: string }) => {
   // Update connections when new data is fetched, ensuring no duplicate _id values
   useEffect(() => {
     const myAllConnections = responseData?.data?.attributes?.results || [];
-    if (myAllConnections?.length > 0) {
+    if (myAllConnections.length > 0) {
       setConnections((prev) => {
         const existingIds = new Set(prev.map((connection) => connection._id));
         const newConnections = myAllConnections.filter(
           (connection: IConnection) => !existingIds.has(connection._id)
         );
-        return currentPage === 1
-          ? newConnections
-          : [...prev, ...newConnections];
+        if (newConnections.length < myAllConnections.length) {
+          console.warn(
+            `Filtered out ${
+              myAllConnections.length - newConnections.length
+            } duplicate connections`
+          );
+        }
+        return currentPage === 1 ? newConnections : [...prev, ...newConnections];
       });
     }
   }, [responseData, currentPage]);
@@ -40,6 +47,7 @@ const MyConnections = ({ sortBy }: { sortBy: string }) => {
   useEffect(() => {
     setConnections([]);
     setCurrentPage(1);
+    setRemovedItemIds([]);
   }, [sortBy]);
 
   // Intersection Observer for infinite scroll
@@ -71,9 +79,8 @@ const MyConnections = ({ sortBy }: { sortBy: string }) => {
   }, [isLoading, isFetching, connections.length, responseData, currentPage]);
 
   const handleItemRemove = (itemId: string) => {
-    setConnections((prev) =>
-      prev.filter((connection) => connection._id !== itemId)
-    );
+    setRemovedItemIds((prev) => [...prev, itemId]);
+    setConnections((prev) => prev.filter((connection) => connection._id !== itemId));
   };
 
   const renderLoading = () => (
@@ -96,13 +103,15 @@ const MyConnections = ({ sortBy }: { sortBy: string }) => {
   } else if (connections.length > 0) {
     content = (
       <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-        {connections?.map((connection, index) => (
-          <MyConnectionCard
-            key={`${connection._id}-${index}`}
-            connection={connection}
-            onRemove={() => handleItemRemove(connection._id)}
-          />
-        ))}
+        {connections
+          .filter((connection) => !removedItemIds.includes(connection._id))
+          .map((connection, index) => (
+            <MyConnectionCard
+              key={`${connection._id}-${index}`}
+              connection={connection}
+              onRemove={() => handleItemRemove(connection._id)}
+            />
+          ))}
       </div>
     );
   }
