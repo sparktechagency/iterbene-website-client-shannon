@@ -5,7 +5,14 @@ const hashtagApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     getHashtagPosts: builder.query({
       query: (hashtag) => ({
-        url: `/hashtag?searchTerm=${hashtag}`,
+        url: `/hashtag/posts?hashtag=${hashtag}`,
+        method: "GET",
+      }),
+      providesTags: ["Hashtag"],
+    }),
+    getHashtags: builder.query({
+      query: (searchTerms) => ({
+        url: `/hashtag?searchTerms=${searchTerms}`,
         method: "GET",
       }),
       providesTags: ["Hashtag"],
@@ -13,4 +20,4 @@ const hashtagApi = baseApi.injectEndpoints({
   }),
 });
 
-export const { useGetHashtagPostsQuery } = hashtagApi;
+export const { useGetHashtagPostsQuery, useGetHashtagsQuery } = hashtagApi;

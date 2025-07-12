@@ -1,9 +1,8 @@
+import SearchHashTagPost from '@/components/pages/search/SearchHashTagPost/SearchHashTagPost'
 import React from 'react'
 
 const page = () => {
-  return (
-    <div>page</div>
-  )
+  return <SearchHashTagPost/>
 }
 
 export default page

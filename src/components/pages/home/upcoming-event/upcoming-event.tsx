@@ -32,8 +32,6 @@ const UpcomingEvent = () => {
   );
   const upComingEvent = responseData?.data?.attributes?.results;
 
-  console.log("Response Data:", responseData);
-
   return (
     <section className="w-full">
       <div className="flex items-center justify-between">

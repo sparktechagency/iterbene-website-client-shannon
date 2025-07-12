@@ -5,10 +5,12 @@ import Stories from "@/components/pages/home/stories/stories";
 
 const Feed = () => {
   return (
-    <section className="w-full space-y-5 md:space-y-8 overflow-y-auto">
+    <section className="w-full h-full space-y-5 md:space-y-8 overflow-y-auto z-50 flex-1 flex flex-col">
       <Stories />
       <CreatePost postType="User" />
-      <Posts />
+      <div className="flex-1">
+        <Posts />
+      </div>
     </section>
   );
 };

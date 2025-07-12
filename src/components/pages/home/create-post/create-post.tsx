@@ -7,7 +7,7 @@ import {
   useGoogleLocationSearch,
 } from "@/hooks/useGoogleLocationSearch";
 import useUser from "@/hooks/useUser";
-import { useGetHashtagPostsQuery } from "@/redux/features/hashtag/hashtagApi";
+import { useGetHashtagsQuery } from "@/redux/features/hashtag/hashtagApi";
 import { useCreateItineraryMutation } from "@/redux/features/itinerary/itineraryApi";
 import {
   useCreatePostMutation,
@@ -127,7 +127,7 @@ const CreatePost = ({
   const [updatePost, { isLoading: isUpdatingPost }] = useUpdatePostMutation(); // New mutation for updating
 
   // Hashtag query
-  const { data: hashtagData } = useGetHashtagPostsQuery(hashtagQuery, {
+  const { data: hashtagData } = useGetHashtagsQuery(hashtagQuery, {
     skip: !hashtagQuery, // Skip query if hashtagQuery is empty
   });
 
