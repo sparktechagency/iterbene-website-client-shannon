@@ -26,6 +26,7 @@ import { IHashtag, ISearchResult } from "@/types/search.types";
 import SearchDropdown from "./SearchDropdown";
 import { useGetSearchHashtagAndUsersQuery } from "@/redux/features/search/searchApi";
 import LocationPermission from "./LocationPermission";
+import { useGetUnviewedNotificationsCountQuery } from "@/redux/features/notifications/notificationsApi";
 
 // Mobile Menu Component
 const MobileMenu: React.FC<{
@@ -156,8 +157,40 @@ const MobileMenu: React.FC<{
 
 // Header Component
 const Header: React.FC = () => {
-  const user = useUser();
+  const { socket } = useSocket();
   const router = useRouter();
+
+  // notification
+  const user = useUser();
+  const [unviewNotificationCount, setUnviewNotificationCount] =
+    useState<number>(0);
+
+  // Get unviewed notification count
+  const { data: notificationCountData } = useGetUnviewedNotificationsCountQuery(
+    undefined,
+    { refetchOnMountOrArgChange: true }
+  );
+
+  // set socket
+  useEffect(() => {
+    if (socket && user) {
+      const notificationEvent = `notification::${user?._id}`;
+      socket.on(notificationEvent, () => {
+        setUnviewNotificationCount(
+          (unviewNotificationCount) => unviewNotificationCount + 1
+        );
+      });
+    }
+  }, [socket, user]);
+
+  // Set initial unviewed count from API
+  useEffect(() => {
+    if (notificationCountData?.data?.attributes?.count) {
+      setUnviewNotificationCount(notificationCountData?.data?.attributes?.count);
+    }
+  }, [notificationCountData]);
+
+
 
   // Desktop/Tablet dropdown states
   const [isMessagesOpen, setIsMessagesOpen] = useState<boolean>(false);
@@ -197,8 +230,8 @@ const Header: React.FC = () => {
   const searchInputRef = useRef<HTMLInputElement>(null);
   const desktopSearchRef = useRef<HTMLDivElement>(null);
 
-  // Socket setup
-  const { socket } = useSocket();
+
+
   useEffect(() => {
     if (socket && user?._id) {
       socket.emit("user/connect", { userId: user?._id });
@@ -368,8 +401,6 @@ const Header: React.FC = () => {
     },
     [router]
   );
-
-
 
   return (
     <nav className="w-full bg-[#F0FAF9] h-[72px] md:h-[88px] lg:h-[112px] fixed top-0 left-0 z-40">

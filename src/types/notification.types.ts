@@ -4,7 +4,7 @@ export interface INotification {
   title: string;
   message?: string;
   image?: string;
-  type: "favorite" | "report" | "payment" | "subscription" | "message";
+  type: string;
   linkId?: string | string;
   role: "admin" | "user";
   viewStatus?: boolean;

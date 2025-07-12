@@ -67,7 +67,7 @@ const MessagesDropdown: React.FC<DropdownProps> = ({ isOpen, user }) => {
   // Handle socket notifications
   useEffect(() => {
     if (socket && user?._id) {
-      const notificationEvent = `notification::${user._id}`;
+      const notificationEvent = `message-notification::${user._id}`;
       const handleNotification = (notificationData: {
         data: INotification;
       }) => {

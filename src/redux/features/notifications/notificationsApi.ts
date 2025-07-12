@@ -36,6 +36,13 @@ const notificationsApi = baseApi.injectEndpoints({
 
       invalidatesTags: ["Notifications"],
     }),
+    getUnviewedNotificationsCount: builder.query({
+      query: () => ({
+        url: "/notifications/unview-notification-count",
+        method: "GET",
+      }),
+      providesTags: ["Notifications"],
+    }),
   }),
 });
 
@@ -43,4 +50,5 @@ export const {
   useGetAllNotificationsQuery,
   useViewAllNotificationsMutation,
   useViewSingleNotificationMutation,
+  useGetUnviewedNotificationsCountQuery,
 } = notificationsApi;
