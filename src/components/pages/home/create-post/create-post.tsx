@@ -307,17 +307,63 @@ const CreatePost = ({
   };
 
   // Handle media upload
-  const handleMediaUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleMediaUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       const newFiles = Array.from(e.target.files);
-      const newPreviews = newFiles.map((file) => ({
-        name: file.name,
-        preview: URL.createObjectURL(file),
-        type: file.type.startsWith("image/") ? "image" : "video",
-        file: file, // Store the actual File object for new uploads
-      }));
-      setMedia((prev) => [...prev, ...newFiles]);
+      const validFiles: File[] = [];
+      const newPreviews: FilePreview[] = [];
+
+      for (const file of newFiles) {
+        const isImage = file.type.startsWith("image/");
+        const isVideo = file.type.startsWith("video/");
+
+        if (isImage) {
+          if (file.size > 5 * 1024 * 1024) {
+            toast.error(`Image "${file.name}" size should not exceed 5MB.`);
+            continue;
+          }
+        }
+
+        if (isVideo) {
+          if (file.size > 10 * 1024 * 1024) {
+            toast.error(`Please upload a video less than 10MB.`);
+            continue;
+          }
+
+          const duration = await new Promise<number>((resolve) => {
+            const video = document.createElement("video");
+            video.preload = "metadata";
+            video.onloadedmetadata = () => {
+              window.URL.revokeObjectURL(video.src);
+              resolve(video.duration);
+            };
+            video.src = URL.createObjectURL(file);
+          });
+
+          if (duration > 30) {
+            toast.error(
+              `Please upload a video with a duration less than 30 seconds.`
+            );
+            continue;
+          }
+        }
+
+        validFiles.push(file);
+        newPreviews.push({
+          name: file.name,
+          preview: URL.createObjectURL(file),
+          type: file.type.startsWith("image/") ? "image" : "video",
+          file: file,
+        });
+      }
+
+      setMedia((prev) => [...prev, ...validFiles]);
       setMediaPreviews((prev) => [...prev, ...newPreviews]);
+
+      // Reset the file input to allow re-uploading the same file
+      if (e.target) {
+        e.target.value = "";
+      }
     }
   };
 
