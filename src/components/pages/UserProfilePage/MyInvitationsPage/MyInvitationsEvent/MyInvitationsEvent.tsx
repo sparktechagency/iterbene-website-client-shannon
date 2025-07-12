@@ -1,43 +1,45 @@
 "use client";
-import { useGetMyInvitedGroupsQuery } from "@/redux/features/group/groupApi";
+import { useGetMyInvitesQuery } from "@/redux/features/event/eventApi";
 import { useState, useEffect, useRef } from "react";
-import { IGroupInvite } from "@/types/group.types";
-import MyInvitationsGroupCard from "./MyInvitationsGroupCard";
-import MyInvitationsGroupSkeleton from "./MyInvitationsGroupSkeleton";
+import { IEventInvitation } from "@/types/event.types";
+import InvitedEventCard from "@/components/pages/events/invited-events/invited-event-card";
+import MyInvitationsEventSkeleton from "./MyInvitationsEventSkeleton";
 
-const MyInvitationsGroups = ({ sortBy }: { sortBy: string }) => {
+const MyInvitationsEvent = ({ sortBy }: { sortBy: string }) => {
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const [invitedGroups, setInvitedGroups] = useState<IGroupInvite[]>([]);
+  const [eventInvitations, setEventInvitations] = useState<IEventInvitation[]>(
+    []
+  );
   const observerRef = useRef<HTMLDivElement | null>(null);
 
-  // Get invited groups
+  // Get event invitations
   const {
     data: responseData,
     isLoading,
     isFetching,
-  } = useGetMyInvitedGroupsQuery([
+  } = useGetMyInvitesQuery([
     { key: "page", value: currentPage },
     { key: "limit", value: 9 },
     { key: "sortBy", value: sortBy },
   ]);
 
-  // Update invited groups when new data is fetched, ensuring no duplicate _id values
+  // Update event invitations when new data is fetched, ensuring no duplicate _id values
   useEffect(() => {
-    const myAllInvitedGroups = responseData?.data?.attributes?.results || [];
-    if (myAllInvitedGroups?.length > 0) {
-      setInvitedGroups((prev) => {
-        const existingIds = new Set(prev.map((group) => group._id));
-        const newGroups = myAllInvitedGroups.filter(
-          (group: IGroupInvite) => !existingIds.has(group._id)
+    const upComingEvent = responseData?.data?.attributes?.results || [];
+    if (upComingEvent?.length > 0) {
+      setEventInvitations((prev) => {
+        const existingIds = new Set(prev.map((event) => event._id));
+        const newEvents = upComingEvent.filter(
+          (event: IEventInvitation) => !existingIds.has(event._id)
         );
-        return currentPage === 1 ? newGroups : [...prev, ...newGroups];
+        return currentPage === 1 ? newEvents : [...prev, ...newEvents];
       });
     }
   }, [responseData, currentPage]);
 
-  // Reset invited groups when sortBy changes
+  // Reset event invitations when sortBy changes
   useEffect(() => {
-    setInvitedGroups([]);
+    setEventInvitations([]);
     setCurrentPage(1);
   }, [sortBy]);
 
@@ -50,7 +52,7 @@ const MyInvitationsGroups = ({ sortBy }: { sortBy: string }) => {
           entries[0].isIntersecting &&
           !isLoading &&
           !isFetching &&
-          invitedGroups.length < totalResults
+          eventInvitations.length < totalResults
         ) {
           setCurrentPage((prev) => prev + 1);
         }
@@ -67,16 +69,19 @@ const MyInvitationsGroups = ({ sortBy }: { sortBy: string }) => {
         observer.unobserve(observerRef.current);
       }
     };
-  }, [isLoading, isFetching, invitedGroups.length, responseData, currentPage]);
+  }, [
+    isLoading,
+    isFetching,
+    eventInvitations.length,
+    responseData,
+    currentPage,
+  ]);
 
-  // const handleItemRemove = (itemId: string) => {
-  //   setInvitedGroups((prev) => prev.filter((group) => group._id !== itemId));
-  // };
-
+  //   
   const renderLoading = () => (
     <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
       {Array.from({ length: 9 }).map((_, index) => (
-        <MyInvitationsGroupSkeleton key={`skeleton-${index}`} />
+        <MyInvitationsEventSkeleton key={`skeleton-${index}`} />
       ))}
     </div>
   );
@@ -84,19 +89,19 @@ const MyInvitationsGroups = ({ sortBy }: { sortBy: string }) => {
   let content = null;
   if (isLoading && currentPage === 1) {
     content = renderLoading();
-  } else if (invitedGroups.length === 0 && !isLoading) {
+  } else if (eventInvitations.length === 0 && !isLoading) {
     content = (
       <h1 className="text-center text-gray-500 py-8">
-        No invited groups available
+        No invitations event available
       </h1>
     );
-  } else if (invitedGroups.length > 0) {
+  } else if (eventInvitations.length > 0) {
     content = (
       <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-        {invitedGroups?.map((group, index) => (
-          <MyInvitationsGroupCard
-            key={`${group._id}-${index}`}
-            group={group}
+        {eventInvitations?.map((event, index) => (
+          <InvitedEventCard
+            key={`${event._id}-${index}`}
+            event={event}
           />
         ))}
       </div>
@@ -109,7 +114,7 @@ const MyInvitationsGroups = ({ sortBy }: { sortBy: string }) => {
       {isFetching && currentPage > 1 && (
         <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 mt-3">
           {Array.from({ length: 3 }).map((_, index) => (
-            <MyInvitationsGroupSkeleton key={`skeleton-more-${index}`} />
+            <MyInvitationsEventSkeleton key={`skeleton-more-${index}`} />
           ))}
         </div>
       )}
@@ -118,4 +123,4 @@ const MyInvitationsGroups = ({ sortBy }: { sortBy: string }) => {
   );
 };
 
-export default MyInvitationsGroups;
+export default MyInvitationsEvent;

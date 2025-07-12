@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import MyUpComingTours from "./MyUpComingTours/MyUpComingTours";
-import MyInvitations from "./MyInvitations/MyInvitations";
+import MyInvitationsEvent from "./MyInvitationsEvent/MyInvitationsEvent";
 import SelectField from "@/components/custom/SelectField";
 
 const MyInvitationsPage = () => {
@@ -70,7 +70,7 @@ const MyInvitationsPage = () => {
         {activeTab === "upcomingTour" ? (
           <MyUpComingTours sortBy={sortBy} />
         ) : (
-          <MyInvitations sortBy={sortBy} />
+          <MyInvitationsEvent sortBy={sortBy} />
         )}
       </div>
     </section>
