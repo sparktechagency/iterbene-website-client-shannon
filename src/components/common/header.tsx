@@ -276,6 +276,7 @@ const Header: React.FC = () => {
   };
 
   const toggleNotifications = () => {
+    console.log("Clicked");
     setIsNotificationsOpen((prev) => !prev);
     setIsMessagesOpen(false);
     setIsUserOpen(false);
@@ -367,6 +368,8 @@ const Header: React.FC = () => {
     },
     [router]
   );
+
+
 
   return (
     <nav className="w-full bg-[#F0FAF9] h-[72px] md:h-[88px] lg:h-[112px] fixed top-0 left-0 z-40">

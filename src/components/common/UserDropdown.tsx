@@ -51,6 +51,8 @@ const UserDropdown: React.FC<DropdownProps> = ({ user, isOpen }) => {
     router.push("/");
   };
 
+
+  console.log("Is settings open:", isSettingsOpen);
   return (
     <AnimatePresence>
       {isOpen && (
@@ -81,7 +83,7 @@ const UserDropdown: React.FC<DropdownProps> = ({ user, isOpen }) => {
               </div>
             </div>
           </Link>
-          <div className="space-y-3 min-h-48 max-h-[400px] overflow-y-auto">
+          <div className="space-y-3 min-h-48 max-h-[400px] overflow-y-auto ">
             <Link
               href={`/${user?.username}`}
               className="text-gray-800 hover:bg-[#ECFCFA] px-4 py-3 rounded-xl flex items-center gap-4"
@@ -133,7 +135,7 @@ const UserDropdown: React.FC<DropdownProps> = ({ user, isOpen }) => {
             </Link>
             <div className="relative">
               <button
-                onClick={toggleSettings}
+                onMouseEnter={toggleSettings}
                 className="text-gray-800 hover:bg-[#ECFCFA] px-4 py-3 rounded-xl flex items-center gap-4 w-full text-left cursor-pointer"
               >
                 <IoSettingsOutline size={24} />

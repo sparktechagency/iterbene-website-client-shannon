@@ -2,6 +2,7 @@ import { IUser } from "@/types/user.types";
 import { useEffect, useRef } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
+import { IoArrowBackOutline } from "react-icons/io5";
 interface DropdownProps {
   user?: IUser;
   isOpen: boolean;
@@ -35,25 +36,28 @@ const SettingsDropdown: React.FC<DropdownProps> = ({ isOpen }) => {
           animate={{ opacity: 1, x: 0 }}
           exit={{ opacity: 0, x: -10 }}
           transition={{ duration: 0.2 }}
-          className="absolute bottom-1 left-[-228px] rounded-xl p-3.5 w-[228px] z-50"
+          className="rounded-xl p-3.5 mt-2 w-[228px] z-50 shadow-lg bg-gray-50 "
         >
           <div className="space-y-3">
             <Link
               href="/about-us"
-              className="text-gray-800 hover:bg-[#ECFCFA] p-3 rounded-xl flex items-center gap-4 text-sm"
+              className="text-gray-800 hover:bg-[#ECFCFA] px-4 py-3 rounded-xl flex items-center gap-4"
             >
+              <IoArrowBackOutline />
               About Us
             </Link>
             <Link
               href="/terms-and-conditions"
-              className="text-gray-800 hover:bg-[#ECFCFA] p-3 rounded-xl flex items-center gap-4 text-sm"
+              className="text-gray-800 hover:bg-[#ECFCFA] px-4 py-3 rounded-xl flex items-center gap-4"
             >
+              <IoArrowBackOutline />
               Terms & Conditions
             </Link>
             <Link
               href="/privacy-policy"
-              className="text-gray-800 hover:bg-[#ECFCFA] p-3 rounded-xl flex items-center gap-4 text-sm"
+              className="text-gray-800 hover:bg-[#ECFCFA] px-4 py-3 rounded-xl flex items-center gap-4"
             >
+              <IoArrowBackOutline />
               Privacy Policy
             </Link>
           </div>

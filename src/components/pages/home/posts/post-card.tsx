@@ -165,7 +165,7 @@ const PostCard = ({ post }: PostCardProps) => {
             <>
               {isHashtag ? (
                 <Link
-                  key={index}
+                  key={index + 1}
                   href={`/search/hashtag/?q=${word.slice(1)}`}
                   className="text-blue-600 hover:underline"
                 >

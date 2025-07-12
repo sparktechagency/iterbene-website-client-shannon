@@ -128,8 +128,8 @@ const Posts = () => {
   }
   return (
     <div className="space-y-4">
-      {allPosts?.map((post) => (
-        <PostCard key={post._id} post={post} />
+      {allPosts?.map((post: IPost, index: number) => (
+        <PostCard key={index + 1} post={post} />
       ))}
 
       {loading && (
