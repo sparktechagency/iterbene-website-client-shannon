@@ -337,7 +337,7 @@ const CreateStories: React.FC = () => {
   if (currentView === "text") {
     return (
       <section className="w-full bg-gray-50 text-white rounded-2xl">
-        <div className="flex flex-row-reverse">
+        <div className="flex flex-col-reverse md:flex-row-reverse">
           <div className="w-80 rounded-r-2xl p-6 text-gray-800 border-l flex flex-col border-gray-200">
             <div className="flex items-center mb-8">
               <button onClick={resetToSelection} className="mr-4 cursor-pointer">
@@ -459,7 +459,7 @@ const CreateStories: React.FC = () => {
   if (currentView === "photo") {
     return (
       <section className="w-full bg-gray-50 text-white rounded-2xl">
-        <div className="flex flex-row-reverse">
+        <div className="flex flex-col-reverse md:flex-row-reverse">
           <div className="w-80 rounded-r-2xl p-6 text-gray-800 border-l flex flex-col border-gray-200">
             <div className="flex items-center mb-8">
               <button onClick={resetToSelection} className="mr-4 cursor-pointer">

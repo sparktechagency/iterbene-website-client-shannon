@@ -8,86 +8,31 @@ import "swiper/css/pagination";
 
 // import required modules
 import { FreeMode, Pagination, Autoplay } from "swiper/modules";
-
-interface IAuthor {
-  fullName: string;
-  profileImage: {
-    imageUrl: string;
-  };
-}
-
-interface IEvent {
-  id: number;
-  title: string;
-  author: IAuthor;
-  image: {
-    imageUrl: string;
-  };
-}
+import { useGetSuggestionsEventsQuery } from "@/redux/features/event/eventApi";
+import { useState } from "react";
+import { IEvent } from "@/types/event.types";
 
 const UpcomingEvent = () => {
-  const upComingEvent: IEvent[] = [
+  const [currentPage, setCurrentPage] = useState<number>(1);
+
+  const { data: responseData } = useGetSuggestionsEventsQuery(
+    [
+      {
+        key: "page",
+        value: currentPage,
+      },
+      {
+        key: "limit",
+        value: 6,
+      },
+    ],
     {
-      id: 1,
-      title: "Holiday trip to Barcelona Spain",
-      author: {
-        fullName: "John Doe",
-        profileImage: {
-          imageUrl:
-            "https://i.ibb.co.com/hFTPRsW0/0de9d1146da18068833210d399cd593e.jpg",
-        },
-      },
-      image: {
-        imageUrl:
-          "https://i.ibb.co.com/6RknjBzS/35b873adc5c444a2d66ee10e62d473d6.jpg",
-      },
-    },
-    {
-      id: 2,
-      title: "Holiday trip to Barcelona Spain",
-      author: {
-        fullName: "John Doe",
-        profileImage: {
-          imageUrl:
-            "https://i.ibb.co.com/hFTPRsW0/0de9d1146da18068833210d399cd593e.jpg",
-        },
-      },
-      image: {
-        imageUrl:
-          "https://i.ibb.co.com/hFVGYMF0/2588a7b47b42d6dddfdfa08bb9300d00.jpg",
-      },
-    },
-    {
-      id: 3,
-      title: "Holiday trip to Barcelona Spain",
-      author: {
-        fullName: "John Doe",
-        profileImage: {
-          imageUrl:
-            "https://i.ibb.co.com/hFTPRsW0/0de9d1146da18068833210d399cd593e.jpg",
-        },
-      },
-      image: {
-        imageUrl:
-          "https://i.ibb.co.com/JVfh3WK/36fe2823b98504660e2f44dc3c1ffb97.jpg",
-      },
-    },
-    {
-      id: 4,
-      title: "Holiday trip to Barcelona Spain",
-      author: {
-        fullName: "John Doe",
-        profileImage: {
-          imageUrl:
-            "https://i.ibb.co.com/hFTPRsW0/0de9d1146da18068833210d399cd593e.jpg",
-        },
-      },
-      image: {
-        imageUrl:
-          "https://i.ibb.co.com/6RknjBzS/35b873adc5c444a2d66ee10e62d473d6.jpg",
-      },
-    },
-  ];
+      refetchOnMountOrArgChange: true,
+    }
+  );
+  const upComingEvent = responseData?.data?.attributes?.results;
+
+  console.log("Response Data:", responseData);
 
   return (
     <section className="w-full">
@@ -112,8 +57,8 @@ const UpcomingEvent = () => {
         modules={[FreeMode, Pagination, Autoplay]}
         className="mySwiper mt-5"
       >
-        {upComingEvent.map((event) => (
-          <SwiperSlide key={event.id}>
+        {upComingEvent?.map((event: IEvent) => (
+          <SwiperSlide key={event._id}>
             <UpcomingEventCard event={event} />
           </SwiperSlide>
         ))}
