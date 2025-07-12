@@ -30,6 +30,7 @@ import formatPostReactionNumber from "@/utils/formatPostReactionNumber";
 import { CalendarCheck } from "lucide-react";
 import ShowItineraryModal from "../create-post/ShowItineraryModal";
 import PostEditModal from "../create-post/PostEditModal"; // Import the new modal
+import Link from "next/link";
 
 interface PostCardProps {
   post: IPost;
@@ -142,8 +143,6 @@ const PostCard = ({ post }: PostCardProps) => {
     {
       try {
         setShowItineraryModal(true);
-        console.log("Post ID:", post._id);
-        console.log("Post Itinerary ID:", post?.itinerary?._id);
         const payload = { postId: post._id, itineraryId: post?.itinerary?._id };
         await incrementItinerary(payload).unwrap();
       } catch (error) {
@@ -163,12 +162,19 @@ const PostCard = ({ post }: PostCardProps) => {
         {post?.content?.split(/(\s+)/).map((word, index) => {
           const isHashtag = word?.match(/^#\w+/);
           return (
-            <span
-              key={index}
-              className={isHashtag ? "text-blue-500 font-bold" : ""}
-            >
-              {word}
-            </span>
+            <>
+              {isHashtag ? (
+                <Link
+                  key={index}
+                  href={`/search/hashtag/?q=${word.slice(1)}`}
+                  className="text-blue-600 hover:underline"
+                >
+                  {word}
+                </Link>
+              ) : (
+                word
+              )}
+            </>
           );
         })}
       </p>

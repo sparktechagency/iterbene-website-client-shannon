@@ -160,7 +160,7 @@ const PostHeader = ({ post, onRemove, onEditClick }: PostHeaderProps) => {
         <div>
           <div className="flex items-center gap-2">
             <Link href={`/${post?.userId?.username || ""}`}>
-              <p className="font-medium text-gray-800 text-lg hover:underline">
+              <p className="font-medium text-gray-800 text-lg">
                 {post?.userId?.fullName || "Unknown User"}
               </p>
             </Link>
