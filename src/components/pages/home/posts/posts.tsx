@@ -2,7 +2,7 @@
 import { useFeedPostsQuery } from "@/redux/features/post/postApi";
 import { IPost } from "@/types/post.types";
 import PostCard from "./post-card";
-import { useState, useEffect, useMemo, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import useUser from "@/hooks/useUser";
 import PostCardSkeleton from "./PostCardSkeleton";
 

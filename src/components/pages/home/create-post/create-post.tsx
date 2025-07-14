@@ -81,7 +81,7 @@ const CreatePost = ({
   const methods = useForm();
   const { reset } = methods;
 
-  const defaultLocation = user?.locationName;
+  const defaultLocation = user?.country;
 
   // State for location
   const [selectedLocation, setSelectedLocation] =
@@ -340,9 +340,9 @@ const CreatePost = ({
             video.src = URL.createObjectURL(file);
           });
 
-          if (duration > 30) {
+          if (duration > 60) {
             toast.error(
-              `Please upload a video with a duration less than 30 seconds.`
+              `Please upload a video with a duration less than 60 seconds.`
             );
             continue;
           }

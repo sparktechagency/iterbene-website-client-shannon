@@ -166,10 +166,8 @@ const Header: React.FC = () => {
     useState<number>(0);
 
   // Get unviewed notification count
-  const { data: notificationCountData } = useGetUnviewedNotificationsCountQuery(
-    undefined,
-    { refetchOnMountOrArgChange: true }
-  );
+  const { data: notificationCountData } =
+    useGetUnviewedNotificationsCountQuery(undefined);
 
   // set socket
   useEffect(() => {
@@ -186,11 +184,11 @@ const Header: React.FC = () => {
   // Set initial unviewed count from API
   useEffect(() => {
     if (notificationCountData?.data?.attributes?.count) {
-      setUnviewNotificationCount(notificationCountData?.data?.attributes?.count);
+      setUnviewNotificationCount(
+        notificationCountData?.data?.attributes?.count
+      );
     }
   }, [notificationCountData]);
-
-
 
   // Desktop/Tablet dropdown states
   const [isMessagesOpen, setIsMessagesOpen] = useState<boolean>(false);
@@ -229,8 +227,6 @@ const Header: React.FC = () => {
   const searchRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const desktopSearchRef = useRef<HTMLDivElement>(null);
-
-
 
   useEffect(() => {
     if (socket && user?._id) {
@@ -402,6 +398,8 @@ const Header: React.FC = () => {
     [router]
   );
 
+
+  console.log("Unview notification count : ", unviewNotificationCount)
   return (
     <nav className="w-full bg-[#F0FAF9] h-[72px] md:h-[88px] lg:h-[112px] fixed top-0 left-0 z-40">
       <div className="w-full container mx-auto flex justify-between items-center h-full px-4 md:px-5">
@@ -466,8 +464,6 @@ const Header: React.FC = () => {
                   <motion.button
                     onClick={toggleMessages}
                     className="size-12 lg:size-14 rounded-full border border-[#40E0D0] bg-white flex justify-center items-center cursor-pointer hover:shadow-md transition-shadow"
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
                   >
                     <BsChatSquareDots size={24} />
                   </motion.button>
@@ -477,19 +473,20 @@ const Header: React.FC = () => {
                 <div ref={notificationsRef} className="relative">
                   <motion.button
                     onClick={toggleNotifications}
-                    className="size-12 lg:size-14 rounded-full border border-[#40E0D0] bg-white flex justify-center items-center cursor-pointer hover:shadow-md transition-shadow"
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
+                    className="size-12 lg:size-14 rounded-full border border-[#40E0D0] bg-white flex justify-center items-center cursor-pointer hover:shadow-md transition-shadow "
                   >
                     <IoMdNotificationsOutline size={28} />
+                    {unviewNotificationCount > 0 && (
+                      <div className="absolute top-0 right-0 size-5 bg-primary rounded-full flex justify-center items-center text-xs font-bold text-white">
+                        {unviewNotificationCount}
+                      </div>
+                    )}
                   </motion.button>
                   <NotificationsDropdown isOpen={isNotificationsOpen} />
                 </div>
 
                 <div ref={userRef} className="relative">
                   <motion.div
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
                   >
                     <Image
                       src={user?.profileImage || "/path/to/default-avatar.png"}

@@ -4,8 +4,9 @@ import { useGetHashtagPostsQuery } from "@/redux/features/hashtag/hashtagApi";
 import { useSearchParams } from "next/navigation";
 import PostCard from "../../home/posts/post-card";
 import { IPost } from "@/types/post.types";
+import { Suspense } from "react";
 
-const SearchHashTagPost = () => {
+const SearchHashTagPostContent = () => {
   const hashtag = useSearchParams().get("q");
   const {
     data: responseData,
@@ -131,5 +132,13 @@ const SearchHashTagPost = () => {
     </div>
   );
 };
+
+const SearchHashTagPost = () => {
+	return (
+		<Suspense fallback={<div>Loading...</div>}>
+			<SearchHashTagPostContent />
+		</Suspense>
+	)
+}
 
 export default SearchHashTagPost;

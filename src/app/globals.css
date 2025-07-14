@@ -17,8 +17,8 @@ body::-webkit-scrollbar {
 
 @theme {
   /* Colors (unchanged) */
-  --color-primary: #40E0D0; /* turquoise */
-  --color-secondary: #FF6347; /* Tomato - Placeholder, please replace with actual hex if different */
+  --color-primary: #40e0d0; /* turquoise */
+  --color-secondary: #ff6347; /* Tomato - Placeholder, please replace with actual hex if different */
 }
 /* OTP Input Styles (unchanged) */
 .otp-input {
@@ -76,7 +76,12 @@ body::-webkit-scrollbar {
   display: none; /* Chrome, Safari, Opera */
 }
 
-/* Global CSS file এ add করুন */
+.swiper-button-prev,
+.swiper-button-next {
+  display: none !important; /* Hide navigation arrows */
+}
+
+/* Global CSS file*/
 .modal-open {
   overflow: hidden !important;
   position: fixed !important;
@@ -87,7 +92,7 @@ html.modal-open {
   overflow: hidden !important;
 }
 
-/* Modal backdrop যাতে scroll prevent করে */
+/* Modal backdrop  */
 .modal-backdrop {
   touch-action: none;
   -webkit-overflow-scrolling: touch;

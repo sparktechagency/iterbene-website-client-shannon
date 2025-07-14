@@ -6,38 +6,60 @@ import "swiper/css";
 import "swiper/css/free-mode";
 import "swiper/css/pagination";
 
-// import required modules
+// Import required modules
 import { FreeMode, Pagination, Autoplay } from "swiper/modules";
 import { useGetSuggestionsEventsQuery } from "@/redux/features/event/eventApi";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { IEvent } from "@/types/event.types";
 
 const UpcomingEvent = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
+  const [allEvents, setAllEvents] = useState<IEvent[]>([]); // Store all events
 
-  const { data: responseData } = useGetSuggestionsEventsQuery(
+  const { data: responseData, isFetching } = useGetSuggestionsEventsQuery(
     [
-      {
-        key: "page",
-        value: currentPage,
-      },
-      {
-        key: "limit",
-        value: 6,
-      },
+      { key: "page", value: currentPage },
+      { key: "limit", value: 6 },
     ],
     {
       refetchOnMountOrArgChange: true,
     }
   );
-  const upComingEvent = responseData?.data?.attributes?.results;
+  const totalPages = responseData?.data?.attributes?.totalPages || 1;
+
+  // Append new events to allEvents, avoiding duplicates
+  useEffect(() => {
+    const newEvents = responseData?.data?.attributes?.results || [];
+    if (newEvents.length > 0) {
+      setAllEvents((prevEvents) => {
+        // Filter out duplicates based on event._id
+        const existingIds = new Set(prevEvents.map((event) => event._id));
+        const uniqueNewEvents = newEvents.filter(
+          (event: IEvent) => !existingIds.has(event._id)
+        );
+        return [...prevEvents, ...uniqueNewEvents];
+      });
+    }
+  }, [responseData]); // Depend on responseData directly
+
+  // Handle slide change to increment page
+  const handleReachEnd = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage((prev) => prev + 1);
+    } else {
+      // Optional: Reset to page 1 for infinite loop
+      setCurrentPage(1);
+      // Optional: Clear events to restart (if desired)
+      // setAllEvents([]);
+    }
+  };
 
   return (
     <section className="w-full">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold uppercase">Upcoming</h1>
         <div className="size-8 rounded-full bg-primary flex items-center justify-center text-white">
-          <span>5</span>
+          <span>{allEvents.length}</span>
         </div>
       </div>
       <Swiper
@@ -50,17 +72,27 @@ const UpcomingEvent = () => {
         }}
         pagination={{
           clickable: true,
-          el: null,
+          el: null, // Disable default pagination bullets
         }}
         modules={[FreeMode, Pagination, Autoplay]}
         className="mySwiper mt-5"
+        onReachEnd={handleReachEnd}
       >
-        {upComingEvent?.map((event: IEvent) => (
-          <SwiperSlide key={event._id}>
-            <UpcomingEventCard event={event} />
+        {isFetching && allEvents.length === 0 ? (
+          <SwiperSlide>
+            <div>Loading...</div>
           </SwiperSlide>
-        ))}
+        ) : (
+          allEvents.map((event: IEvent) => (
+            <SwiperSlide key={event._id}>
+              <UpcomingEventCard event={event} />
+            </SwiperSlide>
+          ))
+        )}
       </Swiper>
+      <div className="text-center mt-2">
+        Page {currentPage} of {totalPages}
+      </div>
     </section>
   );
 };

@@ -119,7 +119,7 @@ const NotificationsDropdown: React.FC<DropdownProps> = ({ isOpen }) => {
                   key={notification._id}
                   onClick={() => handleNotificationClick(notification)}
                   className={`text-gray-800 hover:bg-[#ECFCFA] px-4 py-3 rounded-xl flex items-center gap-4 cursor-pointer transition-colors ${
-                    !notification.viewStatus ? "bg-blue-50" : ""
+                    !notification.viewStatus ? "bg-[#ECFCFA]" : ""
                   }`}
                 >
                   <Image
