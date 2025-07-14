@@ -1,35 +1,60 @@
-'use client';
-import React, { useState } from "react";
+"use client";
+import React, { useState, useMemo } from "react";
 import {
   Globe,
   Users,
   Lock,
-  Eye,
-  Shield,
-  MapPin,
-  Phone,
   User,
   Heart,
   Briefcase,
   MessageCircle,
+  MapPin,
+  Phone,
   ChevronDown,
   Check,
+  LucideIcon,
 } from "lucide-react";
+import { useUpdatePrivacySettingsMutation } from "@/redux/features/users/userApi";
+import { TError } from "@/types/error";
+import toast from "react-hot-toast";
+import useUser from "@/hooks/useUser";
 
-// Privacy visibility options
+// Define PrivacyVisibility enum to match backend
 const PrivacyVisibility = {
-  PUBLIC: "PUBLIC",
-  FRIENDS: "FRIENDS",
-  ONLY_ME: "ONLY_ME",
-};
+  PUBLIC: "Public",
+  FRIENDS: "Friends",
+  ONLY_ME: "Only Me",
+} as const;
 
-const ConnectionPrivacy = {
-  PUBLIC: "PUBLIC",
-  FRIENDS: "FRIENDS",
-  ONLY_ME: "ONLY_ME",
-};
+type PrivacyVisibilityValue =
+  (typeof PrivacyVisibility)[keyof typeof PrivacyVisibility];
 
-const privacyOptions = [
+// Type for individual privacy settings
+interface IPrivacySettings {
+  ageRange: PrivacyVisibilityValue;
+  nickname: PrivacyVisibilityValue;
+  gender: PrivacyVisibilityValue;
+  location: PrivacyVisibilityValue;
+  locationName: PrivacyVisibilityValue;
+  country: PrivacyVisibilityValue;
+  state: PrivacyVisibilityValue;
+  city: PrivacyVisibilityValue;
+  profession: PrivacyVisibilityValue;
+  aboutMe: PrivacyVisibilityValue;
+  phoneNumber: PrivacyVisibilityValue;
+  maritalStatus: PrivacyVisibilityValue;
+}
+
+// Type for privacy options in dropdown
+interface PrivacyOption {
+  value: PrivacyVisibilityValue;
+  label: string;
+  icon: LucideIcon;
+  description: string;
+}
+
+// Privacy visibility options for dropdown
+const privacyOptions: PrivacyOption[] = [
   {
     value: PrivacyVisibility.PUBLIC,
     label: "Public",
@@ -50,49 +75,52 @@ const privacyOptions = [
   },
 ];
 
-const connectionOptions = [
-  {
-    value: ConnectionPrivacy.PUBLIC,
-    label: "Public",
-    icon: Globe,
-    description: "Anyone can see your connections",
-  },
-  {
-    value: ConnectionPrivacy.FRIENDS,
-    label: "Friends",
-    icon: Users,
-    description: "Only friends can see your connections",
-  },
-  {
-    value: ConnectionPrivacy.ONLY_ME,
-    label: "Only Me",
-    icon: Lock,
-    description: "Only you can see your connections",
-  },
-];
+// Type for settings group
+interface SettingsGroup {
+  title: string;
+  icon: LucideIcon;
+  description: string;
+  settings: {
+    key: keyof IPrivacySettings;
+    label: string;
+    icon: LucideIcon;
+  }[];
+}
 
 export default function PrivacySettings() {
-  const [privacySettings, setPrivacySettings] = useState({
-    ageRange: PrivacyVisibility.ONLY_ME,
-    nickname: PrivacyVisibility.PUBLIC,
-    gender: PrivacyVisibility.ONLY_ME,
-    location: PrivacyVisibility.PUBLIC,
-    locationName: PrivacyVisibility.PUBLIC,
-    country: PrivacyVisibility.PUBLIC,
-    state: PrivacyVisibility.PUBLIC,
-    city: PrivacyVisibility.PUBLIC,
-    profession: PrivacyVisibility.PUBLIC,
-    aboutMe: PrivacyVisibility.PUBLIC,
-    phoneNumber: PrivacyVisibility.ONLY_ME,
-    maritalStatus: PrivacyVisibility.PUBLIC,
-  });
+  const user = useUser();
 
-  const [connectionPrivacy, setConnectionPrivacy] = useState(
-    ConnectionPrivacy.PUBLIC
+  const initialPrivacySettings = useMemo(
+    () => ({
+      ageRange: user?.privacySettings?.ageRange || PrivacyVisibility.ONLY_ME,
+      nickname: user?.privacySettings?.nickname || PrivacyVisibility.PUBLIC,
+      gender: user?.privacySettings?.gender || PrivacyVisibility.ONLY_ME,
+      location: user?.privacySettings?.location || PrivacyVisibility.PUBLIC,
+      locationName:
+        user?.privacySettings?.locationName || PrivacyVisibility.PUBLIC,
+      country: user?.privacySettings?.country || PrivacyVisibility.PUBLIC,
+      state: user?.privacySettings?.state || PrivacyVisibility.PUBLIC,
+      city: user?.privacySettings?.city || PrivacyVisibility.PUBLIC,
+      profession: user?.privacySettings?.profession || PrivacyVisibility.PUBLIC,
+      aboutMe: user?.privacySettings?.aboutMe || PrivacyVisibility.PUBLIC,
+      phoneNumber:
+        user?.privacySettings?.phoneNumber || PrivacyVisibility.ONLY_ME,
+      maritalStatus:
+        user?.privacySettings?.maritalStatus || PrivacyVisibility.PUBLIC,
+    }),
+    [user]
   );
-  const [activeDropdown, setActiveDropdown] = useState(null);
 
-  const handlePrivacyChange = (field, value) => {
+  const [privacySettings, setPrivacySettings] =
+    useState<IPrivacySettings>(initialPrivacySettings);
+  const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+  const [updatePrivacySettingsMutation, { isLoading }] =
+    useUpdatePrivacySettingsMutation();
+
+  const handlePrivacyChange = (
+    field: keyof IPrivacySettings,
+    value: PrivacyVisibilityValue
+  ) => {
     setPrivacySettings((prev) => ({
       ...prev,
       [field]: value,
@@ -100,7 +128,50 @@ export default function PrivacySettings() {
     setActiveDropdown(null);
   };
 
-  const PrivacyDropdown = ({ field, currentValue, options, onSelect }) => {
+  const handleSaveChanges = async () => {
+    try {
+      await updatePrivacySettingsMutation({
+        privacySettings,
+      }).unwrap();
+      toast.success("Privacy settings updated successfully!");
+    } catch (err) {
+      const error = err as TError;
+      toast.error(error?.data?.message || "Something went wrong!");
+    }
+  };
+
+  const handleResetToDefault = () => {
+    setPrivacySettings({
+      ageRange: PrivacyVisibility.ONLY_ME,
+      nickname: PrivacyVisibility.PUBLIC,
+      gender: PrivacyVisibility.ONLY_ME,
+      location: PrivacyVisibility.PUBLIC,
+      locationName: PrivacyVisibility.PUBLIC,
+      country: PrivacyVisibility.PUBLIC,
+      state: PrivacyVisibility.PUBLIC,
+      city: PrivacyVisibility.PUBLIC,
+      profession: PrivacyVisibility.PUBLIC,
+      aboutMe: PrivacyVisibility.PUBLIC,
+      phoneNumber: PrivacyVisibility.ONLY_ME,
+      maritalStatus: PrivacyVisibility.PUBLIC,
+    });
+    setActiveDropdown(null);
+  };
+
+  const PrivacyDropdown = ({
+    field,
+    currentValue,
+    options,
+    onSelect,
+  }: {
+    field: keyof IPrivacySettings;
+    currentValue: PrivacyVisibilityValue;
+    options: PrivacyOption[];
+    onSelect: (
+      field: keyof IPrivacySettings,
+      value: PrivacyVisibilityValue
+    ) => void;
+  }) => {
     const isActive = activeDropdown === field;
     const currentOption = options.find((opt) => opt.value === currentValue);
     const IconComponent = currentOption?.icon || Globe;
@@ -163,7 +234,7 @@ export default function PrivacySettings() {
     );
   };
 
-  const settingsGroups = [
+  const settingsGroups: SettingsGroup[] = [
     {
       title: "Personal Information",
       icon: User,
@@ -236,43 +307,6 @@ export default function PrivacySettings() {
 
           {/* Main Content */}
           <div className="lg:col-span-3 space-y-6">
-            {/* Connection Privacy */}
-            <div className="bg-white rounded-lg shadow-sm p-6">
-              <div className="flex items-center space-x-3 mb-6">
-                <Users className="h-6 w-6 text-primary" />
-                <div>
-                  <h3 className="text-xl font-semibold text-gray-900">
-                    Connection Privacy
-                  </h3>
-                  <p className="text-sm text-gray-600">
-                    Control who can see your friends and connections
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                <div className="flex items-center space-x-3">
-                  <div className="bg-blue-100 p-2 rounded-full">
-                    <Users className="h-5 w-5 text-primary" />
-                  </div>
-                  <div>
-                    <div className="font-medium text-gray-900">
-                      Friends List Visibility
-                    </div>
-                    <div className="text-sm text-gray-500">
-                      Who can see your friends and connections
-                    </div>
-                  </div>
-                </div>
-                <PrivacyDropdown
-                  field="connectionPrivacy"
-                  currentValue={connectionPrivacy}
-                  options={connectionOptions}
-                  onSelect={(field, value) => setConnectionPrivacy(value)}
-                />
-              </div>
-            </div>
-
             {/* Privacy Settings Groups */}
             {settingsGroups.map((group) => {
               const GroupIcon = group.icon;
@@ -313,7 +347,8 @@ export default function PrivacySettings() {
                                 {
                                   privacyOptions.find(
                                     (opt) =>
-                                      opt.value === privacySettings[setting.key]
+                                      opt.value ===
+                                      privacySettings[setting.key]
                                   )?.description
                                 }
                               </div>
@@ -333,14 +368,21 @@ export default function PrivacySettings() {
               );
             })}
 
-
             {/* Save Button */}
             <div className="flex justify-end space-x-4">
-              <button className="px-6 py-2 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 transition-colors cursor-pointer">
+              <button
+                onClick={handleResetToDefault}
+                className="px-6 py-2 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 transition-colors cursor-pointer"
+                disabled={isLoading}
+              >
                 Reset to Default
               </button>
-              <button className="px-6 py-2 bg-primary text-white rounded-xl transition-colors cursor-pointer">
-                Save Changes
+              <button
+                onClick={handleSaveChanges}
+                className="px-6 py-2 bg-primary text-white rounded-xl transition-colors cursor-pointer disabled:bg-gray-400"
+                disabled={isLoading}
+              >
+                {isLoading ? "Saving..." : "Save Changes"}
               </button>
             </div>
           </div>

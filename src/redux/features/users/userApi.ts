@@ -16,7 +16,19 @@ const usersApi = baseApi.injectEndpoints({
       }),
       providesTags: ["User"],
     }),
+    updatePrivacySettings: builder.mutation({
+      query: (data) => ({
+        url: "/users/privacy-settings",
+        method: "PATCH",
+        body: data,
+      }),
+      invalidatesTags: ["User"],
+    }),
   }),
 });
 
-export const { useGetSingleUserQuery, useGetSingleByUserIdQuery } = usersApi;
+export const {
+  useGetSingleUserQuery,
+  useGetSingleByUserIdQuery,
+  useUpdatePrivacySettingsMutation,
+} = usersApi;

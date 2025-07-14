@@ -3,7 +3,7 @@ import { MapPin, Users, Camera, Heart, Globe, Star } from "lucide-react";
 
 export default function AboutUs() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+    <div className="bg-gradient-to-br from-blue-50 to-indigo-100 rounded-xl">
       {/* Hero Section */}
       <section className="relative py-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto text-center">

@@ -11,9 +11,9 @@ import {
 
 export default function TermsAndConditions() {
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="w-full bg-gray-50">
       {/* Hero Section */}
-      <section className="bg-gradient-to-r from-indigo-600 to-purple-600 py-16 px-4 sm:px-6 lg:px-8">
+      <section className="bg-gradient-to-r from-indigo-600 to-purple-600 py-16 px-4 sm:px-6 lg:px-8 rounded-t-xl ">
         <div className="max-w-4xl mx-auto text-center text-white">
           <div className="flex justify-center mb-6">
             <div className="bg-white bg-opacity-20 rounded-full p-4">
