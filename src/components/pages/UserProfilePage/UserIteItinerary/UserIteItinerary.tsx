@@ -1,6 +1,6 @@
 "use client";
 import { useGetUserTimelinePostsQuery } from "@/redux/features/post/postApi";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { IPost } from "@/types/post.types";
 import { useParams } from "next/navigation";
 import UserIteItineraryCard from "./UserIteItineraryCard";
@@ -11,7 +11,9 @@ const UserIteItinerary = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [itineraryPosts, setItineraryPosts] = useState<IPost[]>([]);
   const [removePostIds, setRemovePostIds] = useState<string[]>([]);
-  const observerRef = useRef<HTMLDivElement | null>(null);
+  const [hasMore, setHasMore] = useState(true);
+  const observer = useRef<IntersectionObserver | null>(null);
+  const loaderRef = useRef<HTMLDivElement | null>(null);
 
   // Get user itinerary posts
   const {
@@ -23,8 +25,8 @@ const UserIteItinerary = () => {
       username: userName,
       filters: [
         { key: "mediaType", value: "itinerary" },
-        { key: "page", value: currentPage },
-        { key: "limit", value: 9 },
+        { key: "page", value: currentPage.toString() },
+        { key: "limit", value: "9" },
       ],
     },
     {
@@ -45,6 +47,7 @@ const UserIteItinerary = () => {
         );
         return currentPage === 1 ? newPosts : [...prev, ...newPosts];
       });
+      setHasMore(currentPage < (responseData.data.attributes.totalPages || 0));
     }
   }, [responseData, currentPage, removePostIds]);
 
@@ -53,35 +56,25 @@ const UserIteItinerary = () => {
     setItineraryPosts([]);
     setRemovePostIds([]);
     setCurrentPage(1);
+    setHasMore(true);
   }, [userName]);
 
-  // Intersection Observer for infinite scroll
-  useEffect(() => {
-    const totalResults = responseData?.data?.attributes?.totalResults || 0;
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (
-          entries[0].isIntersecting &&
-          !isLoading &&
-          !isFetching &&
-          itineraryPosts.length < totalResults
-        ) {
-          setCurrentPage((prev) => prev + 1);
+  // Set up IntersectionObserver for infinite scroll (from Posts)
+  const lastPostElementRef = useCallback(
+    (node: HTMLDivElement | null) => {
+      if (isLoading || isFetching) return;
+      if (observer.current) observer.current.disconnect();
+
+      observer.current = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting && hasMore) {
+          setCurrentPage((prevPage) => prevPage + 1);
         }
-      },
-      { threshold: 0.1 }
-    );
+      });
 
-    if (observerRef.current) {
-      observer.observe(observerRef.current);
-    }
-
-    return () => {
-      if (observerRef.current) {
-        observer.unobserve(observerRef.current);
-      }
-    };
-  }, [isLoading, isFetching, itineraryPosts.length, responseData, currentPage]);
+      if (node) observer.current.observe(node);
+    },
+    [isLoading, isFetching, hasMore]
+  );
 
   const handleRemovePost = (postId: string) => {
     setRemovePostIds((prev) => [...prev, postId]);
@@ -101,18 +94,31 @@ const UserIteItinerary = () => {
     content = renderLoading();
   } else if (itineraryPosts.length === 0 && !isLoading) {
     content = (
-      <h1 className="text-center text-gray-500 py-8">No Post available</h1>
+      <h1 className="text-center text-gray-500 py-8">No itinerary available</h1>
     );
   } else if (itineraryPosts.length > 0) {
     content = (
       <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {itineraryPosts?.map((post, index) => (
-          <UserIteItineraryCard
-            key={`${post._id}-${index}`}
-            post={post}
-            onRemove={() => handleRemovePost(post._id)}
-          />
-        ))}
+        {itineraryPosts.map((post, index) => {
+          // Attach ref to the last post for infinite scroll
+          if (index === itineraryPosts.length - 1) {
+            return (
+              <div key={post._id} ref={lastPostElementRef}>
+                <UserIteItineraryCard
+                  post={post}
+                  onRemove={() => handleRemovePost(post._id)}
+                />
+              </div>
+            );
+          }
+          return (
+            <UserIteItineraryCard
+              key={post._id}
+              post={post}
+              onRemove={() => handleRemovePost(post._id)}
+            />
+          );
+        })}
       </div>
     );
   }
@@ -127,7 +133,7 @@ const UserIteItinerary = () => {
           ))}
         </div>
       )}
-      <div ref={observerRef} className="h-10" />
+      <div ref={loaderRef} className="h-10" />
     </div>
   );
 };

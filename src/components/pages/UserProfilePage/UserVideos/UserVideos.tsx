@@ -1,6 +1,6 @@
 "use client";
 import { useGetUserTimelinePostsQuery } from "@/redux/features/post/postApi";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { IPost } from "@/types/post.types";
 import { useParams } from "next/navigation";
 import VideoCard from "./VideoCard";
@@ -10,7 +10,9 @@ const UserVideos = () => {
   const { userName } = useParams();
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [timelinePosts, setTimelinePosts] = useState<IPost[]>([]);
-  const observerRef = useRef<HTMLDivElement | null>(null);
+  const [hasMore, setHasMore] = useState(true);
+  const observer = useRef<IntersectionObserver | null>(null);
+  const loaderRef = useRef<HTMLDivElement | null>(null);
 
   // Get user timeline posts with videos
   const {
@@ -22,8 +24,8 @@ const UserVideos = () => {
       username: userName,
       filters: [
         { key: "mediaType", value: "video" },
-        { key: "page", value: currentPage },
-        { key: "limit", value: 8 },
+        { key: "page", value: currentPage.toString() },
+        { key: "limit", value: "8" },
       ],
     },
     { refetchOnMountOrArgChange: true, skip: !userName }
@@ -40,6 +42,7 @@ const UserVideos = () => {
         );
         return currentPage === 1 ? newPosts : [...prev, ...newPosts];
       });
+      setHasMore(currentPage < (responseData.data.attributes.totalPages || 0));
     }
   }, [responseData, currentPage]);
 
@@ -47,35 +50,25 @@ const UserVideos = () => {
   useEffect(() => {
     setTimelinePosts([]);
     setCurrentPage(1);
+    setHasMore(true);
   }, [userName]);
 
-  // Intersection Observer for infinite scroll
-  useEffect(() => {
-    const totalResults = responseData?.data?.attributes?.totalResults || 0;
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (
-          entries[0].isIntersecting &&
-          !isLoading &&
-          !isFetching &&
-          timelinePosts.length < totalResults
-        ) {
-          setCurrentPage((prev) => prev + 1);
+  // Set up IntersectionObserver for infinite scroll (from Posts)
+  const lastVideoElementRef = useCallback(
+    (node: HTMLDivElement | null) => {
+      if (isLoading || isFetching) return;
+      if (observer.current) observer.current.disconnect();
+
+      observer.current = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting && hasMore) {
+          setCurrentPage((prevPage) => prevPage + 1);
         }
-      },
-      { threshold: 0.1 }
-    );
+      });
 
-    if (observerRef.current) {
-      observer.observe(observerRef.current);
-    }
-
-    return () => {
-      if (observerRef.current) {
-        observer.unobserve(observerRef.current);
-      }
-    };
-  }, [isLoading, isFetching, timelinePosts.length, responseData, currentPage]);
+      if (node) observer.current.observe(node);
+    },
+    [isLoading, isFetching, hasMore]
+  );
 
   const renderLoading = () => (
     <div className="w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
@@ -100,9 +93,17 @@ const UserVideos = () => {
     );
     content = (
       <div className="w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-        {videoMedia.map((media, index) => (
-          <VideoCard key={`${media._id}-${index}`} url={media.mediaUrl} />
-        ))}
+        {videoMedia.map((media, index) => {
+          // Attach ref to the last video for infinite scroll
+          if (index === videoMedia.length - 1) {
+            return (
+              <div key={media._id} ref={lastVideoElementRef}>
+                <VideoCard url={media.mediaUrl} />
+              </div>
+            );
+          }
+          return <VideoCard key={media._id} url={media.mediaUrl} />;
+        })}
       </div>
     );
   }
@@ -122,7 +123,7 @@ const UserVideos = () => {
           ))}
         </div>
       )}
-      <div ref={observerRef} className="h-10" />
+      <div ref={loaderRef} className="h-10" />
     </div>
   );
 };

@@ -1,6 +1,6 @@
 "use client";
 import { useGetMyInvitedGroupsQuery } from "@/redux/features/group/groupApi";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { IGroupInvite } from "@/types/group.types";
 import MyInvitationsGroupCard from "./MyInvitationsGroupCard";
 import MyInvitationsGroupSkeleton from "./MyInvitationsGroupSkeleton";
@@ -8,7 +8,9 @@ import MyInvitationsGroupSkeleton from "./MyInvitationsGroupSkeleton";
 const MyInvitationsGroups = ({ sortBy }: { sortBy: string }) => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [invitedGroups, setInvitedGroups] = useState<IGroupInvite[]>([]);
-  const observerRef = useRef<HTMLDivElement | null>(null);
+  const [hasMore, setHasMore] = useState(true);
+  const observer = useRef<IntersectionObserver | null>(null);
+  const loaderRef = useRef<HTMLDivElement | null>(null);
 
   // Get invited groups
   const {
@@ -16,8 +18,8 @@ const MyInvitationsGroups = ({ sortBy }: { sortBy: string }) => {
     isLoading,
     isFetching,
   } = useGetMyInvitedGroupsQuery([
-    { key: "page", value: currentPage },
-    { key: "limit", value: 9 },
+    { key: "page", value: currentPage.toString() },
+    { key: "limit", value: "9" },
     { key: "sortBy", value: sortBy },
   ]);
 
@@ -32,6 +34,7 @@ const MyInvitationsGroups = ({ sortBy }: { sortBy: string }) => {
         );
         return currentPage === 1 ? newGroups : [...prev, ...newGroups];
       });
+      setHasMore(currentPage < (responseData.data.attributes.totalPages || 0));
     }
   }, [responseData, currentPage]);
 
@@ -39,39 +42,25 @@ const MyInvitationsGroups = ({ sortBy }: { sortBy: string }) => {
   useEffect(() => {
     setInvitedGroups([]);
     setCurrentPage(1);
+    setHasMore(true);
   }, [sortBy]);
 
-  // Intersection Observer for infinite scroll
-  useEffect(() => {
-    const totalResults = responseData?.data?.attributes?.totalResults || 0;
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (
-          entries[0].isIntersecting &&
-          !isLoading &&
-          !isFetching &&
-          invitedGroups.length < totalResults
-        ) {
-          setCurrentPage((prev) => prev + 1);
+  // Set up IntersectionObserver for infinite scroll (from Posts)
+  const lastGroupElementRef = useCallback(
+    (node: HTMLDivElement | null) => {
+      if (isLoading || isFetching) return;
+      if (observer.current) observer.current.disconnect();
+
+      observer.current = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting && hasMore) {
+          setCurrentPage((prevPage) => prevPage + 1);
         }
-      },
-      { threshold: 0.1 }
-    );
+      });
 
-    if (observerRef.current) {
-      observer.observe(observerRef.current);
-    }
-
-    return () => {
-      if (observerRef.current) {
-        observer.unobserve(observerRef.current);
-      }
-    };
-  }, [isLoading, isFetching, invitedGroups.length, responseData, currentPage]);
-
-  // const handleItemRemove = (itemId: string) => {
-  //   setInvitedGroups((prev) => prev.filter((group) => group._id !== itemId));
-  // };
+      if (node) observer.current.observe(node);
+    },
+    [isLoading, isFetching, hasMore]
+  );
 
   const renderLoading = () => (
     <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
@@ -93,12 +82,17 @@ const MyInvitationsGroups = ({ sortBy }: { sortBy: string }) => {
   } else if (invitedGroups.length > 0) {
     content = (
       <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-        {invitedGroups?.map((group, index) => (
-          <MyInvitationsGroupCard
-            key={`${group._id}-${index}`}
-            group={group}
-          />
-        ))}
+        {invitedGroups.map((group, index) => {
+          // Attach ref to the last group for infinite scroll
+          if (index === invitedGroups.length - 1) {
+            return (
+              <div key={group._id} ref={lastGroupElementRef}>
+                <MyInvitationsGroupCard group={group} />
+              </div>
+            );
+          }
+          return <MyInvitationsGroupCard key={group._id} group={group} />;
+        })}
       </div>
     );
   }
@@ -113,7 +107,7 @@ const MyInvitationsGroups = ({ sortBy }: { sortBy: string }) => {
           ))}
         </div>
       )}
-      <div ref={observerRef} className="h-10" />
+      <div ref={loaderRef} className="h-10" />
     </div>
   );
 };

@@ -1,6 +1,6 @@
 "use client";
 import { useGetMyJoinedGroupsQuery } from "@/redux/features/group/groupApi";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { IGroup } from "@/types/group.types";
 import MyJoinedGroupCard from "./MyJoinedGroupCard";
 import MyJoinedGroupSkeleton from "./MyJoinedGroupSkeleton";
@@ -8,7 +8,9 @@ import MyJoinedGroupSkeleton from "./MyJoinedGroupSkeleton";
 const MyJoinedGroups = ({ sortBy }: { sortBy: string }) => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [joinedGroups, setJoinedGroups] = useState<IGroup[]>([]);
-  const observerRef = useRef<HTMLDivElement | null>(null);
+  const [hasMore, setHasMore] = useState(true);
+  const observer = useRef<IntersectionObserver | null>(null);
+  const loaderRef = useRef<HTMLDivElement | null>(null);
 
   // Get joined groups
   const {
@@ -16,8 +18,8 @@ const MyJoinedGroups = ({ sortBy }: { sortBy: string }) => {
     isLoading,
     isFetching,
   } = useGetMyJoinedGroupsQuery([
-    { key: "page", value: currentPage },
-    { key: "limit", value: 9 },
+    { key: "page", value: currentPage.toString() },
+    { key: "limit", value: "9" },
     { key: "sortBy", value: sortBy },
   ]);
 
@@ -32,6 +34,7 @@ const MyJoinedGroups = ({ sortBy }: { sortBy: string }) => {
         );
         return currentPage === 1 ? newGroups : [...prev, ...newGroups];
       });
+      setHasMore(currentPage < (responseData.data.attributes.totalPages || 0));
     }
   }, [responseData, currentPage]);
 
@@ -39,41 +42,25 @@ const MyJoinedGroups = ({ sortBy }: { sortBy: string }) => {
   useEffect(() => {
     setJoinedGroups([]);
     setCurrentPage(1);
+    setHasMore(true);
   }, [sortBy]);
 
-  // Intersection Observer for infinite scroll
-  useEffect(() => {
-    const totalResults = responseData?.data?.attributes?.totalResults || 0;
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (
-          entries[0].isIntersecting &&
-          !isLoading &&
-          !isFetching &&
-          joinedGroups.length < totalResults
-        ) {
-          setCurrentPage((prev) => prev + 1);
+  // Set up IntersectionObserver for infinite scroll (from Posts)
+  const lastGroupElementRef = useCallback(
+    (node: HTMLDivElement | null) => {
+      if (isLoading || isFetching) return;
+      if (observer.current) observer.current.disconnect();
+
+      observer.current = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting && hasMore) {
+          setCurrentPage((prevPage) => prevPage + 1);
         }
-      },
-      { threshold: 0.1 }
-    );
+      });
 
-    if (observerRef.current) {
-      observer.observe(observerRef.current);
-    }
-
-    return () => {
-      if (observerRef.current) {
-        observer.unobserve(observerRef.current);
-      }
-    };
-  }, [isLoading, isFetching, joinedGroups.length, responseData, currentPage]);
-
-  // const handleItemRemove = (itemId: string) => {
-  //   setJoinedGroups((prev) =>
-  //     prev.filter((group) => group._id !== itemId)
-  //   );
-  // };
+      if (node) observer.current.observe(node);
+    },
+    [isLoading, isFetching, hasMore]
+  );
 
   const renderLoading = () => (
     <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
@@ -88,20 +75,22 @@ const MyJoinedGroups = ({ sortBy }: { sortBy: string }) => {
     content = renderLoading();
   } else if (joinedGroups.length === 0 && !isLoading) {
     content = (
-      <h1 className="text-center text-gray-500 py-8">
-        No groups available
-      </h1>
+      <h1 className="text-center text-gray-500 py-8">No groups available</h1>
     );
   } else if (joinedGroups.length > 0) {
     content = (
       <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-        {joinedGroups?.map((group, index) => (
-          <MyJoinedGroupCard
-            key={`${group._id}-${index}`}
-            group={group}
-            // onRemove={() => handleItemRemove(group._id)}
-          />
-        ))}
+        {joinedGroups.map((group, index) => {
+          // Attach ref to the last group for infinite scroll
+          if (index === joinedGroups.length - 1) {
+            return (
+              <div key={group._id} ref={lastGroupElementRef}>
+                <MyJoinedGroupCard group={group} />
+              </div>
+            );
+          }
+          return <MyJoinedGroupCard key={group._id} group={group} />;
+        })}
       </div>
     );
   }
@@ -116,7 +105,7 @@ const MyJoinedGroups = ({ sortBy }: { sortBy: string }) => {
           ))}
         </div>
       )}
-      <div ref={observerRef} className="h-10" />
+      <div ref={loaderRef} className="h-10" />
     </div>
   );
 };

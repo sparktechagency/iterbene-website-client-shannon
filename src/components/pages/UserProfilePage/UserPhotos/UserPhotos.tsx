@@ -1,6 +1,6 @@
 "use client";
 import { useGetUserTimelinePostsQuery } from "@/redux/features/post/postApi";
-import { useState, useEffect, useRef, useMemo } from "react";
+import { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import { IMedia, IPost } from "@/types/post.types";
 import { useParams } from "next/navigation";
 import Lightbox from "yet-another-react-lightbox";
@@ -12,9 +12,11 @@ const UserPhotos = () => {
   const { userName } = useParams();
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [timelinePosts, setTimelinePosts] = useState<IPost[]>([]);
+  const [hasMore, setHasMore] = useState(true);
   const [open, setOpen] = useState(false);
   const [photoIndex, setPhotoIndex] = useState(0);
-  const observerRef = useRef<HTMLDivElement | null>(null);
+  const observer = useRef<IntersectionObserver | null>(null);
+  const loaderRef = useRef<HTMLDivElement | null>(null);
 
   // Get user timeline posts with images
   const {
@@ -26,8 +28,8 @@ const UserPhotos = () => {
       username: userName,
       filters: [
         { key: "mediaType", value: "image" },
-        { key: "page", value: currentPage },
-        { key: "limit", value: 8 },
+        { key: "page", value: currentPage.toString() },
+        { key: "limit", value: "8" },
       ],
     },
     { refetchOnMountOrArgChange: true, skip: !userName }
@@ -44,6 +46,7 @@ const UserPhotos = () => {
         );
         return currentPage === 1 ? newPosts : [...prev, ...newPosts];
       });
+      setHasMore(currentPage < (responseData.data.attributes.totalPages || 0));
     }
   }, [responseData, currentPage]);
 
@@ -51,35 +54,25 @@ const UserPhotos = () => {
   useEffect(() => {
     setTimelinePosts([]);
     setCurrentPage(1);
+    setHasMore(true);
   }, [userName]);
 
-  // Intersection Observer for infinite scroll
-  useEffect(() => {
-    const totalResults = responseData?.data?.attributes?.totalResults || 0;
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (
-          entries[0].isIntersecting &&
-          !isLoading &&
-          !isFetching &&
-          timelinePosts.length < totalResults
-        ) {
-          setCurrentPage((prev) => prev + 1);
+  // Set up IntersectionObserver for infinite scroll (from Posts)
+  const lastPhotoElementRef = useCallback(
+    (node: HTMLDivElement | null) => {
+      if (isLoading || isFetching) return;
+      if (observer.current) observer.current.disconnect();
+
+      observer.current = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting && hasMore) {
+          setCurrentPage((prevPage) => prevPage + 1);
         }
-      },
-      { threshold: 0.1 }
-    );
+      });
 
-    if (observerRef.current) {
-      observer.observe(observerRef.current);
-    }
-
-    return () => {
-      if (observerRef.current) {
-        observer.unobserve(observerRef.current);
-      }
-    };
-  }, [isLoading, isFetching, timelinePosts.length, responseData, currentPage]);
+      if (node) observer.current.observe(node);
+    },
+    [isLoading, isFetching, hasMore]
+  );
 
   // Flatten all media items into a single array for easier handling
   const allMediaItems = useMemo(() => {
@@ -129,14 +122,28 @@ const UserPhotos = () => {
   } else if (allMediaItems.length > 0) {
     content = (
       <div className="w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-        {allMediaItems?.map((media, index) => (
-          <UserPhotoCard
-            key={`${media._id}-${index}`}
-            handleImageClick={handleImageClick}
-            index={index}
-            media={media}
-          />
-        ))}
+        {allMediaItems.map((media, index) => {
+          // Attach ref to the last photo for infinite scroll
+          if (index === allMediaItems.length - 1) {
+            return (
+              <div key={media._id} ref={lastPhotoElementRef}>
+                <UserPhotoCard
+                  handleImageClick={handleImageClick}
+                  index={index}
+                  media={media}
+                />
+              </div>
+            );
+          }
+          return (
+            <UserPhotoCard
+              key={media._id}
+              handleImageClick={handleImageClick}
+              index={index}
+              media={media}
+            />
+          );
+        })}
       </div>
     );
   }
@@ -159,7 +166,7 @@ const UserPhotos = () => {
           ))}
         </div>
       )}
-      <div ref={observerRef} className="h-10" />
+      <div ref={loaderRef} className="h-10" />
       {/* Lightbox */}
       {lightboxSlides.length > 0 && (
         <Lightbox
