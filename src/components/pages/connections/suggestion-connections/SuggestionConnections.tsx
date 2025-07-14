@@ -9,7 +9,7 @@ const SuggestionConnections: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [isLoadingMore, setIsLoadingMore] = useState<boolean>(false);
   const [allConnections, setAllConnections] = useState<IConnection[]>([]);
-  
+
   const { data: responseData, isLoading } = useGetSuggestionsConnectionsQuery(
     [
       {
@@ -25,7 +25,7 @@ const SuggestionConnections: React.FC = () => {
       refetchOnMountOrArgChange: true,
     }
   );
-  
+
   const suggestionsConnections = responseData?.data?.attributes?.results;
   const totalPages = responseData?.data?.attributes?.totalPages;
 
@@ -37,10 +37,18 @@ const SuggestionConnections: React.FC = () => {
       } else {
         // Additional pages - append only new unique connections
         setAllConnections((prev) => {
+          console.log("Prev", prev?.length);
+          console.log("suggestionsConnections", suggestionsConnections?.length);
           const existingIds = new Set(prev.map((conn) => conn._id));
+          const suggationIds = new Set(
+            suggestionsConnections.map((conn: IConnection) => conn._id)
+          );
+          console.log("Existing IDs", existingIds);
+          console.log("Suggation IDs", suggationIds);
           const newConnections = suggestionsConnections.filter(
             (conn: IConnection) => !existingIds.has(conn._id)
           );
+          console.log("New Connections", newConnections?.length);
           return [...prev, ...newConnections];
         });
       }
@@ -57,7 +65,7 @@ const SuggestionConnections: React.FC = () => {
 
   // Handle connection added/removed - optimistically remove from UI
   const handleConnectionAction = (connectionId: string) => {
-    setAllConnections((prev) => 
+    setAllConnections((prev) =>
       prev.filter((conn) => conn._id !== connectionId)
     );
   };
@@ -96,6 +104,7 @@ const SuggestionConnections: React.FC = () => {
     return null;
   }
 
+  console.log("Suggestions Connections:", responseData?.data?.attributes);
   return (
     <section className="w-full">
       {/* Header Section */}

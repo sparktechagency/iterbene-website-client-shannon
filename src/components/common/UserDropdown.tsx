@@ -51,8 +51,6 @@ const UserDropdown: React.FC<DropdownProps> = ({ user, isOpen }) => {
     router.push("/");
   };
 
-
-  console.log("Is settings open:", isSettingsOpen);
   return (
     <AnimatePresence>
       {isOpen && (
