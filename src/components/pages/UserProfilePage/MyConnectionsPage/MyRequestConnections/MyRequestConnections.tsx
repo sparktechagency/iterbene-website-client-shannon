@@ -1,16 +1,16 @@
 "use client";
 import { useGetConnectionRequestsQuery } from "@/redux/features/connections/connectionsApi";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { IConnectionRequest } from "@/types/connection.types";
 import MyRequestConnectionCard from "./MyRequestConnectionCard";
 import MyRequestConnectionSkeleton from "./MyRequestConnectionSkeleton";
 
 const RequestConnections = ({ sortBy }: { sortBy: string }) => {
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const [connectionRequests, setConnectionRequests] = useState<
-    IConnectionRequest[]
-  >([]);
-  const observerRef = useRef<HTMLDivElement | null>(null);
+  const [connectionRequests, setConnectionRequests] = useState<IConnectionRequest[]>([]);
+  const [hasMore, setHasMore] = useState(true);
+  const observer = useRef<IntersectionObserver | null>(null);
+  const loaderRef = useRef<HTMLDivElement | null>(null);
 
   // Get connection requests
   const {
@@ -18,8 +18,8 @@ const RequestConnections = ({ sortBy }: { sortBy: string }) => {
     isLoading,
     isFetching,
   } = useGetConnectionRequestsQuery([
-    { key: "page", value: currentPage },
-    { key: "limit", value: 9 },
+    { key: "page", value: currentPage.toString() },
+    { key: "limit", value: "9" },
     { key: "sortBy", value: sortBy },
   ]);
 
@@ -34,6 +34,7 @@ const RequestConnections = ({ sortBy }: { sortBy: string }) => {
         );
         return currentPage === 1 ? newRequests : [...prev, ...newRequests];
       });
+      setHasMore(currentPage < (responseData.data.attributes.totalPages || 0));
     }
   }, [responseData, currentPage]);
 
@@ -41,47 +42,25 @@ const RequestConnections = ({ sortBy }: { sortBy: string }) => {
   useEffect(() => {
     setConnectionRequests([]);
     setCurrentPage(1);
+    setHasMore(true);
   }, [sortBy]);
 
-  // Intersection Observer for infinite scroll
-  useEffect(() => {
-    const totalResults = responseData?.data?.attributes?.totalResults || 0;
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (
-          entries[0].isIntersecting &&
-          !isLoading &&
-          !isFetching &&
-          connectionRequests.length < totalResults
-        ) {
-          setCurrentPage((prev) => prev + 1);
+  // Set up IntersectionObserver for infinite scroll (from Posts)
+  const lastRequestElementRef = useCallback(
+    (node: HTMLDivElement | null) => {
+      if (isLoading || isFetching) return;
+      if (observer.current) observer.current.disconnect();
+
+      observer.current = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting && hasMore) {
+          setCurrentPage((prevPage) => prevPage + 1);
         }
-      },
-      { threshold: 0.1 }
-    );
+      });
 
-    if (observerRef.current) {
-      observer.observe(observerRef.current);
-    }
-
-    return () => {
-      if (observerRef.current) {
-        observer.unobserve(observerRef.current);
-      }
-    };
-  }, [
-    isLoading,
-    isFetching,
-    connectionRequests.length,
-    responseData,
-    currentPage,
-  ]);
-
-  // const handleItemRemove = (itemId: string) => {
-  //   setConnectionRequests((prev) =>
-  //     prev.filter((request) => request._id !== itemId)
-  //   );
-  // };
+      if (node) observer.current.observe(node);
+    },
+    [isLoading, isFetching, hasMore]
+  );
 
   const renderLoading = () => (
     <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
@@ -103,12 +82,17 @@ const RequestConnections = ({ sortBy }: { sortBy: string }) => {
   } else if (connectionRequests.length > 0) {
     content = (
       <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-        {connectionRequests?.map((request, index) => (
-          <MyRequestConnectionCard
-            key={`${request._id}-${index}`}
-            connection={request}
-          />
-        ))}
+        {connectionRequests.map((request, index) => {
+          // Attach ref to the last connection request for infinite scroll
+          if (index === connectionRequests.length - 1) {
+            return (
+              <div key={request._id} ref={lastRequestElementRef}>
+                <MyRequestConnectionCard connection={request} />
+              </div>
+            );
+          }
+          return <MyRequestConnectionCard key={request._id} connection={request} />;
+        })}
       </div>
     );
   }
@@ -123,7 +107,7 @@ const RequestConnections = ({ sortBy }: { sortBy: string }) => {
           ))}
         </div>
       )}
-      <div ref={observerRef} className="h-10" />
+      <div ref={loaderRef} className="h-10" />
     </div>
   );
 };
