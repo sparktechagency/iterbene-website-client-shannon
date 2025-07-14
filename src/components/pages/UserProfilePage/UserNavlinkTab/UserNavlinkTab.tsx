@@ -17,6 +17,7 @@ const UserNavlinkTab = ({ isMyProfile }: { isMyProfile: boolean }) => {
     { name: "Maps", path: `/${userName}/maps` },
     { name: "Itinerary", path: `/${userName}/itinerary` },
     { name: "Invitations", path: `/${userName}/invitations` },
+    { name: "Privacy", path: `/${userName}/privacy` },
   ];
 
   const userTabs = [
@@ -30,7 +31,7 @@ const UserNavlinkTab = ({ isMyProfile }: { isMyProfile: boolean }) => {
   const tabs = isMyProfile ? myTabs : userTabs;
 
   // Find the active tab index based on the current pathname
-  const activeTabIndex = tabs.findIndex(tab => tab.path === pathname);
+  const activeTabIndex = tabs.findIndex((tab) => tab.path === pathname);
 
   return (
     <div className="bg-gray-100  border-gray-200 overflow-x-auto scrollbar-thin">
@@ -40,7 +41,9 @@ const UserNavlinkTab = ({ isMyProfile }: { isMyProfile: boolean }) => {
             <Link href={tab.path}>
               <motion.div
                 className={`text-sm font-medium pb-2 transition-colors duration-200 ${
-                  pathname === tab.path ? "text-primary" : "text-gray-600 hover:text-primary"
+                  pathname === tab.path
+                    ? "text-primary"
+                    : "text-gray-600 hover:text-primary"
                 }`}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
