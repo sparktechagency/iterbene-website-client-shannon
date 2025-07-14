@@ -1,6 +1,6 @@
 "use client";
 import { useGetMyInterestedEventsQuery } from "@/redux/features/event/eventApi";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { IEvent } from "@/types/event.types";
 import MyUpComingTourCard from "./MyUpComingTourCard";
 import MyUpComingTourSkeleton from "./MyUpComingTourSkeleton";
@@ -8,7 +8,9 @@ import MyUpComingTourSkeleton from "./MyUpComingTourSkeleton";
 const MyUpComingTours = ({ sortBy }: { sortBy: string }) => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [interestedEvents, setInterestedEvents] = useState<IEvent[]>([]);
-  const observerRef = useRef<HTMLDivElement | null>(null);
+  const [hasMore, setHasMore] = useState(true);
+  const observer = useRef<IntersectionObserver | null>(null);
+  const loaderRef = useRef<HTMLDivElement | null>(null);
 
   // Get interested events
   const {
@@ -16,8 +18,8 @@ const MyUpComingTours = ({ sortBy }: { sortBy: string }) => {
     isLoading,
     isFetching,
   } = useGetMyInterestedEventsQuery([
-    { key: "page", value: currentPage },
-    { key: "limit", value: 9 },
+    { key: "page", value: currentPage.toString() },
+    { key: "limit", value: "9" },
     { key: "sortBy", value: sortBy },
   ]);
 
@@ -32,6 +34,7 @@ const MyUpComingTours = ({ sortBy }: { sortBy: string }) => {
         );
         return currentPage === 1 ? newEvents : [...prev, ...newEvents];
       });
+      setHasMore(currentPage < (responseData.data.attributes.totalPages || 0));
     }
   }, [responseData, currentPage]);
 
@@ -39,41 +42,25 @@ const MyUpComingTours = ({ sortBy }: { sortBy: string }) => {
   useEffect(() => {
     setInterestedEvents([]);
     setCurrentPage(1);
+    setHasMore(true);
   }, [sortBy]);
 
-  // Intersection Observer for infinite scroll
-  useEffect(() => {
-    const totalResults = responseData?.data?.attributes?.totalResults || 0;
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (
-          entries[0].isIntersecting &&
-          !isLoading &&
-          !isFetching &&
-          interestedEvents.length < totalResults
-        ) {
-          setCurrentPage((prev) => prev + 1);
+  // Set up IntersectionObserver for infinite scroll (from Posts)
+  const lastEventElementRef = useCallback(
+    (node: HTMLDivElement | null) => {
+      if (isLoading || isFetching) return;
+      if (observer.current) observer.current.disconnect();
+
+      observer.current = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting && hasMore) {
+          setCurrentPage((prevPage) => prevPage + 1);
         }
-      },
-      { threshold: 0.1 }
-    );
+      });
 
-    if (observerRef.current) {
-      observer.observe(observerRef.current);
-    }
-
-    return () => {
-      if (observerRef.current) {
-        observer.unobserve(observerRef.current);
-      }
-    };
-  }, [isLoading, isFetching, interestedEvents.length, responseData, currentPage]);
-
-  // const handleItemRemove = (itemId: string) => {
-  //   setInterestedEvents((prev) =>
-  //     prev.filter((event) => event._id !== itemId)
-  //   );
-  // };
+      if (node) observer.current.observe(node);
+    },
+    [isLoading, isFetching, hasMore]
+  );
 
   const renderLoading = () => (
     <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
@@ -93,12 +80,17 @@ const MyUpComingTours = ({ sortBy }: { sortBy: string }) => {
   } else if (interestedEvents.length > 0) {
     content = (
       <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-        {interestedEvents?.map((event, index) => (
-          <MyUpComingTourCard
-            key={`${event._id}-${index}`}
-            event={event}
-          />
-        ))}
+        {interestedEvents.map((event, index) => {
+          // Attach ref to the last event for infinite scroll
+          if (index === interestedEvents.length - 1) {
+            return (
+              <div key={event._id} ref={lastEventElementRef}>
+                <MyUpComingTourCard event={event} />
+              </div>
+            );
+          }
+          return <MyUpComingTourCard key={event._id} event={event} />;
+        })}
       </div>
     );
   }
@@ -113,7 +105,7 @@ const MyUpComingTours = ({ sortBy }: { sortBy: string }) => {
           ))}
         </div>
       )}
-      <div ref={observerRef} className="h-10" />
+      <div ref={loaderRef} className="h-10" />
     </div>
   );
 };

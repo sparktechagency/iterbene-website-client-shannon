@@ -6,7 +6,7 @@ import SuggestionEvent from "./SuggestionEvent/SuggestionEvent";
 
 const Events = () => {
   return (
-    <section className="w-full pb-10 space-y-8">
+    <section className="w-full pb-10 min-h-screen space-y-8">
       <CreateEvent />
       <MyEvents />
       <InvitedEvents />

@@ -54,7 +54,6 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
       {/* Layout for Desktop screens (visible on large screens) */}
       <section className="w-full container mx-auto px-5 hidden lg:flex gap-5 pt-[130px]">
         {/* Section 1: Left Sidebar (Static) */}
-        {/* This section contains user bio, main navigation, and invitations or upcoming events. */}
         <div className="w-full hidden xl:block max-w-[260px] md:max-w-[280px] xl:max-w-[320px] 2xl:max-w-[382px] space-y-5 pb-10 sticky top-[130px] h-fit max-h-[calc(100vh-130px)] overflow-y-auto scrollbar-hide">
           <AuthorBio />
           <MainNavigation />
@@ -63,14 +62,11 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
         </div>
 
         {/* Section 2: Main Content (Scrollable) */}
-        {/* This is where the primary content of the page is displayed. */}
-        {/* Added min-height to prevent layout shift when content is minimal */}
         <div className="flex-1 overflow-y-auto min-w-0 min-h-[calc(100vh-130px)]">
           {children}
         </div>
 
         {/* Section 3: Right Sidebar (Static & Conditionally Hidden) */}
-        {/* This section shows friend requests and contact list, but is hidden on certain pages to provide more content space. */}
         {!shouldHideSection3 && (
           <div className="w-full max-w-[260px] md:max-w-[280px] xl:max-w-[320px] 2xl:max-w-[382px] space-y-5 pb-10 sticky top-[130px] h-fit max-h-[calc(100vh-130px)] overflow-y-auto scrollbar-hide">
             <FriendRequest />

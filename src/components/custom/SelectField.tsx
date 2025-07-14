@@ -130,7 +130,7 @@ const SelectField = ({
               : "border rounded-lg"
           } border-[#DDDDDD] ${inputSizeClass} ${
             disabled ? "bg-gray-100 cursor-not-allowed opacity-60" : "cursor-pointer"
-          } ${isOpen ? "ring-2 ring-blue-200" : ""}`}
+          }`}
           whileFocus={{ scale: disabled ? 1 : 1.02 }}
           transition={{ duration: 0.2 }}
         >
@@ -193,10 +193,10 @@ const SelectField = ({
                   <motion.li
                     key={item.value}
                     whileHover={{ backgroundColor: "#f1f5f9" }}
-                    className={`px-4 py-2 cursor-pointer ${
+                    className={`px-4 py-2 cursor-pointer text-gray-900 ${
                       value === item.value
-                        ? "bg-blue-50 text-blue-900 font-medium"
-                        : "text-gray-900"
+                        ? "bg-blue-50"
+                        : ""
                     }`}
                     onClick={() => handleSelect(item)}
                     role="option"

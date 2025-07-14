@@ -1,6 +1,6 @@
 "use client";
 import { useGetMyInvitesQuery } from "@/redux/features/event/eventApi";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { IEventInvitation } from "@/types/event.types";
 import InvitedEventCard from "@/components/pages/events/invited-events/invited-event-card";
 import MyInvitationsEventSkeleton from "./MyInvitationsEventSkeleton";
@@ -10,7 +10,9 @@ const MyInvitationsEvent = ({ sortBy }: { sortBy: string }) => {
   const [eventInvitations, setEventInvitations] = useState<IEventInvitation[]>(
     []
   );
-  const observerRef = useRef<HTMLDivElement | null>(null);
+  const [hasMore, setHasMore] = useState(true);
+  const observer = useRef<IntersectionObserver | null>(null);
+  const loaderRef = useRef<HTMLDivElement | null>(null);
 
   // Get event invitations
   const {
@@ -18,8 +20,8 @@ const MyInvitationsEvent = ({ sortBy }: { sortBy: string }) => {
     isLoading,
     isFetching,
   } = useGetMyInvitesQuery([
-    { key: "page", value: currentPage },
-    { key: "limit", value: 9 },
+    { key: "page", value: currentPage.toString() },
+    { key: "limit", value: "9" },
     { key: "sortBy", value: sortBy },
   ]);
 
@@ -34,6 +36,7 @@ const MyInvitationsEvent = ({ sortBy }: { sortBy: string }) => {
         );
         return currentPage === 1 ? newEvents : [...prev, ...newEvents];
       });
+      setHasMore(currentPage < (responseData.data.attributes.totalPages || 0));
     }
   }, [responseData, currentPage]);
 
@@ -41,43 +44,26 @@ const MyInvitationsEvent = ({ sortBy }: { sortBy: string }) => {
   useEffect(() => {
     setEventInvitations([]);
     setCurrentPage(1);
+    setHasMore(true);
   }, [sortBy]);
 
-  // Intersection Observer for infinite scroll
-  useEffect(() => {
-    const totalResults = responseData?.data?.attributes?.totalResults || 0;
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (
-          entries[0].isIntersecting &&
-          !isLoading &&
-          !isFetching &&
-          eventInvitations.length < totalResults
-        ) {
-          setCurrentPage((prev) => prev + 1);
+  // Set up IntersectionObserver for infinite scroll (from Posts)
+  const lastEventElementRef = useCallback(
+    (node: HTMLDivElement | null) => {
+      if (isLoading || isFetching) return;
+      if (observer.current) observer.current.disconnect();
+
+      observer.current = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting && hasMore) {
+          setCurrentPage((prevPage) => prevPage + 1);
         }
-      },
-      { threshold: 0.1 }
-    );
+      });
 
-    if (observerRef.current) {
-      observer.observe(observerRef.current);
-    }
+      if (node) observer.current.observe(node);
+    },
+    [isLoading, isFetching, hasMore]
+  );
 
-    return () => {
-      if (observerRef.current) {
-        observer.unobserve(observerRef.current);
-      }
-    };
-  }, [
-    isLoading,
-    isFetching,
-    eventInvitations.length,
-    responseData,
-    currentPage,
-  ]);
-
-  //   
   const renderLoading = () => (
     <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
       {Array.from({ length: 9 }).map((_, index) => (
@@ -98,12 +84,17 @@ const MyInvitationsEvent = ({ sortBy }: { sortBy: string }) => {
   } else if (eventInvitations.length > 0) {
     content = (
       <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-        {eventInvitations?.map((event, index) => (
-          <InvitedEventCard
-            key={`${event._id}-${index}`}
-            event={event}
-          />
-        ))}
+        {eventInvitations.map((event, index) => {
+          // Attach ref to the last event for infinite scroll
+          if (index === eventInvitations.length - 1) {
+            return (
+              <div key={event._id} ref={lastEventElementRef}>
+                <InvitedEventCard event={event} />
+              </div>
+            );
+          }
+          return <InvitedEventCard key={event._id} event={event} />;
+        })}
       </div>
     );
   }
@@ -118,7 +109,7 @@ const MyInvitationsEvent = ({ sortBy }: { sortBy: string }) => {
           ))}
         </div>
       )}
-      <div ref={observerRef} className="h-10" />
+      <div ref={loaderRef} className="h-10" />
     </div>
   );
 };
