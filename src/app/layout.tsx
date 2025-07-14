@@ -35,6 +35,7 @@ export default function RootLayout({
             }}
           >
             <UserVerificationWrapper />
+            
             <Providers>{children}</Providers>
             <Toaster position="top-center" />
           </ConfigProvider>
