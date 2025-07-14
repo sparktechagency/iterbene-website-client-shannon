@@ -59,7 +59,7 @@ const PostDetails = ({ isOpen, onClose, post }: PostDetailsProps) => {
   };
   const handleReaction = async (reactionType: string) => {
     try {
-      await addOrRemoveReaction({ postId: post._id, reactionType }).unwrap();
+      await addOrRemoveReaction({ postId: post?._id, reactionType }).unwrap();
 
       setShowReactions(false);
     } catch (error) {
@@ -102,7 +102,7 @@ const PostDetails = ({ isOpen, onClose, post }: PostDetailsProps) => {
                 <div className="w-fit flex items-center gap-1 cursor-pointer">
                   <div className="flex -space-x-1 cursor-pointer ">
                     {/* Show up to 3 reaction types */}
-                    {nonZeroReactions.slice(0, 3).map((reaction) => (
+                    {nonZeroReactions?.slice(0, 3).map((reaction) => (
                       <div key={reaction.type}>
                         <span className={`${reactionColors[reaction.type]}`}>
                           {reactionIcons[reaction.type]}
@@ -127,7 +127,7 @@ const PostDetails = ({ isOpen, onClose, post }: PostDetailsProps) => {
                   className="flex gap-2 items-center cursor-pointer ml-1"
                   onClick={() =>
                     userReaction
-                      ? handleReaction(userReaction.reactionType)
+                      ? handleReaction(userReaction?.reactionType)
                       : handleReaction("love")
                   }
                 >

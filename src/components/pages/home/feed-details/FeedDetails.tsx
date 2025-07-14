@@ -10,11 +10,9 @@ const FeedDetails = () => {
     skip: !feedId,
   });
   const feedDetailsData = responseData?.data?.attributes;
-
-  console.log("Feed Details Data:", feedDetailsData);
   return (
     <section className="w-full">
-      <PostCard post={feedDetailsData} />
+      {feedDetailsData && <PostCard post={feedDetailsData} />}
     </section>
   );
 };

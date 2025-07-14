@@ -137,8 +137,8 @@ const EventPost = () => {
 
   return (
     <div className="space-y-4">
-      {allPosts?.map((post) => (
-        <PostCard key={post._id} post={post} />
+      {allPosts?.map((post, index) => (
+        <PostCard key={index} post={post} />
       ))}
 
       {loading && (

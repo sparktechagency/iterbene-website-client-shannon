@@ -125,7 +125,7 @@ const PostCard = ({ post }: PostCardProps) => {
   // handle reaction function
   const handleReaction = async (reactionType: string) => {
     try {
-      await addOrRemoveReaction({ postId: post._id, reactionType }).unwrap();
+      await addOrRemoveReaction({ postId: post?._id, reactionType }).unwrap();
 
       setShowReactions(false);
     } catch (error) {
@@ -143,7 +143,7 @@ const PostCard = ({ post }: PostCardProps) => {
     {
       try {
         setShowItineraryModal(true);
-        const payload = { postId: post._id, itineraryId: post?.itinerary?._id };
+        const payload = { postId: post?._id, itineraryId: post?.itinerary?._id };
         await incrementItinerary(payload).unwrap();
       } catch (error) {
         const err = error as TError;
