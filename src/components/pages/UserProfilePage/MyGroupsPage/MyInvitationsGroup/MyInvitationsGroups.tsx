@@ -73,25 +73,25 @@ const MyInvitationsGroups = ({ sortBy }: { sortBy: string }) => {
   let content = null;
   if (isLoading && currentPage === 1) {
     content = renderLoading();
-  } else if (invitedGroups.length === 0 && !isLoading) {
+  } else if (invitedGroups?.length === 0 && !isLoading) {
     content = (
       <h1 className="text-center text-gray-500 py-8">
         No invited groups available
       </h1>
     );
-  } else if (invitedGroups.length > 0) {
+  } else if (invitedGroups?.length > 0) {
     content = (
       <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-        {invitedGroups.map((group, index) => {
+        {invitedGroups?.map((group, index) => {
           // Attach ref to the last group for infinite scroll
-          if (index === invitedGroups.length - 1) {
+          if (index === invitedGroups?.length - 1) {
             return (
-              <div key={group._id} ref={lastGroupElementRef}>
+              <div key={group?._id} ref={lastGroupElementRef}>
                 <MyInvitationsGroupCard group={group} />
               </div>
             );
           }
-          return <MyInvitationsGroupCard key={group._id} group={group} />;
+          return <MyInvitationsGroupCard key={group?._id} group={group} />;
         })}
       </div>
     );
@@ -102,7 +102,7 @@ const MyInvitationsGroups = ({ sortBy }: { sortBy: string }) => {
       {content}
       {isFetching && currentPage > 1 && (
         <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 mt-3">
-          {Array.from({ length: 3 }).map((_, index) => (
+          {Array?.from({ length: 3 }).map((_, index) => (
             <MyInvitationsGroupSkeleton key={`skeleton-more-${index}`} />
           ))}
         </div>

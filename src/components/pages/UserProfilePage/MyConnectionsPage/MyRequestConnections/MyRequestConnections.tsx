@@ -5,7 +5,7 @@ import { IConnectionRequest } from "@/types/connection.types";
 import MyRequestConnectionCard from "./MyRequestConnectionCard";
 import MyRequestConnectionSkeleton from "./MyRequestConnectionSkeleton";
 
-const RequestConnections = ({ sortBy }: { sortBy: string }) => {
+const RequestConnections = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [connectionRequests, setConnectionRequests] = useState<IConnectionRequest[]>([]);
   const [hasMore, setHasMore] = useState(true);
@@ -19,8 +19,7 @@ const RequestConnections = ({ sortBy }: { sortBy: string }) => {
     isFetching,
   } = useGetConnectionRequestsQuery([
     { key: "page", value: currentPage.toString() },
-    { key: "limit", value: "9" },
-    { key: "sortBy", value: sortBy },
+    { key: "limit", value: "9" }
   ]);
 
   // Update connection requests when new data is fetched, ensuring no duplicate _id values
@@ -38,12 +37,6 @@ const RequestConnections = ({ sortBy }: { sortBy: string }) => {
     }
   }, [responseData, currentPage]);
 
-  // Reset connection requests when sortBy changes
-  useEffect(() => {
-    setConnectionRequests([]);
-    setCurrentPage(1);
-    setHasMore(true);
-  }, [sortBy]);
 
   // Set up IntersectionObserver for infinite scroll (from Posts)
   const lastRequestElementRef = useCallback(

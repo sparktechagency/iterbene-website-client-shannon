@@ -5,7 +5,7 @@ import { useGetMyConnectionsQuery } from "@/redux/features/connections/connectio
 import MyConnectionCard from "./MyConnectionCard";
 import MyConnectionsSkeleton from "./MyConnectionsSkeleton";
 
-const MyConnections = ({ sortBy }: { sortBy: string }) => {
+const MyConnections = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [connections, setConnections] = useState<IConnection[]>([]);
   const [hasMore, setHasMore] = useState(true);
@@ -19,7 +19,6 @@ const MyConnections = ({ sortBy }: { sortBy: string }) => {
   } = useGetMyConnectionsQuery([
     { key: "page", value: currentPage.toString() },
     { key: "limit", value: "9" },
-    { key: "sortBy", value: sortBy },
   ]);
 
   // Update connections when new data is fetched, ensuring no duplicate _id values
@@ -46,12 +45,6 @@ const MyConnections = ({ sortBy }: { sortBy: string }) => {
     }
   }, [responseData, currentPage]);
 
-  // Reset connections when sortBy changes
-  useEffect(() => {
-    setConnections([]);
-    setCurrentPage(1);
-    setHasMore(true);
-  }, [sortBy]);
 
   // Set up IntersectionObserver for infinite scroll (from Posts)
   const lastConnectionElementRef = useCallback(

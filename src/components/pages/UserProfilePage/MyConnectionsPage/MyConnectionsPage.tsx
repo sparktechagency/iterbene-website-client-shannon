@@ -2,10 +2,10 @@
 import React, { useState } from "react";
 import MyConnections from "./MyConnections/MyConnections";
 import MyRequestConnections from "./MyRequestConnections/MyRequestConnections";
-import SelectField from "@/components/custom/SelectField";
+// import SelectField from "@/components/custom/SelectField";
 const MyConnectionsPage = () => {
   const [activeTab, setActiveTab] = useState<string>("My Connections");
-  const [sortBy, setSortBy] = useState<string>("");
+  // const [sortBy, setSortBy] = useState<string>("");
 
   return (
     <section className="w-full pb-20">
@@ -31,7 +31,7 @@ const MyConnectionsPage = () => {
             Requests
           </button>
         </div>
-        <div className="w-full max-w-40">
+        {/* <div className="w-full max-w-40">
           <SelectField
             items={[
               {
@@ -57,13 +57,13 @@ const MyConnectionsPage = () => {
             placeholder="Sort By"
             onChange={(e) => setSortBy(e.target.value)}
           />
-        </div>
+        </div> */}
       </div>
       {/* Content */}
       {activeTab === "My Connections" ? (
-        <MyConnections sortBy={sortBy} />
+        <MyConnections />
       ) : (
-        <MyRequestConnections sortBy={sortBy} />
+        <MyRequestConnections />
       )}
     </section>
   );
