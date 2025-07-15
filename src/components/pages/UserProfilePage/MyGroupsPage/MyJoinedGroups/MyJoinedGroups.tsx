@@ -5,7 +5,7 @@ import { IGroup } from "@/types/group.types";
 import MyJoinedGroupCard from "./MyJoinedGroupCard";
 import MyJoinedGroupSkeleton from "./MyJoinedGroupSkeleton";
 
-const MyJoinedGroups = ({ sortBy }: { sortBy: string }) => {
+const MyJoinedGroups = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [joinedGroups, setJoinedGroups] = useState<IGroup[]>([]);
   const [hasMore, setHasMore] = useState(true);
@@ -19,8 +19,7 @@ const MyJoinedGroups = ({ sortBy }: { sortBy: string }) => {
     isFetching,
   } = useGetMyJoinedGroupsQuery([
     { key: "page", value: currentPage.toString() },
-    { key: "limit", value: "9" },
-    { key: "sortBy", value: sortBy },
+    { key: "limit", value: "9" }
   ]);
 
   // Update joined groups when new data is fetched, ensuring no duplicate _id values
@@ -37,13 +36,6 @@ const MyJoinedGroups = ({ sortBy }: { sortBy: string }) => {
       setHasMore(currentPage < (responseData.data.attributes.totalPages || 0));
     }
   }, [responseData, currentPage]);
-
-  // Reset joined groups when sortBy changes
-  useEffect(() => {
-    setJoinedGroups([]);
-    setCurrentPage(1);
-    setHasMore(true);
-  }, [sortBy]);
 
   // Set up IntersectionObserver for infinite scroll (from Posts)
   const lastGroupElementRef = useCallback(

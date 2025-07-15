@@ -4,8 +4,10 @@ import { IEvent } from "@/types/event.types";
 import React, { useEffect, useState } from "react";
 import SuggestionEventCard from "./SuggestionEventCard";
 import MyGroupCardSkeleton from "../../groups/my-groups/MyGroupCardSkeleton";
+import useUser from "@/hooks/useUser";
 
 const SuggestionEvent: React.FC = () => {
+  const user = useUser();
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [isLoadingMore, setIsLoadingMore] = useState<boolean>(false);
   const [allSuggestedEvents, setAllSuggestedEvents] = useState<IEvent[]>([]);
@@ -19,6 +21,7 @@ const SuggestionEvent: React.FC = () => {
         key: "limit",
         value: 6,
       },
+      ...(user ? [{ key: "userId", value: user?._id }] : []),
     ],
     {
       refetchOnMountOrArgChange: true,
@@ -84,7 +87,11 @@ const SuggestionEvent: React.FC = () => {
     content = (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {allSuggestedEvents?.map((event: IEvent) => (
-          <SuggestionEventCard key={event?._id} event={event} handleOptimisticUiUpdate={handleOptimisticUiUpdate} />
+          <SuggestionEventCard
+            key={event?._id}
+            event={event}
+            handleOptimisticUiUpdate={handleOptimisticUiUpdate}
+          />
         ))}
       </div>
     );

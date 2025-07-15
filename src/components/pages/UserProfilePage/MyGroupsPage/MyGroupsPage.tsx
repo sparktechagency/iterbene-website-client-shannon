@@ -2,14 +2,14 @@
 import { useState } from "react";
 import MyJoinedGroups from "./MyJoinedGroups/MyJoinedGroups";
 import MyInvitationsGroups from "./MyInvitationsGroup/MyInvitationsGroups";
-import SelectField from "@/components/custom/SelectField";
+// import SelectField from "@/components/custom/SelectField";
 
 const MyGroupsPage = () => {
   const [activeTab, setActiveTab] = useState<string>("myGroups");
-  const [sortBy, setSortBy] = useState<string>("");
+  // const [sortBy, setSortBy] = useState<string>("");
 
   return (
-   <section className="w-full pb-20">
+    <section className="w-full pb-20">
       {/* Tabs */}
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between pb-5 gap-5">
         <div className="flex space-x-4 ">
@@ -32,7 +32,7 @@ const MyGroupsPage = () => {
             Invitations
           </button>
         </div>
-        <div className="w-full max-w-40">
+        {/* <div className="w-full max-w-40">
           <SelectField
             items={[
               {
@@ -58,14 +58,14 @@ const MyGroupsPage = () => {
             placeholder="Sort By"
             onChange={(e) => setSortBy(e.target.value)}
           />
-        </div>
+        </div> */}
       </div>
       {/* Content */}
       <div className="w-full">
         {activeTab === "myGroups" ? (
-          <MyJoinedGroups sortBy={sortBy} />
+          <MyJoinedGroups />
         ) : (
-          <MyInvitationsGroups sortBy={sortBy} />
+          <MyInvitationsGroups />
         )}
       </div>
     </section>

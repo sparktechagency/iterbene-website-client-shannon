@@ -2,10 +2,10 @@
 import { useState } from "react";
 import MyUpComingTours from "./MyUpComingTours/MyUpComingTours";
 import MyInvitationsEvent from "./MyInvitationsEvent/MyInvitationsEvent";
-import SelectField from "@/components/custom/SelectField";
+// import SelectField from "@/components/custom/SelectField";
 
 const MyInvitationsPage = () => {
-  const [sortBy, setSortBy] = useState<string>("");
+  // const [sortBy, setSortBy] = useState<string>("");
   const [activeTab, setActiveTab] = useState<"upcomingTour" | "invitation">(
     "upcomingTour"
   );
@@ -34,9 +34,7 @@ const MyInvitationsPage = () => {
             Invitations
           </button>
         </div>
-
-        {/* CustomForm দিয়ে wrap করা select field */}
-        <div className="w-full max-w-40">
+        {/* <div className="w-full max-w-40">
           <SelectField
             items={[
               {
@@ -62,15 +60,15 @@ const MyInvitationsPage = () => {
             placeholder="Sort By"
             onChange={(e) => setSortBy(e.target.value)}
           />
-        </div>
+        </div> */}
       </div>
 
       {/* Content */}
       <div className="w-full">
         {activeTab === "upcomingTour" ? (
-          <MyUpComingTours sortBy={sortBy} />
+          <MyUpComingTours  />
         ) : (
-          <MyInvitationsEvent sortBy={sortBy} />
+          <MyInvitationsEvent  />
         )}
       </div>
     </section>

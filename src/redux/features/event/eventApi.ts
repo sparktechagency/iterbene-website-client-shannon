@@ -61,10 +61,20 @@ const eventApi = baseApi.injectEndpoints({
       providesTags: ["Events"],
     }),
     getSuggestionsEvents: builder.query({
-      query: () => ({
-        url: "/events/suggestions",
-        method: "GET",
-      }),
+      query: (filters) => {
+        const params = new URLSearchParams();
+        if (filters) {
+          filters?.forEach(
+            (filter: { key: string; value: string }) =>
+              filter?.value && params.append(filter?.key, filter?.value)
+          );
+        }
+        return {
+          url: "/events/suggestions",
+          method: "GET",
+          params,
+        };
+      },
       providesTags: ["Events"],
     }),
     sendEventInvite: builder.mutation({

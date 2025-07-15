@@ -5,7 +5,7 @@ import { IGroupInvite } from "@/types/group.types";
 import MyInvitationsGroupCard from "./MyInvitationsGroupCard";
 import MyInvitationsGroupSkeleton from "./MyInvitationsGroupSkeleton";
 
-const MyInvitationsGroups = ({ sortBy }: { sortBy: string }) => {
+const MyInvitationsGroups = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [invitedGroups, setInvitedGroups] = useState<IGroupInvite[]>([]);
   const [hasMore, setHasMore] = useState(true);
@@ -19,8 +19,7 @@ const MyInvitationsGroups = ({ sortBy }: { sortBy: string }) => {
     isFetching,
   } = useGetMyInvitedGroupsQuery([
     { key: "page", value: currentPage.toString() },
-    { key: "limit", value: "9" },
-    { key: "sortBy", value: sortBy },
+    { key: "limit", value: "9" }
   ]);
 
   // Update invited groups when new data is fetched, ensuring no duplicate _id values
@@ -38,12 +37,6 @@ const MyInvitationsGroups = ({ sortBy }: { sortBy: string }) => {
     }
   }, [responseData, currentPage]);
 
-  // Reset invited groups when sortBy changes
-  useEffect(() => {
-    setInvitedGroups([]);
-    setCurrentPage(1);
-    setHasMore(true);
-  }, [sortBy]);
 
   // Set up IntersectionObserver for infinite scroll (from Posts)
   const lastGroupElementRef = useCallback(
