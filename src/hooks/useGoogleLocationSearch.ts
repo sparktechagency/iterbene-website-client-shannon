@@ -239,7 +239,6 @@
 // };
 
 import { useState, useEffect, useRef, useCallback } from "react";
-import toast from "react-hot-toast";
 import { loadGoogleMapsApi } from "@/lib/googleMapsLoader";
 
 const GOOGLE_MAPS_API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAP_API_KEY || "";
@@ -361,9 +360,8 @@ export const useGoogleLocationSearch = (
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "Unknown error";
       setError(errorMessage);
-      toast.error("Failed to initialize location services.");
     }
-  }, [initializeServices]);
+  }, [initializeServices, isInitialized]);
 
   const searchLocations = useCallback(
     async (query: string) => {

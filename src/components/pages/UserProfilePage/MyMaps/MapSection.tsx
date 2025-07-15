@@ -2,6 +2,7 @@
 import { useGetMyMapsQuery } from "@/redux/features/maps/mapsApi";
 import { ITripVisitedLocation } from "@/types/trip.types";
 import { GoogleMap, Marker, useJsApiLoader } from "@react-google-maps/api";
+import { Loader2 } from "lucide-react";
 
 // Define the map container style
 const mapContainerStyle: React.CSSProperties = {
@@ -23,7 +24,9 @@ const MapSection = ({
   showFullMap: boolean;
   setShowFullMap: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
-  const { data: responseData } = useGetMyMapsQuery(undefined, { refetchOnMountOrArgChange: true });
+  const { data: responseData } = useGetMyMapsQuery(undefined, {
+    refetchOnMountOrArgChange: true,
+  });
   const apiKey: string = process.env.NEXT_PUBLIC_GOOGLE_MAP_API_KEY || "";
 
   // Only load the libraries you actually need
@@ -33,11 +36,12 @@ const MapSection = ({
   });
 
   // Set default center to user's current location from API
-  const userCurrentLocation = responseData?.data?.attributes?.userCurrentLocation;
-  const defaultCenter: Location = 
+  const userCurrentLocation =
+    responseData?.data?.attributes?.userCurrentLocation;
+  const defaultCenter: Location =
     userCurrentLocation &&
-    typeof userCurrentLocation.latitude === 'number' &&
-    typeof userCurrentLocation.longitude === 'number'
+    typeof userCurrentLocation.latitude === "number" &&
+    typeof userCurrentLocation.longitude === "number"
       ? {
           lat: userCurrentLocation.latitude,
           lng: userCurrentLocation.longitude,
@@ -48,18 +52,24 @@ const MapSection = ({
         };
 
   // Get locations from API data
-  const interestedPlaces: Location[] = responseData?.data?.attributes?.interestedLocations
-    ? responseData.data.attributes.interestedLocations.map((loc: ITripVisitedLocation) => ({
-        lat: loc.latitude,
-        lng: loc.longitude,
-      }))
+  const interestedPlaces: Location[] = responseData?.data?.attributes
+    ?.interestedLocations
+    ? responseData.data.attributes.interestedLocations.map(
+        (loc: ITripVisitedLocation) => ({
+          lat: loc.latitude,
+          lng: loc.longitude,
+        })
+      )
     : [];
 
-  const visitedPlaces: Location[] = responseData?.data?.attributes?.visitedLocations
-    ? responseData.data.attributes.visitedLocations.map((loc: ITripVisitedLocation) => ({
-        lat: loc.latitude,
-        lng: loc.longitude,
-      }))
+  const visitedPlaces: Location[] = responseData?.data?.attributes
+    ?.visitedLocations
+    ? responseData.data.attributes.visitedLocations.map(
+        (loc: ITripVisitedLocation) => ({
+          lat: loc.latitude,
+          lng: loc.longitude,
+        })
+      )
     : [];
 
   const homeLocation: Location = defaultCenter;
@@ -70,16 +80,16 @@ const MapSection = ({
 
     return {
       interested: {
-        url: "https://i.ibb.co.com/BVgNBSG8/interested.png",
-        scaledSize: new window.google.maps.Size(40,40),
+        url: "https://iter-bene.s3.eu-north-1.amazonaws.com/basic/interested.png",
+        scaledSize: new window.google.maps.Size(40, 40),
       },
       visited: {
-        url: "https://i.ibb.co.com/60gHYs1m/visit.png",
-        scaledSize: new window.google.maps.Size(40,40),
+        url: "https://iter-bene.s3.eu-north-1.amazonaws.com/basic/visit.png",
+        scaledSize: new window.google.maps.Size(40, 40),
       },
       home: {
-        url: "https://i.ibb.co.com/5xxKK494/home.png",
-        scaledSize: new window.google.maps.Size(40,40),
+        url: "https://iter-bene.s3.eu-north-1.amazonaws.com/basic/home.png",
+        scaledSize: new window.google.maps.Size(40, 40),
       },
     };
   };
@@ -87,9 +97,8 @@ const MapSection = ({
   if (!isLoaded) {
     return (
       <div className="w-full h-[600px] flex items-center justify-center bg-gray-100 rounded-2xl">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading Map...</p>
+        <div className="flex items-center justify-center py-8">
+          <Loader2 className="animate-spin text-primary" size={28} />
         </div>
       </div>
     );
