@@ -79,7 +79,7 @@ const Stories = () => {
                 onClick={handleAddJourney}
               >
                 <Image
-                  src="https://iter-bene.s3.eu-north-1.amazonaws.com/uploads/users/a62e7936-b779-4b00-bbcb-99371f3b79ad.jpg"
+                  src="https://iter-bene.s3.eu-north-1.amazonaws.com/basic/story.webp"
                   alt="Add Journey"
                   fill
                   className="object-cover w-full h-full rounded-xl group-hover:scale-105 transition-transform duration-300"

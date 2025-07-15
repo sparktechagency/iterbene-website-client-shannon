@@ -110,7 +110,7 @@ const WatchVideo = () => {
   if (isLoading && allPosts?.length === 0) {
     return (
       <div className="w-full text-center py-4">
-        {Array.from({ length: 4 }).map((_, index) => (
+        {Array?.from({ length: 4 }).map((_, index) => (
           <PostCardSkeleton key={index} />
         ))}
       </div>
@@ -121,14 +121,14 @@ const WatchVideo = () => {
   if (!isLoading && allPosts?.length === 0) {
     return (
       <section className="w-full text-center py-4">
-        <p className="text-gray-600 text-lg">Not posts available</p>
+        <p className="text-gray-600 text-lg">Not watch videos available</p>
       </section>
     );
   }
   return (
     <section className="w-full space-y-4">
       {allPosts?.map((post) => (
-        <PostCard key={post._id} post={post} />
+        <PostCard key={post?._id} post={post} />
       ))}
 
       {loading && (

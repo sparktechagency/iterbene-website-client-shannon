@@ -28,7 +28,7 @@ const PhotosPage = () => {
   const currentPagePosts = useMemo(
     () =>
       Array.isArray(responseData?.data?.attributes?.results)
-        ? (responseData.data.attributes.results as IPost[])
+        ? (responseData?.data?.attributes?.results as IPost[])
         : [],
     [responseData]
   );
@@ -92,7 +92,7 @@ const PhotosPage = () => {
 
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting) {
+        if (entries[0]?.isIntersecting) {
           loadMore();
         }
       },
@@ -122,7 +122,7 @@ const PhotosPage = () => {
   if (!isLoading && allPosts?.length === 0) {
     return (
       <section className="w-full text-center py-4">
-        <p className="text-gray-600 text-lg">Not posts available</p>
+        <p className="text-gray-600 text-lg">Not photos available</p>
       </section>
     );
   }
