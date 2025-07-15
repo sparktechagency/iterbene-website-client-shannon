@@ -1,9 +1,7 @@
 import CustomButton from "@/components/custom/custom-button";
 import CustomModal from "@/components/custom/custom-modal";
 import { useGetMyConnectionsQuery } from "@/redux/features/connections/connectionsApi";
-import {
-  useSendGroupInviteMutation,
-} from "@/redux/features/group/groupApi";
+import { useSendGroupInviteMutation } from "@/redux/features/group/groupApi";
 import { IMyConnections } from "@/types/connection.types";
 import { TError } from "@/types/error";
 import { IGroupDetails } from "@/types/group.types";
@@ -38,17 +36,21 @@ const GroupInviteModal = ({
   const [inviteGroup, { isLoading: isInviteLoading }] =
     useSendGroupInviteMutation();
 
-
-
   // Get connections with pagination
   const {
     data: responseData,
     isLoading,
     isFetching,
-  } = useGetMyConnectionsQuery({
-    page,
-    limit: 10,
-  });
+  } = useGetMyConnectionsQuery([
+    {
+      key: "page",
+      value: page.toString(),
+    },
+    {
+      key: "limit",
+      value: "9",
+    },
+  ]);
 
   // Extract connections from the response
   const connections = useMemo(
@@ -171,7 +173,7 @@ const GroupInviteModal = ({
           </button>
         </div>
       }
-         className="w-full p-2"
+      className="w-full p-2"
     >
       <div className="space-y-4">
         <div className="relative">
@@ -321,12 +323,6 @@ const GroupInviteModal = ({
             {(isLoading || isFetching) && (
               <div className="flex items-center justify-center py-4">
                 <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
-              </div>
-            )}
-
-            {!hasMore && allConnections?.length > 0 && !searchTerm && (
-              <div className="text-center py-4 text-gray-500 text-sm">
-                No more connections to load
               </div>
             )}
 

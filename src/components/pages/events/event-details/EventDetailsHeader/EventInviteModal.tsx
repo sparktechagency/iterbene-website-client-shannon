@@ -41,10 +41,16 @@ const EventInviteModal = ({
     data: responseData,
     isLoading,
     isFetching,
-  } = useGetMyConnectionsQuery({
-    page,
-    limit: 10,
-  });
+  } = useGetMyConnectionsQuery([
+    {
+      key: "page",
+      value: page.toString(),
+    },
+    {
+      key: "limit",
+      value: "9",
+    },
+  ]);
 
   // Extract connections from the response
   const connections = useMemo(
@@ -320,11 +326,6 @@ const EventInviteModal = ({
               </div>
             )}
 
-            {!hasMore && allConnections?.length > 0 && !searchTerm && (
-              <div className="text-center py-4 text-gray-500 text-sm">
-                No more connections to load
-              </div>
-            )}
 
             {!isLoading && !isFetching && filteredConnections?.length === 0 && (
               <div className="text-center py-8 text-gray-500">
@@ -349,10 +350,11 @@ const EventInviteModal = ({
             onClick={handleInviteConnections}
             loading={isInviteLoading}
             disabled={invitedPeople.length === 0}
-            className={`flex-1 px-4 py-2 rounded-lg transition-colors ${invitedPeople.length > 0
-              ? "bg-primary text-white hover:bg-primary/90"
-              : "bg-gray-300 text-gray-500 cursor-not-allowed"
-              }`}
+            className={`flex-1 px-4 py-2 rounded-lg transition-colors ${
+              invitedPeople.length > 0
+                ? "bg-primary text-white hover:bg-primary/90"
+                : "bg-gray-300 text-gray-500 cursor-not-allowed"
+            }`}
           >
             Invite ({invitedPeople.length})
           </CustomButton>
