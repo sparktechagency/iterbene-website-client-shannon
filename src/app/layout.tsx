@@ -6,6 +6,7 @@ import { AntdRegistry } from "@ant-design/nextjs-registry";
 import { Toaster } from "react-hot-toast";
 import { Providers } from "@/components/providers";
 import UserVerificationWrapper from "@/components/common/UserVerificationWrapper";
+import AuthModalWrapper from "@/components/common/AuthModalWrapper";
 
 const inter = Source_Sans_3({
   subsets: ["latin"],
@@ -34,10 +35,12 @@ export default function RootLayout({
               },
             }}
           >
-            <UserVerificationWrapper />
-            
-            <Providers>{children}</Providers>
-            <Toaster position="top-center" />
+            <Providers>
+              <UserVerificationWrapper />
+              <AuthModalWrapper />
+              {children}
+              <Toaster position="top-center" />
+            </Providers>
           </ConfigProvider>
         </AntdRegistry>
       </body>
