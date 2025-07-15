@@ -33,17 +33,37 @@ const eventApi = baseApi.injectEndpoints({
       invalidatesTags: ["Events"],
     }),
     getMyEvents: builder.query({
-      query: () => ({
-        url: "/events/my-events",
-        method: "GET",
-      }),
+      query: (filters) => {
+        const params = new URLSearchParams();
+        if (filters) {
+          filters?.forEach(
+            (filter: { key: string; value: string }) =>
+              filter?.value && params.append(filter?.key, filter?.value)
+          );
+        }
+        return {
+          url: "/events/my-events",
+          method: "GET",
+          params,
+        };
+      },
       providesTags: ["Events"],
     }),
     getMyInvites: builder.query({
-      query: () => ({
-        url: "/events/invites/my-invites",
-        method: "GET",
-      }),
+      query: (filters) => {
+        const params = new URLSearchParams();
+        if (filters) {
+          filters?.forEach(
+            (filter: { key: string; value: string }) =>
+              filter?.value && params.append(filter?.key, filter?.value)
+          );
+        }
+        return {
+          url: "/events/invites/my-invites",
+          method: "GET",
+          params,
+        };
+      },
       providesTags: ["Events"],
     }),
     getEvent: builder.query({
@@ -54,10 +74,20 @@ const eventApi = baseApi.injectEndpoints({
       providesTags: ["Events"],
     }),
     getMyInterestedEvents: builder.query({
-      query: () => ({
-        url: "/events/my-interested-events",
-        method: "GET",
-      }),
+      query: (filters) => {
+        const params = new URLSearchParams();
+        if (filters) {
+          filters?.forEach(
+            (filter: { key: string; value: string }) =>
+              filter?.value && params.append(filter?.key, filter?.value)
+          );
+        }
+        return {
+          url: "/events/my-interested-events",
+          method: "GET",
+          params,
+        };
+      },
       providesTags: ["Events"],
     }),
     getSuggestionsEvents: builder.query({
