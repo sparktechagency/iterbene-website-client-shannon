@@ -64,7 +64,7 @@ const MyUpComingTours = () => {
   );
 
   let content = null;
-  if (!isLoading && currentPage === 1) {
+  if (isLoading && currentPage === 1) {
     content = renderLoading();
   } else if (interestedEvents.length === 0 && !isLoading) {
     content = (
