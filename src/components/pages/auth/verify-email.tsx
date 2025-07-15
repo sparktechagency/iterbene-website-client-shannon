@@ -34,7 +34,6 @@ const VerifyEmail = () => {
       toast.error(err?.data?.message || "Something went wrong!");
     }
   };
-  console.log("Type:", type);
   return (
     <section className="w-full h-screen flex items-center justify-center relative p-5">
       {/* Background with blur effect */}

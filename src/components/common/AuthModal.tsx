@@ -27,6 +27,17 @@ import Image from "next/image";
 import { X, Mail, Lock, UserRound, ArrowLeft } from "lucide-react";
 import logo from "@/asset/logo/logo.png";
 import { useRouter, useSearchParams } from "next/navigation";
+import CustomForm from "../custom/custom-form";
+import {
+  forgotPasswordValidationSchema,
+  loginValidationSchema,
+  registerValidationSchema,
+  resetPasswordValidationSchema,
+} from "@/validation/auth.validation";
+import { zodResolver } from "@hookform/resolvers/zod";
+import CustomInput from "../custom/custom-input";
+import CustomButton from "../custom/custom-button";
+import { FieldValues } from "react-hook-form";
 
 type ModalStep =
   | "welcome"
@@ -56,24 +67,6 @@ const AuthModal = () => {
   const searchParams = useSearchParams();
   const redirectUrl = searchParams.get("redirect_url");
   const router = useRouter();
-
-  // Form states
-  const [loginForm, setLoginForm] = useState({
-    email: "",
-    password: "",
-    remember: false,
-  });
-  const [registerForm, setRegisterForm] = useState({
-    fullName: "",
-    email: "",
-    password: "",
-    agree: false,
-  });
-  const [forgotForm, setForgotForm] = useState({ email: "" });
-  const [resetForm, setResetForm] = useState({
-    newPassword: "",
-    confirmPassword: "",
-  });
 
   // API hooks
   const [login, { isLoading: loginLoading }] = useLoginMutation();
@@ -160,10 +153,6 @@ const AuthModal = () => {
   const handleClose = () => {
     dispatch(closeAuthModal());
     setModalStep("welcome");
-    setLoginForm({ email: "", password: "", remember: false });
-    setRegisterForm({ fullName: "", email: "", password: "", agree: false });
-    setForgotForm({ email: "" });
-    setResetForm({ newPassword: "", confirmPassword: "" });
     setOneTimeCode("");
   };
 
@@ -176,10 +165,9 @@ const AuthModal = () => {
   };
 
   // Login handler
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleLogin = async (values: FieldValues) => {
     try {
-      const res = await login(loginForm).unwrap();
+      const res = await login(values).unwrap();
       if (res?.data?.attributes?.user?.role === "admin") {
         toast.error("You are admin you can't login here!");
         return;
@@ -189,10 +177,11 @@ const AuthModal = () => {
         res?.data?.attributes?.tokens?.accessToken,
         res?.data?.attributes?.tokens?.refreshToken
       );
-      handleClose();
       if (redirectUrl) {
+        window.location.reload();
         router.push(redirectUrl);
       } else {
+        window.location.reload();
         router.push("/");
       }
     } catch (error) {
@@ -202,13 +191,17 @@ const AuthModal = () => {
   };
 
   // Register handler
-  const handleRegister = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleRegister = async (values: FieldValues) => {
     try {
-      const res = await register(registerForm).unwrap();
+      const res = await register(values).unwrap();
       const accessToken = res?.data?.attributes?.accessToken;
-      Cookies.set("accessToken", accessToken, { expires: 7 });
-      setUserEmail(registerForm.email);
+      //set access token in cookies
+      Cookies.set("accessToken", accessToken, {
+        expires: 7,
+      });
+      //redirect to verify email page
+      window.location.reload();
+      setUserEmail(values?.email);
       setVerifyType("register");
       dispatch(setAuthStep("verify"));
       toast.success(res?.message);
@@ -219,15 +212,19 @@ const AuthModal = () => {
   };
 
   // Forgot password handler
-  const handleForgotPassword = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleForgotPassword = async (values: FieldValues) => {
     try {
-      const res = await forgotPassword(forgotForm).unwrap();
+      const res = await forgotPassword(values).unwrap();
       const accessToken = res?.data?.attributes?.accessToken;
-      Cookies.set("accessToken", accessToken, { expires: 7 });
-      setUserEmail(forgotForm.email);
-      setVerifyType("forgot");
+      //set access token in cookies
+      Cookies.set("accessToken", accessToken, {
+        expires: 7,
+      });
+      //redirect to verify email page
+      window.location.reload();
+      setVerifyType("register");
       dispatch(setAuthStep("verify"));
+      setUserEmail(values?.email);
       toast.success(res?.message);
     } catch (error) {
       const err = error as TError;
@@ -243,7 +240,7 @@ const AuthModal = () => {
       if (verifyType === "forgot") {
         dispatch(setAuthStep("reset"));
       } else {
-        handleClose();
+        dispatch(setAuthStep("login"));
       }
     } catch (error) {
       const err = error as TError;
@@ -252,18 +249,13 @@ const AuthModal = () => {
   };
 
   // Reset password handler
-  const handleResetPassword = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (resetForm.newPassword !== resetForm.confirmPassword) {
-      toast.error("Passwords don't match!");
-      return;
-    }
+  const handleResetPassword = async (values: FieldValues) => {
     try {
       const res = await resetPassword({
-        password: resetForm.newPassword,
+        password: values?.newPassword,
       }).unwrap();
       toast.success(res?.message);
-      handleClose();
+      router.push("/login");
     } catch (error) {
       const err = error as TError;
       toast.error(err?.data?.message || "Something went wrong!");
@@ -287,19 +279,19 @@ const AuthModal = () => {
       <div className="space-y-4">
         <button
           onClick={() => dispatch(setAuthStep("login"))}
-          className="w-full bg-secondary text-white py-3 px-6 rounded-lg font-medium hover:bg-secondary/90 transition-all duration-300"
+          className="w-full bg-secondary cursor-pointer text-white py-3 px-6 rounded-lg font-medium hover:bg-secondary/90 transition-all duration-300"
         >
           Login to Your Account
         </button>
         <button
           onClick={() => dispatch(setAuthStep("register"))}
-          className="w-full text-secondary border border-secondary py-3 px-6 rounded-lg font-medium hover:bg-secondary hover:text-white transition-all duration-300"
+          className="w-full text-secondary cursor-pointer border border-secondary py-3 px-6 rounded-lg font-medium hover:bg-secondary hover:text-white transition-all duration-300"
         >
           Create New Account
         </button>
         <button
           onClick={handleClose}
-          className="w-full text-gray-600 py-2 px-6 rounded-lg font-medium hover:text-gray-800 transition-colors duration-300"
+          className="w-full text-gray-600 cursor-pointer py-2 px-6 rounded-lg font-medium hover:text-gray-800 transition-colors duration-300"
         >
           Maybe Later
         </button>
@@ -323,78 +315,67 @@ const AuthModal = () => {
         </button>
         <h1 className="text-2xl font-bold text-gray-800">Login</h1>
       </div>
-      <form onSubmit={handleLogin} className="space-y-4">
-        <div className="relative">
-          <Mail
-            className="absolute left-3 top-1/2 transform -translate-y-1/2 text-secondary"
-            size={20}
-          />
-          <input
+      {/* Form content */}
+      <CustomForm
+        onSubmit={handleLogin}
+        resolver={zodResolver(loginValidationSchema)}
+      >
+        <div className="space-y-3 md:space-y-6 mt-8">
+          <CustomInput
+            name="email"
+            label="Email"
             type="email"
+            variant="outline"
+            icon={<Mail size={24} className="text-secondary" />}
+            size="lg"
+            fullWidth
             placeholder="Enter your email"
-            value={loginForm.email}
-            onChange={(e) =>
-              setLoginForm({ ...loginForm, email: e.target.value })
-            }
-            className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-secondary"
-            required
           />
-        </div>
-        <div className="relative">
-          <Lock
-            className="absolute left-3 top-1/2 transform -translate-y-1/2 text-secondary"
-            size={20}
-          />
-          <input
+          <CustomInput
+            name="password"
+            label="Password"
+            variant="outline"
             type="password"
-            placeholder="Enter your password"
-            value={loginForm.password}
-            onChange={(e) =>
-              setLoginForm({ ...loginForm, password: e.target.value })
-            }
-            className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-secondary"
-            required
+            size="lg"
+            icon={<Lock size={24} className="text-secondary" />}
+            fullWidth
+            placeholder="Enter your email"
           />
-        </div>
-        <div className="flex items-center justify-between">
-          <div className="flex items-center">
-            <Checkbox
-              checked={loginForm.remember}
-              onChange={(e) =>
-                setLoginForm({ ...loginForm, remember: e.target.checked })
-              }
-              className="border-primary"
-            />
-            <label className="ml-2 text-sm">Remember me</label>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center">
+              <Checkbox id="remember" className="border-primary " />
+              <label
+                htmlFor="remember"
+                className="ml-2 text-sm md:text-[16px] "
+              >
+                Remember me
+              </label>
+            </div>
+            <div>
+              <button
+                onClick={() => dispatch(setAuthStep("forgot"))}
+                className="text-sm md:text-[16px] font-medium text-primary hover:underline"
+              >
+                Forgot password?
+              </button>
+            </div>
           </div>
-          <button
-            type="button"
-            onClick={() => dispatch(setAuthStep("forgot"))}
-            className="text-sm text-primary hover:underline"
-          >
-            Forgot password?
-          </button>
+          <CustomButton loading={loginLoading} fullWidth className="py-4">
+            Login
+          </CustomButton>
+          <div className="flex gap-1 items-center justify-center">
+            <span className="text-sm md:text-[16px] font-medium">
+              Don&apos;t have an account?
+            </span>
+            <button
+              onClick={() => dispatch(setAuthStep("register"))}
+              className="text-sm md:text-[16px] font-medium text-primary hover:underline"
+            >
+              Register
+            </button>
+          </div>
         </div>
-        <button
-          type="submit"
-          disabled={loginLoading}
-          className="w-full bg-secondary text-white py-3 rounded-lg font-medium hover:bg-secondary/90 transition-all duration-300 disabled:opacity-50"
-        >
-          {loginLoading ? "Logging in..." : "Login"}
-        </button>
-        <div className="text-center">
-          <span className="text-sm text-gray-600">
-            Don&apos;t have an account?{" "}
-          </span>
-          <button
-            type="button"
-            onClick={() => dispatch(setAuthStep("register"))}
-            className="text-sm text-primary hover:underline font-medium"
-          >
-            Register
-          </button>
-        </div>
-      </form>
+      </CustomForm>
     </motion.div>
   );
 
@@ -414,87 +395,74 @@ const AuthModal = () => {
         </button>
         <h1 className="text-2xl font-bold text-gray-800">Register</h1>
       </div>
-      <form onSubmit={handleRegister} className="space-y-4">
-        <div className="relative">
-          <UserRound
-            className="absolute left-3 top-1/2 transform -translate-y-1/2 text-secondary"
-            size={20}
-          />
-          <input
+      {/* Form content */}
+      <CustomForm
+        onSubmit={handleRegister}
+        resolver={zodResolver(registerValidationSchema)}
+      >
+        <div className="space-y-3 md:space-y-6 mt-8">
+          <CustomInput
+            name="fullName"
+            label="Full Name"
             type="text"
+            variant="outline"
+            size="lg"
+            icon={<UserRound size={24} className="text-secondary" />}
+            fullWidth
             placeholder="Enter your full name"
-            value={registerForm.fullName}
-            onChange={(e) =>
-              setRegisterForm({ ...registerForm, fullName: e.target.value })
-            }
-            className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-secondary"
-            required
           />
-        </div>
-        <div className="relative">
-          <Mail
-            className="absolute left-3 top-1/2 transform -translate-y-1/2 text-secondary"
-            size={20}
-          />
-          <input
+          <CustomInput
+            name="email"
+            label="Email"
             type="email"
+            variant="outline"
+            icon={<Mail size={24} className="text-secondary" />}
+            size="lg"
+            fullWidth
             placeholder="Enter your email"
-            value={registerForm.email}
-            onChange={(e) =>
-              setRegisterForm({ ...registerForm, email: e.target.value })
-            }
-            className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-secondary"
-            required
           />
-        </div>
-        <div className="relative">
-          <Lock
-            className="absolute left-3 top-1/2 transform -translate-y-1/2 text-secondary"
-            size={20}
-          />
-          <input
+          <CustomInput
+            name="password"
+            label="Password"
+            variant="outline"
             type="password"
+            size="lg"
+            icon={<Lock size={24} className="text-secondary" />}
+            fullWidth
             placeholder="Enter your password"
-            value={registerForm.password}
-            onChange={(e) =>
-              setRegisterForm({ ...registerForm, password: e.target.value })
-            }
-            className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-secondary"
-            required
           />
+          <div>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center">
+                <Checkbox
+                  id="remember"
+                  className="border-primary cursor-pointer "
+                />
+                <label
+                  htmlFor="remember"
+                  className="ml-2 block text-sm md:text-[16px]"
+                >
+                  I agree to all terms & conditions.
+                </label>
+              </div>
+            </div>
+          </div>
+          <CustomButton loading={registerLoading} fullWidth className="py-4">
+            Register
+          </CustomButton>
+          <div className="flex gap-1 items-center justify-center">
+            <span className="text-sm md:text-[16px] font-medium">
+              Already have an account?
+            </span>
+            <button
+              onClick={() => dispatch(setAuthStep("login"))}
+              className="text-md font-medium text-primary hover:underline"
+            >
+              Login
+            </button>
+          </div>
         </div>
-        <div className="flex items-center">
-          <Checkbox
-            checked={registerForm.agree}
-            onChange={(e) =>
-              setRegisterForm({ ...registerForm, agree: e.target.checked })
-            }
-            className="border-primary"
-          />
-          <label className="ml-2 text-sm">
-            I agree to all terms & conditions.
-          </label>
-        </div>
-        <button
-          type="submit"
-          disabled={registerLoading || !registerForm.agree}
-          className="w-full bg-secondary text-white py-3 rounded-lg font-medium hover:bg-secondary/90 transition-all duration-300 disabled:opacity-50"
-        >
-          {registerLoading ? "Creating Account..." : "Register"}
-        </button>
-        <div className="text-center">
-          <span className="text-sm text-gray-600">
-            Already have an account?{" "}
-          </span>
-          <button
-            type="button"
-            onClick={() => dispatch(setAuthStep("login"))}
-            className="text-sm text-primary hover:underline font-medium"
-          >
-            Login
-          </button>
-        </div>
-      </form>
+      </CustomForm>
     </motion.div>
   );
 
@@ -514,41 +482,36 @@ const AuthModal = () => {
         </button>
         <h1 className="text-2xl font-bold text-gray-800">Forgot Password</h1>
       </div>
-      <form onSubmit={handleForgotPassword} className="space-y-4">
-        <div className="relative">
-          <Mail
-            className="absolute left-3 top-1/2 transform -translate-y-1/2 text-secondary"
-            size={20}
-          />
-          <input
+      {/* Form content */}
+      <CustomForm
+        onSubmit={handleForgotPassword}
+        resolver={zodResolver(forgotPasswordValidationSchema)}
+      >
+        <div className="space-y-3 md:space-y-6 mt-8">
+          <CustomInput
+            name="email"
+            label="Email"
             type="email"
+            variant="outline"
+            icon={<Mail size={24} className="text-secondary" />}
+            size="lg"
+            fullWidth
             placeholder="Enter your email"
-            value={forgotForm.email}
-            onChange={(e) =>
-              setForgotForm({ ...forgotForm, email: e.target.value })
-            }
-            className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-secondary"
-            required
           />
+          <CustomButton loading={forgotLoading} fullWidth className="py-4">
+            Send OTP
+          </CustomButton>
+          <div className="flex gap-1 items-center justify-center">
+            <span className="text-sm md:text-[16px] font-medium">Back To</span>
+            <button
+              onClick={() => dispatch(setAuthStep("login"))}
+              className="text-sm md:text-[16px] font-medium text-primary hover:underline"
+            >
+              Login
+            </button>
+          </div>
         </div>
-        <button
-          type="submit"
-          disabled={forgotLoading}
-          className="w-full bg-secondary text-white py-3 rounded-lg font-medium hover:bg-secondary/90 transition-all duration-300 disabled:opacity-50"
-        >
-          {forgotLoading ? "Sending OTP..." : "Send OTP"}
-        </button>
-        <div className="text-center">
-          <span className="text-sm text-gray-600">Back to </span>
-          <button
-            type="button"
-            onClick={() => dispatch(setAuthStep("login"))}
-            className="text-sm text-primary hover:underline font-medium"
-          >
-            Login
-          </button>
-        </div>
-      </form>
+      </CustomForm>
     </motion.div>
   );
 
@@ -581,16 +544,18 @@ const AuthModal = () => {
             onChange={setOneTimeCode}
             numInputs={6}
             renderInput={(props) => <input {...props} />}
-            containerStyle="flex justify-center gap-2"
+            containerStyle="otp-container"
             inputStyle={{
-              width: "3rem",
-              height: "3rem",
-              fontSize: "1.5rem",
+              width: "100%",
+              maxWidth: "7rem",
+              height: "4rem",
+              margin: "0 0.3rem",
+              borderRadius: "5px",
+              fontSize: "2rem",
               fontWeight: "bold",
               textAlign: "center",
               outline: "none",
               border: "1px solid #F95F19",
-              borderRadius: "5px",
               transition: "border-color 0.3s ease",
             }}
           />
@@ -637,57 +602,46 @@ const AuthModal = () => {
         </button>
         <h1 className="text-2xl font-bold text-gray-800">Reset Password</h1>
       </div>
-      <form onSubmit={handleResetPassword} className="space-y-4">
-        <div className="relative">
-          <Lock
-            className="absolute left-3 top-1/2 transform -translate-y-1/2 text-secondary"
-            size={20}
-          />
-          <input
-            type="password"
+      {/* Form content */}
+      <CustomForm
+        onSubmit={handleResetPassword}
+        resolver={zodResolver(resetPasswordValidationSchema)}
+      >
+        <div className="space-y-3 md:space-y-6 mt-8">
+          <CustomInput
+            name="newPassword"
+            label="New Password"
+            fullWidth
+            size="lg"
+            icon={<Lock size={24} className="text-secondry" />}
             placeholder="Enter new password"
-            value={resetForm.newPassword}
-            onChange={(e) =>
-              setResetForm({ ...resetForm, newPassword: e.target.value })
-            }
-            className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-secondary"
-            required
-          />
-        </div>
-        <div className="relative">
-          <Lock
-            className="absolute left-3 top-1/2 transform -translate-y-1/2 text-secondary"
-            size={20}
-          />
-          <input
+            variant="outline"
             type="password"
-            placeholder="Confirm new password"
-            value={resetForm.confirmPassword}
-            onChange={(e) =>
-              setResetForm({ ...resetForm, confirmPassword: e.target.value })
-            }
-            className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-secondary"
-            required
           />
+          <CustomInput
+            name="confirmPassword"
+            label="Confirm Password"
+            fullWidth
+            size="lg"
+            icon={<Lock size={24} className="text-second" />}
+            placeholder="Enter confirm password"
+            variant="outline"
+            type="password"
+          />
+          <CustomButton loading={resetLoading} fullWidth className="py-4">
+            Reset
+          </CustomButton>
+          <div className="flex gap-1 items-center justify-center">
+            <span className="text-sm md:text-[16px] font-medium">Back To</span>
+            <button
+              onClick={() => setModalStep("login")}
+              className="text-sm md:text-[16px] font-medium text-primary hover:underline"
+            >
+              Login
+            </button>
+          </div>
         </div>
-        <button
-          type="submit"
-          disabled={resetLoading}
-          className="w-full bg-secondary text-white py-3 rounded-lg font-medium hover:bg-secondary/90 transition-all duration-300 disabled:opacity-50"
-        >
-          {resetLoading ? "Resetting..." : "Reset Password"}
-        </button>
-        <div className="text-center">
-          <span className="text-sm text-gray-600">Back to </span>
-          <button
-            type="button"
-            onClick={() => dispatch(setAuthStep("login"))}
-            className="text-sm text-primary hover:underline font-medium"
-          >
-            Login
-          </button>
-        </div>
-      </form>
+      </CustomForm>
     </motion.div>
   );
 

@@ -18,7 +18,7 @@ import toast from "react-hot-toast";
 const ForgotPassword = () => {
   const router = useRouter();
   const [forgotPassword, { isLoading }] = useForgotPasswordMutation();
-  const handleLogin = async (values: FieldValues) => {
+  const handleForgotPassword = async (values: FieldValues) => {
     try {
       const res = await forgotPassword(values).unwrap();
       const accessToken = res?.data?.attributes?.accessToken;
@@ -65,7 +65,7 @@ const ForgotPassword = () => {
         </div>
         {/* Form content */}
         <CustomForm
-          onSubmit={handleLogin}
+          onSubmit={handleForgotPassword}
           resolver={zodResolver(forgotPasswordValidationSchema)}
         >
           <div className="space-y-3 md:space-y-6 mt-8">
