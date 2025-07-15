@@ -29,7 +29,7 @@ import PostDetails from "../post-details/PostDetails";
 import formatPostReactionNumber from "@/utils/formatPostReactionNumber";
 import { CalendarCheck } from "lucide-react";
 import ShowItineraryModal from "../create-post/ShowItineraryModal";
-import PostEditModal from "../create-post/PostEditModal"; // Import the new modal
+import PostEditModal from "../create-post/PostEditModal";
 import Link from "next/link";
 
 interface PostCardProps {
@@ -47,7 +47,7 @@ const PostCard = ({ post }: PostCardProps) => {
   const [editCommentText, setEditCommentText] = useState<string>("");
   const [showPostDetails, setShowPostDetails] = useState<boolean>(false);
   const [showItineraryModal, setShowItineraryModal] = useState<boolean>(false);
-  const [showEditModal, setShowEditModal] = useState<boolean>(false); // State for edit modal
+  const [showEditModal, setShowEditModal] = useState<boolean>(false);
 
   const [incrementItinerary] = useIncrementItineraryViewCountMutation();
 
@@ -126,7 +126,6 @@ const PostCard = ({ post }: PostCardProps) => {
   const handleReaction = async (reactionType: string) => {
     try {
       await addOrRemoveReaction({ postId: post?._id, reactionType }).unwrap();
-
       setShowReactions(false);
     } catch (error) {
       const err = error as TError;
@@ -134,32 +133,30 @@ const PostCard = ({ post }: PostCardProps) => {
     }
   };
 
-  // Function to handle post update (e.g., refetching posts)
+  // Function to handle post update
   const handlePostUpdated = () => {
     setShowEditModal(false);
   };
 
   const handleItineraryClick = async () => {
-    {
-      try {
-        setShowItineraryModal(true);
-        const payload = { postId: post?._id, itineraryId: post?.itinerary?._id };
-        await incrementItinerary(payload).unwrap();
-      } catch (error) {
-        const err = error as TError;
-        toast.error(err?.data?.message || "Something went wrong!");
-      }
+    try {
+      setShowItineraryModal(true);
+      const payload = { postId: post?._id, itineraryId: post?.itinerary?._id };
+      await incrementItinerary(payload).unwrap();
+    } catch (error) {
+      const err = error as TError;
+      toast.error(err?.data?.message || "Something went wrong!");
     }
   };
 
   return (
     <div
       ref={postRef}
-      className="w-full  bg-white rounded-xl p-4 mb-4 relative"
+      className="w-full bg-white rounded-xl p-4 mb-4 relative"
     >
       <PostHeader post={post} onEditClick={() => setShowEditModal(true)} />
       <p className="text-gray-700 mb-4">
-        {post?.content?.split(/(\s+)/).map((word, index) => {
+        {post?.content?.split(/(\s+)/)?.map((word, index) => {
           const isHashtag = word?.match(/^#\w+/);
           return (
             <span key={index}>
@@ -178,11 +175,11 @@ const PostCard = ({ post }: PostCardProps) => {
         })}
       </p>
       <PostContentRender data={post?.media || []} isVisible={isVisible} />
-      {/* if post itineray is avaialbe */}
+      {/* if post itinerary is available */}
       {post?.itinerary && (
         <div
           onClick={handleItineraryClick}
-          className="px-4 py-2 mt-5 border cursor-pointer  rounded-full text-gray-600  border-gray-200 flex items-center justify-between text-sm"
+          className="px-4 py-2 mt-5 border cursor-pointer rounded-full text-gray-600 border-gray-200 flex items-center justify-between text-sm"
         >
           <span>Click to view full itinerary</span>
           <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs">
@@ -198,17 +195,17 @@ const PostCard = ({ post }: PostCardProps) => {
               onClick={() => setShowReactionDetails(true)}
               className="w-fit flex items-center gap-1 cursor-pointer"
             >
-              <div className="flex -space-x-1 cursor-pointer ">
+              <div className="flex -space-x-1 cursor-pointer">
                 {/* Show up to 3 reaction types */}
                 {nonZeroReactions?.slice(0, 3)?.map((reaction) => (
-                  <div key={reaction.type}>
+                  <div key={reaction?.type}>
                     <span className={`${reactionColors[reaction?.type]}`}>
                       {reactionIcons[reaction?.type]}
                     </span>
                   </div>
                 ))}
               </div>
-              <span className="text-[18px] hover:underline cursor-pointer font-semibold text-gray-500 ">
+              <span className="text-[18px] hover:underline cursor-pointer font-semibold text-gray-500">
                 {formatPostReactionNumber(post?.reactions?.length || 0)}
               </span>
             </div>
@@ -234,9 +231,9 @@ const PostCard = ({ post }: PostCardProps) => {
               className="w-full p-2"
             >
               {post?.reactions?.length > 0 && (
-                <div className="w-full space-y-2 ">
+                <div className="w-full space-y-2">
                   {post?.reactions?.map((reaction) => (
-                    <div key={reaction.userId._id}>
+                    <div key={reaction?.userId?._id}>
                       <div className="flex justify-between items-center gap-2 border-b border-gray-200 pb-1">
                         <div className="flex items-center gap-3">
                           <Image
@@ -246,7 +243,7 @@ const PostCard = ({ post }: PostCardProps) => {
                             height={40}
                             className="size-[40px] rounded-full"
                           />
-                          <div className="flex flex-col  mt-2">
+                          <div className="flex flex-col mt-2">
                             <h1 className="font-semibold">
                               {reaction?.userId?.fullName}
                             </h1>
@@ -288,21 +285,21 @@ const PostCard = ({ post }: PostCardProps) => {
               {userReaction ? (
                 <>
                   <span
-                    className={`${reactionColors[userReaction.reactionType]}`}
+                    className={`${reactionColors[userReaction?.reactionType]}`}
                   >
-                    {reactionIcons[userReaction.reactionType]}
+                    {reactionIcons[userReaction?.reactionType]}
                   </span>
                   <span
-                    className={`font-semibold capitalize  ${
-                      reactionColors[userReaction.reactionType]
+                    className={`font-semibold capitalize ${
+                      reactionColors[userReaction?.reactionType]
                     }`}
                   >
-                    <span> {userReaction.reactionType}</span>
+                    <span>{userReaction?.reactionType}</span>
                   </span>
                 </>
               ) : (
                 <div className="flex items-center gap-1">
-                  <FaRegHeart size={23} className=" text-gray-500" />
+                  <FaRegHeart size={23} className="text-gray-500" />
                   <span className="font-semibold text-gray-500">Love</span>
                 </div>
               )}
@@ -311,22 +308,22 @@ const PostCard = ({ post }: PostCardProps) => {
               {showReactions && (
                 <motion.div
                   initial={{ opacity: 0, y: 0 }}
-                  animate={{ opacity: 1, y: -9 }} // Adjusted y for better positioning
+                  animate={{ opacity: 1, y: -9 }}
                   exit={{ opacity: 0, y: 0 }}
                   transition={{ duration: 0.2 }}
                   className="absolute -top-12 -left-2 bg-white border border-gray-50 rounded-full shadow-lg px-3 py-2 flex space-x-3 z-10"
                 >
-                  {Object.keys(ReactionType).map((reactionKey) => {
+                  {Object.keys(ReactionType)?.map((reactionKey) => {
                     const reaction =
                       ReactionType[
                         reactionKey as keyof typeof ReactionType
-                      ].toLowerCase();
+                      ]?.toLowerCase();
                     return (
                       <motion.button
                         key={reaction}
                         onClick={() => handleReaction(reaction)}
-                        whileHover={{ scale: 1.25 }} // Scale up on hover
-                        whileTap={{ scale: 0.9 }} // Scale down on click
+                        whileHover={{ scale: 1.25 }}
+                        whileTap={{ scale: 0.9 }}
                         className={`text-2xl cursor-pointer ${
                           userReaction?.reactionType === reaction
                             ? reactionColors[reaction]
@@ -335,7 +332,8 @@ const PostCard = ({ post }: PostCardProps) => {
                       >
                         <Tooltip
                           title={
-                            reaction.charAt(0).toUpperCase() + reaction.slice(1)
+                            reaction?.charAt(0)?.toUpperCase() +
+                            reaction?.slice(1)
                           }
                         >
                           {reactionIcons[reaction]}
@@ -369,7 +367,7 @@ const PostCard = ({ post }: PostCardProps) => {
             <div className="flex items-center space-x-2 cursor-pointer">
               <CalendarCheck className="size-6 text-gray-600" />
               <span className="font-semibold">
-                {formatPostReactionNumber(post?.itineraryViewCount)}
+                {formatPostReactionNumber(post?.itineraryViewCount || 0)}
               </span>
             </div>
           )}

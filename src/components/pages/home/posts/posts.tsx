@@ -64,7 +64,7 @@ const Posts = () => {
   );
 
   // Show loading skeletons for initial load
-  if (isLoading && allPosts.length === 0) {
+  if (isLoading && allPosts?.length === 0) {
     return (
       <div className="w-full text-center py-4">
         {Array.from({ length: 4 }).map((_, index) => (
@@ -75,7 +75,7 @@ const Posts = () => {
   }
 
   // Show "Not available" message if no posts
-  if (!isLoading && allPosts.length === 0 && !hasMore) {
+  if (!isLoading && allPosts?.length === 0 && !hasMore) {
     return (
       <section className="w-full text-center py-4">
         <p className="text-gray-600 text-lg">No posts available</p>
@@ -87,19 +87,19 @@ const Posts = () => {
     <div className="space-y-4">
       {allPosts?.map((post: IPost, index: number) => {
         // Attach ref to the last post for infinite scroll
-        if (index === allPosts.length - 1) {
+        if (index === allPosts?.length - 1) {
           return (
-            <div key={post._id} ref={lastPostElementRef}>
+            <div key={post?._id} ref={lastPostElementRef}>
               <PostCard post={post} />
             </div>
           );
         }
-        return <PostCard key={post._id} post={post} />;
+        return <PostCard key={post?._id} post={post} />;
       })}
       {/* Loading indicator for fetching more posts */}
       {isFetching && hasMore && (
         <div className="w-full text-center py-4">
-          {Array.from({ length: 2 }).map((_, index) => (
+          {Array?.from({ length: 2 }).map((_, index) => (
             <PostCardSkeleton key={`fetching-${index}`} />
           ))}
         </div>

@@ -10,15 +10,39 @@ const nextConfig: NextConfig = {
     },
   ],
   images: {
-    domains: [
-      "i.ibb.co.com",
-      "images.unsplash.com",
-      "randomuser.me",
-      "i.postimg.cc",
-      "images.pexels.com",
-      "api.dicebear.com",
-      "iter-bene.s3.eu-north-1.amazonaws.com",
-      "maps.googleapis.com"
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "i.ibb.co.com",
+      },
+      {
+        protocol: "https",
+        hostname: "images.unsplash.com",
+      },
+      {
+        protocol: "https",
+        hostname: "randomuser.me",
+      },
+      {
+        protocol: "https",
+        hostname: "i.postimg.cc",
+      },
+      {
+        protocol: "https",
+        hostname: "images.pexels.com",
+      },
+      {
+        protocol: "https",
+        hostname: "api.dicebear.com",
+      },
+      {
+        protocol: "https",
+        hostname: "iter-bene.s3.eu-north-1.amazonaws.com",
+      },
+      {
+        protocol: "https",
+        hostname: "maps.googleapis.com",
+      },
     ],
   },
 };
