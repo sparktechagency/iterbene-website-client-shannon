@@ -162,10 +162,9 @@ const PostCard = ({ post }: PostCardProps) => {
         {post?.content?.split(/(\s+)/).map((word, index) => {
           const isHashtag = word?.match(/^#\w+/);
           return (
-            <>
+            <span key={index}>
               {isHashtag ? (
                 <Link
-                  key={index + 1}
                   href={`/search/hashtag/?q=${word.slice(1)}`}
                   className="text-blue-600 hover:underline"
                 >
@@ -174,7 +173,7 @@ const PostCard = ({ post }: PostCardProps) => {
               ) : (
                 word
               )}
-            </>
+            </span>
           );
         })}
       </p>

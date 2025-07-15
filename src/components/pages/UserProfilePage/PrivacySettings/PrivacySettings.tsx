@@ -111,8 +111,9 @@ export default function PrivacySettings() {
     [user]
   );
 
-  const [privacySettings, setPrivacySettings] =
-    useState<IPrivacySettings>(initialPrivacySettings);
+  const [privacySettings, setPrivacySettings] = useState<IPrivacySettings>(
+    initialPrivacySettings
+  );
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [updatePrivacySettingsMutation, { isLoading }] =
     useUpdatePrivacySettingsMutation();
@@ -281,110 +282,81 @@ export default function PrivacySettings() {
           </div>
         </div>
 
-        <div className="grid lg:grid-cols-4 gap-8">
-          {/* Sidebar */}
-          <div className="lg:col-span-1">
-            <div className="bg-white rounded-lg shadow-sm p-6 sticky top-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                Quick Settings
-              </h3>
-              <div className="space-y-3">
-                <button className="w-full flex items-center space-x-3 px-3 py-2 text-left hover:bg-gray-50 rounded-lg transition-colors">
-                  <User className="h-4 w-4 text-gray-500" />
-                  <span className="text-sm text-gray-700">Personal Info</span>
-                </button>
-                <button className="w-full flex items-center space-x-3 px-3 py-2 text-left hover:bg-gray-50 rounded-lg transition-colors">
-                  <MapPin className="h-4 w-4 text-gray-500" />
-                  <span className="text-sm text-gray-700">Location</span>
-                </button>
-                <button className="w-full flex items-center space-x-3 px-3 py-2 text-left hover:bg-gray-50 rounded-lg transition-colors">
-                  <Users className="h-4 w-4 text-gray-500" />
-                  <span className="text-sm text-gray-700">Connections</span>
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {/* Main Content */}
-          <div className="lg:col-span-3 space-y-6">
-            {/* Privacy Settings Groups */}
-            {settingsGroups.map((group) => {
-              const GroupIcon = group.icon;
-              return (
-                <div
-                  key={group.title}
-                  className="bg-white rounded-lg shadow-sm p-6"
-                >
-                  <div className="flex items-center space-x-3 mb-6">
-                    <GroupIcon className="h-6 w-6 text-primary" />
-                    <div>
-                      <h3 className="text-xl font-semibold text-gray-900">
-                        {group.title}
-                      </h3>
-                      <p className="text-sm text-gray-600">
-                        {group.description}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="space-y-4">
-                    {group.settings.map((setting) => {
-                      const SettingIcon = setting.icon;
-                      return (
-                        <div
-                          key={setting.key}
-                          className="flex items-center justify-between p-4 hover:bg-gray-50 rounded-lg transition-colors"
-                        >
-                          <div className="flex items-center space-x-3">
-                            <div className="bg-gray-100 p-2 rounded-full">
-                              <SettingIcon className="h-4 w-4 text-gray-600" />
-                            </div>
-                            <div>
-                              <div className="font-medium text-gray-900">
-                                {setting.label}
-                              </div>
-                              <div className="text-sm text-gray-500">
-                                {
-                                  privacyOptions.find(
-                                    (opt) =>
-                                      opt.value ===
-                                      privacySettings[setting.key]
-                                  )?.description
-                                }
-                              </div>
-                            </div>
-                          </div>
-                          <PrivacyDropdown
-                            field={setting.key}
-                            currentValue={privacySettings[setting.key]}
-                            options={privacyOptions}
-                            onSelect={handlePrivacyChange}
-                          />
-                        </div>
-                      );
-                    })}
+        <div className="w-full space-y-6">
+          {/* Privacy Settings Groups */}
+          {settingsGroups.map((group) => {
+            const GroupIcon = group.icon;
+            return (
+              <div
+                key={group.title}
+                className="bg-white rounded-lg shadow-sm p-6"
+              >
+                <div className="flex items-center space-x-3 mb-6">
+                  <GroupIcon className="h-6 w-6 text-primary" />
+                  <div>
+                    <h3 className="text-xl font-semibold text-gray-900">
+                      {group.title}
+                    </h3>
+                    <p className="text-sm text-gray-600">{group.description}</p>
                   </div>
                 </div>
-              );
-            })}
 
-            {/* Save Button */}
-            <div className="flex justify-end space-x-4">
-              <button
-                onClick={handleResetToDefault}
-                className="px-6 py-2 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 transition-colors cursor-pointer"
-                disabled={isLoading}
-              >
-                Reset to Default
-              </button>
-              <button
-                onClick={handleSaveChanges}
-                className="px-6 py-2 bg-primary text-white rounded-xl transition-colors cursor-pointer disabled:bg-gray-400"
-                disabled={isLoading}
-              >
-                {isLoading ? "Saving..." : "Save Changes"}
-              </button>
-            </div>
+                <div className="space-y-4">
+                  {group.settings.map((setting) => {
+                    const SettingIcon = setting.icon;
+                    return (
+                      <div
+                        key={setting.key}
+                        className="flex items-center justify-between p-4 hover:bg-gray-50 rounded-lg transition-colors"
+                      >
+                        <div className="flex items-center space-x-3">
+                          <div className="bg-gray-100 p-2 rounded-full">
+                            <SettingIcon className="h-4 w-4 text-gray-600" />
+                          </div>
+                          <div>
+                            <div className="font-medium text-gray-900">
+                              {setting.label}
+                            </div>
+                            <div className="text-sm text-gray-500">
+                              {
+                                privacyOptions.find(
+                                  (opt) =>
+                                    opt.value === privacySettings[setting.key]
+                                )?.description
+                              }
+                            </div>
+                          </div>
+                        </div>
+                        <PrivacyDropdown
+                          field={setting.key}
+                          currentValue={privacySettings[setting.key]}
+                          options={privacyOptions}
+                          onSelect={handlePrivacyChange}
+                        />
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })}
+
+          {/* Save Button */}
+          <div className="flex justify-end space-x-4">
+            <button
+              onClick={handleResetToDefault}
+              className="px-6 py-2 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 transition-colors cursor-pointer"
+              disabled={isLoading}
+            >
+              Reset to Default
+            </button>
+            <button
+              onClick={handleSaveChanges}
+              className="px-6 py-2 bg-primary text-white rounded-xl transition-colors cursor-pointer disabled:bg-gray-400"
+              disabled={isLoading}
+            >
+              {isLoading ? "Saving..." : "Save Changes"}
+            </button>
           </div>
         </div>
       </div>

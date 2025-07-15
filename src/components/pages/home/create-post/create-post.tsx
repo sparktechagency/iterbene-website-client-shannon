@@ -572,7 +572,7 @@ const CreatePost = ({
                   )}
               </AnimatePresence>
             </div>
-            {!post && allMediaPreviews.length === 0 && (
+            {!post && allMediaPreviews?.length === 0 && (
               <button
                 onClick={handlePostAction}
                 disabled={
@@ -733,8 +733,9 @@ const CreatePost = ({
                     </div>
                   )}
                 </div>
-                <div className="flex-1 justify-end items-center">
-                  {post && (
+                {/* if post or allMediaPrivies lenght > 0 show post button */}
+                {post || allMediaPreviews.length > 0 ? (
+                  <div className="flex-1 justify-end items-center">
                     <button
                       onClick={handlePostAction}
                       disabled={
@@ -776,8 +777,8 @@ const CreatePost = ({
                         "Post It!"
                       )}
                     </button>
-                  )}
-                </div>
+                  </div>
+                ) : null}
               </div>
 
               {/* Icons for Additional Functionalities */}

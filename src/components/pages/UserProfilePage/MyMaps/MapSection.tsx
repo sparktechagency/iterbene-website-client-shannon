@@ -33,15 +33,19 @@ const MapSection = ({
   });
 
   // Set default center to user's current location from API
-  const defaultCenter: Location = responseData?.data?.attributes?.userCurrentLocation
-    ? {
-        lat: responseData.data.attributes.userCurrentLocation.latitude,
-        lng: responseData.data.attributes.userCurrentLocation.longitude,
-      }
-    : {
-        lat: 40.7128, // Fallback to New York if API data is unavailable
-        lng: -74.006,
-      };
+  const userCurrentLocation = responseData?.data?.attributes?.userCurrentLocation;
+  const defaultCenter: Location = 
+    userCurrentLocation &&
+    typeof userCurrentLocation.latitude === 'number' &&
+    typeof userCurrentLocation.longitude === 'number'
+      ? {
+          lat: userCurrentLocation.latitude,
+          lng: userCurrentLocation.longitude,
+        }
+      : {
+          lat: 40.7128, // Fallback to New York if API data is unavailable or invalid
+          lng: -74.006,
+        };
 
   // Get locations from API data
   const interestedPlaces: Location[] = responseData?.data?.attributes?.interestedLocations

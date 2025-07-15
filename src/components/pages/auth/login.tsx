@@ -13,10 +13,13 @@ import { Checkbox } from "antd";
 import { Lock, Mail } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { FieldValues } from "react-hook-form";
 import toast from "react-hot-toast";
 const Login = () => {
+
+  const searchParams = useSearchParams();
+  const redirectUrl = searchParams.get("redirect_url");
   const [login, { isLoading }] = useLoginMutation();
   const router = useRouter();
   const handleLogin = async (values: FieldValues) => {
@@ -31,7 +34,11 @@ const Login = () => {
         res?.data?.attributes?.tokens?.accessToken,
         res?.data?.attributes?.tokens?.refreshToken
       );
-      router.push("/");
+      if (redirectUrl) {
+        router.push(redirectUrl);
+      } else {
+        router.push("/");
+      }
     } catch (error) {
       const err = error as TError;
       toast.error(err?.data?.message || "Something went wrong!");
