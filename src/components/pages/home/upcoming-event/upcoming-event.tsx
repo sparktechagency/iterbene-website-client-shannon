@@ -11,6 +11,7 @@ import { FreeMode, Pagination, Autoplay } from "swiper/modules";
 import { useGetSuggestionsEventsQuery } from "@/redux/features/event/eventApi";
 import { useState, useEffect } from "react";
 import { IEvent } from "@/types/event.types";
+import MyUpComingTourSkeleton from "../../UserProfilePage/MyInvitationsPage/MyUpComingTours/MyUpComingTourSkeleton";
 
 const UpcomingEvent = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -80,7 +81,7 @@ const UpcomingEvent = () => {
       >
         {isFetching && allEvents.length === 0 ? (
           <SwiperSlide>
-            <div>Loading...</div>
+            <MyUpComingTourSkeleton />
           </SwiperSlide>
         ) : (
           allEvents.map((event: IEvent) => (
@@ -90,9 +91,6 @@ const UpcomingEvent = () => {
           ))
         )}
       </Swiper>
-      <div className="text-center mt-2">
-        Page {currentPage} of {totalPages}
-      </div>
     </section>
   );
 };

@@ -110,7 +110,15 @@ const AuthModal = () => {
 
   const handleClose = () => {
     dispatch(closeAuthModal());
-    setModalStep("welcome");
+  };
+
+  const handleLogin = () => {
+    handleClose();
+    router.push("/login");
+  };
+  const handleRegister = () => {
+    handleClose();
+    router.push("/register");
   };
 
   const renderWelcomeStep = () => (
@@ -129,13 +137,13 @@ const AuthModal = () => {
       </p>
       <div className="space-y-4">
         <button
-          onClick={() => router.push("/login")}
+          onClick={handleLogin}
           className="w-full bg-secondary cursor-pointer text-white py-3 px-6 rounded-lg font-medium hover:bg-secondary/90 transition-all duration-300"
         >
           Login to Your Account
         </button>
         <button
-          onClick={() => router.push("/register")}
+          onClick={handleRegister}
           className="w-full text-secondary cursor-pointer border border-secondary py-3 px-6 rounded-lg font-medium hover:bg-secondary hover:text-white transition-all duration-300"
         >
           Create New Account
