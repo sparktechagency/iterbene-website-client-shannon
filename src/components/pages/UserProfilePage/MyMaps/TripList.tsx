@@ -4,6 +4,7 @@ import TripCard from "./TripCard";
 import { useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { ISearchPost } from "@/types/search.types";
+import TripCardSkeleton from "./TripCardSkeleton";
 
 const TripList = ({
   mapHide,
@@ -69,8 +70,14 @@ const TripList = ({
 
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+      <div
+        className={`grid grid-cols-1 gap-5 ${
+          mapHide ? "md:grid-cols-3 lg:grid-cols-4" : "md:grid-cols-2"
+        }`}
+      >
+        {Array.from({ length: 4 }).map((_, index) => (
+          <TripCardSkeleton key={`skeleton-${index}`} />
+        ))}
       </div>
     );
   }

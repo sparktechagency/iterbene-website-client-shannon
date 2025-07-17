@@ -75,7 +75,7 @@ const GroupLocationMap = ({
   // Define custom marker icon only after Google Maps is loaded
   const customMarkerIcon = isLoaded && window.google
     ? {
-        url: "https://iter-bene.s3.eu-north-1.amazonaws.com/uploads/maps/interested.png",
+        url: "https://iter-bene.s3.eu-north-1.amazonaws.com/basic/interested.png",
         scaledSize: new window.google.maps.Size(40, 40),
       }
     : undefined;
