@@ -64,7 +64,7 @@ const NotificationsDropdown: React.FC<DropdownProps> = ({ isOpen }) => {
         setAllNotifications((prev) => [...prev, ...uniqueNewNotifications]);
       }
     }
-  }, [responseData, currentPage]);
+  }, [responseData, currentPage, allNotifications]);
 
   // Handle click inside dropdown
   useEffect(() => {

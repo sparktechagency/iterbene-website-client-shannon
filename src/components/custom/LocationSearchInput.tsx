@@ -337,7 +337,7 @@ const LocationSearchInput: React.FC<LocationSearchInputProps> = ({
     if (value !== inputValue) {
       setInputValue(value);
     }
-  }, [value]); // Removed inputValue from dependency array
+  }, [inputValue, value]); // Removed inputValue from dependency array
 
   return (
     <div className={`flex flex-col gap-2 ${className}`}>

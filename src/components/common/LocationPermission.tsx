@@ -27,7 +27,7 @@ const LocationPermission = () => {
   >("prompt");
   const [locationData, setLocationData] = useState<ILocationData | null>(null);
   const [setLatestLocation] = useSetLatestLocationMutation();
-  const user = useUser(); 
+  const user = useUser();
 
   useEffect(() => {
     const hasPermission =
@@ -62,6 +62,10 @@ const LocationPermission = () => {
         name: "geolocation",
       });
       setPermissionStatus(permission.state);
+      if (permission.state === "granted") {
+        // Automatically fetch and update location if permission is already granted
+        await handleRequestPermission();
+      }
     } catch (error) {
       console.log("Error checking permission status:", error);
       setPermissionStatus("prompt");
@@ -144,29 +148,29 @@ const LocationPermission = () => {
         country: addressData?.country,
       };
 
+      // Only update if location data has changed
       if (
-        locationData &&
-        locationData.latitude === newLocationData.latitude &&
-        locationData.longitude === newLocationData.longitude &&
-        locationData.locationName === newLocationData.locationName &&
-        locationData.city === newLocationData.city &&
-        locationData.state === newLocationData.state &&
-        locationData.country === newLocationData.country
+        !locationData ||
+        locationData.latitude !== newLocationData.latitude ||
+        locationData.longitude !== newLocationData.longitude ||
+        locationData.locationName !== newLocationData.locationName ||
+        locationData.city !== newLocationData.city ||
+        locationData.state !== newLocationData.state ||
+        locationData.country !== newLocationData.country
       ) {
-        setIsRequesting(false);
-        setIsOpen(false);
-        localStorage.setItem("locationPermissionGranted", "true");
-        return;
+        await setLatestLocation(newLocationData).unwrap();
+        setLocationData(newLocationData);
+        toast.success("Location updated successfully!");
       }
-      await setLatestLocation(newLocationData).unwrap();
+
       setPermissionStatus("granted");
       localStorage.setItem("locationPermissionGranted", "true");
-      setLocationData(newLocationData);
-      setIsRequesting(false);
       setIsOpen(false);
     } catch (error) {
       const err = error as TError;
       toast.error(err?.data?.message || "Something went wrong");
+      setPermissionStatus("denied");
+    } finally {
       setIsRequesting(false);
     }
   };

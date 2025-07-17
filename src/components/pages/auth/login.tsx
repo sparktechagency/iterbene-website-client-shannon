@@ -17,7 +17,6 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { FieldValues } from "react-hook-form";
 import toast from "react-hot-toast";
 const Login = () => {
-
   const searchParams = useSearchParams();
   const redirectUrl = searchParams.get("redirect_url");
   const [login, { isLoading }] = useLoginMutation();
