@@ -1,6 +1,7 @@
 "use client";
 import { IEventDetails } from "@/types/event.types";
 import { GoogleMap, Marker, useJsApiLoader } from "@react-google-maps/api";
+import { Loader2 } from "lucide-react";
 import React from "react";
 
 // Map container mx-auto style
@@ -52,7 +53,11 @@ const EventLocationMap = ({
     : null;
 
   if (!isLoaded) {
-    return <div>Loading...</div>;
+    return (
+      <div className="flex items-center justify-center py-8">
+        <Loader2 className="animate-spin text-primary" size={28} />
+      </div>
+    );
   }
 
   // Check if location is valid; if not, show fallback UI

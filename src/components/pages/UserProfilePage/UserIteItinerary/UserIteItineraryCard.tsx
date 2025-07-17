@@ -19,15 +19,15 @@ import CustomModal from "@/components/custom/custom-modal";
 import Image from "next/image";
 import { IoMdClose } from "react-icons/io";
 import UserIteItineraryContent from "./UserIteItineraryContent";
-import {CalendarCheck } from "lucide-react";
+import { CalendarCheck } from "lucide-react";
 import PostHeader from "../../home/posts/post.header";
 import formatPostReactionNumber from "@/utils/formatPostReactionNumber";
+import Link from "next/link";
 
 interface PostCardProps {
   post: IPost;
   onRemove?: () => void;
 }
-
 
 const UserIteItineraryCard = ({ post, onRemove }: PostCardProps) => {
   const user = useUser();
@@ -150,9 +150,11 @@ const UserIteItineraryCard = ({ post, onRemove }: PostCardProps) => {
                             className="size-[40px] rounded-full"
                           />
                           <div className="flex flex-col  mt-2">
-                            <h1 className="font-semibold">
-                              {reaction?.userId?.fullName}
-                            </h1>
+                            <Link href={`/${reaction?.userId?.username}`}>
+                              <h1 className="font-semibold hover:underline">
+                                {reaction?.userId?.fullName}
+                              </h1>
+                            </Link>
                             <span className="text-gray-500">
                               {reaction?.userId?.username}
                             </span>

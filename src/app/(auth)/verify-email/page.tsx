@@ -1,4 +1,5 @@
 import VerifyEmail from "@/components/pages/auth/verify-email";
+import { Loader2 } from "lucide-react";
 import { Metadata } from "next";
 import { Suspense } from "react";
 
@@ -13,7 +14,7 @@ const VerifyEmailPage = () => {
     <Suspense
       fallback={
         <div className="w-full h-screen flex items-center justify-center">
-          <p>Loading...</p>
+          <Loader2 className="animate-spin text-primary" size={28} />
         </div>
       }
     >

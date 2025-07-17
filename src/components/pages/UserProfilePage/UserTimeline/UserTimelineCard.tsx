@@ -145,9 +145,11 @@ const UserTimelineCard = ({ post, onRemove }: PostCardProps) => {
                             className="size-[40px] rounded-full"
                           />
                           <div className="flex flex-col mt-2">
-                            <h1 className="font-semibold">
-                              {reaction?.userId?.fullName}
-                            </h1>
+                            <Link href={`/${reaction?.userId?.username}`}>
+                              <h1 className="font-semibold hover:underline">
+                                {reaction?.userId?.fullName}
+                              </h1>
+                            </Link>
                             <span className="text-gray-500">
                               {reaction?.userId?.username}
                             </span>

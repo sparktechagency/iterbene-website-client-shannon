@@ -150,10 +150,7 @@ const PostCard = ({ post }: PostCardProps) => {
   };
 
   return (
-    <div
-      ref={postRef}
-      className="w-full bg-white rounded-xl p-4 mb-4 relative"
-    >
+    <div ref={postRef} className="w-full bg-white rounded-xl p-4 mb-4 relative">
       <PostHeader post={post} onEditClick={() => setShowEditModal(true)} />
       <p className="text-gray-700 mb-4">
         {post?.content?.split(/(\s+)/)?.map((word, index) => {
@@ -244,9 +241,11 @@ const PostCard = ({ post }: PostCardProps) => {
                             className="size-[40px] rounded-full"
                           />
                           <div className="flex flex-col mt-2">
-                            <h1 className="font-semibold">
-                              {reaction?.userId?.fullName}
-                            </h1>
+                            <Link href={`/${reaction?.userId?.username}`}>
+                              <h1 className="font-semibold hover:underline">
+                                {reaction?.userId?.fullName}
+                              </h1>
+                            </Link>
                             <span className="text-gray-500">
                               {reaction?.userId?.username}
                             </span>

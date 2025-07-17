@@ -19,7 +19,7 @@ const MyJoinedGroups = () => {
     isFetching,
   } = useGetMyJoinedGroupsQuery([
     { key: "page", value: currentPage.toString() },
-    { key: "limit", value: "9" }
+    { key: "limit", value: "9" },
   ]);
 
   // Update joined groups when new data is fetched, ensuring no duplicate _id values
@@ -87,6 +87,7 @@ const MyJoinedGroups = () => {
     );
   }
 
+  console.log("My joined groups", joinedGroups);
   return (
     <div>
       {content}

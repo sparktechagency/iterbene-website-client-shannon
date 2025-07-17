@@ -5,37 +5,31 @@ import { useSearchParams } from "next/navigation";
 import PostCard from "../../home/posts/post-card";
 import { IPost } from "@/types/post.types";
 import { Suspense } from "react";
+import Skeleton from "@/components/custom/custom-skeleton";
+import PostCardSkeleton from "../../home/posts/PostCardSkeleton";
+import { Loader2 } from "lucide-react";
 
 const SearchHashTagPostContent = () => {
   const hashtag = useSearchParams().get("q");
-  const {
-    data: responseData,
-    isLoading,
-    error,
-  } = useGetHashtagPostsQuery(hashtag, {
+  const { data: responseData, isLoading } = useGetHashtagPostsQuery(hashtag, {
     refetchOnMountOrArgChange: true,
     skip: !hashtag,
   });
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 py-8">
+      <div className="min-h-screen py-8">
         <div className="max-w-2xl mx-auto px-4">
-          <div className="animate-pulse">
-            <div className="h-8 bg-gray-200 rounded w-1/3 mb-6"></div>
-            <div className="space-y-4">
+          <div className="space-y-2">
+            <Skeleton width="40%" height="12px" className="rounded" />
+            <div className="flex items-center space-x-2">
+              <Skeleton width="10%" height="12px" className="rounded" />
+              <Skeleton width="10%" height="12px" className="rounded" />
+            </div>
+
+            <div className="space-y-4 mt-10">
               {[1, 2, 3].map((i) => (
-                <div key={i} className="bg-white rounded-lg p-4">
-                  <div className="flex items-center space-x-3 mb-4">
-                    <div className="w-10 h-10 bg-gray-200 rounded-full"></div>
-                    <div className="flex-1">
-                      <div className="h-4 bg-gray-200 rounded w-1/4 mb-2"></div>
-                      <div className="h-3 bg-gray-200 rounded w-1/6"></div>
-                    </div>
-                  </div>
-                  <div className="h-4 bg-gray-200 rounded w-full mb-2"></div>
-                  <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-                </div>
+                <PostCardSkeleton key={i} />
               ))}
             </div>
           </div>
@@ -44,23 +38,9 @@ const SearchHashTagPostContent = () => {
     );
   }
 
-  if (error) {
-    return (
-      <div>
-        <div className="max-w-2xl mx-auto px-4">
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-            <p className="text-red-700">
-              Error loading hashtag posts. Please try again.
-            </p>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   if (!hashtag) {
     return (
-      <div className="min-h-screen bg-gray-50 py-8">
+      <div className="min-h-screen py-8">
         <div className="max-w-2xl mx-auto px-4">
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
             <p className="text-blue-700">Please enter a hashtag to search.</p>
@@ -70,8 +50,10 @@ const SearchHashTagPostContent = () => {
     );
   }
 
-  const posts = responseData?.data?.attributes?.results?.[0]?.posts || [];
-  const totalResults = responseData?.data?.attributes?.totalResults || 0;
+  console.log("Response Data:", responseData?.data?.attributes?.results);
+
+  const posts = responseData?.data?.attributes?.results[0]?.posts || [];
+  const postCount = responseData?.data?.attributes?.results[0]?.postCount || 0;
 
   return (
     <div className="w-full">
@@ -80,15 +62,15 @@ const SearchHashTagPostContent = () => {
         <div className="mb-6">
           <h1 className="text-2xl font-bold text-gray-900 mb-2">#{hashtag}</h1>
           <p className="text-gray-600">
-            {totalResults} {totalResults === 1 ? "post" : "posts"} found
+            {postCount} {postCount === 1 ? "post" : "posts"} found
           </p>
         </div>
 
         {/* Posts */}
-        {posts.length > 0 ? (
+        {posts?.length > 0 ? (
           <div className="space-y-4">
-            {posts.map((post: IPost) => (
-              <PostCard key={post._id} post={post} />
+            {posts?.map((post: IPost) => (
+              <PostCard key={post?._id} post={post} />
             ))}
           </div>
         ) : (
@@ -116,29 +98,23 @@ const SearchHashTagPostContent = () => {
             </p>
           </div>
         )}
-
-        {/* Pagination */}
-        {responseData?.data?.attributes?.totalPages > 1 && (
-          <div className="mt-8 flex justify-center">
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-              <p className="text-sm text-gray-600">
-                Page {responseData.data.attributes.page} of{" "}
-                {responseData.data.attributes.totalPages}
-              </p>
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );
 };
 
 const SearchHashTagPost = () => {
-	return (
-		<Suspense fallback={<div>Loading...</div>}>
-			<SearchHashTagPostContent />
-		</Suspense>
-	)
-}
+  return (
+    <Suspense
+      fallback={
+        <div className="flex items-center justify-center py-8">
+          <Loader2 className="animate-spin text-primary" size={28} />
+        </div>
+      }
+    >
+      <SearchHashTagPostContent />
+    </Suspense>
+  );
+};
 
 export default SearchHashTagPost;

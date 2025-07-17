@@ -5,8 +5,7 @@ import { RootState } from "@/redux/store";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import useUser from "@/hooks/useUser";
 import {
-  closeAuthModal,
-  openAuthModal,
+  closeAuthModal
 } from "@/redux/features/auth/authModalSlice";
 import Image from "next/image";
 import { X } from "lucide-react";
@@ -50,14 +49,14 @@ const AuthModal = () => {
   }, [currentStep]);
 
   // Timer for showing modal after 30 seconds if not authenticated and verified
-  useEffect(() => {
-    if (!isAuthenticated && isVerified) {
-      const timer = setTimeout(() => {
-        dispatch(openAuthModal("welcome"));
-      }, 30000); // 30 seconds
-      return () => clearTimeout(timer);
-    }
-  }, [isAuthenticated, isVerified, dispatch]);
+  // useEffect(() => {
+  //   if (!isAuthenticated && isVerified) {
+  //     const timer = setTimeout(() => {
+  //       dispatch(openAuthModal("welcome"));
+  //     }, 30000); // 30 seconds
+  //     return () => clearTimeout(timer);
+  //   }
+  // }, [isAuthenticated, isVerified, dispatch]);
 
   // Handle body overflow and prevent scrolling when modal is open
   useEffect(() => {
