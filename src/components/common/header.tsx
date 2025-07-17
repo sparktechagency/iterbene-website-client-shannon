@@ -403,7 +403,7 @@ const Header: React.FC = () => {
       setDebouncedSearchValue("");
       setIsSearchOpen(false);
     },
-    [router]
+    [dispatch, router, user]
   );
 
   return (

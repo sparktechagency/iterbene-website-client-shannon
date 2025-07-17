@@ -88,9 +88,12 @@ const UserTimelineCard = ({ post }: PostCardProps) => {
           );
         })}
       </p>
-      <Link href={`/feed/${post?._id}`}>
+      {post.media[0]?.mediaType === "image" ? (
+        <Link href={`/feed/${post?._id}`}></Link>
+      ) : (
         <UserTimelineContentRender data={post.media || []} />
-      </Link>
+      )}
+
       <div className="mt-5">
         {nonZeroReactions?.length > 0 && (
           <div className="relative mb-2 mt-2">
