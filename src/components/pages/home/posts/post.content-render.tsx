@@ -303,27 +303,29 @@ const PostContentRender = ({ data, isVisible }: PostContentRenderProps) => {
           className="w-full mt-3"
         >
           {data.map((media, index) => (
-            <SwiperSlide key={index}>
-              <div className="aspect-square">
-                {media.mediaType === "image" ? (
-                  <Image
-                    src={media?.mediaUrl}
-                    alt={`Post media ${index + 1}`}
-                    width={400}
-                    height={350}
-                    className="w-full h-full object-cover rounded-xl cursor-pointer"
-                    onClick={() => handleImageClick(media)}
-                    priority={index === 0}
-                  />
-                ) : (
-                  <VideoCard
-                    url={media?.mediaUrl}
-                    isVisible={isVisible}
-                    className="w-full h-full"
-                  />
-                )}
-              </div>
-            </SwiperSlide>
+            <VideoProvider key={index}>
+              <SwiperSlide>
+                <div className="aspect-square">
+                  {media.mediaType === "image" ? (
+                    <Image
+                      src={media?.mediaUrl}
+                      alt={`Post media ${index + 1}`}
+                      width={400}
+                      height={350}
+                      className="w-full h-full object-cover rounded-xl cursor-pointer"
+                      onClick={() => handleImageClick(media)}
+                      priority={index === 0}
+                    />
+                  ) : (
+                    <VideoCard
+                      url={media?.mediaUrl}
+                      isVisible={isVisible}
+                      className="w-full h-full"
+                    />
+                  )}
+                </div>
+              </SwiperSlide>
+            </VideoProvider>
           ))}
         </Swiper>
       ) : (
