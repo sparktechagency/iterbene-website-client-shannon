@@ -173,11 +173,17 @@ const PostHeader = ({ post, onEditClick, refetch }: PostHeaderProps) => {
         />
         <div>
           <div className="flex items-center gap-2">
-            <Link href={`/${post?.userId?.username || ""}`}>
+            {user ? (
+              <Link href={`/${post?.userId?.username || ""}`}>
+                <p className="font-medium text-gray-800 text-lg">
+                  {post?.userId?.fullName || "Unknown User"}
+                </p>
+              </Link>
+            ) : (
               <p className="font-medium text-gray-800 text-lg">
                 {post?.userId?.fullName || "Unknown User"}
               </p>
-            </Link>
+            )}
             <span className="text-sm">
               {post?.createdAt && formatTimeAgo(post?.createdAt)}
             </span>

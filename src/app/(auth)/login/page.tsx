@@ -1,4 +1,5 @@
 import Login from "@/components/pages/auth/login";
+import { Loader2 } from "lucide-react";
 import { Metadata } from "next";
 import { Suspense } from "react";
 
@@ -10,8 +11,8 @@ export const metadata: Metadata = {
 
 const LoginLoadingFallback = () => {
   return (
-    <div className="w-full h-screen flex items-center justify-center">
-      <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
+    <div className="flex items-center justify-center py-8">
+      <Loader2 className="animate-spin text-primary" size={28} />
     </div>
   );
 };
