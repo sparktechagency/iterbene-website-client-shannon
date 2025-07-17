@@ -305,7 +305,6 @@ const Header: React.FC = () => {
   };
 
   const toggleNotifications = () => {
-    console.log("Clicked");
     setIsNotificationsOpen((prev) => !prev);
     setIsMessagesOpen(false);
     setIsUserOpen(false);

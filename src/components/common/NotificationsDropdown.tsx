@@ -37,8 +37,7 @@ const NotificationsDropdown: React.FC<DropdownProps> = ({ isOpen }) => {
   const {
     data: responseData,
     isLoading,
-    isError,
-    error,
+    refetch,
   } = useGetAllNotificationsQuery(
     [
       { key: "page", value: currentPage },
@@ -49,6 +48,10 @@ const NotificationsDropdown: React.FC<DropdownProps> = ({ isOpen }) => {
 
   // Mark all as read mutation
   const [viewAllNotifications] = useViewAllNotificationsMutation();
+
+  useEffect(() => {
+    refetch();
+  }, [isOpen, refetch]);
 
   // Update notifications when data arrives
   useEffect(() => {
@@ -122,6 +125,8 @@ const NotificationsDropdown: React.FC<DropdownProps> = ({ isOpen }) => {
     }
   };
 
+  const unviewNotificationCount = responseData?.data?.attributes?.count || 0;
+
   return (
     <AnimatePresence>
       {isOpen && (
@@ -137,13 +142,15 @@ const NotificationsDropdown: React.FC<DropdownProps> = ({ isOpen }) => {
         >
           <div className="flex justify-between items-center mb-5">
             <h3 className="font-semibold text-lg">Notifications</h3>
-            <button
-              onClick={handleMarkAllAsRead}
-              className="text-primary cursor-pointer"
-              aria-label="Mark all as read"
-            >
-              Mark all as read
-            </button>
+            {unviewNotificationCount > 0 && (
+              <button
+                onClick={handleMarkAllAsRead}
+                className="text-primary cursor-pointer"
+                aria-label="Mark all as read"
+              >
+                Mark all as read
+              </button>
+            )}
           </div>
 
           <div className="space-y-3 min-h-48 max-h-[400px] scrollbar-hide overflow-y-auto">
@@ -174,17 +181,10 @@ const NotificationsDropdown: React.FC<DropdownProps> = ({ isOpen }) => {
                     </div>
                   </div>
                 ))
-            ) : isError ? (
-              <div className="flex items-center justify-center py-8 text-red-500">
-                {error
-                  ? (error as TError)?.data?.message ||
-                    "Failed to load notifications"
-                  : "Something went wrong"}
-              </div>
             ) : allNotifications.length > 0 ? (
-              allNotifications.map((notification) => (
+              allNotifications?.map((notification) => (
                 <div
-                  key={notification._id}
+                  key={notification?._id}
                   onClick={() => handleNotificationClick(notification)}
                   className={`text-gray-800 hover:bg-[#ECFCFA] px-4 py-3 rounded-xl flex items-center gap-4 cursor-pointer transition-colors ${
                     !notification.viewStatus ? "bg-[#ECFCFA]" : ""
@@ -195,16 +195,19 @@ const NotificationsDropdown: React.FC<DropdownProps> = ({ isOpen }) => {
                     e.key === "Enter" && handleNotificationClick(notification)
                   }
                 >
-                  <Image
-                    src={
-                      notification.image ||
-                      "https://i.ibb.co.com/hFTPRsW0/0de9d1146da18068833210d399cd593e.jpg"
-                    }
-                    width={60}
-                    height={60}
-                    className="size-14 rounded-full flex-shrink-0 object-cover"
-                    alt="user"
-                  />
+                  {notification?.image ? (
+                    <Image
+                      src={notification?.image}
+                      width={40}
+                      height={40}
+                      className="size-[40px] rounded-full flex-shrink-0 object-cover"
+                      alt="user"
+                    />
+                  ) : (
+                    <div className="size-[40px] rounded-full bg-gray-300 flex items-center justify-center">
+                      🔔
+                    </div>
+                  )}
                   <div className="flex-1 min-w-0">
                     <p
                       className={`truncate ${

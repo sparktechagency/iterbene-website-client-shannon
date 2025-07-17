@@ -104,7 +104,7 @@ const SuggestionConnections: React.FC = () => {
     return null;
   }
 
-  console.log("Suggestions Connections:", responseData?.data?.attributes);
+  
   return (
     <section className="w-full">
       {/* Header Section */}

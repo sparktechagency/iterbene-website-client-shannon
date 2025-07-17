@@ -12,6 +12,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
+import Skeleton from "../custom/custom-skeleton";
 
 interface DropdownProps {
   user?: IUser;
@@ -129,12 +130,36 @@ const MessagesDropdown: React.FC<DropdownProps> = ({ isOpen, user }) => {
             } gap-3 min-h-48 max-h-[400px] scrollbar-hide overflow-y-auto`}
           >
             {isNotificationsLoading ? (
-              <div className="text-center text-gray-500">
-                Loading notifications...
-              </div>
+              Array(3)
+                .fill(null)
+                .map((_, index) => (
+                  <div
+                    key={index}
+                    className="animate-pulse px-4 py-3 rounded-xl flex items-center gap-4"
+                  >
+                    <Skeleton
+                      width="56px"
+                      height="56px"
+                      className="rounded-full"
+                    />
+                    <div className="flex-1 space-y-2">
+                      <Skeleton
+                        width="70%"
+                        height="0.8rem"
+                        className="rounded"
+                      />
+                      <Skeleton
+                        width="50%"
+                        height="0.4rem"
+                        className="rounded"
+                      />
+                    </div>
+                  </div>
+                ))
             ) : localNotifications?.length === 0 ? (
-              <div className="text-center text-gray-500">
-                No message notifications
+              <div className="flex flex-col items-center justify-center py-8 text-gray-500">
+                <div className="text-4xl mb-2">🔔</div>
+                <p className="text-sm">No message notifications yet</p>
               </div>
             ) : (
               localNotifications?.map(
@@ -144,14 +169,18 @@ const MessagesDropdown: React.FC<DropdownProps> = ({ isOpen, user }) => {
                     onClick={() => handleNotificationClick(notification)}
                     className="text-gray-800 hover:bg-[#ECFCFA] px-4 py-3 rounded-xl cursor-pointer flex items-center gap-4"
                   >
-                    {notification?.image && (
+                    {notification?.image ? (
                       <Image
                         src={notification?.image}
-                        width={60}
-                        height={60}
-                        className="size-14 rounded-full flex-shrink-0"
+                        width={40}
+                        height={40}
+                        className="size-[40px] rounded-full flex-shrink-0 object-cover"
                         alt="user"
                       />
+                    ) : (
+                      <div className="size-[40px] rounded-full bg-gray-300 flex items-center justify-center">
+                        🔔
+                      </div>
                     )}
                     <div className="flex-1 min-w-0">
                       <h1 className="font-medium truncate">
