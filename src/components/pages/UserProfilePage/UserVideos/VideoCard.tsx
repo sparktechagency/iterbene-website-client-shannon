@@ -1,4 +1,394 @@
-import { Pause, Play, Volume2, VolumeX, Maximize, Minimize, PictureInPicture } from "lucide-react";
+// import { Pause, Play, Volume2, VolumeX, Maximize, Minimize, PictureInPicture } from "lucide-react";
+// import React, { useEffect, useRef, useState } from "react";
+
+// interface VideoCardProps {
+//   url: string;
+//   className?: string;
+//   isVisible?: boolean;
+// }
+
+// const VideoCard = ({ url, className = "h-56 md:h-80", isVisible = true }: VideoCardProps) => {
+//   const videoRef = useRef<HTMLVideoElement>(null);
+//   const progressRef = useRef<HTMLDivElement>(null);
+//   const playPromiseRef = useRef<Promise<void> | null>(null);
+//   const [isPlaying, setIsPlaying] = useState(false);
+//   const [isMuted, setIsMuted] = useState(true); // Start muted to comply with autoplay policies
+//   const [isLoading, setIsLoading] = useState(true);
+//   const [progress, setProgress] = useState(0);
+//   const [currentTime, setCurrentTime] = useState(0);
+//   const [duration, setDuration] = useState(0);
+//   const [userInteracted, setUserInteracted] = useState(false);
+//   const [userPaused, setUserPaused] = useState(false); // Track if user manually paused
+//   const [isHovered, setIsHovered] = useState(false);
+//   const [error, setError] = useState<string | null>(null);
+//   const [isFullScreen, setIsFullScreen] = useState(false);
+
+//   const playVideo = React.useCallback(async () => {
+//     if (videoRef.current) {
+//       try {
+//         setIsLoading(true);
+//         if (playPromiseRef.current) {
+//           await playPromiseRef.current;
+//         }
+//         playPromiseRef.current = videoRef.current.play();
+//         await playPromiseRef.current;
+//         setIsPlaying(true);
+//         setError(null);
+//       } catch (error: unknown) {
+//         if (error && typeof error === "object" && "name" in error) {
+//           if ((error as { name?: string }).name === "NotAllowedError") {
+//             setError("Autoplay blocked. Please interact with the page.");
+//           } else if ((error as { name?: string }).name !== "AbortError") {
+//             console.log("Play failed:", error);
+//             setError("Play failed");
+//           }
+//         }
+//       } finally {
+//         setIsLoading(false);
+//         playPromiseRef.current = null;
+//       }
+//     }
+//   }, []);
+
+//   const pauseVideo = React.useCallback(() => {
+//     if (videoRef.current) {
+//       if (playPromiseRef.current) {
+//         playPromiseRef.current.then(() => {
+//           if (videoRef.current) {
+//             videoRef.current.pause();
+//             setIsPlaying(false);
+//           }
+//         });
+//       } else {
+//         videoRef.current.pause();
+//         setIsPlaying(false);
+//       }
+//     }
+//   }, []);
+
+//   // Handle visibility-based play/pause - only if user hasn't manually paused
+//   useEffect(() => {
+//     const timeoutId = setTimeout(() => {
+//       // Only auto-play/pause if user hasn't manually paused the video
+//       if (isVisible && !isPlaying && !isLoading && !userPaused) {
+//         playVideo();
+//       } else if (!isVisible && isPlaying && !userPaused) {
+//         pauseVideo();
+//       }
+//     }, 150);
+
+//     return () => clearTimeout(timeoutId);
+//   }, [isVisible, isPlaying, isLoading, userPaused, playVideo, pauseVideo]);
+
+//   useEffect(() => {
+//     const video = videoRef.current;
+//     if (!video) return;
+
+//     const handleLoadStart = () => {
+//       setIsLoading(true);
+//       setError(null);
+//     };
+
+//     const handleLoadedData = () => {
+//       setIsLoading(false);
+//     };
+
+//     const handleCanPlay = () => {
+//       setIsLoading(false);
+//       // Only auto-play if visible and user hasn't paused
+//       if (isVisible && !userInteracted && !userPaused) {
+//         playVideo();
+//       }
+//     };
+
+//     const handleWaiting = () => {
+//       setIsLoading(true);
+//     };
+
+//     const handlePlaying = () => {
+//       setIsLoading(false);
+//     };
+
+//     const handleTimeUpdate = () => {
+//       if (video.duration) {
+//         setProgress((video.currentTime / video.duration) * 100);
+//         setCurrentTime(video.currentTime);
+//       }
+//     };
+
+//     const handleLoadedMetadata = () => {
+//       if (video.duration && !isNaN(video.duration)) {
+//         setDuration(video.duration);
+//       }
+//     };
+
+//     const handleEnded = () => {
+//       setIsPlaying(false);
+//       setUserPaused(false); // Reset user pause state when video ends
+//     };
+
+//     const handleError = () => {
+//       setIsLoading(false);
+//       setError("Failed to load video");
+//     };
+
+//     const handleFullScreenChange = () => {
+//       setIsFullScreen(document.fullscreenElement === video);
+//     };
+
+//     video.addEventListener("loadstart", handleLoadStart);
+//     video.addEventListener("loadeddata", handleLoadedData);
+//     video.addEventListener("canplay", handleCanPlay);
+//     video.addEventListener("waiting", handleWaiting);
+//     video.addEventListener("playing", handlePlaying);
+//     video.addEventListener("contextmenu", (e) => e.preventDefault());
+//     video.addEventListener("timeupdate", handleTimeUpdate);
+//     video.addEventListener("loadedmetadata", handleLoadedMetadata);
+//     video.addEventListener("ended", handleEnded);
+//     video.addEventListener("error", handleError);
+//     document.addEventListener("fullscreenchange", handleFullScreenChange);
+
+//     if (video.readyState >= 1) {
+//       handleLoadedMetadata();
+//       setIsLoading(false);
+//     }
+
+//     return () => {
+//       video.removeEventListener("loadstart", handleLoadStart);
+//       video.removeEventListener("loadeddata", handleLoadedData);
+//       video.removeEventListener("canplay", handleCanPlay);
+//       video.removeEventListener("waiting", handleWaiting);
+//       video.removeEventListener("playing", handlePlaying);
+//       video.removeEventListener("timeupdate", handleTimeUpdate);
+//       video.removeEventListener("loadedmetadata", handleLoadedMetadata);
+//       video.removeEventListener("ended", handleEnded);
+//       video.removeEventListener("error", handleError);
+//       video.removeEventListener("contextmenu", (e) => e.preventDefault());
+//       document.removeEventListener("fullscreenchange", handleFullScreenChange);
+//     };
+//   }, [playVideo, userInteracted, isVisible, userPaused]);
+
+//   const togglePlay = async () => {
+//     setUserInteracted(true);
+
+//     if (videoRef.current && videoRef.current.ended) {
+//       videoRef.current.currentTime = 0;
+//       setProgress(0);
+//       setCurrentTime(0);
+//       setUserPaused(false); // Reset user pause state when restarting
+//     }
+
+//     if (isPlaying) {
+//       setUserPaused(true); // Mark as user paused
+//       pauseVideo();
+//     } else {
+//       setUserPaused(false); // Mark as user resumed
+//       await playVideo();
+//     }
+//   };
+
+//   const toggleMute = () => {
+//     if (videoRef.current) {
+//       videoRef.current.muted = !videoRef.current.muted;
+//       setIsMuted(videoRef.current.muted);
+//     }
+//     setUserInteracted(true);
+//   };
+
+//   const toggleFullScreen = async () => {
+//     if (!videoRef.current) return;
+//     try {
+//       if (!isFullScreen) {
+//         await videoRef.current.requestFullscreen();
+//       } else {
+//         await document.exitFullscreen();
+//       }
+//       setIsFullScreen(!isFullScreen);
+//     } catch (err) {
+//       console.error("Fullscreen toggle failed:", err);
+//     }
+//     setUserInteracted(true);
+//   };
+
+//   const togglePictureInPicture = async () => {
+//     if (!videoRef.current) return;
+//     try {
+//       if (document.pictureInPictureElement) {
+//         await document.exitPictureInPicture();
+//       } else {
+//         await videoRef.current.requestPictureInPicture();
+//       }
+//     } catch (err) {
+//       console.error("Picture-in-Picture toggle failed:", err);
+//     }
+//     setUserInteracted(true);
+//   };
+
+//   const handleProgressClick = (e: React.MouseEvent<HTMLDivElement>) => {
+//     e.stopPropagation();
+//     if (!progressRef.current || !videoRef.current) return;
+//     const rect = progressRef.current.getBoundingClientRect();
+//     const pos = (e.clientX - rect.left) / rect.width;
+//     videoRef.current.currentTime = pos * videoRef.current.duration;
+//     setUserInteracted(true);
+//   };
+
+//   const formatTime = (time: number) => {
+//     const minutes = Math.floor(time / 60);
+//     const seconds = Math.floor(time % 60);
+//     return `${minutes}:${seconds.toString().padStart(2, "0")}`;
+//   };
+
+//   const handleVideoClick = () => {
+//     setUserInteracted(true);
+//     togglePlay();
+//   };
+
+//   const handleMouseEnter = () => {
+//     setIsHovered(true);
+//   };
+
+//   const handleMouseLeave = () => {
+//     setIsHovered(false);
+//   };
+
+//   return (
+//     <div
+//       className="relative w-full rounded-2xl group bg-black overflow-hidden shadow-2xl"
+//       onClick={handleVideoClick}
+//       onMouseEnter={handleMouseEnter}
+//       onMouseLeave={handleMouseLeave}
+//     >
+//       <video
+//         ref={videoRef}
+//         src={url}
+//         className={`w-full ${className} object-cover ${isLoading ? "opacity-0" : "opacity-100"} transition-opacity duration-300`}
+//         controls={false}
+//         controlsList="nodownload"
+//         playsInline
+//         muted={isMuted}
+//         preload="metadata"
+//         loop={false}
+//       />
+
+//       {/* Loading Spinner */}
+//       {isLoading && (
+//         <div className="absolute inset-0 flex items-center justify-center bg-black">
+//           <div className="relative">
+//             <div className="w-8 h-8 border-2 border-gray-600 border-t-white rounded-full animate-spin"></div>
+//             <div className="absolute top-12 left-1/2 transform -translate-x-1/2 text-white text-xs whitespace-nowrap">
+//               Loading...
+//             </div>
+//           </div>
+//         </div>
+//       )}
+
+//       {/* Error State */}
+//       {error && !isLoading && (
+//         <div className="absolute inset-0 flex items-center justify-center bg-black">
+//           <div className="text-center text-white">
+//             <div className="text-2xl mb-2">⚠️</div>
+//             <p className="text-sm mb-3">{error}</p>
+//             <button
+//               onClick={(e) => {
+//                 e.stopPropagation();
+//                 setError(null);
+//                 setIsLoading(true);
+//                 setUserPaused(false); // Reset user pause state on retry
+//                 if (videoRef.current) {
+//                   videoRef.current.load();
+//                 }
+//               }}
+//               className="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg text-sm transition-colors cursor-pointer"
+//             >
+//               Retry
+//             </button>
+//           </div>
+//         </div>
+//       )}
+
+//       {/* Controls Overlay */}
+//       {isHovered && !isLoading && (
+//         <div className="absolute cursor-pointer inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20 z-10">
+//           {/* Bottom controls */}
+//           <div className="absolute bottom-4 left-4 right-4">
+//             {/* Progress bar */}
+//             <div
+//               ref={progressRef}
+//               className="
+//               w-full h-[3px] bg-white bg-opacity-30 rounded-full mb-3 cursor-pointer"
+//               onClick={handleProgressClick}
+//             >
+//               <div
+//                 className="h-full bg-primary rounded-full transition-all duration-100"
+//                 style={{ width: `${progress}%` }}
+//               />
+//             </div>
+
+//             {/* Time display */}
+//             <div className="flex justify-between items-center text-white text-sm">
+//               <button
+//                 onClick={(e) => {
+//                   e.stopPropagation();
+//                   togglePlay();
+//                 }}
+//                 className="bg-white/40 bg-opacity-50 p-2 rounded-full hover:bg-opacity-70 transition-all cursor-pointer"
+//               >
+//                 {isPlaying ? <Pause size={16} /> : <Play size={16} />}
+//               </button>
+//               <div className="flex items-center gap-3">
+//                 <div>
+//                   <span>{formatTime(currentTime)}</span>/
+//                   <span>{formatTime(duration)}</span>
+//                 </div>
+//                 <button
+//                   onClick={(e) => {
+//                     e.stopPropagation();
+//                     toggleMute();
+//                   }}
+//                   className="bg-white/40 bg-opacity-50 p-2 rounded-full text-white hover:bg-opacity-70 transition-all cursor-pointer"
+//                 >
+//                   {isMuted ? <VolumeX size={16} /> : <Volume2 size={16} />}
+//                 </button>
+//                 <button
+//                   onClick={(e) => {
+//                     e.stopPropagation();
+//                     togglePictureInPicture();
+//                   }}
+//                   className="bg-white/40 bg-opacity-50 p-2 rounded-full text-white hover:bg-opacity-70 transition-all cursor-pointer"
+//                 >
+//                   <PictureInPicture size={16} />
+//                 </button>
+//                 <button
+//                   onClick={(e) => {
+//                     e.stopPropagation();
+//                     toggleFullScreen();
+//                   }}
+//                   className="bg-white/40 bg-opacity-50 p-2 rounded-full text-white hover:bg-opacity-70 transition-all cursor-pointer"
+//                 >
+//                   {isFullScreen ? <Minimize size={16} /> : <Maximize size={16} />}
+//                 </button>
+//               </div>
+//             </div>
+//           </div>
+//         </div>
+//       )}
+//     </div>
+//   );
+// };
+
+// export default VideoCard;
+
+import { useVideoContext } from "@/context/VideoContext";
+import {
+  Pause,
+  Play,
+  Volume2,
+  VolumeX,
+  Maximize,
+  Minimize,
+  PictureInPicture,
+} from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
 
 interface VideoCardProps {
@@ -7,32 +397,59 @@ interface VideoCardProps {
   isVisible?: boolean;
 }
 
-const VideoCard = ({ url, className = "h-56 md:h-80", isVisible = true }: VideoCardProps) => {
+const VideoCard = ({
+  url,
+  className = "h-56 md:h-80",
+  isVisible = true,
+}: VideoCardProps) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const progressRef = useRef<HTMLDivElement>(null);
   const playPromiseRef = useRef<Promise<void> | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [isMuted, setIsMuted] = useState(true); // Start muted to comply with autoplay policies
+  const [isMuted, setIsMuted] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
   const [progress, setProgress] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [userInteracted, setUserInteracted] = useState(false);
-  const [userPaused, setUserPaused] = useState(false); // Track if user manually paused
+  const [userPaused, setUserPaused] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isFullScreen, setIsFullScreen] = useState(false);
+
+  // Generate unique video ID
+  const videoId = React.useMemo(
+    () =>
+      `video-${url.split("/").pop()}-${Math.random()
+        .toString(36)
+        .substr(2, 9)}`,
+    [url]
+  );
+
+  // Use video context
+  const { currentlyPlayingVideo, setCurrentlyPlayingVideo } = useVideoContext();
+
+  // Check if this video is currently playing
+  // const isCurrentlyPlaying = currentlyPlayingVideo === videoId;
 
   const playVideo = React.useCallback(async () => {
     if (videoRef.current) {
       try {
         setIsLoading(true);
+
+        // Pause any other currently playing video
+        if (currentlyPlayingVideo && currentlyPlayingVideo !== videoId) {
+          setCurrentlyPlayingVideo(null);
+        }
+
         if (playPromiseRef.current) {
           await playPromiseRef.current;
         }
         playPromiseRef.current = videoRef.current.play();
         await playPromiseRef.current;
+
         setIsPlaying(true);
+        setCurrentlyPlayingVideo(videoId);
         setError(null);
       } catch (error: unknown) {
         if (error && typeof error === "object" && "name" in error) {
@@ -48,7 +465,7 @@ const VideoCard = ({ url, className = "h-56 md:h-80", isVisible = true }: VideoC
         playPromiseRef.current = null;
       }
     }
-  }, []);
+  }, [videoId, currentlyPlayingVideo, setCurrentlyPlayingVideo]);
 
   const pauseVideo = React.useCallback(() => {
     if (videoRef.current) {
@@ -57,20 +474,40 @@ const VideoCard = ({ url, className = "h-56 md:h-80", isVisible = true }: VideoC
           if (videoRef.current) {
             videoRef.current.pause();
             setIsPlaying(false);
+            if (currentlyPlayingVideo === videoId) {
+              setCurrentlyPlayingVideo(null);
+            }
           }
         });
       } else {
         videoRef.current.pause();
         setIsPlaying(false);
+        if (currentlyPlayingVideo === videoId) {
+          setCurrentlyPlayingVideo(null);
+        }
       }
     }
-  }, []);
+  }, [videoId, currentlyPlayingVideo, setCurrentlyPlayingVideo]);
 
-  // Handle visibility-based play/pause - only if user hasn't manually paused
+  // Handle global video state changes
+  useEffect(() => {
+    if (currentlyPlayingVideo !== videoId && isPlaying) {
+      // Another video is playing, pause this one
+      pauseVideo();
+    }
+  }, [currentlyPlayingVideo, videoId, isPlaying, pauseVideo]);
+
+  // Handle visibility-based play/pause with auto-play logic
   useEffect(() => {
     const timeoutId = setTimeout(() => {
-      // Only auto-play/pause if user hasn't manually paused the video
-      if (isVisible && !isPlaying && !isLoading && !userPaused) {
+      if (
+        isVisible &&
+        !isPlaying &&
+        !isLoading &&
+        !userPaused &&
+        !currentlyPlayingVideo
+      ) {
+        // Auto-play only if no other video is playing
         playVideo();
       } else if (!isVisible && isPlaying && !userPaused) {
         pauseVideo();
@@ -78,7 +515,60 @@ const VideoCard = ({ url, className = "h-56 md:h-80", isVisible = true }: VideoC
     }, 150);
 
     return () => clearTimeout(timeoutId);
-  }, [isVisible, isPlaying, isLoading, userPaused, playVideo, pauseVideo]);
+  }, [
+    isVisible,
+    isPlaying,
+    isLoading,
+    userPaused,
+    currentlyPlayingVideo,
+    playVideo,
+    pauseVideo,
+  ]);
+
+  // Intersection Observer for auto-play when video comes into view
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0];
+        if (entry.isIntersecting) {
+          // Video is in view, auto-play if conditions are met
+          if (
+            !isPlaying &&
+            !userPaused &&
+            !currentlyPlayingVideo &&
+            !isLoading
+          ) {
+            playVideo();
+          }
+        } else {
+          // Video is out of view, pause if playing and user hasn't manually started it
+          if (isPlaying && !userInteracted) {
+            pauseVideo();
+          }
+        }
+      },
+      {
+        threshold: 0.5, // Play when 50% of video is visible
+      }
+    );
+
+    observer.observe(video);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, [
+    isPlaying,
+    userPaused,
+    currentlyPlayingVideo,
+    isLoading,
+    userInteracted,
+    playVideo,
+    pauseVideo,
+  ]);
 
   useEffect(() => {
     const video = videoRef.current;
@@ -95,10 +585,6 @@ const VideoCard = ({ url, className = "h-56 md:h-80", isVisible = true }: VideoC
 
     const handleCanPlay = () => {
       setIsLoading(false);
-      // Only auto-play if visible and user hasn't paused
-      if (isVisible && !userInteracted && !userPaused) {
-        playVideo();
-      }
     };
 
     const handleWaiting = () => {
@@ -124,7 +610,10 @@ const VideoCard = ({ url, className = "h-56 md:h-80", isVisible = true }: VideoC
 
     const handleEnded = () => {
       setIsPlaying(false);
-      setUserPaused(false); // Reset user pause state when video ends
+      setUserPaused(false);
+      if (currentlyPlayingVideo === videoId) {
+        setCurrentlyPlayingVideo(null);
+      }
     };
 
     const handleError = () => {
@@ -166,23 +655,23 @@ const VideoCard = ({ url, className = "h-56 md:h-80", isVisible = true }: VideoC
       video.removeEventListener("contextmenu", (e) => e.preventDefault());
       document.removeEventListener("fullscreenchange", handleFullScreenChange);
     };
-  }, [playVideo, userInteracted, isVisible, userPaused]);
+  }, [videoId, currentlyPlayingVideo, setCurrentlyPlayingVideo]);
 
   const togglePlay = async () => {
     setUserInteracted(true);
-    
+
     if (videoRef.current && videoRef.current.ended) {
       videoRef.current.currentTime = 0;
       setProgress(0);
       setCurrentTime(0);
-      setUserPaused(false); // Reset user pause state when restarting
+      setUserPaused(false);
     }
-    
+
     if (isPlaying) {
-      setUserPaused(true); // Mark as user paused
+      setUserPaused(true);
       pauseVideo();
     } else {
-      setUserPaused(false); // Mark as user resumed
+      setUserPaused(false);
       await playVideo();
     }
   };
@@ -262,7 +751,9 @@ const VideoCard = ({ url, className = "h-56 md:h-80", isVisible = true }: VideoC
       <video
         ref={videoRef}
         src={url}
-        className={`w-full ${className} object-cover ${isLoading ? "opacity-0" : "opacity-100"} transition-opacity duration-300`}
+        className={`w-full ${className} object-cover ${
+          isLoading ? "opacity-0" : "opacity-100"
+        } transition-opacity duration-300`}
         controls={false}
         controlsList="nodownload"
         playsInline
@@ -294,7 +785,7 @@ const VideoCard = ({ url, className = "h-56 md:h-80", isVisible = true }: VideoC
                 e.stopPropagation();
                 setError(null);
                 setIsLoading(true);
-                setUserPaused(false); // Reset user pause state on retry
+                setUserPaused(false);
                 if (videoRef.current) {
                   videoRef.current.load();
                 }
@@ -315,8 +806,7 @@ const VideoCard = ({ url, className = "h-56 md:h-80", isVisible = true }: VideoC
             {/* Progress bar */}
             <div
               ref={progressRef}
-              className=" 
-              w-full h-[3px] bg-white bg-opacity-30 rounded-full mb-3 cursor-pointer"
+              className="w-full h-[3px] bg-white bg-opacity-30 rounded-full mb-3 cursor-pointer"
               onClick={handleProgressClick}
             >
               <div
@@ -366,7 +856,11 @@ const VideoCard = ({ url, className = "h-56 md:h-80", isVisible = true }: VideoC
                   }}
                   className="bg-white/40 bg-opacity-50 p-2 rounded-full text-white hover:bg-opacity-70 transition-all cursor-pointer"
                 >
-                  {isFullScreen ? <Minimize size={16} /> : <Maximize size={16} />}
+                  {isFullScreen ? (
+                    <Minimize size={16} />
+                  ) : (
+                    <Maximize size={16} />
+                  )}
                 </button>
               </div>
             </div>

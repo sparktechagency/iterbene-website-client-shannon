@@ -8,6 +8,7 @@ import { IMedia } from "@/types/post.types";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
+import { VideoProvider } from "@/context/VideoContext";
 
 interface UserTimelineContentRenderProps {
   data: IMedia[];
@@ -27,23 +28,25 @@ const UserTimelineContentRender = ({
       >
         {data.map((media, index) => (
           <SwiperSlide key={index}>
-            <div className="w-full flex items-center justify-center">
-              {media.mediaType === "image" ? (
-                <Image
-                  src={media.mediaUrl}
-                  alt={`Timeline media ${index + 1}`}
-                  width={500}
-                  height={300}
-                  className="w-full h-[300px] object-cover cursor-pointer rounded-xl"
-                  priority={index === 0} // Optimize loading for the first image
-                />
-              ) : (
-                <VideoCard
-                  url={media.mediaUrl}
-                  className="w-full h-[300px]  rounded-xl"
-                />
-              )}
-            </div>
+            <VideoProvider>
+              <div className="w-full flex items-center justify-center">
+                {media.mediaType === "image" ? (
+                  <Image
+                    src={media.mediaUrl}
+                    alt={`Timeline media ${index + 1}`}
+                    width={500}
+                    height={300}
+                    className="w-full h-[300px] object-cover cursor-pointer rounded-xl"
+                    priority={index === 0} // Optimize loading for the first image
+                  />
+                ) : (
+                  <VideoCard
+                    url={media.mediaUrl}
+                    className="w-full h-[300px]  rounded-xl"
+                  />
+                )}
+              </div>
+            </VideoProvider>
           </SwiperSlide>
         ))}
       </Swiper>

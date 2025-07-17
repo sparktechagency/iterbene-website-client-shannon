@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 
 const LoginLoadingFallback = () => {
   return (
-    <div className="flex items-center justify-center py-8">
+    <div className="w-full h-screen flex items-center justify-center">
       <Loader2 className="animate-spin text-primary" size={28} />
     </div>
   );

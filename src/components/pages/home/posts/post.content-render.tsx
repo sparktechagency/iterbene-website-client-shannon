@@ -11,6 +11,7 @@ import useWindowSize from "@/hooks/useWindowSize";
 import Lightbox from "yet-another-react-lightbox";
 import "yet-another-react-lightbox/styles.css";
 import { useState } from "react";
+import { VideoProvider } from "@/context/VideoContext";
 
 interface PostContentRenderProps {
   data: IMedia[];
@@ -326,7 +327,7 @@ const PostContentRender = ({ data, isVisible }: PostContentRenderProps) => {
           ))}
         </Swiper>
       ) : (
-        renderDesktopLayout()
+        <VideoProvider>{renderDesktopLayout()}</VideoProvider>
       )}
       <Lightbox
         open={open}
