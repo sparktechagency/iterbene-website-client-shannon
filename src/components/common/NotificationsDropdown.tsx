@@ -43,14 +43,16 @@ const NotificationsDropdown: React.FC<DropdownProps> = ({ isOpen }) => {
       { key: "page", value: currentPage },
       { key: "limit", value: "10" },
     ],
-    { refetchOnMountOrArgChange: true }
+    { refetchOnMountOrArgChange: true, skip: !isOpen }
   );
 
   // Mark all as read mutation
   const [viewAllNotifications] = useViewAllNotificationsMutation();
 
   useEffect(() => {
-    refetch();
+    if (isOpen) {
+      refetch();
+    }
   }, [isOpen, refetch]);
 
   // Update notifications when data arrives

@@ -25,9 +25,9 @@ import formatPostReactionNumber from "@/utils/formatPostReactionNumber";
 
 interface PostCardProps {
   post: IPost;
-  onRemove?: () => void;
+  onPostDelete?: (postId: string) => void;
 }
-const UserTimelineCard = ({ post}: PostCardProps) => {
+const UserTimelineCard = ({ post, onPostDelete }: PostCardProps) => {
   const user = useUser();
   const currentUserId = user?._id;
   const [showReactions, setShowReactions] = useState<boolean>(false);
@@ -75,7 +75,7 @@ const UserTimelineCard = ({ post}: PostCardProps) => {
 
   return (
     <div className="w-full flex flex-col bg-white rounded-xl p-4 mb-4 relative">
-      <PostHeader post={post} />
+      <PostHeader post={post} onPostDelete={onPostDelete} />
       <p className="text-gray-700 flex-1 mb-3">
         {post?.content?.split(/(\s+)/).map((word, index) => {
           const isHashtag = word.match(/^#\w+/);

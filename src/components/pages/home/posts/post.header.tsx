@@ -29,11 +29,11 @@ import {
 
 interface PostHeaderProps {
   post: IPost;
-  onRemove?: () => void;
+  onPostDelete?: (postId: string) => void;
   onEditClick?: () => void;
 }
 
-const PostHeader = ({ post, onRemove, onEditClick }: PostHeaderProps) => {
+const PostHeader = ({ post, onPostDelete, onEditClick }: PostHeaderProps) => {
   const user = useUser();
   const [isOpen, setIsOpen] = useState(false);
   const triggerRef = useRef<HTMLButtonElement>(null);
@@ -108,8 +108,10 @@ const PostHeader = ({ post, onRemove, onEditClick }: PostHeaderProps) => {
     try {
       await deletePost(post._id).unwrap();
       setIsDeletePopupOpen(false);
+      if (onPostDelete) {
+        onPostDelete(post?._id);
+      }
       toast.success("Post deleted successfully!");
-      onRemove?.();
     } catch (error) {
       const err = error as TError;
       toast.error(err?.data?.message || "Failed to delete post");

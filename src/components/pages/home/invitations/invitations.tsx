@@ -29,6 +29,13 @@ const Invitations: React.FC = () => {
   const totalPages = responseData?.data?.attributes?.totalPages || 1;
   const invitationCount = responseData?.data?.attributes?.invitationCount || 0;
 
+  // update allInvitations when user accepect the invitation
+  const handleAcceptInvitation = (invitationId: string) => {
+    setAllInvitations((prevInvitations) =>
+      prevInvitations.filter((invitation) => invitation._id !== invitationId)
+    );
+  };
+
   // Append new invitations to allInvitations, avoiding duplicates
   useEffect(() => {
     const newInvitations = responseData?.data?.attributes?.results || [];
@@ -65,19 +72,19 @@ const Invitations: React.FC = () => {
         <MyUpComingTourSkeleton />
       </SwiperSlide>
     );
-  } else if (allInvitations.length === 0) {
+  } else if (allInvitations?.length === 0) {
     content = <p className="text-xl">No events found</p>;
   } else {
-    content = allInvitations.map((event: IEventInvitation) => (
-      <SwiperSlide key={event._id}>
-        <InvitationCard event={event} />
+    content = allInvitations?.map((event: IEventInvitation) => (
+      <SwiperSlide key={event?._id}>
+        <InvitationCard event={event} handleAcceptInvitation={handleAcceptInvitation} />
       </SwiperSlide>
     ));
   }
 
   return (
     <section className="w-full">
-      {allInvitations.length > 0 || isFetching ? (
+      {allInvitations?.length > 0 || isFetching ? (
         <>
           <div className="flex items-center justify-between">
             <h1 className="text-2xl font-semibold uppercase">Invitations</h1>
@@ -104,9 +111,7 @@ const Invitations: React.FC = () => {
             {content}
           </Swiper>
         </>
-      ) : (
-        null
-      )}
+      ) : null}
     </section>
   );
 };

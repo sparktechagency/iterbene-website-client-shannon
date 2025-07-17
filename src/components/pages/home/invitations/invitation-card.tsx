@@ -11,9 +11,10 @@ import { PiUserBold } from "react-icons/pi";
 
 interface UpcomingEventCardProps {
   event: IEventInvitation;
+  handleAcceptInvitation: (invitationId: string) => void;
 }
 
-const InvitationCard = ({ event }: UpcomingEventCardProps) => {
+const InvitationCard = ({ event,handleAcceptInvitation }: UpcomingEventCardProps) => {
   const [acceptInvitation, { isLoading: isAccepting }] =
     useAcceptEventInviteMutation();
   const [declineInvitation, { isLoading: isDeclining }] =
@@ -24,6 +25,9 @@ const InvitationCard = ({ event }: UpcomingEventCardProps) => {
         inviteId: event._id,
       };
       await acceptInvitation(payload).unwrap();
+      if (handleAcceptInvitation) {
+        handleAcceptInvitation(event?._id);
+      }
       toast.success("Invitation accepted successfully");
     } catch (error) {
       const err = error as TError;

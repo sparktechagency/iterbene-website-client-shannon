@@ -57,6 +57,13 @@ const UserTimeline = () => {
     setHasMore(true);
   }, [username]);
 
+  // state update when user delete posts
+  const onPostDelete = (postId: string) => {
+    setTimelinePosts((prevPosts) =>
+      prevPosts.filter((post) => post._id !== postId)
+    );
+  };
+
   // Set up IntersectionObserver for infinite scroll
   const lastPostElementRef = useCallback(
     (node: HTMLDivElement | null) => {
@@ -75,7 +82,7 @@ const UserTimeline = () => {
   );
 
   // Show loading skeletons for initial load
-  if (isLoading && timelinePosts.length === 0) {
+  if (isLoading && timelinePosts?.length === 0) {
     return (
       <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
         {Array.from({ length: 9 }).map((_, index) => (
@@ -86,7 +93,7 @@ const UserTimeline = () => {
   }
 
   // Show "Not available" message if no posts
-  if (!isLoading && timelinePosts.length === 0 && !hasMore) {
+  if (!isLoading && timelinePosts?.length === 0 && !hasMore) {
     return (
       <h1 className="text-center text-gray-500 py-8">No Post available</h1>
     );
@@ -95,21 +102,21 @@ const UserTimeline = () => {
   return (
     <div>
       <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-        {timelinePosts.map((post, index) => {
+        {timelinePosts?.map((post, index) => {
           // Attach ref to the last post for infinite scroll
-          if (index === timelinePosts.length - 1) {
+          if (index === timelinePosts?.length - 1) {
             return (
-              <div key={post._id} ref={lastPostElementRef}>
-                <UserTimelineCard post={post} />
+              <div key={post?._id} ref={lastPostElementRef}>
+                <UserTimelineCard post={post} onPostDelete={onPostDelete} />
               </div>
             );
           }
-          return <UserTimelineCard key={post._id} post={post} />;
+          return <UserTimelineCard key={post?._id} post={post} />;
         })}
       </div>
       {isFetching && hasMore && (
         <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 mt-3">
-          {Array.from({ length: 3 }).map((_, index) => (
+          {Array?.from({ length: 3 }).map((_, index) => (
             <UserTimelineSkeletonCard key={`skeleton-more-${index}`} />
           ))}
         </div>
