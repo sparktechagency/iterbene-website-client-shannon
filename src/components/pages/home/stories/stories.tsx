@@ -16,16 +16,16 @@ import { Swiper as SwiperCore } from "swiper/types";
 import useUser from "@/hooks/useUser";
 
 const Stories = () => {
+  const user = useUser();
   const [page, setPage] = useState(1);
   const [limit] = useState(10);
   const { data: storiesData, isLoading } = useGetFeedStoriesQuery(
     { page, limit },
-    { refetchOnMountOrArgChange: true }
+    { refetchOnMountOrArgChange: true, skip: !user }
   );
   const router = useRouter();
   const [stories, setStories] = useState<IStory[]>([]);
   const swiperRef = useRef<SwiperCore | null>(null);
-  const user = useUser();
 
   useEffect(() => {
     if (storiesData?.data?.attributes?.results) {

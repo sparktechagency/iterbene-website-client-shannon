@@ -168,8 +168,12 @@ const Header: React.FC = () => {
     useState<number>(0);
 
   // Get unviewed notification count
-  const { data: notificationCountData } =
-    useGetUnviewedNotificationsCountQuery(undefined);
+  const { data: notificationCountData } = useGetUnviewedNotificationsCountQuery(
+    undefined,
+    {
+      skip: !user,
+    }
+  );
 
   // set socket
   useEffect(() => {
@@ -231,7 +235,6 @@ const Header: React.FC = () => {
   const desktopSearchRef = useRef<HTMLDivElement>(null);
   //dispatch openAuthModal
   const dispatch = useAppDispatch();
-
 
   useEffect(() => {
     if (socket && user?._id) {

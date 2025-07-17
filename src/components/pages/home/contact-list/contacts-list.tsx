@@ -4,7 +4,9 @@ import ContactListCard from "./contact-list-card";
 import { useEffect, useState } from "react";
 import { IChat } from "@/types/chatTypes";
 import ContactListCardSkeleton from "./ContactListCardSkeleton";
+import useUser from "@/hooks/useUser";
 const ContactList: React.FC = () => {
+  const user = useUser();
   const { data: responseData, isLoading } = useGetChatsQuery(
     [
       {
@@ -19,6 +21,7 @@ const ContactList: React.FC = () => {
     {
       refetchOnMountOrArgChange: true,
       refetchOnFocus: true,
+      skip: !user,
     }
   );
   const totalResults = responseData?.data?.attributes?.totalResults;

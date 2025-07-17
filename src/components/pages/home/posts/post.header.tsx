@@ -53,7 +53,7 @@ const PostHeader = ({ post, onEditClick, refetch }: PostHeaderProps) => {
   // Check if post is saved
   const { data: isSaved, isLoading: isCheckingSaved } = useIsPostSavedQuery(
     post?._id,
-    { skip: !post?._id }
+    { skip: !post?._id || !user?._id }
   );
 
   // Save post

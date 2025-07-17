@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import toast from "react-hot-toast";
 
 const GOOGLE_MAPS_API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAP_API_KEY || "";
 
@@ -239,7 +238,7 @@ export const useGoogleLocationSearch = (
         const finalError =
           "Failed to initialize location services after multiple attempts. Please refresh the page.";
         setError(finalError);
-        toast.error(finalError);
+        window.location.reload();
       }
     }
   }, [
