@@ -34,8 +34,9 @@ import Link from "next/link";
 
 interface PostCardProps {
   post: IPost;
+  refetch?: () => void;
 }
-const PostCard = ({ post }: PostCardProps) => {
+const PostCard = ({ post,refetch }: PostCardProps) => {
   const user = useUser();
   const postRef = useRef<HTMLDivElement>(null);
   const [isVisible, setIsVisible] = useState(false);
@@ -126,6 +127,7 @@ const PostCard = ({ post }: PostCardProps) => {
   const handleReaction = async (reactionType: string) => {
     try {
       await addOrRemoveReaction({ postId: post?._id, reactionType }).unwrap();
+      refetch?.();
       setShowReactions(false);
     } catch (error) {
       const err = error as TError;
@@ -143,6 +145,7 @@ const PostCard = ({ post }: PostCardProps) => {
       setShowItineraryModal(true);
       const payload = { postId: post?._id, itineraryId: post?.itinerary?._id };
       await incrementItinerary(payload).unwrap();
+      refetch?.();
     } catch (error) {
       const err = error as TError;
       toast.error(err?.data?.message || "Something went wrong!");
@@ -151,7 +154,7 @@ const PostCard = ({ post }: PostCardProps) => {
 
   return (
     <div ref={postRef} className="w-full bg-white rounded-xl p-4 mb-4 relative">
-      <PostHeader post={post} onEditClick={() => setShowEditModal(true)} />
+      <PostHeader post={post} onEditClick={() => setShowEditModal(true)} refetch={refetch} />
       <p className="text-gray-700 mb-4">
         {post?.content?.split(/(\s+)/)?.map((word, index) => {
           const isHashtag = word?.match(/^#\w+/);

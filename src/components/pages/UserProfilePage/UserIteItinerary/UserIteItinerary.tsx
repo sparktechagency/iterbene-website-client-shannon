@@ -1,6 +1,6 @@
 "use client";
 import { useGetUserTimelinePostsQuery } from "@/redux/features/post/postApi";
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { IPost } from "@/types/post.types";
 import { useParams } from "next/navigation";
 import UserIteItineraryCard from "./UserIteItineraryCard";
@@ -12,8 +12,15 @@ const UserIteItinerary = () => {
   const [itineraryPosts, setItineraryPosts] = useState<IPost[]>([]);
   const [removePostIds, setRemovePostIds] = useState<string[]>([]);
   const [hasMore, setHasMore] = useState(true);
+  const [loading, setLoading] = useState(false);
   const observer = useRef<IntersectionObserver | null>(null);
-  const loaderRef = useRef<HTMLDivElement | null>(null);
+
+  const username =
+    typeof userName === "string"
+      ? userName
+      : Array.isArray(userName)
+      ? userName[0]
+      : "";
 
   // Get user itinerary posts
   const {
@@ -22,7 +29,7 @@ const UserIteItinerary = () => {
     isFetching,
   } = useGetUserTimelinePostsQuery(
     {
-      username: userName,
+      username,
       filters: [
         { key: "mediaType", value: "itinerary" },
         { key: "page", value: currentPage.toString() },
@@ -31,35 +38,83 @@ const UserIteItinerary = () => {
     },
     {
       refetchOnMountOrArgChange: true,
-      skip: !userName,
+      skip: !username,
     }
   );
 
-  // Update itinerary posts when new data is fetched, ensuring no duplicate _id values
-  useEffect(() => {
-    const userItineraryData = responseData?.data?.attributes?.results || [];
-    if (userItineraryData?.length > 0) {
-      setItineraryPosts((prev) => {
-        const existingIds = new Set(prev.map((post) => post._id));
-        const newPosts = userItineraryData.filter(
-          (post: IPost) =>
-            !existingIds.has(post._id) && !removePostIds.includes(post._id)
-        );
-        return currentPage === 1 ? newPosts : [...prev, ...newPosts];
-      });
-      setHasMore(currentPage < (responseData.data.attributes.totalPages || 0));
-    }
-  }, [responseData, currentPage, removePostIds]);
+  // Get current page posts from RTK Query cache
+  const currentPagePosts = useMemo(
+    () =>
+      Array.isArray(responseData?.data?.attributes?.results)
+        ? (responseData.data.attributes.results as IPost[])
+        : [],
+    [responseData]
+  );
 
-  // Reset itinerary posts and removed post IDs when userName changes
+  const totalPages = responseData?.data?.attributes?.totalPages;
+
+  // Add new posts to itineraryPosts when currentPage-posts changes
+  useEffect(() => {
+    if (currentPagePosts?.length > 0) {
+      if (currentPage === 1) {
+        // Reset posts for first page
+        setItineraryPosts(
+          currentPagePosts.filter((post) => !removePostIds.includes(post._id))
+        );
+      } else {
+        // Append new posts, avoiding duplicates and removed posts
+        setItineraryPosts((prevPosts) => {
+          const existingIds = new Set(prevPosts?.map((post) => post?._id));
+          const newPosts = currentPagePosts?.filter(
+            (post) =>
+              !existingIds.has(post._id) && !removePostIds.includes(post._id)
+          );
+          return [...prevPosts, ...newPosts];
+        });
+      }
+    }
+  }, [currentPagePosts, currentPage, removePostIds]);
+
+  // Handle real-time updates: merge updated posts from RTK Query cache
+  useEffect(() => {
+    if (currentPagePosts?.length > 0 && itineraryPosts?.length > 0) {
+      setItineraryPosts((prevPosts) => {
+        return prevPosts?.map((existingPost) => {
+          const updatedPost = currentPagePosts?.find(
+            (p) => p?._id === existingPost?._id
+          );
+          return updatedPost || existingPost;
+        });
+      });
+    }
+  }, [currentPagePosts, itineraryPosts?.length]);
+
+  // Update loading and hasMore states
+  useEffect(() => {
+    if (isLoading) {
+      setLoading(true);
+    } else {
+      setLoading(false);
+      setHasMore(currentPage < (totalPages || 0));
+    }
+  }, [isLoading, currentPage, totalPages]);
+
+  // Reset itinerary posts and removed post IDs when username changes
   useEffect(() => {
     setItineraryPosts([]);
     setRemovePostIds([]);
     setCurrentPage(1);
     setHasMore(true);
-  }, [userName]);
+  }, [username]);
 
-  // Set up IntersectionObserver for infinite scroll (from Posts)
+  // Load more posts function
+  const loadMore = useCallback(() => {
+    if (!loading && hasMore) {
+      setCurrentPage((prev) => prev + 1);
+    }
+  }, [loading, hasMore]);
+
+  // Set up IntersectionObserver for infinite scroll (last post)
   const lastPostElementRef = useCallback(
     (node: HTMLDivElement | null) => {
       if (isLoading || isFetching) return;
@@ -76,6 +131,27 @@ const UserIteItinerary = () => {
     [isLoading, isFetching, hasMore]
   );
 
+  // Infinite scroll with IntersectionObserver (for sentinel)
+  useEffect(() => {
+    if (!hasMore || loading) return;
+
+    const observerInstance = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          loadMore();
+        }
+      },
+      { threshold: 0.11 }
+    );
+
+    const sentinel = document.getElementById("sentinel");
+    if (sentinel) observerInstance.observe(sentinel);
+
+    return () => {
+      if (sentinel) observerInstance.unobserve(sentinel);
+    };
+  }, [loadMore, loading, hasMore]);
+
   const handleRemovePost = (postId: string) => {
     setRemovePostIds((prev) => [...prev, postId]);
     setItineraryPosts((prev) => prev.filter((post) => post._id !== postId));
@@ -90,9 +166,9 @@ const UserIteItinerary = () => {
   );
 
   let content = null;
-  if (isLoading && currentPage === 1) {
+  if (isLoading && itineraryPosts?.length === 0) {
     content = renderLoading();
-  } else if (itineraryPosts.length === 0 && !isLoading) {
+  } else if (itineraryPosts.length === 0 && !hasMore) {
     content = (
       <h1 className="text-center text-gray-500 py-8">No itinerary available</h1>
     );
@@ -126,14 +202,14 @@ const UserIteItinerary = () => {
   return (
     <div>
       {content}
-      {isFetching && currentPage > 1 && (
+      {isFetching && hasMore && (
         <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-3">
           {Array.from({ length: 3 }).map((_, index) => (
             <UserTimelineSkeletonCard key={`skeleton-more-${index}`} />
           ))}
         </div>
       )}
-      <div ref={loaderRef} className="h-10" />
+      <div id="sentinel" style={{ height: "1px" }} />
     </div>
   );
 };

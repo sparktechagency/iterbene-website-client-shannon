@@ -2,17 +2,17 @@
 import { useFeedPostsQuery } from "@/redux/features/post/postApi";
 import { IPost } from "@/types/post.types";
 import PostCard from "./post-card";
-import { useState, useEffect, useCallback, useRef } from "react";
-import useUser from "@/hooks/useUser";
 import PostCardSkeleton from "./PostCardSkeleton";
+import { useState, useEffect, useCallback, useRef, useMemo } from "react";
+import useUser from "@/hooks/useUser";
 
 const Posts = () => {
   const user = useUser();
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [allPosts, setAllPosts] = useState<IPost[]>([]);
   const [hasMore, setHasMore] = useState(true);
+  const [loading, setLoading] = useState(false);
   const observer = useRef<IntersectionObserver | null>(null);
-  const loaderRef = useRef<HTMLDivElement | null>(null);
 
   const {
     data: responseData,
@@ -31,20 +31,64 @@ const Posts = () => {
     }
   );
 
-  // Process fetched posts
+  // Get current page posts from RTK Query cache
+  const currentPagePosts = useMemo(
+    () =>
+      Array.isArray(responseData?.data?.attributes?.results)
+        ? (responseData.data.attributes.results as IPost[])
+        : [],
+    [responseData]
+  );
+
+  const totalPages = responseData?.data?.attributes?.totalPages;
+
+  // Add new posts to allPosts when currentPagePosts changes
   useEffect(() => {
-    if (responseData?.data?.attributes?.results) {
-      setAllPosts((prevPosts) => {
-        // Filter out duplicates based on post ID
-        const newPosts = responseData.data.attributes.results.filter(
-          (newPost: IPost) =>
-            !prevPosts.some((post) => post._id === newPost._id)
-        );
-        return [...prevPosts, ...newPosts];
-      });
-      setHasMore(currentPage < responseData.data.attributes.totalPages);
+    if (currentPagePosts?.length > 0) {
+      if (currentPage === 1) {
+        setAllPosts(currentPagePosts);
+      } else {
+        setAllPosts((prevPosts) => {
+          const existingIds = new Set(prevPosts?.map((post) => post?._id));
+          const newPosts = currentPagePosts?.filter(
+            (post) => !existingIds.has(post._id)
+          );
+          return [...prevPosts, ...newPosts];
+        });
+      }
     }
-  }, [responseData, currentPage]);
+  }, [currentPagePosts, currentPage]);
+
+  // Handle real-time updates: merge updated posts from RTK Query cache
+  useEffect(() => {
+    if (currentPagePosts?.length > 0 && allPosts?.length > 0) {
+      setAllPosts((prevPosts) => {
+        return prevPosts?.map((existingPost) => {
+          const updatedPost = currentPagePosts?.find(
+            (p) => p?._id === existingPost?._id
+          );
+          return updatedPost || existingPost;
+        });
+      });
+    }
+  }, [allPosts?.length, currentPagePosts]);
+
+  // Update loading and hasMore states
+  useEffect(() => {
+    if (isLoading) {
+      setLoading(true);
+    } else {
+      setLoading(false);
+      setHasMore(currentPage < (totalPages || 0));
+    }
+  }, [isLoading, currentPage, totalPages]);
+
+  // Load more posts function
+  const loadMore = useCallback(() => {
+    if (!loading && hasMore) {
+      setCurrentPage((prev) => prev + 1);
+    }
+  }, [loading, hasMore]);
 
   // Set up IntersectionObserver for infinite scroll
   const lastPostElementRef = useCallback(
@@ -62,6 +106,27 @@ const Posts = () => {
     },
     [isLoading, isFetching, hasMore]
   );
+
+  // Infinite scroll with IntersectionObserver (for sentinel)
+  useEffect(() => {
+    if (!hasMore || loading) return;
+
+    const observerInstance = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          loadMore();
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    const sentinel = document.getElementById("sentinel");
+    if (sentinel) observerInstance.observe(sentinel);
+
+    return () => {
+      if (sentinel) observerInstance.unobserve(sentinel);
+    };
+  }, [loadMore, loading, hasMore]);
 
   // Show loading skeletons for initial load
   if (isLoading && allPosts?.length === 0) {
@@ -99,12 +164,12 @@ const Posts = () => {
       {/* Loading indicator for fetching more posts */}
       {isFetching && hasMore && (
         <div className="w-full text-center py-4">
-          {Array?.from({ length: 2 }).map((_, index) => (
+          {Array.from({ length: 2 }).map((_, index) => (
             <PostCardSkeleton key={`fetching-${index}`} />
           ))}
         </div>
       )}
-      <div ref={loaderRef} />
+      <div id="sentinel" style={{ height: "1px" }} />
     </div>
   );
 };

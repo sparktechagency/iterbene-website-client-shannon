@@ -48,13 +48,15 @@ const InvitedGroupCard = ({
     <div className="w-full bg-white rounded-2xl  p-4 flex flex-col items-center">
       {/* Group Image */}
       <div className="w-full h-56 md:h-60 lg:h-[248px]  bg-gray-200 rounded-xl mb-4 relative">
-        <Image
-          src={group?.groupId?.groupImage}
-          alt={group?.groupId?.name}
-          width={248}
-          height={248}
-          className="w-full h-56 md:h-60 lg:h-[248px] object-cover rounded-2xl mb-4"
-        />
+        {group?.groupId?.groupImage && (
+          <Image
+            src={group?.groupId?.groupImage}
+            alt={group?.groupId?.name}
+            width={248}
+            height={248}
+            className="w-full h-56 md:h-60 lg:h-[248px] object-cover rounded-2xl mb-4"
+          />
+        )}
         <div className="absolute top-0 left-0 right-0 bottom-0 bg-gray-950/20 rounded-xl"></div>
         {/* Member Count Overlay */}
         <div className="absolute top-5 right-5 bg-white rounded-full px-4 py-2 flex items-center gap-1">
