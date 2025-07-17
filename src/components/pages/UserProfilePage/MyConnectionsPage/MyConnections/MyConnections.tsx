@@ -1,14 +1,27 @@
 "use client";
-import { IConnection } from "@/types/connection.types";
-import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useGetMyConnectionsQuery } from "@/redux/features/connections/connectionsApi";
+import { useEffect, useRef, useCallback } from "react";
+import { IConnection } from "@/types/connection.types";
 import MyConnectionCard from "./MyConnectionCard";
 import MyConnectionsSkeleton from "./MyConnectionsSkeleton";
 
-const MyConnections = () => {
-  const [currentPage, setCurrentPage] = useState<number>(1);
-  const [connections, setConnections] = useState<IConnection[]>([]);
-  const [hasMore, setHasMore] = useState(true);
+interface MyConnectionsProps {
+  connections: IConnection[];
+  setConnections: React.Dispatch<React.SetStateAction<IConnection[]>>;
+  currentPage: number;
+  setCurrentPage: React.Dispatch<React.SetStateAction<number>>;
+  hasMore: boolean;
+  setHasMore: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+const MyConnections = ({
+  connections,
+  setConnections,
+  currentPage,
+  setCurrentPage,
+  hasMore,
+  setHasMore,
+}: MyConnectionsProps) => {
   const observer = useRef<IntersectionObserver | null>(null);
   const loaderRef = useRef<HTMLDivElement | null>(null);
 
@@ -43,10 +56,9 @@ const MyConnections = () => {
       });
       setHasMore(currentPage < (responseData.data.attributes.totalPages || 0));
     }
-  }, [responseData, currentPage]);
+  }, [responseData, currentPage, setConnections, setHasMore]);
 
-
-  // Set up IntersectionObserver for infinite scroll (from Posts)
+  // Set up IntersectionObserver for infinite scroll
   const lastConnectionElementRef = useCallback(
     (node: HTMLDivElement | null) => {
       if (isLoading || isFetching) return;
@@ -60,7 +72,7 @@ const MyConnections = () => {
 
       if (node) observer.current.observe(node);
     },
-    [isLoading, isFetching, hasMore]
+    [isLoading, isFetching, hasMore, setCurrentPage]
   );
 
   const renderLoading = () => (

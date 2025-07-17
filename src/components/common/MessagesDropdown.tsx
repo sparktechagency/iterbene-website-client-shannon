@@ -30,11 +30,16 @@ const MessagesDropdown: React.FC<DropdownProps> = ({ isOpen, user }) => {
     data: responseData,
     isLoading: isNotificationsLoading,
     refetch,
-  } = useGetAllNotificationsQuery([
-    { key: "page", value: 1 },
-    { key: "limit", value: 10 },
-    { key: "type", value: "message" },
-  ]);
+  } = useGetAllNotificationsQuery(
+    [
+      { key: "page", value: 1 },
+      { key: "limit", value: 10 },
+      { key: "type", value: "message" },
+    ],
+    {
+      skip: !isOpen,
+    }
+  );
 
   // Local state to manage notifications
   const [localNotifications, setLocalNotifications] = useState<INotification[]>(

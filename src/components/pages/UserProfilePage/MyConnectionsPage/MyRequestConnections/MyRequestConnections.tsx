@@ -1,14 +1,29 @@
 "use client";
 import { useGetConnectionRequestsQuery } from "@/redux/features/connections/connectionsApi";
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useEffect, useRef, useCallback } from "react";
 import { IConnectionRequest } from "@/types/connection.types";
 import MyRequestConnectionCard from "./MyRequestConnectionCard";
 import MyRequestConnectionSkeleton from "./MyRequestConnectionSkeleton";
 
-const RequestConnections = () => {
-  const [currentPage, setCurrentPage] = useState<number>(1);
-  const [connectionRequests, setConnectionRequests] = useState<IConnectionRequest[]>([]);
-  const [hasMore, setHasMore] = useState(true);
+interface MyRequestConnectionsProps {
+  connectionRequests: IConnectionRequest[];
+  setConnectionRequests: React.Dispatch<
+    React.SetStateAction<IConnectionRequest[]>
+  >;
+  currentPage: number;
+  setCurrentPage: React.Dispatch<React.SetStateAction<number>>;
+  hasMore: boolean;
+  setHasMore: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+const MyRequestConnections = ({
+  connectionRequests,
+  setConnectionRequests,
+  currentPage,
+  setCurrentPage,
+  hasMore,
+  setHasMore,
+}: MyRequestConnectionsProps) => {
   const observer = useRef<IntersectionObserver | null>(null);
   const loaderRef = useRef<HTMLDivElement | null>(null);
 
@@ -19,7 +34,7 @@ const RequestConnections = () => {
     isFetching,
   } = useGetConnectionRequestsQuery([
     { key: "page", value: currentPage.toString() },
-    { key: "limit", value: "9" }
+    { key: "limit", value: "9" },
   ]);
 
   // Update connection requests when new data is fetched, ensuring no duplicate _id values
@@ -35,10 +50,9 @@ const RequestConnections = () => {
       });
       setHasMore(currentPage < (responseData.data.attributes.totalPages || 0));
     }
-  }, [responseData, currentPage]);
+  }, [responseData, currentPage, setConnectionRequests, setHasMore]);
 
-
-  // Set up IntersectionObserver for infinite scroll (from Posts)
+  // Set up IntersectionObserver for infinite scroll
   const lastRequestElementRef = useCallback(
     (node: HTMLDivElement | null) => {
       if (isLoading || isFetching) return;
@@ -52,7 +66,7 @@ const RequestConnections = () => {
 
       if (node) observer.current.observe(node);
     },
-    [isLoading, isFetching, hasMore]
+    [isLoading, isFetching, hasMore, setCurrentPage]
   );
 
   const renderLoading = () => (
@@ -84,7 +98,9 @@ const RequestConnections = () => {
               </div>
             );
           }
-          return <MyRequestConnectionCard key={request._id} connection={request} />;
+          return (
+            <MyRequestConnectionCard key={request._id} connection={request} />
+          );
         })}
       </div>
     );
@@ -105,4 +121,4 @@ const RequestConnections = () => {
   );
 };
 
-export default RequestConnections;
+export default MyRequestConnections;

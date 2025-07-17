@@ -1,11 +1,19 @@
 "use client";
-import React, { useState } from "react";
+import { useState } from "react";
 import MyConnections from "./MyConnections/MyConnections";
 import MyRequestConnections from "./MyRequestConnections/MyRequestConnections";
-// import SelectField from "@/components/custom/SelectField";
+import { IConnection, IConnectionRequest } from "@/types/connection.types";
+
 const MyConnectionsPage = () => {
   const [activeTab, setActiveTab] = useState<string>("My Connections");
-  // const [sortBy, setSortBy] = useState<string>("");
+  const [connections, setConnections] = useState<IConnection[]>([]);
+  const [connectionRequests, setConnectionRequests] = useState<
+    IConnectionRequest[]
+  >([]);
+  const [connectionsPage, setConnectionsPage] = useState<number>(1);
+  const [requestsPage, setRequestsPage] = useState<number>(1);
+  const [hasMoreConnections, setHasMoreConnections] = useState<boolean>(true);
+  const [hasMoreRequests, setHasMoreRequests] = useState<boolean>(true);
 
   return (
     <section className="w-full pb-20">
@@ -31,40 +39,29 @@ const MyConnectionsPage = () => {
             Requests
           </button>
         </div>
-        {/* <div className="w-full max-w-40">
-          <SelectField
-            items={[
-              {
-                label: "Recently",
-                value: "createdAt",
-              },
-              {
-                label: "Name (A-Z)",
-                value: "nameAsc",
-              },
-              {
-                label: "Name (Z-A)",
-                value: "nameDesc",
-              },
-              {
-                label: "Oldest First",
-                value: "-createdAt",
-              },
-            ]}
-            name="sortBy"
-            fullWidth
-            value={sortBy}
-            placeholder="Sort By"
-            onChange={(e) => setSortBy(e.target.value)}
-          />
-        </div> */}
       </div>
       {/* Content */}
-      {activeTab === "My Connections" ? (
-        <MyConnections />
-      ) : (
-        <MyRequestConnections />
-      )}
+      <div className="w-full">
+        {activeTab === "My Connections" ? (
+          <MyConnections
+            connections={connections}
+            setConnections={setConnections}
+            currentPage={connectionsPage}
+            setCurrentPage={setConnectionsPage}
+            hasMore={hasMoreConnections}
+            setHasMore={setHasMoreConnections}
+          />
+        ) : (
+          <MyRequestConnections
+            connectionRequests={connectionRequests}
+            setConnectionRequests={setConnectionRequests}
+            currentPage={requestsPage}
+            setCurrentPage={setRequestsPage}
+            hasMore={hasMoreRequests}
+            setHasMore={setHasMoreRequests}
+          />
+        )}
+      </div>
     </section>
   );
 };

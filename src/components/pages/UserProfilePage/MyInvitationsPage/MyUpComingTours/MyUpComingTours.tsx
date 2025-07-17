@@ -1,14 +1,27 @@
 "use client";
 import { useGetMyInterestedEventsQuery } from "@/redux/features/event/eventApi";
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useEffect, useRef, useCallback } from "react";
 import { IEvent } from "@/types/event.types";
 import MyUpComingTourCard from "./MyUpComingTourCard";
 import MyUpComingTourSkeleton from "./MyUpComingTourSkeleton";
 
-const MyUpComingTours = () => {
-  const [currentPage, setCurrentPage] = useState<number>(1);
-  const [interestedEvents, setInterestedEvents] = useState<IEvent[]>([]);
-  const [hasMore, setHasMore] = useState(true);
+interface MyUpComingToursProps {
+  interestedEvents: IEvent[];
+  setInterestedEvents: React.Dispatch<React.SetStateAction<IEvent[]>>;
+  currentPage: number;
+  setCurrentPage: React.Dispatch<React.SetStateAction<number>>;
+  hasMore: boolean;
+  setHasMore: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+const MyUpComingTours = ({
+  interestedEvents,
+  setInterestedEvents,
+  currentPage,
+  setCurrentPage,
+  hasMore,
+  setHasMore,
+}: MyUpComingToursProps) => {
   const observer = useRef<IntersectionObserver | null>(null);
   const loaderRef = useRef<HTMLDivElement | null>(null);
 
@@ -35,10 +48,9 @@ const MyUpComingTours = () => {
       });
       setHasMore(currentPage < (responseData.data.attributes.totalPages || 0));
     }
-  }, [responseData, currentPage]);
+  }, [responseData, currentPage, setInterestedEvents, setHasMore]);
 
-
-  // Set up IntersectionObserver for infinite scroll (from Posts)
+  // Set up IntersectionObserver for infinite scroll
   const lastEventElementRef = useCallback(
     (node: HTMLDivElement | null) => {
       if (isLoading || isFetching) return;
@@ -52,7 +64,7 @@ const MyUpComingTours = () => {
 
       if (node) observer.current.observe(node);
     },
-    [isLoading, isFetching, hasMore]
+    [isLoading, isFetching, hasMore, setCurrentPage]
   );
 
   const renderLoading = () => (
@@ -92,7 +104,7 @@ const MyUpComingTours = () => {
     <div>
       {content}
       {isFetching && currentPage > 1 && (
-        <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-43 gap-3 mt-3">
+        <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 mt-3">
           {Array.from({ length: 3 }).map((_, index) => (
             <MyUpComingTourSkeleton key={`skeleton-more-${index}`} />
           ))}

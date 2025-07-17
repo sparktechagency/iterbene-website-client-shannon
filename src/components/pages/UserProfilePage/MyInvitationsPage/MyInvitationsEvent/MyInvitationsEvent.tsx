@@ -1,16 +1,27 @@
 "use client";
 import { useGetMyInvitesQuery } from "@/redux/features/event/eventApi";
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useEffect, useRef, useCallback } from "react";
 import { IEventInvitation } from "@/types/event.types";
 import InvitedEventCard from "@/components/pages/events/invited-events/invited-event-card";
 import MyInvitationsEventSkeleton from "./MyInvitationsEventSkeleton";
 
-const MyInvitationsEvent = () => {
-  const [currentPage, setCurrentPage] = useState<number>(1);
-  const [eventInvitations, setEventInvitations] = useState<IEventInvitation[]>(
-    []
-  );
-  const [hasMore, setHasMore] = useState(true);
+interface MyInvitationsEventProps {
+  eventInvitations: IEventInvitation[];
+  setEventInvitations: React.Dispatch<React.SetStateAction<IEventInvitation[]>>;
+  currentPage: number;
+  setCurrentPage: React.Dispatch<React.SetStateAction<number>>;
+  hasMore: boolean;
+  setHasMore: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+const MyInvitationsEvent = ({
+  eventInvitations,
+  setEventInvitations,
+  currentPage,
+  setCurrentPage,
+  hasMore,
+  setHasMore,
+}: MyInvitationsEventProps) => {
   const observer = useRef<IntersectionObserver | null>(null);
   const loaderRef = useRef<HTMLDivElement | null>(null);
 
@@ -21,7 +32,7 @@ const MyInvitationsEvent = () => {
     isFetching,
   } = useGetMyInvitesQuery([
     { key: "page", value: currentPage.toString() },
-    { key: "limit", value: "9" }
+    { key: "limit", value: "9" },
   ]);
 
   // Update event invitations when new data is fetched, ensuring no duplicate _id values
@@ -37,10 +48,9 @@ const MyInvitationsEvent = () => {
       });
       setHasMore(currentPage < (responseData.data.attributes.totalPages || 0));
     }
-  }, [responseData, currentPage]);
+  }, [responseData, currentPage, setEventInvitations, setHasMore]);
 
-
-  // Set up IntersectionObserver for infinite scroll (from Posts)
+  // Set up IntersectionObserver for infinite scroll
   const lastEventElementRef = useCallback(
     (node: HTMLDivElement | null) => {
       if (isLoading || isFetching) return;
@@ -54,7 +64,7 @@ const MyInvitationsEvent = () => {
 
       if (node) observer.current.observe(node);
     },
-    [isLoading, isFetching, hasMore]
+    [isLoading, isFetching, hasMore, setCurrentPage]
   );
 
   const renderLoading = () => (

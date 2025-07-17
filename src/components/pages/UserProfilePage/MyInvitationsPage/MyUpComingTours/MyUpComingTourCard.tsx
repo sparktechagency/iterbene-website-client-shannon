@@ -1,10 +1,7 @@
 import CustomButton from "@/components/custom/custom-button";
-import { useNotInterestEventMutation } from "@/redux/features/event/eventApi";
-import { TError } from "@/types/error";
 import { IEvent } from "@/types/event.types";
 import Image from "next/image";
 import Link from "next/link";
-import toast from "react-hot-toast";
 import { PiUserBold } from "react-icons/pi";
 
 interface UpcomingEventCardProps {
@@ -12,21 +9,21 @@ interface UpcomingEventCardProps {
 }
 
 const MyUpComingTourCard = ({ event }: UpcomingEventCardProps) => {
-  const [notInterest, { isLoading: isNotInterestLoading }] =
-    useNotInterestEventMutation();
-  const handleNotInterest = async () => {
-    try {
-      await notInterest(event?._id).unwrap();
-      toast.success("Marked as not interested successfully.");
-    } catch (error) {
-      const err = error as TError;
-      toast.error(
-        err?.data?.message ||
-          "Failed to mark as not interested. Please try again."
-      );
-      console.error("Failed to mark as not interested:", error);
-    }
-  };
+  // const [notInterest, { isLoading: isNotInterestLoading }] =
+  //   useNotInterestEventMutation();
+  // const handleNotInterest = async () => {
+  //   try {
+  //     await notInterest(event?._id).unwrap();
+  //     toast.success("Marked as not interested successfully.");
+  //   } catch (error) {
+  //     const err = error as TError;
+  //     toast.error(
+  //       err?.data?.message ||
+  //         "Failed to mark as not interested. Please try again."
+  //     );
+  //     console.error("Failed to mark as not interested:", error);
+  //   }
+  // };
   return (
     <div className="w-full bg-white rounded-2xl  p-4 flex flex-col items-center">
       {/* Group Image */}
@@ -68,7 +65,7 @@ const MyUpComingTourCard = ({ event }: UpcomingEventCardProps) => {
             View
           </CustomButton>
         </Link>
-        <CustomButton
+        {/* <CustomButton
           loading={isNotInterestLoading}
           onClick={handleNotInterest}
           variant="outline"
@@ -76,7 +73,7 @@ const MyUpComingTourCard = ({ event }: UpcomingEventCardProps) => {
           fullWidth
         >
           Not Interest
-        </CustomButton>
+        </CustomButton> */}
       </div>
     </div>
   );

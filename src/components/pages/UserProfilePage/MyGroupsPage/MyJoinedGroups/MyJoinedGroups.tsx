@@ -1,14 +1,27 @@
 "use client";
 import { useGetMyJoinedGroupsQuery } from "@/redux/features/group/groupApi";
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useEffect, useRef, useCallback } from "react";
 import { IGroup } from "@/types/group.types";
 import MyJoinedGroupCard from "./MyJoinedGroupCard";
 import MyJoinedGroupSkeleton from "./MyJoinedGroupSkeleton";
 
-const MyJoinedGroups = () => {
-  const [currentPage, setCurrentPage] = useState<number>(1);
-  const [joinedGroups, setJoinedGroups] = useState<IGroup[]>([]);
-  const [hasMore, setHasMore] = useState(true);
+interface MyJoinedGroupsProps {
+  joinedGroups: IGroup[];
+  setJoinedGroups: React.Dispatch<React.SetStateAction<IGroup[]>>;
+  currentPage: number;
+  setCurrentPage: React.Dispatch<React.SetStateAction<number>>;
+  hasMore: boolean;
+  setHasMore: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+const MyJoinedGroups = ({
+  joinedGroups,
+  setJoinedGroups,
+  currentPage,
+  setCurrentPage,
+  hasMore,
+  setHasMore,
+}: MyJoinedGroupsProps) => {
   const observer = useRef<IntersectionObserver | null>(null);
   const loaderRef = useRef<HTMLDivElement | null>(null);
 
@@ -35,9 +48,9 @@ const MyJoinedGroups = () => {
       });
       setHasMore(currentPage < (responseData.data.attributes.totalPages || 0));
     }
-  }, [responseData, currentPage]);
+  }, [responseData, currentPage, setJoinedGroups, setHasMore]);
 
-  // Set up IntersectionObserver for infinite scroll (from Posts)
+  // Set up IntersectionObserver for infinite scroll
   const lastGroupElementRef = useCallback(
     (node: HTMLDivElement | null) => {
       if (isLoading || isFetching) return;
@@ -51,7 +64,7 @@ const MyJoinedGroups = () => {
 
       if (node) observer.current.observe(node);
     },
-    [isLoading, isFetching, hasMore]
+    [isLoading, isFetching, hasMore, setCurrentPage]
   );
 
   const renderLoading = () => (
@@ -87,7 +100,6 @@ const MyJoinedGroups = () => {
     );
   }
 
-  console.log("My joined groups", joinedGroups);
   return (
     <div>
       {content}

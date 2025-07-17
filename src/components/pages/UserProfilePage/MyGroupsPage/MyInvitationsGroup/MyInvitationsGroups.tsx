@@ -1,14 +1,27 @@
 "use client";
 import { useGetMyInvitedGroupsQuery } from "@/redux/features/group/groupApi";
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useEffect, useRef, useCallback } from "react";
 import { IGroupInvite } from "@/types/group.types";
 import MyInvitationsGroupCard from "./MyInvitationsGroupCard";
 import MyInvitationsGroupSkeleton from "./MyInvitationsGroupSkeleton";
 
-const MyInvitationsGroups = () => {
-  const [currentPage, setCurrentPage] = useState<number>(1);
-  const [invitedGroups, setInvitedGroups] = useState<IGroupInvite[]>([]);
-  const [hasMore, setHasMore] = useState(true);
+interface MyInvitationsGroupsProps {
+  invitedGroups: IGroupInvite[];
+  setInvitedGroups: React.Dispatch<React.SetStateAction<IGroupInvite[]>>;
+  currentPage: number;
+  setCurrentPage: React.Dispatch<React.SetStateAction<number>>;
+  hasMore: boolean;
+  setHasMore: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+const MyInvitationsGroups = ({
+  invitedGroups,
+  setInvitedGroups,
+  currentPage,
+  setCurrentPage,
+  hasMore,
+  setHasMore,
+}: MyInvitationsGroupsProps) => {
   const observer = useRef<IntersectionObserver | null>(null);
   const loaderRef = useRef<HTMLDivElement | null>(null);
 
@@ -19,7 +32,7 @@ const MyInvitationsGroups = () => {
     isFetching,
   } = useGetMyInvitedGroupsQuery([
     { key: "page", value: currentPage.toString() },
-    { key: "limit", value: "9" }
+    { key: "limit", value: "9" },
   ]);
 
   // Update invited groups when new data is fetched, ensuring no duplicate _id values
@@ -35,10 +48,9 @@ const MyInvitationsGroups = () => {
       });
       setHasMore(currentPage < (responseData.data.attributes.totalPages || 0));
     }
-  }, [responseData, currentPage]);
+  }, [responseData, currentPage, setInvitedGroups, setHasMore]);
 
-
-  // Set up IntersectionObserver for infinite scroll (from Posts)
+  // Set up IntersectionObserver for infinite scroll
   const lastGroupElementRef = useCallback(
     (node: HTMLDivElement | null) => {
       if (isLoading || isFetching) return;
@@ -52,7 +64,7 @@ const MyInvitationsGroups = () => {
 
       if (node) observer.current.observe(node);
     },
-    [isLoading, isFetching, hasMore]
+    [isLoading, isFetching, hasMore, setCurrentPage]
   );
 
   const renderLoading = () => (
