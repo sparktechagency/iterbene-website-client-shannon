@@ -11,6 +11,8 @@ import { IPost } from "@/types/post.types";
 import { TError } from "@/types/error";
 import toast from "react-hot-toast";
 import useUser from "@/hooks/useUser";
+import { openAuthModal } from "@/redux/features/auth/authModalSlice";
+import { useAppDispatch } from "@/redux/hooks";
 
 interface PostCommentInputProps {
   post: IPost;
@@ -36,6 +38,8 @@ const PostCommentInput = ({
 
   const [createComment, { isLoading: isCreating }] = useCreateCommentMutation();
   const [updateComment, { isLoading: isUpdating }] = useUpdateCommentMutation();
+
+  const dispatch = useAppDispatch();
 
   // Sync newComment with editCommentText when it changes
   useEffect(() => {
@@ -94,6 +98,10 @@ const PostCommentInput = ({
   }, [showEmojiPicker]);
 
   const handleCommentSubmit = async () => {
+    if (!user) {
+      dispatch(openAuthModal());
+      return;
+    }
     if (newComment?.trim() !== "") {
       try {
         if (editCommentId) {

@@ -1,4 +1,4 @@
-import { NextResponse, NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 // Helper function to check for authentication
 function isAuthenticated(request: NextRequest): boolean {

@@ -26,6 +26,8 @@ import {
   useSavePostMutation,
   useUnsavePostMutation, // Import unsave mutation
 } from "@/redux/features/savedPost/savedPost.api";
+import { openAuthModal } from "@/redux/features/auth/authModalSlice";
+import { useAppDispatch } from "@/redux/hooks";
 
 interface PostHeaderProps {
   post: IPost;
@@ -39,6 +41,8 @@ const PostHeader = ({ post, onEditClick, refetch }: PostHeaderProps) => {
   const triggerRef = useRef<HTMLButtonElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const isOwnPost = post?.userId?._id === user?._id;
+  //dispatch openAuthModal
+  const dispatch = useAppDispatch();
 
   const [isDeletePopupOpen, setIsDeletePopupOpen] = useState<boolean>(false);
   const [isReportModalOpen, setIsReportModalOpen] = useState<boolean>(false);
@@ -74,6 +78,11 @@ const PostHeader = ({ post, onEditClick, refetch }: PostHeaderProps) => {
 
   // Handle save
   const handleSave = async () => {
+    if (!user) {
+      dispatch(openAuthModal());
+      setIsOpen(false);
+      return;
+    }
     try {
       const payload = { postId: post._id };
       await savePost(payload).unwrap();
@@ -99,6 +108,11 @@ const PostHeader = ({ post, onEditClick, refetch }: PostHeaderProps) => {
 
   // Handle report
   const handleReport = () => {
+    if (!user) {
+      dispatch(openAuthModal());
+      setIsOpen(false);
+      return;
+    }
     setIsOpen(false);
     setIsReportModalOpen(true);
   };

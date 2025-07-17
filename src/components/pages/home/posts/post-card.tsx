@@ -31,12 +31,14 @@ import { CalendarCheck } from "lucide-react";
 import ShowItineraryModal from "../create-post/ShowItineraryModal";
 import PostEditModal from "../create-post/PostEditModal";
 import Link from "next/link";
+import { useAppDispatch } from "@/redux/hooks";
+import { openAuthModal } from "@/redux/features/auth/authModalSlice";
 
 interface PostCardProps {
   post: IPost;
   refetch?: () => void;
 }
-const PostCard = ({ post,refetch }: PostCardProps) => {
+const PostCard = ({ post, refetch }: PostCardProps) => {
   const user = useUser();
   const postRef = useRef<HTMLDivElement>(null);
   const [isVisible, setIsVisible] = useState(false);
@@ -49,6 +51,9 @@ const PostCard = ({ post,refetch }: PostCardProps) => {
   const [showPostDetails, setShowPostDetails] = useState<boolean>(false);
   const [showItineraryModal, setShowItineraryModal] = useState<boolean>(false);
   const [showEditModal, setShowEditModal] = useState<boolean>(false);
+
+  // dispatch openAuthModal
+  const dispatch = useAppDispatch();
 
   const [incrementItinerary] = useIncrementItineraryViewCountMutation();
 
@@ -125,6 +130,10 @@ const PostCard = ({ post,refetch }: PostCardProps) => {
 
   // handle reaction function
   const handleReaction = async (reactionType: string) => {
+    if (!user) {
+      dispatch(openAuthModal());
+      return
+    }
     try {
       await addOrRemoveReaction({ postId: post?._id, reactionType }).unwrap();
       refetch?.();
@@ -154,7 +163,11 @@ const PostCard = ({ post,refetch }: PostCardProps) => {
 
   return (
     <div ref={postRef} className="w-full bg-white rounded-xl p-4 mb-4 relative">
-      <PostHeader post={post} onEditClick={() => setShowEditModal(true)} refetch={refetch} />
+      <PostHeader
+        post={post}
+        onEditClick={() => setShowEditModal(true)}
+        refetch={refetch}
+      />
       <p className="text-gray-700 mb-4">
         {post?.content?.split(/(\s+)/)?.map((word, index) => {
           const isHashtag = word?.match(/^#\w+/);

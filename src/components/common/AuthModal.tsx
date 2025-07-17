@@ -4,34 +4,20 @@ import { useEffect, useState } from "react";
 import { RootState } from "@/redux/store";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import useUser from "@/hooks/useUser";
-import {
-  closeAuthModal
-} from "@/redux/features/auth/authModalSlice";
+import { closeAuthModal } from "@/redux/features/auth/authModalSlice";
 import Image from "next/image";
 import { X } from "lucide-react";
 import logo from "@/asset/logo/logo.png";
 import { useRouter } from "next/navigation";
-
-type ModalStep =
-  | "welcome"
-  | "login"
-  | "register"
-  | "forgot"
-  | "verify"
-  | "reset";
 
 const AuthModal = () => {
   const dispatch = useAppDispatch();
   const isModalOpen = useAppSelector(
     (state: RootState) => state.auth.showAuthModal
   );
-  const currentStep = useAppSelector(
-    (state: RootState) => state.auth.currentStep
-  );
   const isAuthenticated = useUser();
   const [isClient, setIsClient] = useState<boolean>(false);
   const [isVerified, setIsVerified] = useState<boolean>(false);
-  const [modalStep, setModalStep] = useState<ModalStep>("welcome");
   const router = useRouter();
 
   // Check if client-side and UserVerification status
@@ -42,11 +28,6 @@ const AuthModal = () => {
       setIsVerified(userVerified === "true");
     }
   }, []);
-
-  // Sync local modalStep with Redux currentStep
-  useEffect(() => {
-    setModalStep(currentStep);
-  }, [currentStep]);
 
   // Timer for showing modal after 30 seconds if not authenticated and verified
   // useEffect(() => {
@@ -120,52 +101,6 @@ const AuthModal = () => {
     router.push("/register");
   };
 
-  const renderWelcomeStep = () => (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -20 }}
-      transition={{ duration: 0.3 }}
-    >
-      <h1 className="text-2xl md:text-3xl text-center font-bold text-gray-800 mb-3">
-        Welcome to Iter Bene!
-      </h1>
-      <p className="text-gray-600  text-center mb-6 text-sm md:text-base">
-        Please log in to access all features and enjoy your premium travel
-        experience.
-      </p>
-      <div className="space-y-4">
-        <button
-          onClick={handleLogin}
-          className="w-full bg-secondary cursor-pointer text-white py-3 px-6 rounded-lg font-medium hover:bg-secondary/90 transition-all duration-300"
-        >
-          Login to Your Account
-        </button>
-        <button
-          onClick={handleRegister}
-          className="w-full text-secondary cursor-pointer border border-secondary py-3 px-6 rounded-lg font-medium hover:bg-secondary hover:text-white transition-all duration-300"
-        >
-          Create New Account
-        </button>
-        <button
-          onClick={handleClose}
-          className="w-full text-gray-600 cursor-pointer py-2 px-6 rounded-lg font-medium hover:text-gray-800 transition-colors duration-300"
-        >
-          Maybe Later
-        </button>
-      </div>
-    </motion.div>
-  );
-
-  const renderCurrentStep = () => {
-    switch (modalStep) {
-      case "welcome":
-        return renderWelcomeStep();
-      default:
-        return renderWelcomeStep();
-    }
-  };
-
   if (!isClient || !isModalOpen || isAuthenticated || !isVerified) return null;
 
   return (
@@ -207,7 +142,44 @@ const AuthModal = () => {
               className="mx-auto mb-4"
             />
           </motion.div>
-          <AnimatePresence mode="wait">{renderCurrentStep()}</AnimatePresence>
+          <AnimatePresence mode="wait">
+            {
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.3 }}
+              >
+                <h1 className="text-2xl md:text-3xl text-center font-bold text-gray-800 mb-3">
+                  Welcome to Iter Bene!
+                </h1>
+                <p className="text-gray-600  text-center mb-6 text-sm md:text-base">
+                  Please log in to access all features and enjoy your premium
+                  travel experience.
+                </p>
+                <div className="space-y-4">
+                  <button
+                    onClick={handleLogin}
+                    className="w-full bg-secondary cursor-pointer text-white py-3 px-6 rounded-lg font-medium hover:bg-secondary/90 transition-all duration-300"
+                  >
+                    Login to Your Account
+                  </button>
+                  <button
+                    onClick={handleRegister}
+                    className="w-full text-secondary cursor-pointer border border-secondary py-3 px-6 rounded-lg font-medium hover:bg-secondary hover:text-white transition-all duration-300"
+                  >
+                    Create New Account
+                  </button>
+                  <button
+                    onClick={handleClose}
+                    className="w-full text-gray-600 cursor-pointer py-2 px-6 rounded-lg font-medium hover:text-gray-800 transition-colors duration-300"
+                  >
+                    Maybe Later
+                  </button>
+                </div>
+              </motion.div>
+            }
+          </AnimatePresence>
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
