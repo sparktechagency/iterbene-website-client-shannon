@@ -7,9 +7,9 @@ import { FiUpload } from "react-icons/fi";
 import { MdChangeCircle } from "react-icons/md";
 import CustomForm from "@/components/custom/custom-form";
 import CustomInput from "@/components/custom/custom-input";
-import CustomSelectField from "@/components/custom/custom-seletectField";
+// import CustomSelectField from "@/components/custom/custom-seletectField";
 import { FieldValues } from "react-hook-form";
-import { DollarSignIcon, Lock } from "lucide-react";
+import { DollarSignIcon, } from "lucide-react";
 import CustomButton from "@/components/custom/custom-button";
 import { IoClose } from "react-icons/io5";
 import useUser from "@/hooks/useUser";
@@ -92,7 +92,7 @@ const CreateEvent: React.FC = () => {
       const formData = new FormData();
       formData.append("eventName", values.eventName);
       formData.append("description", values.description);
-      formData.append("privacy", values.privacy);
+      // formData.append("privacy", values.privacy);
       formData.append("startDate", values.startDate);
       formData.append("endDate", values.endDate);
       formData.append(
@@ -384,7 +384,7 @@ const CreateEvent: React.FC = () => {
                 />
 
                 {/* Who can see the event? */}
-                <CustomSelectField
+                {/* <CustomSelectField
                   items={[
                     { label: "Public", value: "public" },
                     { label: "Private", value: "private" },
@@ -394,7 +394,7 @@ const CreateEvent: React.FC = () => {
                   placeholder="Who can see the event?"
                   name="privacy"
                   required
-                />
+                /> */}
 
                 {/* Description */}
                 <CustomInput

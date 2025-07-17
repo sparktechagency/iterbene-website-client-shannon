@@ -4,7 +4,6 @@ import { TError } from "@/types/error";
 import { IEvent } from "@/types/event.types";
 import Image from "next/image";
 import Link from "next/link";
-import React from "react";
 import toast from "react-hot-toast";
 import { PiUserBold } from "react-icons/pi";
 
@@ -56,7 +55,7 @@ const MyUpComingTourCard = ({ event }: UpcomingEventCardProps) => {
                 </span>
               </div>
             </div>
-            <h2 className="text-2xl md:text-[32px] font-semibold text-white">
+            <h2 className="text-xl md:text-2xl font-bold text-white">
               {event?.eventName}
             </h2>
           </div>

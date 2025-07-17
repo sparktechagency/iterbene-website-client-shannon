@@ -63,7 +63,7 @@ const SuggestionEventCard = ({
                 </span>
               </div>
             </div>
-            <h2 className="text-2xl md:text-[32px] font-semibold text-white">
+            <h2 className="text-xl md:text-2xl font-bold text-white">
               {event?.eventName}
             </h2>
           </div>

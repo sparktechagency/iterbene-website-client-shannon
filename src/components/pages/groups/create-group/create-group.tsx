@@ -7,9 +7,8 @@ import { FiUpload } from "react-icons/fi";
 import { MdChangeCircle } from "react-icons/md";
 import CustomForm from "@/components/custom/custom-form";
 import CustomInput from "@/components/custom/custom-input";
-import CustomSelectField from "@/components/custom/custom-seletectField";
+// import CustomSelectField from "@/components/custom/custom-seletectField";
 import { FieldValues } from "react-hook-form";
-import { Lock } from "lucide-react";
 import CustomButton from "@/components/custom/custom-button";
 import { IoClose } from "react-icons/io5";
 import useUser from "@/hooks/useUser";
@@ -224,7 +223,7 @@ const CreateGroup: React.FC = () => {
                 />
 
                 {/* Who can see the group? */}
-                <CustomSelectField
+                {/* <CustomSelectField
                   items={[
                     { label: "Public", value: "public" },
                     { label: "Private", value: "private" },
@@ -234,7 +233,7 @@ const CreateGroup: React.FC = () => {
                   placeholder="Who can see the group?"
                   name="privacy"
                   required
-                />
+                /> */}
 
                 {/* Description */}
                 <CustomInput
