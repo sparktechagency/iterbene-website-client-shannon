@@ -18,7 +18,7 @@ import JourneyCard from "./journey.card";
 const Journeys = () => {
   const user = useUser();
   const [page, setPage] = useState(1);
-  const [limit] = useState(10);
+  const [limit] = useState(100);
   const { data: storiesData, isLoading } = useGetFeedStoriesQuery(
     { page, limit },
     {
