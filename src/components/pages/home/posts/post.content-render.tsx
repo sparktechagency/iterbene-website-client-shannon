@@ -11,7 +11,6 @@ import useWindowSize from "@/hooks/useWindowSize";
 import Lightbox from "yet-another-react-lightbox";
 import "yet-another-react-lightbox/styles.css";
 import { useState } from "react";
-import { VideoProvider } from "@/context/VideoContext";
 
 interface PostContentRenderProps {
   data: IMedia[];
@@ -52,6 +51,7 @@ const PostContentRender = ({ data, isVisible }: PostContentRenderProps) => {
               width={400}
               height={350}
               className="w-full object-contain cursor-pointer rounded-md"
+              style={{ height: "auto" }}
               onClick={() => handleImageClick(media)}
               priority
             />
@@ -77,7 +77,7 @@ const PostContentRender = ({ data, isVisible }: PostContentRenderProps) => {
                   alt="Post media"
                   width={400}
                   height={350}
-                  className="w-full h-[350px]  rounded-xl cursor-pointer"
+                  className="w-full h-full object-cover rounded-xl cursor-pointer"
                   onClick={() => handleImageClick(media)}
                   priority={index === 0}
                 />
@@ -302,11 +302,10 @@ const PostContentRender = ({ data, isVisible }: PostContentRenderProps) => {
           autoplay={{ delay: 3000 }}
           className="w-full mt-3"
         >
-          {data.map((media, index) => (
-            <VideoProvider key={index}>
-              <SwiperSlide>
+          {data?.map((media, index) => (
+              <SwiperSlide key={index}>
                 <div className="aspect-square">
-                  {media.mediaType === "image" ? (
+                  {media?.mediaType === "image" ? (
                     <Image
                       src={media?.mediaUrl}
                       alt={`Post media ${index + 1}`}
@@ -325,11 +324,10 @@ const PostContentRender = ({ data, isVisible }: PostContentRenderProps) => {
                   )}
                 </div>
               </SwiperSlide>
-            </VideoProvider>
           ))}
         </Swiper>
       ) : (
-        <VideoProvider>{renderDesktopLayout()}</VideoProvider>
+       renderDesktopLayout()
       )}
       <Lightbox
         open={open}

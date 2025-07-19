@@ -4,6 +4,7 @@ import { useEffect, useRef, useCallback } from "react";
 import { IConnectionRequest } from "@/types/connection.types";
 import MyRequestConnectionCard from "./MyRequestConnectionCard";
 import MyRequestConnectionSkeleton from "./MyRequestConnectionSkeleton";
+import useUser from "@/hooks/useUser";
 
 interface MyRequestConnectionsProps {
   connectionRequests: IConnectionRequest[];
@@ -24,6 +25,7 @@ const MyRequestConnections = ({
   hasMore,
   setHasMore,
 }: MyRequestConnectionsProps) => {
+  const user = useUser();
   const observer = useRef<IntersectionObserver | null>(null);
   const loaderRef = useRef<HTMLDivElement | null>(null);
 
@@ -32,10 +34,16 @@ const MyRequestConnections = ({
     data: responseData,
     isLoading,
     isFetching,
-  } = useGetConnectionRequestsQuery([
-    { key: "page", value: currentPage.toString() },
-    { key: "limit", value: "9" },
-  ]);
+  } = useGetConnectionRequestsQuery(
+    [
+      { key: "page", value: currentPage.toString() },
+      { key: "limit", value: "9" },
+    ],
+    {
+      refetchOnMountOrArgChange: true,
+      skip: !user,
+    }
+  );
 
   // Update connection requests when new data is fetched, ensuring no duplicate _id values
   useEffect(() => {

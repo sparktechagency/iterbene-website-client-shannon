@@ -3,11 +3,14 @@ import { useGetConnectionRequestsQuery } from "@/redux/features/connections/conn
 import FriendRequestCard from "./friend-request-card";
 import { IConnectionRequest } from "@/types/connection.types";
 import FriendRequestCardSkeleton from "./FriendRequestCardSkeleton";
+import useUser from "@/hooks/useUser";
 const FriendRequest = () => {
+  const user = useUser();
   const { data: responseData, isLoading } = useGetConnectionRequestsQuery(
     undefined,
     {
       refetchOnMountOrArgChange: true,
+      skip: !user,
     }
   );
   const connectionsRequestData = responseData?.data?.attributes?.results;

@@ -50,7 +50,7 @@ const VerifyEmail = () => {
       {/* Semi-transparent color overlay */}
       <div className="absolute top-0 left-0 w-full h-full bg-[#40E0D054]"></div>
       {/* Content that remains sharp */}
-      <div className="w-full max-w-[500px] mx-auto px-8 md:px-[65px] py-12 md:py-[56px] bg-[#FFFFFF] z-30 rounded-xl border-2 border-primary shadow-xl shadow-gray-900">
+      <div className="w-full max-w-[500px] mx-auto px-8 xl:px-[65px] py-12 xl:py-[56px] bg-[#FFFFFF] z-30 rounded-xl border-2 border-primary shadow-xl shadow-gray-900">
         <div className="flex items-center  justify-between">
           <h1 className="text-xl lg:text-3xl xl:text-4xl font-semibold">
             Verify Email
@@ -60,7 +60,7 @@ const VerifyEmail = () => {
             alt="logo"
             width={128}
             height={128}
-            className="ml-2 w-[90px] md:w-[128px] md:h-[115px]"
+            className="ml-2 w-[90px] md:w-[100px] md:h-[90px] xl:w-[128px] xl:h-[115px]"
           />
         </div>
         <div className="w-full space-y-8">

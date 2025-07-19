@@ -10,7 +10,7 @@ interface IDecodeData {
 }
 
 const TOKEN_EXPIRY_DAYS = 7; // Token expires in 7 days
-const REFRESH_TOKEN_EXPIRY_DAYS = 30; 
+const REFRESH_TOKEN_EXPIRY_DAYS = 30;
 
 // Store the access token and refresh token in cookies with 7 days expiry
 export const storeTokens = (accessToken: string, refreshToken: string) => {
@@ -37,9 +37,9 @@ export const getRefreshToken = (): string | undefined => {
 // Decode the access token and check if it's expired
 export const isTokenExpired = (accessToken: string): boolean => {
   try {
-    const decoded: IDecodeData = jwtDecode(accessToken); // Decode the token
-    const currentTime = Date.now() / 1000; // Get current time in seconds
-    return decoded.exp < currentTime; // Check if token is expired
+    const decoded: IDecodeData = jwtDecode(accessToken); 
+    const currentTime = (Date.now() / 1000); 
+    return decoded.exp < currentTime;
   } catch (error) {
     console.error("Error decoding token:", error);
     return true; // Assume expired if decoding fails

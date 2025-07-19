@@ -4,8 +4,10 @@ import { IConnectionRequest } from "@/types/connection.types";
 import React, { useEffect, useState } from "react";
 import RequestedConnectionCard from "./requested-connection-card";
 import SuggestionConnectionsCardSkeleton from "../suggestion-connections/SuggestionConnectionsCardSkeleton";
+import useUser from "@/hooks/useUser";
 
 const RequestedConnections: React.FC = () => {
+  const user = useUser();
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [isLoadingMore, setIsLoadingMore] = useState<boolean>(false);
   const [allConnectionRequests, setAllConnectionRequests] = useState<
@@ -25,6 +27,7 @@ const RequestedConnections: React.FC = () => {
     ],
     {
       refetchOnMountOrArgChange: true,
+      skip: !user,
     }
   );
 

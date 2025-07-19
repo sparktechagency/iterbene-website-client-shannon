@@ -51,8 +51,8 @@ const Register = () => {
       {/* Semi-transparent color overlay */}
       <div className="absolute top-0 left-0 w-full h-full bg-[#40E0D054]"></div>
       {/* Content that remains sharp */}
-      <div className="w-full max-w-[500px] mx-auto px-8 md:px-[65px] py-12 md:py-[56px] bg-[#FFFFFF] z-30  rounded-xl border-2 border-primary shadow-xl shadow-gray-900">
-        <div className="flex justify-between">
+      <div className="w-full max-w-[500px] mx-auto px-8 xl:px-[65px] py-8 xl:py-[56px] bg-[#FFFFFF] z-30 rounded-xl border-2 border-primary shadow-xl shadow-gray-900">
+        <div className="flex justify-between  md:justify-center xl:justify-between">
           <h1 className="text-xl lg:text-3xl xl:text-4xl font-semibold">
             Register
           </h1>
@@ -61,7 +61,7 @@ const Register = () => {
             alt="logo"
             width={120}
             height={120}
-            className="ml-2 size-[90px] md:w-[120px] md:h-[105px]"
+            className="ml-2 w-[90px] block md:hidden xl:block md:w-[100px] md:h-[90px] xl:w-[128px] xl:h-[115px]"
           />
         </div>
         {/* Form content */}

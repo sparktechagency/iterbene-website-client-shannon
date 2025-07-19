@@ -7,7 +7,6 @@ import "swiper/css/pagination";
 import { Navigation, Pagination } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
 import VideoCard from "../../UserProfilePage/UserVideos/VideoCard";
-import { VideoProvider } from "@/context/VideoContext";
 
 interface PostDetailsContentRenderProps {
   medias: IMedia[];
@@ -33,7 +32,6 @@ const PostDetailsContentRender = ({
       >
         {medias?.map((media, index) => (
           <SwiperSlide key={index}>
-            <VideoProvider>
               {media.mediaType === "image" ? (
                 <SmartImage
                   src={media?.mediaUrl}
@@ -46,7 +44,6 @@ const PostDetailsContentRender = ({
                   className="w-full h-[200px] md:h-[600px] object-contain"
                 />
               )}
-            </VideoProvider>
           </SwiperSlide>
         ))}
       </Swiper>

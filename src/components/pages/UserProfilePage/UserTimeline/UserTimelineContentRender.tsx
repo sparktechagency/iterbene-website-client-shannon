@@ -8,7 +8,6 @@ import { IMedia } from "@/types/post.types";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
-import { VideoProvider } from "@/context/VideoContext";
 
 interface UserTimelineContentRenderProps {
   data: IMedia[];
@@ -26,9 +25,8 @@ const UserTimelineContentRender = ({
         pagination={{ clickable: false }}
         className="w-full"
       >
-        {data.map((media, index) => (
+        {data?.map((media, index) => (
           <SwiperSlide key={index}>
-            <VideoProvider>
               <div className="w-full flex items-center justify-center">
                 {media.mediaType === "image" ? (
                   <Image
@@ -46,7 +44,6 @@ const UserTimelineContentRender = ({
                   />
                 )}
               </div>
-            </VideoProvider>
           </SwiperSlide>
         ))}
       </Swiper>

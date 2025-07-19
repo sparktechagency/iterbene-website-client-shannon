@@ -49,7 +49,7 @@ const LocationPermission = () => {
     return () => {
       document.body.style.overflow = "unset";
     };
-  }, [isOpen]);
+  }, [isOpen, checkPermissionStatus]);
 
   const checkPermissionStatus = async () => {
     if (!navigator.geolocation) {

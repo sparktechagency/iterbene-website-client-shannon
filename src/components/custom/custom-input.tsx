@@ -42,9 +42,9 @@ const CustomInput = ({
 
   // Input/Textarea size class based on the prop
   const inputSizeClass = {
-    sm: "py-2 px-3 text-sm",
-    md: "py-2.5 px-3 text-base",
-    lg: "py-3 px-3 text-base",
+    sm: "py-1.5 px-3 text-sm",
+    md: "py-2 px-3 text-base",
+    lg: "py-2.5 px-3 text-base",
   }[size];
 
   // Textarea-specific styles
@@ -62,7 +62,7 @@ const CustomInput = ({
       {label && (
         <label
           htmlFor={name}
-          className="block text-gray-950 mb-2  text-[15px]"
+          className="block text-gray-950   text-[15px]"
         >
           {label} {required && <span className="text-red-500">*</span>}
         </label>
