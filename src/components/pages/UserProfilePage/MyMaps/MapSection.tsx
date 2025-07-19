@@ -10,6 +10,9 @@ const mapContainerStyle: React.CSSProperties = {
   height: "100%",
 };
 
+// Move libraries array outside component to maintain stable reference
+const GOOGLE_MAPS_LIBRARIES: never[] = [];
+
 // Define types for location coordinates
 interface Location {
   lat: number;
@@ -30,10 +33,10 @@ const MapSection = ({
   });
   const apiKey: string = process.env.NEXT_PUBLIC_GOOGLE_MAP_API_KEY || "";
 
-  // Only load the libraries you actually need
+  // Use the stable libraries reference
   const { isLoaded } = useJsApiLoader({
     googleMapsApiKey: apiKey,
-    libraries: [],
+    libraries: GOOGLE_MAPS_LIBRARIES,
   });
 
   // Set default center to user's current location from API

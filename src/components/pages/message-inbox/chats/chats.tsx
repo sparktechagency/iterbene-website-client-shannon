@@ -29,7 +29,9 @@ const Chats = () => {
       },
     ],
     {
-      refetchOnMountOrArgChange: true,
+            refetchOnMountOrArgChange: true,
+      refetchOnFocus: true,
+      refetchOnReconnect: true,
     }
   );
 

@@ -274,7 +274,11 @@ const MessageItem: React.FC<MessageItemProps> = ({
                   className="w-[120px] h-[120px] object-cover rounded-lg"
                 />
               ) : (
-                "Journey no longer available"
+                <div className="w-[120px] h-[120px] bg-slate-100 flex items-center justify-center rounded-lg">
+                  <h1 className="text-xs text-gray-700 text-center">
+                    Journey no longer available
+                  </h1>
+                </div>
               )}
 
               {/* Text */}

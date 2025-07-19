@@ -141,7 +141,7 @@ const JourneyView = () => {
         setCurrentStoryIndex(nextStoryIndex);
         setCurrentStory(allStories[nextStoryIndex]);
         setCurrentMediaIndex(0);
-        router.push(`/story/${allStories[nextStoryIndex]._id}`);
+        router.push(`/journey/${allStories[nextStoryIndex]._id}`);
       } else {
         router.push("/");
       }
@@ -221,7 +221,7 @@ const JourneyView = () => {
       setCurrentMediaIndex(
         (allStories[prevStoryIndex].mediaIds?.length ?? 0) - 1
       );
-      router.push(`/story/${allStories[prevStoryIndex]._id}`);
+      router.push(`/journey/${allStories[prevStoryIndex]._id}`);
     }
   };
 
@@ -249,7 +249,7 @@ const JourneyView = () => {
     setCurrentStoryIndex(index);
     setCurrentStory(story);
     setCurrentMediaIndex(0);
-    router.push(`/story/${story._id}`);
+    router.push(`/journey/${story._id}`);
   };
 
   const handleLike = async () => {

@@ -10,6 +10,8 @@ const FriendRequest = () => {
     undefined,
     {
       refetchOnMountOrArgChange: true,
+      refetchOnFocus: true,
+      refetchOnReconnect: true,
       skip: !user,
     }
   );

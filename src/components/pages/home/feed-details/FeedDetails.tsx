@@ -7,6 +7,8 @@ const FeedDetails = () => {
   const { feedId } = useParams();
   const { data: responseData } = useGetSinglePostQuery(feedId, {
     refetchOnMountOrArgChange: true,
+    refetchOnFocus: true,
+    refetchOnReconnect: true,
     skip: !feedId,
   });
   const feedDetailsData = responseData?.data?.attributes;

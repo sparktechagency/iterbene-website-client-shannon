@@ -24,6 +24,8 @@ const UpcomingEvent = () => {
     ],
     {
       refetchOnMountOrArgChange: true,
+      refetchOnFocus: true,
+      refetchOnReconnect: true,
     }
   );
   const totalPages = responseData?.data?.attributes?.totalPages || 1;

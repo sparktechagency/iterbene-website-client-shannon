@@ -21,6 +21,7 @@ const ContactList: React.FC = () => {
     {
       refetchOnMountOrArgChange: true,
       refetchOnFocus: true,
+      refetchOnReconnect: true,
       skip: !user,
     }
   );

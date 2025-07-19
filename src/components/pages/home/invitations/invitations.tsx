@@ -23,6 +23,8 @@ const Invitations: React.FC = () => {
     ],
     {
       refetchOnMountOrArgChange: true,
+      refetchOnFocus: true,
+      refetchOnReconnect: true,
     }
   );
 
@@ -77,7 +79,10 @@ const Invitations: React.FC = () => {
   } else {
     content = allInvitations?.map((event: IEventInvitation) => (
       <SwiperSlide key={event?._id}>
-        <InvitationCard event={event} handleAcceptInvitation={handleAcceptInvitation} />
+        <InvitationCard
+          event={event}
+          handleAcceptInvitation={handleAcceptInvitation}
+        />
       </SwiperSlide>
     ));
   }

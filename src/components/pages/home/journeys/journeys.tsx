@@ -1,27 +1,32 @@
 "use client";
+import useUser from "@/hooks/useUser";
+import { useGetFeedStoriesQuery } from "@/redux/features/stories/storiesApi";
+import { IStory } from "@/types/stories.types";
 import { Plus } from "lucide-react";
 import Image from "next/image";
-import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
 import "swiper/css";
 import "swiper/css/free-mode";
 import "swiper/css/pagination";
 import { FreeMode, Pagination } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { useGetFeedStoriesQuery } from "@/redux/features/stories/storiesApi";
-import { IStory } from "@/types/stories.types";
 import { Swiper as SwiperCore } from "swiper/types";
-import useUser from "@/hooks/useUser";
 import JourneyCardSkeleton from "./JourneyCardSkeleton";
 import JourneyCard from "./journey.card";
 
-const Stories = () => {
+const Journeys = () => {
   const user = useUser();
   const [page, setPage] = useState(1);
   const [limit] = useState(10);
   const { data: storiesData, isLoading } = useGetFeedStoriesQuery(
     { page, limit },
-    { refetchOnMountOrArgChange: true, skip: !user }
+    {
+      refetchOnMountOrArgChange: true,
+      refetchOnFocus: true,
+      refetchOnReconnect: true,
+      skip: !user,
+    }
   );
   const router = useRouter();
   const [stories, setStories] = useState<IStory[]>([]);
@@ -156,4 +161,4 @@ const Stories = () => {
   );
 };
 
-export default Stories;
+export default Journeys;
