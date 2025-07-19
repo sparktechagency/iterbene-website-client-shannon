@@ -1,19 +1,19 @@
 "use client";
-import React, { useState, useRef, useCallback } from "react";
+import SelectField from "@/components/custom/SelectField";
+import { useCreateStoryMutation } from "@/redux/features/stories/storiesApi";
+import { TError } from "@/types/error";
+import { motion } from "framer-motion";
 import {
-  Camera,
-  Type,
   ArrowLeft,
+  Camera,
+  RotateCw,
+  Type,
   ZoomIn,
   ZoomOut,
-  RotateCw,
 } from "lucide-react";
-import { motion } from "framer-motion";
-import { useCreateStoryMutation } from "@/redux/features/stories/storiesApi";
-import toast from "react-hot-toast";
-import { TError } from "@/types/error";
 import { useRouter } from "next/navigation";
-import SelectField from "@/components/custom/SelectField";
+import React, { useCallback, useRef, useState } from "react";
+import toast from "react-hot-toast";
 
 type ViewType = "selection" | "text" | "photo";
 type TextStyleType = "Clean" | "Bold" | "Typewriter" | "Modern";
@@ -21,7 +21,7 @@ type PrivacyType = "public" | "followers" | "custom";
 
 import Image from "next/image";
 
-const CreateStories: React.FC = () => {
+const CreateJourney: React.FC = () => {
   const [currentView, setCurrentView] = useState<ViewType>("selection");
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -626,4 +626,4 @@ const CreateStories: React.FC = () => {
   return null;
 };
 
-export default CreateStories;
+export default CreateJourney;

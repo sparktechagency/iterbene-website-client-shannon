@@ -25,7 +25,7 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
       "/connections",
       "/groups",
       "/events",
-      "/stories",
+      "/journeys",
       "/search/posts-locations",
     ];
 

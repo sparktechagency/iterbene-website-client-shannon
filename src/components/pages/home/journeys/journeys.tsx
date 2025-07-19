@@ -8,12 +8,12 @@ import "swiper/css/free-mode";
 import "swiper/css/pagination";
 import { FreeMode, Pagination } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
-import StoryCard from "./stories.card";
-import StoryCardSkeleton from "./StoryCardSkeleton"; // Adjust import path as needed
 import { useGetFeedStoriesQuery } from "@/redux/features/stories/storiesApi";
 import { IStory } from "@/types/stories.types";
 import { Swiper as SwiperCore } from "swiper/types";
 import useUser from "@/hooks/useUser";
+import JourneyCardSkeleton from "./JourneyCardSkeleton";
+import JourneyCard from "./journey.card";
 
 const Stories = () => {
   const user = useUser();
@@ -34,11 +34,11 @@ const Stories = () => {
   }, [storiesData]);
 
   const handleAddJourney = () => {
-    router.push("/stories");
+    router.push("/journeys");
   };
 
-  const handleStoryClick = (storyId: number | string) => {
-    router.push(`/story/${storyId}`);
+  const handleStoryClick = (journeyId: number | string) => {
+    router.push(`/journey/${journeyId}`);
   };
 
   const handleNextPage = () => {
@@ -102,13 +102,13 @@ const Stories = () => {
                   .fill(0)
                   .map((_, index) => (
                     <SwiperSlide key={`skeleton-${index}`}>
-                      <StoryCardSkeleton />
+                      <JourneyCardSkeleton />
                     </SwiperSlide>
                   ))
               : stories?.map((story) => (
                   <SwiperSlide key={story._id}>
                     <div onClick={() => handleStoryClick(story._id)}>
-                      <StoryCard story={story} />
+                      <JourneyCard story={story} />
                     </div>
                   </SwiperSlide>
                 ))}

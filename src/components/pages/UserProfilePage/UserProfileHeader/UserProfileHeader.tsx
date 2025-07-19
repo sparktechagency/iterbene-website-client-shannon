@@ -1,4 +1,6 @@
 import CustomButton from "@/components/custom/custom-button";
+import useUser from "@/hooks/useUser";
+import { openAuthModal } from "@/redux/features/auth/authModalSlice";
 import {
   useAddConnectionMutation,
   useCancelConnectionMutation,
@@ -7,19 +9,29 @@ import {
 import { TError } from "@/types/error";
 import { IUser } from "@/types/user.types";
 import Image from "next/image";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import React from "react";
 import toast from "react-hot-toast";
+import { useDispatch } from "react-redux";
 
 const UserProfileHeader = ({ userData }: { userData: IUser }) => {
+  const user = useUser();
+  const dispatch = useDispatch();
+  const router = useRouter();
+
+  // add connection
   const [addConnection, { isLoading }] = useAddConnectionMutation();
+
+  // cancel connection
   const [cancelConnection, { isLoading: isLoadingCancel }] =
     useCancelConnectionMutation();
+
+  // check if sent connection exists
   const { data: responseData } = useCheckIsSentConnectionExistsQuery(
     userData?._id,
     {
       refetchOnMountOrArgChange: true,
-      skip: !userData?._id,
+      skip: !userData?._id || !user?._id,
     }
   );
   const isSentConnectionExists =
@@ -27,6 +39,10 @@ const UserProfileHeader = ({ userData }: { userData: IUser }) => {
   const isConnected = responseData?.data?.attributes?.status === "accepted";
 
   const handleAddConnection = async () => {
+    if (!user) {
+      dispatch(openAuthModal());
+      return;
+    }
     try {
       const payload = { receivedBy: userData?._id };
       await addConnection(payload).unwrap();
@@ -38,6 +54,10 @@ const UserProfileHeader = ({ userData }: { userData: IUser }) => {
   };
 
   const handleCancelRequest = async () => {
+    if (!user) {
+      dispatch(openAuthModal());
+      return;
+    }
     try {
       await cancelConnection(userData?._id).unwrap();
       toast.success("Request canceled successfully!");
@@ -45,6 +65,14 @@ const UserProfileHeader = ({ userData }: { userData: IUser }) => {
       const err = error as TError;
       toast.error(err?.data?.message || "Something went wrong!");
     }
+  };
+
+  const handleRedirectToChat = () => {
+    if (!user) {
+      dispatch(openAuthModal());
+      return;
+    }
+    router.push(`/messages/${userData?._id}`);
   };
 
   return (
@@ -106,11 +134,13 @@ const UserProfileHeader = ({ userData }: { userData: IUser }) => {
               Connect
             </CustomButton>
           )}
-          <Link href={`/messages/${userData?._id}`}>
-            <CustomButton variant="outline" className="px-8 py-3">
-              Message
-            </CustomButton>
-          </Link>
+          <CustomButton
+            onClick={handleRedirectToChat}
+            variant="outline"
+            className="px-8 py-3"
+          >
+            Message
+          </CustomButton>
         </div>
       </div>
     </div>

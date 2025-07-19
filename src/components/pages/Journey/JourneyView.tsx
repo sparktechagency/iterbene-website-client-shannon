@@ -27,15 +27,15 @@ import { motion, AnimatePresence } from "framer-motion"; // Import Framer Motion
 import toast from "react-hot-toast";
 import { TError } from "@/types/error";
 const JourneyView = () => {
-  const { storyId } = useParams();
+  const { journeyId } = useParams();
   const router = useRouter();
   const user = useUser();
 
   // API hooks
   const { data: responseData, isLoading: storyLoading } = useGetStoryQuery(
-    storyId as string,
+    journeyId as string,
     {
-      skip: !storyId,
+      skip: !journeyId,
       refetchOnMountOrArgChange: true,
     }
   );
@@ -95,10 +95,10 @@ const JourneyView = () => {
 
       setAllStories(stories);
 
-      const index = stories.findIndex((story: IStory) => story._id === storyId);
+      const index = stories.findIndex((story: IStory) => story._id === journeyId);
       setCurrentStoryIndex(index >= 0 ? index : 0);
     }
-  }, [feedData, storyId]);
+  }, [feedData, journeyId]);
 
   // Track story view
   useEffect(() => {
@@ -127,7 +127,7 @@ const JourneyView = () => {
   // Reset view tracking when media changes
   useEffect(() => {
     setHasViewedCurrent(false);
-  }, [currentMediaIndex, storyId]);
+  }, [currentMediaIndex, journeyId]);
 
   const handleNext = useCallback(() => {
     if (

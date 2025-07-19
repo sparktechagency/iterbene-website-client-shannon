@@ -4,7 +4,7 @@ import Image from "next/image";
 import React, { useRef } from "react";
 import useUser from "@/hooks/useUser"; // Adjust import path as needed
 
-const StoryCard = ({ story }: { story: IStory }) => {
+const JourneyCard = ({ story }: { story: IStory }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const user = useUser(); // Get current user data
 
@@ -78,4 +78,4 @@ const StoryCard = ({ story }: { story: IStory }) => {
   );
 };
 
-export default StoryCard;
+export default JourneyCard;

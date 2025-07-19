@@ -1,7 +1,7 @@
 "use client";
 import CreatePost from "@/components/pages/home/create-post/create-post";
 import Posts from "@/components/pages/home/posts/posts";
-import Stories from "@/components/pages/home/stories/stories";
+import Stories from "@/components/pages/home/journeys/journeys";
 
 const Feed = () => {
   return (

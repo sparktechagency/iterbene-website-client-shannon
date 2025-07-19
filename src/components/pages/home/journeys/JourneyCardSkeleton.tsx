@@ -1,7 +1,7 @@
 "use client";
 import Skeleton from "@/components/custom/custom-skeleton";
 import React from "react";
-const StoryCardSkeleton = () => {
+const JourneyCardSkeleton = () => {
   return (
     <div className="relative w-full h-[190px] md:h-[210px] rounded-xl overflow-hidden shadow-lg">
       {/* Main content skeleton */}
@@ -29,4 +29,4 @@ const StoryCardSkeleton = () => {
   );
 };
 
-export default StoryCardSkeleton;
+export default JourneyCardSkeleton;
