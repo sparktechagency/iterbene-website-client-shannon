@@ -1,11 +1,11 @@
-interface IViewer {
+export interface IViewer {
   _id: string;
   fullName: string;
   username: string;
   profileImage: string;
 }
 
-interface IReactions {
+export interface IReactions {
   userId: {
     _id: string;
     fullName: string;
@@ -15,7 +15,7 @@ interface IReactions {
   reactionType: string;
 }
 
-interface IStoryMedia {
+export interface IStoryMedia {
   _id: string;
   mediaUrl: string;
   textContent?: string;

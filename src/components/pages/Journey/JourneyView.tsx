@@ -8,7 +8,12 @@ import {
   useReplyToStoryMutation,
   useDeleteStoryMutation,
 } from "@/redux/features/stories/storiesApi";
-import { IStory } from "@/types/stories.types";
+import {
+  IReactions,
+  IStory,
+  IStoryMedia,
+  IViewer,
+} from "@/types/stories.types";
 import {
   ChevronLeft,
   ChevronRight,
@@ -19,13 +24,17 @@ import {
   Trash2,
   MoreVertical,
   X,
+  Eye,
 } from "lucide-react";
 import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
 import React, { useEffect, useRef, useState, useCallback } from "react";
-import { motion, AnimatePresence } from "framer-motion"; // Import Framer Motion
+import { motion, AnimatePresence } from "framer-motion";
 import toast from "react-hot-toast";
 import { TError } from "@/types/error";
+import Link from "next/link";
+import JourneyViewSkeleton from "./JourneyViewSkeleton";
+
 const JourneyView = () => {
   const { journeyId } = useParams();
   const router = useRouter();
@@ -57,28 +66,53 @@ const JourneyView = () => {
   const [isMuted, setIsMuted] = useState(false);
   const [progress, setProgress] = useState(0);
   const [replyText, setReplyText] = useState("");
-  const [isLiked, setIsLiked] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
+  const [showViewers, setShowViewers] = useState(false);
   const [hasViewedCurrent, setHasViewedCurrent] = useState(false);
+
+  // New state for tracking reactions per media
+  const [mediaReactions, setMediaReactions] = useState<{
+    [mediaId: string]: {
+      isLiked: boolean;
+      reactions: IReactions[];
+    };
+  }>({});
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const progressIntervalRef = useRef<number | null>(null);
   const startTimeRef = useRef<number>(0);
   const pausedTimeRef = useRef<number>(0);
-
-  //is story delete state
   const showMenuRef = useRef<HTMLDivElement>(null);
+
   // Constants
   const STORY_DURATION = 7000;
   const storyData = responseData?.data?.attributes;
 
-  // Initialize current story
+  // Initialize current story and reactions
   useEffect(() => {
     if (storyData) {
       setCurrentStory(storyData);
       setHasViewedCurrent(false);
+
+      // Initialize reactions for all media in the story
+      const reactionsMap: {
+        [mediaId: string]: { isLiked: boolean; reactions: IReactions[] };
+      } = {};
+
+      storyData.mediaIds?.forEach((media: IStoryMedia) => {
+        const userReaction = media.reactions?.find(
+          (reaction: IReactions) => reaction.userId._id === user?._id
+        );
+
+        reactionsMap[media._id] = {
+          isLiked: !!userReaction,
+          reactions: media.reactions || [],
+        };
+      });
+
+      setMediaReactions(reactionsMap);
     }
-  }, [storyData]);
+  }, [storyData, user?._id]);
 
   // Initialize all stories and current story index
   useEffect(() => {
@@ -95,7 +129,9 @@ const JourneyView = () => {
 
       setAllStories(stories);
 
-      const index = stories.findIndex((story: IStory) => story._id === journeyId);
+      const index = stories.findIndex(
+        (story: IStory) => story._id === journeyId
+      );
       setCurrentStoryIndex(index >= 0 ? index : 0);
     }
   }, [feedData, journeyId]);
@@ -118,9 +154,7 @@ const JourneyView = () => {
       }
     };
 
-    // Track view after a short delay to ensure user is actually viewing
     const viewTimeout = setTimeout(trackView, 1000);
-
     return () => clearTimeout(viewTimeout);
   }, [currentStory, currentMediaIndex, viewStory, hasViewedCurrent]);
 
@@ -254,21 +288,26 @@ const JourneyView = () => {
 
   const handleLike = async () => {
     if (currentStory?.mediaIds?.[currentMediaIndex]) {
-      // Temporarily pause the story during interaction
       const wasPaused = isPaused;
       setIsPaused(true);
-
       const mediaId = currentStory.mediaIds[currentMediaIndex]._id;
       try {
         await reactToStory({
           mediaId,
           reactionType: "love",
         }).unwrap();
-        setIsLiked(!isLiked);
+
+        // Update local state
+        setMediaReactions((prev) => ({
+          ...prev,
+          [mediaId]: {
+            ...prev[mediaId],
+            isLiked: !prev[mediaId]?.isLiked,
+          },
+        }));
       } catch (error) {
         console.error("Failed to react to story:", error);
       } finally {
-        // Resume story if it wasn't paused before
         if (!wasPaused) {
           setIsPaused(false);
         }
@@ -278,7 +317,6 @@ const JourneyView = () => {
 
   const handleReply = async () => {
     if (replyText.trim() && currentStory?.mediaIds?.[currentMediaIndex]) {
-      // Temporarily pause the story during interaction
       const wasPaused = isPaused;
       setIsPaused(true);
 
@@ -296,7 +334,6 @@ const JourneyView = () => {
         const err = error as TError;
         toast.error(err?.data?.message || "Something went wrong!");
       } finally {
-        // Resume story if it wasn't paused before
         if (!wasPaused) {
           setIsPaused(false);
         }
@@ -307,7 +344,6 @@ const JourneyView = () => {
   const handleDeleteStory = async (mediaId: string) => {
     try {
       await deleteStory(mediaId).unwrap();
-      // Navigate to next story or home
       if (allStories.length > 1) {
         handleNext();
       } else {
@@ -337,7 +373,7 @@ const JourneyView = () => {
   if (storyLoading || feedLoading) {
     return (
       <div className="fixed inset-0 bg-black z-50 flex items-center justify-center">
-        <div className="text-white text-lg">Loading Journey...</div>
+        <JourneyViewSkeleton />
       </div>
     );
   }
@@ -355,6 +391,12 @@ const JourneyView = () => {
   const isImage = currentMedia?.mediaType === "image";
   const isMixed = currentMedia?.mediaType === "mixed";
   const isOwnStory = user?._id === currentStory?.userId?._id;
+
+  // Get current media's reaction state
+  const currentMediaReaction = mediaReactions[currentMedia?._id] || {
+    isLiked: false,
+    reactions: [],
+  };
 
   return (
     <div className="fixed inset-0 bg-black z-50 flex items-center justify-center">
@@ -426,11 +468,11 @@ const JourneyView = () => {
                       className="absolute right-0 mt-1 w-36 p-1 bg-gray-600 shadow-2xl rounded-xl z-50 cursor-pointer"
                       initial={{ opacity: 0, scale: 0.95 }}
                       animate={{ opacity: 1, scale: 1 }}
-                      exit="exit"
+                      exit={{ opacity: 0, scale: 0.95 }}
                     >
                       <button
                         onClick={() => handleDeleteStory(currentMedia._id)}
-                        className="flex items-center gap-2 text-white text-sm p-2  "
+                        className="flex items-center gap-2 text-white text-sm p-2"
                       >
                         <Trash2 className="w-4 h-4 text-red-500" />
                         Delete
@@ -515,30 +557,21 @@ const JourneyView = () => {
           {isOwnStory ? (
             <div className="flex items-center gap-3">
               <div className="flex-1">
-                <div className="text-white text-sm font-medium">
+                <div
+                  className="text-white text-sm font-medium cursor-pointer flex items-center gap-2"
+                  onClick={() => setShowViewers(true)}
+                >
+                  <Eye className="w-4 h-4" />
                   Viewed by {currentMedia?.viewedBy?.length || 0}
                 </div>
-                {currentMedia?.viewedBy?.length > 0 && (
-                  <div className="flex items-center gap-2 mt-2">
-                    {currentMedia?.viewedBy?.map((viewer) => (
-                      <div
-                        key={viewer?._id}
-                        className="w-8 h-8 rounded-full border-2 border-white overflow-hidden"
-                      >
-                        <Image
-                          src={viewer?.profileImage || "/default-avatar.png"}
-                          alt={viewer?.username || "Viewer"}
-                          className="w-full h-full object-cover"
-                          width={32}
-                          height={32}
-                        />
-                      </div>
-                    ))}
-                    {currentMedia?.viewedBy?.length > 3 && (
-                      <div className="text-white text-xs">
-                        +{currentMedia?.viewedBy.length - 3} more
-                      </div>
-                    )}
+
+                {/* Show reaction count for current media */}
+                {currentMedia?.reactions?.length > 0 && (
+                  <div className="flex items-center gap-2 mt-1">
+                    <Heart className="w-4 h-4 text-red-500 fill-current" />
+                    <span className="text-white text-xs">
+                      {currentMedia.reactions.length} reactions
+                    </span>
                   </div>
                 )}
               </div>
@@ -558,15 +591,19 @@ const JourneyView = () => {
               <button
                 onClick={handleLike}
                 className={`p-2 rounded-full cursor-pointer bg-transparent transition-colors ${
-                  isLiked ? "text-red-500" : "text-white"
+                  currentMediaReaction.isLiked ? "text-red-500" : "text-white"
                 }`}
               >
-                <Heart className={`w-6 h-6 ${isLiked ? "fill-current" : ""}`} />
+                <Heart
+                  className={`w-6 h-6 ${
+                    currentMediaReaction.isLiked ? "fill-current" : ""
+                  }`}
+                />
               </button>
               <button
                 onClick={handleReply}
                 disabled={!replyText.trim()}
-                className={`p-2 rounded-full bg-transparent transition-colors cursor-pointer text-white`}
+                className="p-2 rounded-full bg-transparent transition-colors cursor-pointer text-white"
               >
                 <Send className="w-6 h-6" />
               </button>
@@ -592,10 +629,114 @@ const JourneyView = () => {
         </div>
       </div>
 
+      {/* Viewers Modal for own stories */}
+      <AnimatePresence>
+        {showViewers && isOwnStory && (
+          <motion.div
+            className="fixed inset-0 bg-black/80 z-60 flex items-center justify-center p-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setShowViewers(false)}
+          >
+            <motion.div
+              className="bg-white rounded-lg p-6 max-w-sm w-full max-h-[80vh] overflow-y-auto"
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-gray-900 font-semibold">
+                  Views & Reactions
+                </h3>
+                <button
+                  onClick={() => setShowViewers(false)}
+                  className="text-gray-400 cursor-pointer"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              {/* Current Media Views */}
+              <div className="mb-4">
+                <h4 className="text-gray-900 text-sm mb-2">
+                  Views ({currentMedia?.viewedBy?.length || 0})
+                </h4>
+                {currentMedia?.viewedBy?.length > 0 ? (
+                  <div className="space-y-2">
+                    {currentMedia.viewedBy
+                      .filter((viewer: IViewer) => viewer?._id !== user?._id)
+                      .map((viewer: IViewer) => (
+                        <div
+                          key={viewer?._id}
+                          className="flex items-center gap-3"
+                        >
+                          <Image
+                            src={viewer?.profileImage || "/default-avatar.png"}
+                            alt={viewer?.username}
+                            className="w-8 h-8 rounded-full object-cover"
+                            width={32}
+                            height={32}
+                          />
+                          <Link
+                            href={`/${viewer?.username}`}
+                            className="text-gray-900 text-sm hover:underline"
+                          >
+                            {viewer?.username}
+                          </Link>
+                        </div>
+                      ))}
+                  </div>
+                ) : (
+                  <p className="text-gray-900 text-sm">No views yet</p>
+                )}
+              </div>
+
+              {/* Current Media Reactions */}
+              <div>
+                <h4 className="text-gray-900 text-sm mb-2">
+                  Reactions ({currentMedia?.reactions?.length || 0})
+                </h4>
+                {currentMedia?.reactions?.length > 0 ? (
+                  <div className="space-y-2">
+                    {currentMedia?.reactions
+                      ?.filter((reaction) => reaction?.userId !== user?._id)
+                      ?.map((reaction: IReactions, index: number) => (
+                        <div key={index} className="flex items-center gap-3">
+                          <Image
+                            src={
+                              reaction.userId.profileImage ||
+                              "/default-avatar.png"
+                            }
+                            alt={reaction.userId.username}
+                            className="w-8 h-8 rounded-full object-cover"
+                            width={32}
+                            height={32}
+                          />
+                          <Link
+                            href={`/${reaction?.userId?.username}`}
+                            className="text-gray-900 text-sm hover:underline"
+                          >
+                            {reaction?.userId?.username}
+                          </Link>
+                          <Heart className="w-4 h-4 text-red-500 fill-current ml-auto" />
+                        </div>
+                      ))}
+                  </div>
+                ) : (
+                  <p className="text-gray-400 text-sm">No reactions yet</p>
+                )}
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Desktop story list */}
       {allStories?.length > 0 && (
         <div className="hidden lg:block absolute left-8 top-1/2 transform -translate-y-1/2 z-20">
-          <div className="flex flex-col gap-4 max-h-96 overflow-y-auto">
+          <div className="flex flex-col gap-4 max-h-screen overflow-y-auto scrollbar-hide">
             {allStories.map((story, index) => (
               <div
                 key={story._id}
@@ -620,10 +761,10 @@ const JourneyView = () => {
       )}
 
       {/* Mobile story list */}
-      {allStories.length > 0 && (
+      {allStories?.length > 0 && (
         <div className="lg:hidden absolute bottom-20 left-0 right-0 z-20 px-4">
           <div className="flex gap-3 overflow-x-auto pb-2">
-            {allStories.map((story, index) => (
+            {allStories?.map((story, index) => (
               <div
                 key={story._id}
                 className={`flex-shrink-0 w-12 h-12 rounded-full p-0.5 cursor-pointer transition-all ${

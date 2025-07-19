@@ -2,7 +2,14 @@
 
 import logo from "@/asset/logo/logo2.png";
 import { AnimatePresence, motion } from "framer-motion";
-import { LucideCalendarCheck, Search, Menu, X } from "lucide-react";
+import {
+  LucideCalendarCheck,
+  Search,
+  Menu,
+  X,
+  Newspaper,
+  Images,
+} from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState, useCallback } from "react";
@@ -10,7 +17,7 @@ import { BiLogOut } from "react-icons/bi";
 import { BsChatSquareDots } from "react-icons/bs";
 import { FaRegCalendarAlt, FaRegUserCircle } from "react-icons/fa";
 import { FiMapPin } from "react-icons/fi";
-import { HiOutlineUserGroup } from "react-icons/hi";
+import { HiOutlineUserGroup, HiOutlineUsers } from "react-icons/hi";
 import { IoMdNotificationsOutline } from "react-icons/io";
 import { IoChatboxEllipsesOutline } from "react-icons/io5";
 import { MdAlternateEmail } from "react-icons/md";
@@ -56,7 +63,9 @@ const MobileMenu: React.FC<{
           className="fixed top-0 right-0 h-screen overflow-y-auto w-full max-w-sm bg-white z-50 shadow-lg"
         >
           <div className="p-5">
-            <div className="flex justify-end">
+            <div className="w-full flex justify-between items-center">
+              {/* logo */}
+              <Image src={logo} alt="logo" width={100} height={100} />
               <button onClick={onClose} className="p-2">
                 <X size={24} />
               </button>
@@ -73,6 +82,44 @@ const MobileMenu: React.FC<{
                     <span>My Profile</span>
                   </button>
                 </Link>
+                {/* Feed */}
+                <Link
+                  onClick={onClose}
+                  href={`/feed`}
+                  className="text-gray-800 hover:bg-[#ECFCFA] px-4 py-3 rounded-xl flex items-center gap-4"
+                >
+                  <Newspaper size={24} />
+                  <span>Feed</span>
+                </Link>
+                {/*  Connections */}
+                <Link
+                  onClick={onClose}
+                  href="/connections"
+                  className="text-gray-800 hover:bg-[#ECFCFA] px-4 py-3 rounded-xl flex items-center gap-4"
+                >
+                  <HiOutlineUsers size={24} />
+                  <span>Connections</span>
+                </Link>
+                {/* Watch videos */}
+                <Link
+                  onClick={onClose}
+                  href="/watch-videos"
+                  className="text-gray-800 hover:bg-[#ECFCFA] px-4 py-3 rounded-xl flex items-center gap-4"
+                >
+                  <FiMapPin size={24} />
+                  <span>Watch Videos</span>
+                </Link>
+                {/* Photos */}
+                <Link
+                  onClick={onClose}
+                  href="/photos"
+                  className="text-gray-800 hover:bg-[#ECFCFA] px-4 py-3 rounded-xl flex items-center gap-4"
+                >
+                  <Images size={24} />
+                  <span>Photos</span>
+                </Link>
+
+                {/* Timeline */}
                 <Link
                   onClick={onClose}
                   href={`/${user?.username}/timeline`}
