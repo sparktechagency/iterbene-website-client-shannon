@@ -98,11 +98,20 @@ const UserVideos = () => {
           if (index === videoMedia.length - 1) {
             return (
               <div key={media._id} ref={lastVideoElementRef}>
-                <VideoCard url={media.mediaUrl} />
+                <VideoCard
+                  url={media.mediaUrl}
+                  className="w-full h-[200px] md:h-[300px]"
+                />
               </div>
             );
           }
-          return <VideoCard key={media._id} url={media.mediaUrl} />;
+          return (
+            <VideoCard
+              key={media._id}
+              url={media.mediaUrl}
+              className="h-[200px] md:h-[300px]"
+            />
+          );
         })}
       </div>
     );
@@ -129,4 +138,3 @@ const UserVideos = () => {
 };
 
 export default UserVideos;
-

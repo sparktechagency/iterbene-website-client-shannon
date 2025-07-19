@@ -9,7 +9,7 @@ import UserDetails from "./UserDetails/UserDetails";
 const UserDetailsPage = () => {
   const user = useUser();
   const { userName } = useParams();
-  const { data: responseData } = useGetSingleUserQuery(userName, {
+  const { data: responseData } = useGetSingleUserQuery( { userName,...user && { userId: user?._id } }, {
     refetchOnMountOrArgChange: true,
     skip: !userName,
   });

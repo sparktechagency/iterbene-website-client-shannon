@@ -27,8 +27,6 @@ import SearchDropdown from "./SearchDropdown";
 import { useGetSearchHashtagAndUsersQuery } from "@/redux/features/search/searchApi";
 import LocationPermission from "./LocationPermission";
 import { useGetUnviewedNotificationsCountQuery } from "@/redux/features/notifications/notificationsApi";
-import { openAuthModal } from "@/redux/features/auth/authModalSlice";
-import { useAppDispatch } from "@/redux/hooks";
 
 // Mobile Menu Component
 const MobileMenu: React.FC<{
@@ -233,8 +231,6 @@ const Header: React.FC = () => {
   const searchRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const desktopSearchRef = useRef<HTMLDivElement>(null);
-  //dispatch openAuthModal
-  const dispatch = useAppDispatch();
 
   useEffect(() => {
     if (socket && user?._id) {
@@ -383,10 +379,6 @@ const Header: React.FC = () => {
   // Handle search result clicks
   const handleSearchResultClick = useCallback(
     (result: IUser | IHashtag, type: string) => {
-      if (!user) {
-        dispatch(openAuthModal());
-        return;
-      }
       switch (type) {
         case "user":
           const userResult = result as IUser;
@@ -406,7 +398,7 @@ const Header: React.FC = () => {
       setDebouncedSearchValue("");
       setIsSearchOpen(false);
     },
-    [dispatch, router, user]
+    [router]
   );
 
   return (

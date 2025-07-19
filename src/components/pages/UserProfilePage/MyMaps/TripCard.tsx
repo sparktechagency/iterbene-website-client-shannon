@@ -40,7 +40,7 @@ const TripCard = ({ trip }: { trip: ISearchPost }) => {
                   ) : (
                     <VideoCard
                       url={media.mediaUrl}
-                      className="w-full h-full rounded-xl"
+                      className="w-full h-[100px] md:h-[250px] rounded-xl"
                     />
                   )}
                 </SwiperSlide>
@@ -61,7 +61,7 @@ const TripCard = ({ trip }: { trip: ISearchPost }) => {
             ) : trip?.media[0]?.mediaType === "video" ? (
               <VideoCard
                 url={trip?.media[0]?.mediaUrl}
-                className="w-full h-full rounded-xl"
+                className="w-full h-[100px] md:h-[250px] rounded-xl"
               />
             ) : null}
           </div>

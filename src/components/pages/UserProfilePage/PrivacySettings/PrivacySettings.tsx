@@ -33,7 +33,6 @@ type PrivacyVisibilityValue =
 interface IPrivacySettings {
   ageRange: PrivacyVisibilityValue;
   nickname: PrivacyVisibilityValue;
-  gender: PrivacyVisibilityValue;
   location: PrivacyVisibilityValue;
   locationName: PrivacyVisibilityValue;
   country: PrivacyVisibilityValue;
@@ -145,7 +144,6 @@ export default function PrivacySettings() {
     setPrivacySettings({
       ageRange: PrivacyVisibility.ONLY_ME,
       nickname: PrivacyVisibility.PUBLIC,
-      gender: PrivacyVisibility.ONLY_ME,
       location: PrivacyVisibility.PUBLIC,
       locationName: PrivacyVisibility.PUBLIC,
       country: PrivacyVisibility.PUBLIC,
@@ -243,8 +241,7 @@ export default function PrivacySettings() {
       settings: [
         { key: "nickname", label: "Nickname", icon: User },
         { key: "ageRange", label: "Age Range", icon: User },
-        { key: "gender", label: "Gender", icon: User },
-        { key: "maritalStatus", label: "Marital Status", icon: Heart },
+        { key: "maritalStatus", label: "Relationship Status", icon: Heart },
         { key: "profession", label: "Profession", icon: Briefcase },
         { key: "aboutMe", label: "About Me", icon: MessageCircle },
         { key: "phoneNumber", label: "Phone Number", icon: Phone },

@@ -59,7 +59,7 @@ const PostContentRender = ({ data, isVisible }: PostContentRenderProps) => {
             <VideoCard
               url={media?.mediaUrl}
               isVisible={isVisible}
-              className="w-full h-[400px]"
+              className="w-full h-[100px] md:h-[400px]"
             />
           )}
         </div>
@@ -85,7 +85,7 @@ const PostContentRender = ({ data, isVisible }: PostContentRenderProps) => {
                 <VideoCard
                   url={media?.mediaUrl}
                   isVisible={isVisible}
-                  className="w-full h-[350px]"
+                  className="w-full h-[100px] md:h-[350px]"
                 />
               )}
             </div>
@@ -112,7 +112,7 @@ const PostContentRender = ({ data, isVisible }: PostContentRenderProps) => {
               <VideoCard
                 url={data[0]?.mediaUrl}
                 isVisible={isVisible}
-                className="h-[350px]"
+                className="w-full h-[100px] md:h-[350px]"
               />
             )}
           </div>
@@ -130,7 +130,7 @@ const PostContentRender = ({ data, isVisible }: PostContentRenderProps) => {
               <VideoCard
                 url={data[1]?.mediaUrl}
                 isVisible={isVisible}
-                className="h-[260px]"
+                className="h-[100px] md:h-[260px]"
               />
             )}
           </div>
@@ -167,7 +167,7 @@ const PostContentRender = ({ data, isVisible }: PostContentRenderProps) => {
                 priority
               />
             ) : (
-              <VideoCard url={data[0]?.mediaUrl} isVisible={isVisible} />
+              <VideoCard url={data[0]?.mediaUrl} isVisible={isVisible} className="w-full h-[100px] md:h-[800px]" />
             )}
           </div>
           <div className="row-span-2 col-span-1">
@@ -181,7 +181,7 @@ const PostContentRender = ({ data, isVisible }: PostContentRenderProps) => {
                 onClick={() => handleImageClick(data[1])}
               />
             ) : (
-              <VideoCard url={data[1]?.mediaUrl} isVisible={isVisible} />
+              <VideoCard url={data[1]?.mediaUrl} isVisible={isVisible} className="w-full h-[100px] md:h-[400px]" />
             )}
           </div>
           <div className="col-span-1">
@@ -195,7 +195,7 @@ const PostContentRender = ({ data, isVisible }: PostContentRenderProps) => {
                 onClick={() => handleImageClick(data[2])}
               />
             ) : (
-              <VideoCard url={data[2]?.mediaUrl} isVisible={isVisible} />
+              <VideoCard url={data[2]?.mediaUrl} isVisible={isVisible} className="w-full h-[100px] md:h-[400px]" />
             )}
           </div>
           <div className="col-span-1">
@@ -209,7 +209,7 @@ const PostContentRender = ({ data, isVisible }: PostContentRenderProps) => {
                 onClick={() => handleImageClick(data[3])}
               />
             ) : (
-              <VideoCard url={data[3]?.mediaUrl} isVisible={isVisible} />
+              <VideoCard url={data[3]?.mediaUrl} isVisible={isVisible} className="w-full h-[100px] md:h-[400px]" />
             )}
           </div>
         </div>
@@ -231,7 +231,7 @@ const PostContentRender = ({ data, isVisible }: PostContentRenderProps) => {
                 priority
               />
             ) : (
-              <VideoCard url={data[0]?.mediaUrl} isVisible={isVisible} />
+              <VideoCard url={data[0]?.mediaUrl} isVisible={isVisible} className="w-full h-[100px] md:h-[400px]" />
             )}
           </div>
           <div className="row-span-2 col-span-1">
@@ -259,7 +259,7 @@ const PostContentRender = ({ data, isVisible }: PostContentRenderProps) => {
                 onClick={() => handleImageClick(data[2])}
               />
             ) : (
-              <VideoCard url={data[2]?.mediaUrl} isVisible={isVisible} />
+              <VideoCard url={data[2]?.mediaUrl} isVisible={isVisible} className="w-full h-[100px] md:h-[400px]" />
             )}
           </div>
           <div
@@ -275,7 +275,7 @@ const PostContentRender = ({ data, isVisible }: PostContentRenderProps) => {
                 className="w-full h-full object-cover rounded-xl cursor-pointer"
               />
             ) : (
-              <VideoCard url={data[3]?.mediaUrl} isVisible={isVisible} />
+              <VideoCard url={data[3]?.mediaUrl} isVisible={isVisible} className="w-full h-[100px] md:h-[400px]" />
             )}
             <div className="absolute top-0 left-0 w-full h-full bg-black/30 rounded-xl cursor-pointer">
               <span className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white text-xl md:text-3xl">

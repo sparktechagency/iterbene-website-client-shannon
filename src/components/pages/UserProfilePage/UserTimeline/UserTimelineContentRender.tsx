@@ -40,7 +40,7 @@ const UserTimelineContentRender = ({
                 ) : (
                   <VideoCard
                     url={media.mediaUrl}
-                    className="w-full h-[300px]  rounded-xl"
+                    className="w-full h-[200px] md:h-[300px]  rounded-xl"
                   />
                 )}
               </div>

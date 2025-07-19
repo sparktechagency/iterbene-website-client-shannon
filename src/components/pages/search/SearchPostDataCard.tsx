@@ -39,7 +39,7 @@ const SearchPostDataCard = ({ post }: { post: ISearchPost }) => {
                   ) : (
                     <VideoCard
                       url={media.mediaUrl}
-                      className="w-full h-full rounded-xl"
+                      className="w-full h-[200px] md:h-[250px] rounded-xl"
                     />
                   )}
                 </SwiperSlide>
@@ -60,7 +60,7 @@ const SearchPostDataCard = ({ post }: { post: ISearchPost }) => {
             ) : post?.media[0]?.mediaType === "video" ? (
               <VideoCard
                 url={post?.media[0]?.mediaUrl}
-                className="w-full h-full rounded-xl"
+                className="w-full h-[200px] md:h-[250px] rounded-xl"
               />
             ) : null}
           </div>

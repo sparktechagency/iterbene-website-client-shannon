@@ -17,10 +17,13 @@ const UserProfileInformationPage = ({
 }) => {
   const user = useUser();
   const { userName } = useParams();
-  const { data: responseData, isLoading } = useGetSingleUserQuery(userName, {
-    refetchOnMountOrArgChange: true,
-    skip: !userName,
-  });
+  const { data: responseData, isLoading } = useGetSingleUserQuery(
+    { userName,...user && { userId: user?._id } },
+    {
+      refetchOnMountOrArgChange: true,
+      skip: !userName,
+    }
+  );
   const userData = responseData?.data?.attributes;
   const isMyProfile = user?._id === userData?._id;
   let content = null;

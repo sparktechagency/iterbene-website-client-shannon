@@ -51,7 +51,6 @@ const VideoCard = ({
           if ((error as { name?: string }).name === "NotAllowedError") {
             setError("Autoplay blocked. Please interact with the page.");
           } else if ((error as { name?: string }).name !== "AbortError") {
-            console.log("Play failed:", error);
             setError("Play failed");
           }
         }
@@ -274,7 +273,7 @@ const VideoCard = ({
       <video
         ref={videoRef}
         src={url}
-        className={`w-full ${className} object-cover ${
+        className={`w-full  ${className}   object-cover ${
           isLoading ? "opacity-0" : "opacity-100"
         } transition-opacity duration-300`}
         controls={false}
