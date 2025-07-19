@@ -19,6 +19,8 @@ type ViewType = "selection" | "text" | "photo";
 type TextStyleType = "Clean" | "Bold" | "Typewriter" | "Modern";
 type PrivacyType = "public" | "followers" | "custom";
 
+import Image from "next/image";
+
 const CreateStories: React.FC = () => {
   const [currentView, setCurrentView] = useState<ViewType>("selection");
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
@@ -579,14 +581,13 @@ const CreateStories: React.FC = () => {
               <div className="w-96 h-[550px] rounded-3xl overflow-hidden relative bg-gray-200">
                 {previewUrl && (
                   <div style={{ position: "relative", width: "100%", height: "550px" }}>
-                    <img
+                    <Image
                       ref={imgRef}
                       src={previewUrl}
                       alt="Journey preview"
+                      layout="fill"
+                      objectFit="contain"
                       style={{
-                        width: "100%",
-                        height: "100%",
-                        objectFit: "contain",
                         transform: `scale(${scale}) rotate(${rotate}deg)`,
                       }}
                     />
