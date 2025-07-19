@@ -6,7 +6,7 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
-import { Navigation, Pagination, Autoplay } from "swiper/modules";
+import { Navigation, Pagination } from "swiper/modules";
 import useWindowSize from "@/hooks/useWindowSize";
 import Lightbox from "yet-another-react-lightbox";
 import "yet-another-react-lightbox/styles.css";
@@ -76,8 +76,8 @@ const PostContentRender = ({ data, isVisible }: PostContentRenderProps) => {
                   src={media?.mediaUrl}
                   alt="Post media"
                   width={400}
-                  height={350}
-                  className="w-full h-full object-cover rounded-xl cursor-pointer"
+                  height={400}
+                  className="w-full h-[100px] md:h-[350px] object-cover rounded-xl cursor-pointer"
                   onClick={() => handleImageClick(media)}
                   priority={index === 0}
                 />
@@ -104,7 +104,7 @@ const PostContentRender = ({ data, isVisible }: PostContentRenderProps) => {
                 alt="Post media"
                 width={400}
                 height={350}
-                className="w-full h-[350px] object-cover rounded-xl cursor-pointer"
+                className="w-full h-[100px] md:h-[350px] object-cover rounded-xl cursor-pointer"
                 onClick={() => handleImageClick(data[0])}
                 priority
               />
@@ -123,7 +123,7 @@ const PostContentRender = ({ data, isVisible }: PostContentRenderProps) => {
                 alt="Post media"
                 width={400}
                 height={260}
-                className="w-full h-[260px] object-cover rounded-xl cursor-pointer"
+                className="w-full h-[100px] md:h-[260px] object-cover rounded-xl cursor-pointer"
                 onClick={() => handleImageClick(data[1])}
               />
             ) : (
@@ -141,11 +141,15 @@ const PostContentRender = ({ data, isVisible }: PostContentRenderProps) => {
                 alt="Post media"
                 width={400}
                 height={260}
-                className="w-full h-[260px] object-cover rounded-xl cursor-pointer"
+                className="w-fullh-[100px] md:h-[260px] object-cover rounded-xl cursor-pointer"
                 onClick={() => handleImageClick(data[2])}
               />
             ) : (
-              <VideoCard url={data[2]?.mediaUrl} isVisible={isVisible} />
+              <VideoCard
+                url={data[2]?.mediaUrl}
+                isVisible={isVisible}
+                className="h-[100px] md:h-[260px]"
+              />
             )}
           </div>
         </div>
@@ -167,7 +171,11 @@ const PostContentRender = ({ data, isVisible }: PostContentRenderProps) => {
                 priority
               />
             ) : (
-              <VideoCard url={data[0]?.mediaUrl} isVisible={isVisible} className="w-full h-[100px] md:h-[800px]" />
+              <VideoCard
+                url={data[0]?.mediaUrl}
+                isVisible={isVisible}
+                className="w-full h-[100px] md:h-[800px]"
+              />
             )}
           </div>
           <div className="row-span-2 col-span-1">
@@ -181,7 +189,11 @@ const PostContentRender = ({ data, isVisible }: PostContentRenderProps) => {
                 onClick={() => handleImageClick(data[1])}
               />
             ) : (
-              <VideoCard url={data[1]?.mediaUrl} isVisible={isVisible} className="w-full h-[100px] md:h-[400px]" />
+              <VideoCard
+                url={data[1]?.mediaUrl}
+                isVisible={isVisible}
+                className="w-full h-[100px] md:h-[400px]"
+              />
             )}
           </div>
           <div className="col-span-1">
@@ -195,7 +207,11 @@ const PostContentRender = ({ data, isVisible }: PostContentRenderProps) => {
                 onClick={() => handleImageClick(data[2])}
               />
             ) : (
-              <VideoCard url={data[2]?.mediaUrl} isVisible={isVisible} className="w-full h-[100px] md:h-[400px]" />
+              <VideoCard
+                url={data[2]?.mediaUrl}
+                isVisible={isVisible}
+                className="w-full h-[100px] md:h-[400px]"
+              />
             )}
           </div>
           <div className="col-span-1">
@@ -209,7 +225,11 @@ const PostContentRender = ({ data, isVisible }: PostContentRenderProps) => {
                 onClick={() => handleImageClick(data[3])}
               />
             ) : (
-              <VideoCard url={data[3]?.mediaUrl} isVisible={isVisible} className="w-full h-[100px] md:h-[400px]" />
+              <VideoCard
+                url={data[3]?.mediaUrl}
+                isVisible={isVisible}
+                className="w-full h-[100px] md:h-[400px]"
+              />
             )}
           </div>
         </div>
@@ -231,7 +251,11 @@ const PostContentRender = ({ data, isVisible }: PostContentRenderProps) => {
                 priority
               />
             ) : (
-              <VideoCard url={data[0]?.mediaUrl} isVisible={isVisible} className="w-full h-[100px] md:h-[400px]" />
+              <VideoCard
+                url={data[0]?.mediaUrl}
+                isVisible={isVisible}
+                className="w-full h-[100px] md:h-[400px]"
+              />
             )}
           </div>
           <div className="row-span-2 col-span-1">
@@ -259,7 +283,11 @@ const PostContentRender = ({ data, isVisible }: PostContentRenderProps) => {
                 onClick={() => handleImageClick(data[2])}
               />
             ) : (
-              <VideoCard url={data[2]?.mediaUrl} isVisible={isVisible} className="w-full h-[100px] md:h-[400px]" />
+              <VideoCard
+                url={data[2]?.mediaUrl}
+                isVisible={isVisible}
+                className="w-full h-[100px] md:h-[400px]"
+              />
             )}
           </div>
           <div
@@ -275,7 +303,11 @@ const PostContentRender = ({ data, isVisible }: PostContentRenderProps) => {
                 className="w-full h-full object-cover rounded-xl cursor-pointer"
               />
             ) : (
-              <VideoCard url={data[3]?.mediaUrl} isVisible={isVisible} className="w-full h-[100px] md:h-[400px]" />
+              <VideoCard
+                url={data[3]?.mediaUrl}
+                isVisible={isVisible}
+                className="w-full h-[100px] md:h-[400px]"
+              />
             )}
             <div className="absolute top-0 left-0 w-full h-full bg-black/30 rounded-xl cursor-pointer">
               <span className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white text-xl md:text-3xl">
@@ -293,41 +325,40 @@ const PostContentRender = ({ data, isVisible }: PostContentRenderProps) => {
     <>
       {isMobile ? (
         <Swiper
-          modules={[Navigation, Pagination, Autoplay]}
+          modules={[Navigation, Pagination]}
           spaceBetween={10}
           slidesPerView={1}
           navigation={{ prevEl: null, nextEl: null }}
           loop
           pagination={{ clickable: true }}
-          autoplay={{ delay: 3000 }}
           className="w-full mt-3"
         >
           {data?.map((media, index) => (
-              <SwiperSlide key={index}>
-                <div className="aspect-square">
-                  {media?.mediaType === "image" ? (
-                    <Image
-                      src={media?.mediaUrl}
-                      alt={`Post media ${index + 1}`}
-                      width={400}
-                      height={350}
-                      className="w-full h-full object-cover rounded-xl cursor-pointer"
-                      onClick={() => handleImageClick(media)}
-                      priority={index === 0}
-                    />
-                  ) : (
-                    <VideoCard
-                      url={media?.mediaUrl}
-                      isVisible={isVisible}
-                      className="w-full h-full"
-                    />
-                  )}
-                </div>
-              </SwiperSlide>
+            <SwiperSlide key={index}>
+              <div className="aspect-square">
+                {media?.mediaType === "image" ? (
+                  <Image
+                    src={media?.mediaUrl}
+                    alt={`Post media ${index + 1}`}
+                    width={400}
+                    height={350}
+                    className="w-full h-full object-cover rounded-xl cursor-pointer"
+                    onClick={() => handleImageClick(media)}
+                    priority={index === 0}
+                  />
+                ) : (
+                  <VideoCard
+                    url={media?.mediaUrl}
+                    isVisible={isVisible}
+                    className="w-full h-full"
+                  />
+                )}
+              </div>
+            </SwiperSlide>
           ))}
         </Swiper>
       ) : (
-       renderDesktopLayout()
+        renderDesktopLayout()
       )}
       <Lightbox
         open={open}

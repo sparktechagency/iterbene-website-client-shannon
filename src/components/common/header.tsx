@@ -13,7 +13,7 @@ import { FiMapPin } from "react-icons/fi";
 import { HiOutlineUserGroup } from "react-icons/hi";
 import { IoMdNotificationsOutline } from "react-icons/io";
 import { IoChatboxEllipsesOutline } from "react-icons/io5";
-import { MdAlternateEmail, MdOutlineNotifications } from "react-icons/md";
+import { MdAlternateEmail } from "react-icons/md";
 import CustomButton from "../custom/custom-button";
 import useUser from "@/hooks/useUser";
 import { IUser } from "@/types/user.types";
@@ -53,7 +53,7 @@ const MobileMenu: React.FC<{
           animate={{ x: 0 }}
           exit={{ x: "100%" }}
           transition={{ type: "spring", stiffness: 300, damping: 30 }}
-          className="fixed top-0 right-0 h-full w-full max-w-sm bg-white z-50 shadow-lg"
+          className="fixed top-0 right-0 h-screen overflow-y-auto w-full max-w-sm bg-white z-50 shadow-lg"
         >
           <div className="p-5">
             <div className="flex justify-end">
@@ -62,63 +62,45 @@ const MobileMenu: React.FC<{
               </button>
             </div>
             <div className="mt-5">
-              <Link href={`/${user?.username}`}>
-                <div className="flex items-center gap-3 mb-4 bg-[#ECFCFA] p-4 rounded-xl">
-                  {user?.profileImage && (
-                    <Image
-                      src={user?.profileImage}
-                      width={40}
-                      height={40}
-                      className="size-14 rounded-full flex-shrink-0"
-                      alt="user"
-                    />
-                  )}
-                  <div className="flex-1 min-w-0">
-                    <p className="font-medium truncate">{user?.fullName}</p>
-                    <p className="text-sm text-gray-500 truncate">
-                      @{user?.username}
-                    </p>
-                  </div>
-                </div>
-              </Link>
               <div className="space-y-3 overflow-y-auto">
-                <Link href={`/${user?.username}`} className="block text-black">
+                <Link
+                  onClick={onClose}
+                  href={`/${user?.username}`}
+                  className="block text-black"
+                >
                   <button className="w-full text-left text-gray-800 hover:bg-[#ECFCFA] px-4 py-3 rounded-xl flex items-center gap-4">
                     <FaRegUserCircle size={24} />
                     <span>My Profile</span>
                   </button>
                 </Link>
                 <Link
-                  href="/"
+                  onClick={onClose}
+                  href={`/${user?.username}/timeline`}
                   className="text-gray-800 hover:bg-[#ECFCFA] px-4 py-3 rounded-xl flex items-center gap-4"
                 >
                   <LucideCalendarCheck size={24} />
                   <span>Timeline</span>
                 </Link>
                 <Link
+                  onClick={onClose}
                   href="/messages"
                   className="text-gray-800 hover:bg-[#ECFCFA] px-4 py-3 rounded-xl flex items-center gap-4"
                 >
                   <IoChatboxEllipsesOutline size={24} />
                   <span>Messages</span>
-                  <span className="ml-auto size-6 rounded-full bg-primary text-white flex justify-center items-center text-sm">
-                    5
-                  </span>
                 </Link>
                 <Link
-                  href="/"
-                  className="text-gray-800 hover:bg-[#ECFCFA] px-4 py-3 rounded-xl flex items-center gap-4"
+                  onClick={onClose}
+                  href="/groups"
+                  className="block text-black"
                 >
-                  <MdOutlineNotifications size={24} />
-                  <span>Notifications</span>
-                </Link>
-                <Link href="/groups" className="block text-black">
                   <button className="w-full text-left text-gray-800 hover:bg-[#ECFCFA] px-4 py-3 rounded-xl flex items-center gap-4">
                     <HiOutlineUserGroup size={24} />
                     <span>Groups</span>
                   </button>
                 </Link>
                 <Link
+                  onClick={onClose}
                   href={`/${user?.username}/maps`}
                   className="text-gray-800 hover:bg-[#ECFCFA] px-4 py-3 rounded-xl flex items-center gap-4 "
                 >
@@ -126,6 +108,7 @@ const MobileMenu: React.FC<{
                   <span>Maps</span>
                 </Link>
                 <Link
+                  onClick={onClose}
                   href="/events"
                   className="text-gray-800 hover:bg-[#ECFCFA] px-4 py-3 rounded-xl flex items-center gap-4"
                 >
@@ -133,6 +116,7 @@ const MobileMenu: React.FC<{
                   <span>Events</span>
                 </Link>
                 <Link
+                  onClick={onClose}
                   href={`/${user?.username}/invitations`}
                   className="text-gray-800 hover:bg-[#ECFCFA] px-4 py-3 rounded-xl flex items-center gap-4"
                 >

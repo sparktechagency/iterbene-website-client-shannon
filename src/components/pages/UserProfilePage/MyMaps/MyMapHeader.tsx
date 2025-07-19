@@ -48,7 +48,7 @@ const MyMapHeader = () => {
                   mass: 0.8, // Slightly lower mass for smoother scaling
                   duration: 0.3 // Slightly longer for noticeable scale effect
                 }}
-                className="absolute right-0 top-8 w-80 bg-white border border-gray-200 rounded-lg shadow-lg p-4 z-10"
+                className="absolute right-0 top-8 w-80 bg-white border border-gray-200 rounded-lg shadow-lg p-4 z-[9999]"
               >
                 <motion.h3 
                   className="font-semibold text-gray-900 mb-3"

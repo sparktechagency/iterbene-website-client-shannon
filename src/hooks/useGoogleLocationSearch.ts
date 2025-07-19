@@ -1,7 +1,19 @@
+// lib/unified-google-maps.ts
+import { useJsApiLoader } from "@react-google-maps/api";
 import { useState, useEffect, useRef, useCallback } from "react";
 
 const GOOGLE_MAPS_API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAP_API_KEY || "";
 
+// Consistent libraries configuration for both map display and places search
+export const GOOGLE_MAPS_LIBRARIES: (
+  | "maps"
+  | "places"
+  | "geometry"
+  | "drawing"
+  | "visualization"
+)[] = ["places"];
+
+// Types for location search
 export interface LocationPrediction {
   description: string;
   place_id: string;
@@ -19,34 +31,32 @@ export interface LocationDetails {
   place_id: string;
 }
 
+// Global unified hook for Google Maps
+export const useUnifiedGoogleMaps = () => {
+  const { isLoaded, loadError } = useJsApiLoader({
+    googleMapsApiKey: GOOGLE_MAPS_API_KEY,
+    libraries: GOOGLE_MAPS_LIBRARIES, // This will load both maps and places
+  });
+
+  return { isLoaded, loadError };
+};
+
+// Updated location search hook that uses the unified loader
 interface UseGoogleLocationSearchOptions {
   debounceMs?: number;
   minQueryLength?: number;
   maxResults?: number;
   types?: string[];
-  autoInitialize?: boolean;
   defaultQuery?: string;
 }
 
 interface UseGoogleLocationSearchReturn {
   predictions: LocationPrediction[];
   isLoading: boolean;
-  isInitialized: boolean;
   searchLocations: (query: string) => Promise<void>;
   getLocationDetails: (placeId: string) => Promise<LocationDetails | null>;
   clearPredictions: () => void;
-  autocompleteService: React.MutableRefObject<google.maps.places.AutocompleteService | null>;
-  placesService: React.MutableRefObject<google.maps.places.PlacesService | null>;
-  initializeGoogleMaps: () => void;
   error: string | null;
-}
-
-// Global state management for Google Maps loading
-declare global {
-  interface Window {
-    googleMapsInitPromise?: Promise<void>;
-    googleMapsLoaded?: boolean;
-  }
 }
 
 export const useGoogleLocationSearch = (
@@ -57,116 +67,28 @@ export const useGoogleLocationSearch = (
     minQueryLength = 1,
     maxResults = 20,
     types = ["establishment", "geocode"],
-    autoInitialize = true,
     defaultQuery = "",
   } = options;
+
+  // Use the unified Google Maps loader
+  const { isLoaded } = useUnifiedGoogleMaps();
 
   // States
   const [predictions, setPredictions] = useState<LocationPrediction[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [isInitialized, setIsInitialized] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Refs
+  // Refs for services
   const autocompleteService =
     useRef<google.maps.places.AutocompleteService | null>(null);
   const placesService = useRef<google.maps.places.PlacesService | null>(null);
   const debounceTimer = useRef<NodeJS.Timeout | null>(null);
-  const initAttempts = useRef(0);
-  const maxInitAttempts = 5;
-  const shouldExecuteDefaultQuery = useRef(false);
+  const servicesInitialized = useRef(false);
 
-  // Check if Google Maps is available
-  const isGoogleMapsAvailable = useCallback((): boolean => {
-    return !!(
-      typeof window !== "undefined" &&
-      window.google?.maps?.places?.AutocompleteService &&
-      window.google?.maps?.places?.PlacesService
-    );
-  }, []);
-
-  // Load Google Maps API
-  const loadGoogleMapsAPI = useCallback((): Promise<void> => {
-    // Return existing promise if already loading
-    if (window.googleMapsInitPromise) {
-      return window.googleMapsInitPromise;
-    }
-
-    // Return resolved promise if already loaded
-    if (isGoogleMapsAvailable()) {
-      window.googleMapsLoaded = true;
-      return Promise.resolve();
-    }
-
-    // Check if API key is available
-    if (!GOOGLE_MAPS_API_KEY) {
-      const errorMsg = "Google Maps API key is missing";
-      setError(errorMsg);
-      return Promise.reject(new Error(errorMsg));
-    }
-
-    window.googleMapsInitPromise = new Promise((resolve, reject) => {
+  // Initialize services when Google Maps is loaded
+  const initializeServices = useCallback(() => {
+    if (isLoaded && !servicesInitialized.current) {
       try {
-        // Remove any existing script
-        const existingScript = document.querySelector(
-          'script[src*="maps.googleapis.com"]'
-        );
-        if (existingScript) {
-          existingScript.remove();
-        }
-
-        // Create new script
-        const script = document.createElement("script");
-        script.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_API_KEY}&libraries=places&callback=initGoogleMaps`;
-        script.async = true;
-        script.defer = true;
-
-        // Global callback function
-        (window as Window & { initGoogleMaps?: () => void }).initGoogleMaps =
-          () => {
-            const checkReady = () => {
-              if (isGoogleMapsAvailable()) {
-                window.googleMapsLoaded = true;
-                delete (window as Window & { initGoogleMaps?: () => void })
-                  .initGoogleMaps;
-                resolve();
-              } else {
-                setTimeout(checkReady, 50);
-              }
-            };
-            checkReady();
-          };
-
-        script.onerror = () => {
-          setError("Failed to load Google Maps API");
-          delete window.googleMapsInitPromise;
-          delete (window as Window & { initGoogleMaps?: () => void })
-            .initGoogleMaps;
-          reject(new Error("Failed to load Google Maps API"));
-        };
-
-        document.head.appendChild(script);
-
-        // Timeout fallback
-        setTimeout(() => {
-          if (!window.googleMapsLoaded) {
-            setError("Google Maps API loading timeout");
-            reject(new Error("Google Maps API loading timeout"));
-          }
-        }, 10000);
-      } catch (err) {
-        setError("Error loading Google Maps API");
-        reject(err);
-      }
-    });
-
-    return window.googleMapsInitPromise;
-  }, [isGoogleMapsAvailable]);
-
-  // Initialize services
-  const initializeServices = useCallback((): boolean => {
-    try {
-      if (isGoogleMapsAvailable()) {
         autocompleteService.current =
           new window.google.maps.places.AutocompleteService();
 
@@ -178,75 +100,24 @@ export const useGoogleLocationSearch = (
           dummyDiv
         );
 
-        setIsInitialized(true);
+        servicesInitialized.current = true;
         setError(null);
 
-        // Mark that we should execute default query
+        // Execute default query if provided
         if (defaultQuery && defaultQuery.length >= minQueryLength) {
-          shouldExecuteDefaultQuery.current = true;
+          setTimeout(() => searchLocations(defaultQuery), 100);
         }
-
-        return true;
-      }
-      return false;
-    } catch (err) {
-      console.error("Error initializing Google Maps services:", err);
-      setError("Failed to initialize location services");
-      return false;
-    }
-  }, [isGoogleMapsAvailable, defaultQuery, minQueryLength]);
-
-  // Main initialization function
-  const initializeGoogleMaps = useCallback(async (): Promise<void> => {
-    if (isInitialized) return;
-
-    initAttempts.current += 1;
-
-    try {
-      setError(null);
-
-      // Check if already available
-      if (isGoogleMapsAvailable()) {
-        initializeServices();
-        return;
-      }
-
-      // Load API
-      await loadGoogleMapsAPI();
-
-      // Initialize services
-      if (!initializeServices()) {
-        throw new Error("Failed to initialize services after API load");
-      }
-    } catch (err) {
-      console.error("Google Maps initialization error:", err);
-
-      const errorMessage = err instanceof Error ? err.message : "Unknown error";
-      setError(errorMessage);
-
-      // Retry with exponential backoff
-      if (initAttempts.current < maxInitAttempts) {
-        const retryDelay = Math.min(
-          1000 * Math.pow(2, initAttempts.current - 1),
-          8000
-        );
-
-        setTimeout(() => {
-          initializeGoogleMaps();
-        }, retryDelay);
-      } else {
-        const finalError =
-          "Failed to initialize location services after multiple attempts. Please refresh the page.";
-        setError(finalError);
-        window.location.reload();
+      } catch (err) {
+        console.error("Error initializing Google Maps services:", err);
+        setError("Failed to initialize location services");
       }
     }
-  }, [
-    isInitialized,
-    isGoogleMapsAvailable,
-    loadGoogleMapsAPI,
-    initializeServices,
-  ]);
+  }, [isLoaded, defaultQuery, minQueryLength]);
+
+  // Initialize services when Google Maps loads
+  useEffect(() => {
+    initializeServices();
+  }, [initializeServices]);
 
   // Search locations
   const searchLocations = useCallback(
@@ -258,16 +129,10 @@ export const useGoogleLocationSearch = (
         return;
       }
 
-      // Initialize if not ready
-      if (!isInitialized) {
-        if (autoInitialize) {
-          await initializeGoogleMaps();
-        }
-        return;
-      }
-
-      if (!autocompleteService.current) {
-        console.warn("AutocompleteService not available");
+      if (!isLoaded || !autocompleteService.current) {
+        console.warn(
+          "Google Maps not loaded or AutocompleteService not available"
+        );
         return;
       }
 
@@ -334,23 +199,14 @@ export const useGoogleLocationSearch = (
         }
       }, debounceMs);
     },
-    [
-      defaultQuery,
-      minQueryLength,
-      isInitialized,
-      autoInitialize,
-      initializeGoogleMaps,
-      debounceMs,
-      maxResults,
-      types,
-    ]
+    [defaultQuery, minQueryLength, isLoaded, debounceMs, maxResults, types]
   );
 
   // Get location details
   const getLocationDetails = useCallback(
     async (placeId: string): Promise<LocationDetails | null> => {
-      if (!isInitialized || !placesService.current) {
-        console.warn("PlacesService not initialized");
+      if (!isLoaded || !placesService.current) {
+        console.warn("Google Maps not loaded or PlacesService not initialized");
         return null;
       }
 
@@ -382,30 +238,13 @@ export const useGoogleLocationSearch = (
         }
       });
     },
-    [isInitialized]
+    [isLoaded]
   );
 
   // Clear predictions
   const clearPredictions = useCallback((): void => {
     setPredictions([]);
   }, []);
-
-  // Auto-initialize effect
-  useEffect(() => {
-    if (autoInitialize) {
-      initializeGoogleMaps();
-    }
-  }, [autoInitialize, initializeGoogleMaps]);
-
-  // Execute default query after initialization
-  useEffect(() => {
-    if (isInitialized && shouldExecuteDefaultQuery.current && defaultQuery) {
-      shouldExecuteDefaultQuery.current = false;
-      setTimeout(() => {
-        searchLocations(defaultQuery);
-      }, 100);
-    }
-  }, [isInitialized, defaultQuery, searchLocations]);
 
   // Cleanup
   useEffect(() => {
@@ -419,13 +258,9 @@ export const useGoogleLocationSearch = (
   return {
     predictions,
     isLoading,
-    isInitialized,
     searchLocations,
     getLocationDetails,
     clearPredictions,
-    autocompleteService,
-    placesService,
-    initializeGoogleMaps,
     error,
   };
 };

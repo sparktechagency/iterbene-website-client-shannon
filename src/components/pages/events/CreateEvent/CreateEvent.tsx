@@ -92,7 +92,6 @@ const CreateEvent: React.FC = () => {
       const formData = new FormData();
       formData.append("eventName", values.eventName);
       formData.append("description", values.description);
-      // formData.append("privacy", values.privacy);
       formData.append("startDate", values.startDate);
       formData.append("endDate", values.endDate);
       formData.append(
@@ -266,7 +265,7 @@ const CreateEvent: React.FC = () => {
                             onClick={() =>
                               handleDurationChange("days", duration.days - 1)
                             }
-                            className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-600 transition-colors"
+                            className="w-8 h-8 rounded-full cursor-pointer bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-600 transition-colors"
                             disabled={duration.days <= 0}
                           >
                             -
@@ -279,7 +278,7 @@ const CreateEvent: React.FC = () => {
                             onClick={() =>
                               handleDurationChange("days", duration.days + 1)
                             }
-                            className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-600 transition-colors"
+                            className="w-8 h-8 rounded-full cursor-pointer bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-600 transition-colors"
                           >
                             +
                           </button>
@@ -300,7 +299,7 @@ const CreateEvent: React.FC = () => {
                                 duration.nights - 1
                               )
                             }
-                            className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-600 transition-colors"
+                            className="w-8 h-8 rounded-full cursor-pointer bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-600 transition-colors"
                             disabled={duration.nights <= 0}
                           >
                             -
@@ -316,7 +315,7 @@ const CreateEvent: React.FC = () => {
                                 duration.nights + 1
                               )
                             }
-                            className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-600 transition-colors"
+                            className="w-8 h-8 rounded-full cursor-pointer bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-600 transition-colors"
                           >
                             +
                           </button>

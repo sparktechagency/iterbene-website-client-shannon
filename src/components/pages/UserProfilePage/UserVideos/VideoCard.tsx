@@ -24,13 +24,13 @@ const VideoCard = ({
   const progressRef = useRef<HTMLDivElement>(null);
   const playPromiseRef = useRef<Promise<void> | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [isMuted, setIsMuted] = useState(true); // Start muted to comply with autoplay policies
+  const [isMuted, setIsMuted] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
   const [progress, setProgress] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [userInteracted, setUserInteracted] = useState(false);
-  const [userPaused, setUserPaused] = useState(false); // Track if user manually paused
+  const [userPaused, setUserPaused] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isFullScreen, setIsFullScreen] = useState(false);
@@ -77,10 +77,8 @@ const VideoCard = ({
     }
   }, []);
 
-  // Handle visibility-based play/pause - only if user hasn't manually paused
   useEffect(() => {
     const timeoutId = setTimeout(() => {
-      // Only auto-play/pause if user hasn't manually paused the video
       if (isVisible && !isPlaying && !isLoading && !userPaused) {
         playVideo();
       } else if (!isVisible && isPlaying && !userPaused) {
@@ -106,7 +104,6 @@ const VideoCard = ({
 
     const handleCanPlay = () => {
       setIsLoading(false);
-      // Only auto-play if visible and user hasn't paused
       if (isVisible && !userInteracted && !userPaused) {
         playVideo();
       }
@@ -135,7 +132,7 @@ const VideoCard = ({
 
     const handleEnded = () => {
       setIsPlaying(false);
-      setUserPaused(false); // Reset user pause state when video ends
+      setUserPaused(false);
     };
 
     const handleError = () => {
@@ -186,14 +183,14 @@ const VideoCard = ({
       videoRef.current.currentTime = 0;
       setProgress(0);
       setCurrentTime(0);
-      setUserPaused(false); // Reset user pause state when restarting
+      setUserPaused(false);
     }
 
     if (isPlaying) {
-      setUserPaused(true); // Mark as user paused
+      setUserPaused(true);
       pauseVideo();
     } else {
-      setUserPaused(false); // Mark as user resumed
+      setUserPaused(false);
       await playVideo();
     }
   };
@@ -265,7 +262,7 @@ const VideoCard = ({
 
   return (
     <div
-      className="relative w-full rounded-2xl group bg-black overflow-hidden shadow-2xl"
+      className={`relative w-full ${className} rounded-2xl group bg-black overflow-hidden shadow-2xl`}
       onClick={handleVideoClick}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
@@ -273,7 +270,7 @@ const VideoCard = ({
       <video
         ref={videoRef}
         src={url}
-        className={`w-full  ${className}   object-cover ${
+        className={`w-full h-full object-cover ${
           isLoading ? "opacity-0" : "opacity-100"
         } transition-opacity duration-300`}
         controls={false}
@@ -307,7 +304,7 @@ const VideoCard = ({
                 e.stopPropagation();
                 setError(null);
                 setIsLoading(true);
-                setUserPaused(false); // Reset user pause state on retry
+                setUserPaused(false);
                 if (videoRef.current) {
                   videoRef.current.load();
                 }
@@ -328,8 +325,7 @@ const VideoCard = ({
             {/* Progress bar */}
             <div
               ref={progressRef}
-              className="
-              w-full h-[3px] bg-white bg-opacity-30 rounded-full mb-3 cursor-pointer"
+              className="w-full h-[3px] bg-white bg-opacity-30 rounded-full mb-3 cursor-pointer"
               onClick={handleProgressClick}
             >
               <div

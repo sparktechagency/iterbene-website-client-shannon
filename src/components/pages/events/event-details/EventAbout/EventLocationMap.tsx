@@ -1,6 +1,7 @@
 "use client";
+import { useUnifiedGoogleMaps } from "@/hooks/useGoogleLocationSearch";
 import { IEventDetails } from "@/types/event.types";
-import { GoogleMap, Marker, useJsApiLoader } from "@react-google-maps/api";
+import { GoogleMap, Marker } from "@react-google-maps/api";
 import { Loader2 } from "lucide-react";
 import React from "react";
 
@@ -23,8 +24,6 @@ const EventLocationMap = ({
 }: {
   eventDetailsData: IEventDetails;
 }) => {
-  const apiKey: string = process.env.NEXT_PUBLIC_GOOGLE_MAP_API_KEY || "";
-
   // Validate and set groupLocation with fallback
   const groupLocation = {
     lat:
@@ -39,10 +38,7 @@ const EventLocationMap = ({
         : defaultLocation.lng,
   };
 
-  // Load Google Maps API
-  const { isLoaded } = useJsApiLoader({
-    googleMapsApiKey: apiKey,
-  });
+  const { isLoaded, loadError } = useUnifiedGoogleMaps();
 
   // Define custom marker icon only after Google Maps is loaded
   const customMarkerIcon = isLoaded
@@ -52,10 +48,23 @@ const EventLocationMap = ({
       }
     : null;
 
+  if (loadError) {
+    return (
+      <div className="w-full h-[600px] flex items-center justify-center bg-red-50 rounded-2xl">
+        <div className="text-center text-red-600 p-4">
+          <p className="font-medium">Map loading failed</p>
+          <p className="text-sm">{loadError.message}</p>
+        </div>
+      </div>
+    );
+  }
+
   if (!isLoaded) {
     return (
-      <div className="flex items-center justify-center py-8">
-        <Loader2 className="animate-spin text-primary" size={28} />
+      <div className="w-full h-[600px] flex items-center justify-center bg-gray-100 rounded-2xl">
+        <div className="flex items-center justify-center py-8">
+          <Loader2 className="animate-spin text-primary" size={28} />
+        </div>
       </div>
     );
   }

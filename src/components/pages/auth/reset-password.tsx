@@ -83,7 +83,7 @@ const ResetPassword = () => {
               type="password"
             />
             <CustomButton loading={isLoading} fullWidth className="py-4">
-              Send OTP
+              Reset
             </CustomButton>
             <div className="flex gap-1 items-center justify-center">
               <span className="text-sm md:text-[16px] font-medium">

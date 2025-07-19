@@ -87,7 +87,6 @@ const CreateGroup: React.FC = () => {
       const formData = new FormData();
       formData.append("name", values.groupName);
       formData.append("description", values.description);
-      formData.append("privacy", values.privacy);
       formData.append(
         "location",
         JSON.stringify({
@@ -244,7 +243,6 @@ const CreateGroup: React.FC = () => {
                   placeholder="What are the details?"
                   required
                 />
-
                 <div className="flex flex-col gap-3">
                   <div className="flex items-center gap-2">
                     <button className="size-6 flex justify-center  items-center rounded-full flex-shrink-0 border-2">

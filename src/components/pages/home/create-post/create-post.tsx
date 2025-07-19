@@ -94,7 +94,6 @@ const CreatePost = ({
   const {
     predictions,
     isLoading: isSearchingLocation,
-    isInitialized,
     searchLocations,
     getLocationDetails,
     clearPredictions,
@@ -180,7 +179,7 @@ const CreatePost = ({
     switch (postType) {
       case "Group":
         return {
-          placeholder: "Share something with your group...",
+          placeholder: `What's new, ${user?.fullName || "User"}?`,
           showPrivacy: false,
           showLocation: true,
           showItinerary: true,
@@ -188,7 +187,7 @@ const CreatePost = ({
         };
       case "Event":
         return {
-          placeholder: "Share about this event...",
+          placeholder: `What's new, ${user?.fullName || "User"}?`,
           showPrivacy: false,
           showLocation: true,
           showItinerary: true,
@@ -836,12 +835,7 @@ const CreatePost = ({
                               type="text"
                               value={locationQuery}
                               onChange={handleLocationInputChange}
-                              placeholder={
-                                !isInitialized
-                                  ? "Loading location services..."
-                                  : "Search for a location..."
-                              }
-                              disabled={!isInitialized}
+                              placeholder="Search for a location.."
                               className="w-full px-4 py-2 border rounded-full border-gray-200 focus:outline-none "
                               onFocus={() => {
                                 if (predictions?.length > 0) {

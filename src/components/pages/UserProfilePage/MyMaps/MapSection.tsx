@@ -1,7 +1,8 @@
 "use client";
+import { useUnifiedGoogleMaps } from "@/hooks/useGoogleLocationSearch";
 import { useGetMyMapsQuery } from "@/redux/features/maps/mapsApi";
 import { ITripVisitedLocation } from "@/types/trip.types";
-import { GoogleMap, Marker, useJsApiLoader } from "@react-google-maps/api";
+import { GoogleMap, Marker } from "@react-google-maps/api";
 import { Loader2 } from "lucide-react";
 
 // Define the map container style
@@ -9,9 +10,6 @@ const mapContainerStyle: React.CSSProperties = {
   width: "100%",
   height: "100%",
 };
-
-// Move libraries array outside component to maintain stable reference
-const GOOGLE_MAPS_LIBRARIES: never[] = [];
 
 // Define types for location coordinates
 interface Location {
@@ -31,13 +29,9 @@ const MapSection = ({
   const { data: responseData } = useGetMyMapsQuery(undefined, {
     refetchOnMountOrArgChange: true,
   });
-  const apiKey: string = process.env.NEXT_PUBLIC_GOOGLE_MAP_API_KEY || "";
 
-  // Use the stable libraries reference
-  const { isLoaded } = useJsApiLoader({
-    googleMapsApiKey: apiKey,
-    libraries: GOOGLE_MAPS_LIBRARIES,
-  });
+  // Use the unified Google Maps loader (loads both maps and places)
+  const { isLoaded, loadError } = useUnifiedGoogleMaps();
 
   // Set default center to user's current location from API
   const userCurrentLocation =
@@ -108,6 +102,17 @@ const MapSection = ({
   const handleMapToggle = () => {
     setShowFullMap(!showFullMap);
   };
+
+  if (loadError) {
+    return (
+      <div className="w-full h-[600px] flex items-center justify-center bg-red-50 rounded-2xl">
+        <div className="text-center text-red-600 p-4">
+          <p className="font-medium">Map loading failed</p>
+          <p className="text-sm">{loadError.message}</p>
+        </div>
+      </div>
+    );
+  }
 
   if (!isLoaded) {
     return (

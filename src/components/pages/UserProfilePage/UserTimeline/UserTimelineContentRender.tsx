@@ -27,23 +27,20 @@ const UserTimelineContentRender = ({
       >
         {data?.map((media, index) => (
           <SwiperSlide key={index}>
-              <div className="w-full flex items-center justify-center">
-                {media.mediaType === "image" ? (
-                  <Image
-                    src={media.mediaUrl}
-                    alt={`Timeline media ${index + 1}`}
-                    width={500}
-                    height={300}
-                    className="w-full h-[300px] object-cover cursor-pointer rounded-xl"
-                    priority={index === 0} // Optimize loading for the first image
-                  />
-                ) : (
-                  <VideoCard
-                    url={media.mediaUrl}
-                    className="w-full h-[200px] md:h-[300px]  rounded-xl"
-                  />
-                )}
-              </div>
+            <div className="w-full flex items-center justify-center">
+              {media.mediaType === "image" ? (
+                <Image
+                  src={media.mediaUrl}
+                  alt={`Timeline media ${index + 1}`}
+                  width={400}
+                  height={350}
+                  className="w-full h-[300px] md:h-[350px]  object-cover cursor-pointer rounded-xl"
+                  priority={index === 0} // Optimize loading for the first image
+                />
+              ) : (
+                <VideoCard url={media.mediaUrl} className="w-full h-[300px] md:h-[350px]" />
+              )}
+            </div>
           </SwiperSlide>
         ))}
       </Swiper>

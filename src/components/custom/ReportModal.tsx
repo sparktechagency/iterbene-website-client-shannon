@@ -2,7 +2,6 @@
 import React, { useState } from "react";
 import {
   Flag,
-  AlertTriangle,
   MessageSquare,
   User,
   FileText,
@@ -196,12 +195,7 @@ const ReportModal: React.FC<ReportModalProps> = ({
 
   const renderSelectStep = () => (
     <div className="space-y-4">
-      <div className="text-center mb-6">
-        <AlertTriangle className="w-12 h-12 text-red-500 mx-auto mb-2" />
-        <p className="text-gray-600">
-          Help us understand what&apos;s happening. Select all that apply:
-        </p>
-      </div>
+
 
       <div className="space-y-2">
         {reasons.map((reason) => (
@@ -241,14 +235,6 @@ const ReportModal: React.FC<ReportModalProps> = ({
 
   const renderDetailsStep = () => (
     <div className="space-y-4">
-      <div className="text-center mb-6">
-        <Flag className="w-12 h-12 text-red-500 mx-auto mb-2" />
-        <p className="text-gray-600">
-          Add any additional details that might help us review this report
-          (optional):
-        </p>
-      </div>
-
       <div className="bg-gray-50 p-3 rounded-lg">
         <p className="text-sm font-medium text-gray-700 mb-2">
           Selected reasons:

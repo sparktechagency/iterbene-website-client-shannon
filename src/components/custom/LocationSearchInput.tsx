@@ -41,7 +41,6 @@ const LocationSearchInput: React.FC<LocationSearchInputProps> = ({
   const {
     predictions,
     isLoading,
-    isInitialized,
     searchLocations,
     getLocationDetails,
     clearPredictions,
@@ -135,10 +134,8 @@ const LocationSearchInput: React.FC<LocationSearchInputProps> = ({
             type="text"
             value={inputValue}
             onChange={handleInputChange}
-            placeholder={
-              !isInitialized ? "Loading location services..." : placeholder
-            }
-            disabled={disabled || !isInitialized}
+            placeholder={placeholder}
+            disabled={disabled}
             className="w-full px-4 py-3 pl-12 border border-gray-300 rounded-lg outline-none transition-colors  "
             onFocus={() => {
               if (predictions.length > 0) {
