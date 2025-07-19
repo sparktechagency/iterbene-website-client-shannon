@@ -30,7 +30,7 @@ const FriendRequest = () => {
     content = (
       <div className="w-full space-y-6 pb-5 md:pb-8">
         {connectionsRequestData
-          ?.slice(0, 4)
+          ?.slice(0, 3)
           ?.map((request: IConnectionRequest) => (
             <FriendRequestCard key={request._id} request={request} />
           ))}

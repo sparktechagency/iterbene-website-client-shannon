@@ -40,7 +40,7 @@ const CustomSelectField = ({
 
   const inputSizeClass = {
     sm: "py-1 px-1.5 text-sm",
-    md: "py-[5px] px-1.5 text-base",
+    md: "py-[4px] px-1.5 text-base",
     lg: "py-2 px-1.5 text-lg",
   }[size];
 
@@ -58,7 +58,7 @@ const CustomSelectField = ({
   return (
     <div className={`w-full relative`}>
       {label && (
-        <label htmlFor={name} className="block text-gray-950 mb-2 text-[15px]">
+        <label htmlFor={name} className="block text-gray-950  text-[15px]">
           {label} {required && <span className="text-red-500">*</span>}
         </label>
       )}

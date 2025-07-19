@@ -1,131 +1,158 @@
 "use client";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { useGetConnectionRequestsQuery } from "@/redux/features/connections/connectionsApi";
-import { useEffect, useRef, useCallback } from "react";
 import { IConnectionRequest } from "@/types/connection.types";
 import MyRequestConnectionCard from "./MyRequestConnectionCard";
 import MyRequestConnectionSkeleton from "./MyRequestConnectionSkeleton";
 import useUser from "@/hooks/useUser";
 
-interface MyRequestConnectionsProps {
-  connectionRequests: IConnectionRequest[];
-  setConnectionRequests: React.Dispatch<
-    React.SetStateAction<IConnectionRequest[]>
-  >;
-  currentPage: number;
-  setCurrentPage: React.Dispatch<React.SetStateAction<number>>;
-  hasMore: boolean;
-  setHasMore: React.Dispatch<React.SetStateAction<boolean>>;
-}
-
-const MyRequestConnections = ({
-  connectionRequests,
-  setConnectionRequests,
-  currentPage,
-  setCurrentPage,
-  hasMore,
-  setHasMore,
-}: MyRequestConnectionsProps) => {
+const MyRequestConnections = () => {
   const user = useUser();
-  const observer = useRef<IntersectionObserver | null>(null);
-  const loaderRef = useRef<HTMLDivElement | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [allRequests, setAllRequests] = useState<IConnectionRequest[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
+  const [sortBy] = useState<string>("createdAt");
 
-  // Get connection requests
-  const {
-    data: responseData,
-    isLoading,
-    isFetching,
-  } = useGetConnectionRequestsQuery(
-    [
-      { key: "page", value: currentPage.toString() },
-      { key: "limit", value: "9" },
-    ],
-    {
-      refetchOnMountOrArgChange: true,
+  // API query parameters
+  const queryParams = [
+    { key: "page", value: currentPage.toString() },
+    { key: "limit", value: "12" },
+    { key: "sortBy", value: sortBy },
+  ];
+
+  const { data: responseData, isLoading: isFetching } =
+    useGetConnectionRequestsQuery(queryParams, {
       skip: !user,
-    }
+      refetchOnMountOrArgChange: true,
+      refetchOnFocus: true,
+      refetchOnReconnect: true,
+    });
+
+  // Get current page connection requests from RTK Query cache
+  const currentPageRequests = useMemo(
+    () =>
+      Array.isArray(responseData?.data?.attributes?.results)
+        ? (responseData.data.attributes.results as IConnectionRequest[])
+        : [],
+    [responseData]
   );
 
-  // Update connection requests when new data is fetched, ensuring no duplicate _id values
+  const totalPages = responseData?.data?.attributes?.totalPages;
+
+  // Add new requests to allRequests when currentPageRequests changes
   useEffect(() => {
-    const myConnectionRequests = responseData?.data?.attributes?.results || [];
-    if (myConnectionRequests?.length > 0) {
-      setConnectionRequests((prev) => {
-        const existingIds = new Set(prev.map((request) => request._id));
-        const newRequests = myConnectionRequests.filter(
-          (request: IConnectionRequest) => !existingIds.has(request._id)
-        );
-        return currentPage === 1 ? newRequests : [...prev, ...newRequests];
-      });
-      setHasMore(currentPage < (responseData.data.attributes.totalPages || 0));
-    }
-  }, [responseData, currentPage, setConnectionRequests, setHasMore]);
-
-  // Set up IntersectionObserver for infinite scroll
-  const lastRequestElementRef = useCallback(
-    (node: HTMLDivElement | null) => {
-      if (isLoading || isFetching) return;
-      if (observer.current) observer.current.disconnect();
-
-      observer.current = new IntersectionObserver((entries) => {
-        if (entries[0].isIntersecting && hasMore) {
-          setCurrentPage((prevPage) => prevPage + 1);
-        }
-      });
-
-      if (node) observer.current.observe(node);
-    },
-    [isLoading, isFetching, hasMore, setCurrentPage]
-  );
-
-  const renderLoading = () => (
-    <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-      {Array.from({ length: 9 }).map((_, index) => (
-        <MyRequestConnectionSkeleton key={`skeleton-${index}`} />
-      ))}
-    </div>
-  );
-
-  let content = null;
-  if (isLoading && currentPage === 1) {
-    content = renderLoading();
-  } else if (connectionRequests.length === 0 && !isLoading) {
-    content = (
-      <h1 className="text-center text-gray-500 py-8">
-        No connection requests available
-      </h1>
-    );
-  } else if (connectionRequests.length > 0) {
-    content = (
-      <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-        {connectionRequests.map((request, index) => {
-          // Attach ref to the last connection request for infinite scroll
-          if (index === connectionRequests.length - 1) {
-            return (
-              <div key={request._id} ref={lastRequestElementRef}>
-                <MyRequestConnectionCard connection={request} />
-              </div>
-            );
-          }
-          return (
-            <MyRequestConnectionCard key={request._id} connection={request} />
+    if (currentPageRequests.length > 0) {
+      if (currentPage === 1) {
+        // Reset requests for first page (handles refreshes/updates)
+        setAllRequests(currentPageRequests);
+      } else {
+        // Append new requests for subsequent pages, avoiding duplicates
+        setAllRequests((prevRequests) => {
+          const existingIds = new Set(
+            prevRequests.map((request) => request?._id)
           );
-        })}
+          const newRequests = currentPageRequests.filter(
+            (request) => !existingIds.has(request._id)
+          );
+          return [...prevRequests, ...newRequests];
+        });
+      }
+    }
+  }, [currentPageRequests, currentPage]);
+
+  // Handle real-time updates: merge updated requests from RTK Query cache
+  useEffect(() => {
+    if (currentPageRequests.length > 0 && allRequests.length > 0) {
+      setAllRequests((prevRequests) =>
+        prevRequests.map((existingRequest) => {
+          const updatedRequest = currentPageRequests.find(
+            (p) => p?._id === existingRequest?._id
+          );
+          return updatedRequest || existingRequest;
+        })
+      );
+    }
+  }, [currentPageRequests, allRequests.length]);
+
+  // Update loading and hasMore states
+  useEffect(() => {
+    if (isFetching) {
+      setLoading(true);
+    } else {
+      setLoading(false);
+      setHasMore(currentPage < (totalPages || 0));
+    }
+  }, [isFetching, currentPage, totalPages]);
+
+  // Load more requests function
+  const loadMore = useCallback(() => {
+    if (!loading && hasMore) {
+      setCurrentPage((prev) => prev + 1);
+    }
+  }, [loading, hasMore]);
+
+  // Infinite scroll with IntersectionObserver
+  useEffect(() => {
+    if (!hasMore || loading) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          loadMore();
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    const sentinel = document.getElementById("sentinel");
+    if (sentinel) observer.observe(sentinel);
+
+    return () => {
+      if (sentinel) observer.unobserve(sentinel);
+    };
+  }, [loadMore, loading, hasMore]);
+
+  // Render loading skeleton when no requests are loaded yet
+  if (isFetching && allRequests.length === 0) {
+    return (
+      <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+        {Array.from({ length: 9 }).map((_, index) => (
+          <MyRequestConnectionSkeleton key={`skeleton-${index}`} />
+        ))}
       </div>
     );
   }
 
+  // Show "Not available" message if no requests
+  if (!isFetching && allRequests.length === 0) {
+    return (
+      <section className="w-full text-center py-4">
+        <p className="text-gray-600 text-lg">
+          No connection requests available
+        </p>
+      </section>
+    );
+  }
+
   return (
-    <div>
-      {content}
-      {isFetching && currentPage > 1 && (
-        <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 mt-3">
-          {Array.from({ length: 3 }).map((_, index) => (
-            <MyRequestConnectionSkeleton key={`skeleton-more-${index}`} />
-          ))}
+    <section className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+      {allRequests.map((request) => (
+        <MyRequestConnectionCard key={request._id} connection={request} />
+      ))}
+
+      {loading && (
+        <div
+          className="flex justify-center items-center py-4 col-span-full"
+          aria-live="polite"
+          aria-busy="true"
+        >
+          <div className="w-8 h-8 border-2 border-primary rounded-full animate-spin"></div>
         </div>
       )}
-      <div ref={loaderRef} className="h-10" />
-    </div>
+
+      {hasMore && <div id="sentinel" style={{ height: "1px" }}></div>}
+    </section>
   );
 };
 

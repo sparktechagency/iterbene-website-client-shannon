@@ -1,6 +1,5 @@
 "use client";
-import { useGetMyInvitedGroupsQuery } from "@/redux/features/group/groupApi";
-import { useEffect, useRef, useCallback } from "react";
+import {  useRef, useCallback } from "react";
 import { IGroupInvite } from "@/types/group.types";
 import MyInvitationsGroupCard from "./MyInvitationsGroupCard";
 import MyInvitationsGroupSkeleton from "./MyInvitationsGroupSkeleton";
@@ -12,59 +11,40 @@ interface MyInvitationsGroupsProps {
   setCurrentPage: React.Dispatch<React.SetStateAction<number>>;
   hasMore: boolean;
   setHasMore: React.Dispatch<React.SetStateAction<boolean>>;
+  dataLoaded: boolean;
+  setDataLoaded: React.Dispatch<React.SetStateAction<boolean>>;
+  isLoading: boolean;
 }
 
 const MyInvitationsGroups = ({
   invitedGroups,
-  setInvitedGroups,
   currentPage,
   setCurrentPage,
   hasMore,
-  setHasMore,
+  dataLoaded,
+  isLoading,
 }: MyInvitationsGroupsProps) => {
   const observer = useRef<IntersectionObserver | null>(null);
   const loaderRef = useRef<HTMLDivElement | null>(null);
 
-  // Get invited groups
-  const {
-    data: responseData,
-    isLoading,
-    isFetching,
-  } = useGetMyInvitedGroupsQuery([
-    { key: "page", value: currentPage.toString() },
-    { key: "limit", value: "9" },
-  ]);
-
-  // Update invited groups when new data is fetched, ensuring no duplicate _id values
-  useEffect(() => {
-    const myAllInvitedGroups = responseData?.data?.attributes?.results || [];
-    if (myAllInvitedGroups?.length > 0) {
-      setInvitedGroups((prev) => {
-        const existingIds = new Set(prev.map((group) => group._id));
-        const newGroups = myAllInvitedGroups.filter(
-          (group: IGroupInvite) => !existingIds.has(group._id)
-        );
-        return currentPage === 1 ? newGroups : [...prev, ...newGroups];
-      });
-      setHasMore(currentPage < (responseData.data.attributes.totalPages || 0));
-    }
-  }, [responseData, currentPage, setInvitedGroups, setHasMore]);
-
   // Set up IntersectionObserver for infinite scroll
   const lastGroupElementRef = useCallback(
     (node: HTMLDivElement | null) => {
-      if (isLoading || isFetching) return;
+      if (isLoading) return;
       if (observer.current) observer.current.disconnect();
 
-      observer.current = new IntersectionObserver((entries) => {
-        if (entries[0].isIntersecting && hasMore) {
-          setCurrentPage((prevPage) => prevPage + 1);
-        }
-      });
+      observer.current = new IntersectionObserver(
+        (entries) => {
+          if (entries[0].isIntersecting && hasMore) {
+            setCurrentPage((prevPage) => prevPage + 1);
+          }
+        },
+        { threshold: 0.1 }
+      );
 
       if (node) observer.current.observe(node);
     },
-    [isLoading, isFetching, hasMore, setCurrentPage]
+    [isLoading, hasMore, setCurrentPage]
   );
 
   const renderLoading = () => (
@@ -76,27 +56,27 @@ const MyInvitationsGroups = ({
   );
 
   let content = null;
-  if (isLoading && currentPage === 1) {
+  if ((isLoading && currentPage === 1) || !dataLoaded) {
     content = renderLoading();
-  } else if (invitedGroups?.length === 0 && !isLoading) {
+  } else if (invitedGroups.length === 0 && dataLoaded) {
     content = (
       <h1 className="text-center text-gray-500 py-8">
         No invited groups available
       </h1>
     );
-  } else if (invitedGroups?.length > 0) {
+  } else if (invitedGroups.length > 0) {
     content = (
       <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-        {invitedGroups?.map((group, index) => {
+        {invitedGroups.map((group, index) => {
           // Attach ref to the last group for infinite scroll
-          if (index === invitedGroups?.length - 1) {
+          if (index === invitedGroups.length - 1) {
             return (
-              <div key={group?._id} ref={lastGroupElementRef}>
+              <div key={group._id} ref={lastGroupElementRef}>
                 <MyInvitationsGroupCard group={group} />
               </div>
             );
           }
-          return <MyInvitationsGroupCard key={group?._id} group={group} />;
+          return <MyInvitationsGroupCard key={group._id} group={group} />;
         })}
       </div>
     );
@@ -105,9 +85,9 @@ const MyInvitationsGroups = ({
   return (
     <div>
       {content}
-      {isFetching && currentPage > 1 && (
+      {isLoading && currentPage > 1 && (
         <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 mt-3">
-          {Array?.from({ length: 3 }).map((_, index) => (
+          {Array.from({ length: 3 }).map((_, index) => (
             <MyInvitationsGroupSkeleton key={`skeleton-more-${index}`} />
           ))}
         </div>

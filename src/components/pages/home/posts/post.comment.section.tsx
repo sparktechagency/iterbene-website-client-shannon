@@ -15,6 +15,9 @@ import {
 } from "@/redux/features/post/postApi";
 import { TError } from "@/types/error";
 import toast from "react-hot-toast";
+import ReportModal, { ReportType } from "@/components/custom/ReportModal";
+import { openAuthModal } from "@/redux/features/auth/authModalSlice";
+import { useAppDispatch } from "@/redux/hooks";
 
 interface PostCommentSectionProps {
   post: IPost;
@@ -39,6 +42,9 @@ const PostCommentSection = ({
   const replyInputRef = useRef<HTMLInputElement>(null);
   const emojiPickerRef = useRef<HTMLDivElement>(null);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [isReportModalOpen, setIsReportModalOpen] = useState<boolean>(false);
+  // dispatch
+  const dispatch = useAppDispatch();
 
   // handle create comment with reply
   const [replyComment] = useCreateCommentMutation();
@@ -171,6 +177,16 @@ const PostCommentSection = ({
     setMenuOpenId(null);
   };
 
+  // Handle report
+  const handleReport = () => {
+    if (!user) {
+      dispatch(openAuthModal());
+      setMenuOpenId(null);
+      return;
+    }
+    setIsReportModalOpen(true);
+  };
+
   // handle delete comment
   const handleDeleteComment = async (commentId: string) => {
     try {
@@ -274,10 +290,21 @@ const PostCommentSection = ({
                             </button>
                           </>
                         ) : (
-                          <button className="w-full transition-all duration-300 text-left px-4 py-3 text-sm text-red-600 hover:bg-gray-100 rounded-t-xl cursor-pointer">
+                          <button
+                            onClick={handleReport}
+                            className="w-full transition-all duration-300 text-left px-4 py-3 text-sm text-red-600 hover:bg-gray-100 rounded-t-xl cursor-pointer"
+                          >
                             Report
                           </button>
                         )}
+                        {/* Report Modal */}
+                        <ReportModal
+                          isOpen={isReportModalOpen}
+                          onClose={() => setIsReportModalOpen(false)}
+                          reportType={ReportType.COMMENT}
+                          reportedUserId={post?.userId?._id || ""}
+                          reportedEntityId={comment?._id}
+                        />
                       </motion.div>
                     )}
                   </div>

@@ -1,6 +1,5 @@
 "use client";
-import { useGetMyInvitesQuery } from "@/redux/features/event/eventApi";
-import { useEffect, useRef, useCallback } from "react";
+import { useRef, useCallback } from "react";
 import { IEventInvitation } from "@/types/event.types";
 import InvitedEventCard from "@/components/pages/events/invited-events/invited-event-card";
 import MyInvitationsEventSkeleton from "./MyInvitationsEventSkeleton";
@@ -12,59 +11,40 @@ interface MyInvitationsEventProps {
   setCurrentPage: React.Dispatch<React.SetStateAction<number>>;
   hasMore: boolean;
   setHasMore: React.Dispatch<React.SetStateAction<boolean>>;
+  dataLoaded: boolean;
+  setDataLoaded: React.Dispatch<React.SetStateAction<boolean>>;
+  isLoading: boolean;
 }
 
 const MyInvitationsEvent = ({
   eventInvitations,
-  setEventInvitations,
   currentPage,
   setCurrentPage,
   hasMore,
-  setHasMore,
+  dataLoaded,
+  isLoading
 }: MyInvitationsEventProps) => {
   const observer = useRef<IntersectionObserver | null>(null);
   const loaderRef = useRef<HTMLDivElement | null>(null);
 
-  // Get event invitations
-  const {
-    data: responseData,
-    isLoading,
-    isFetching,
-  } = useGetMyInvitesQuery([
-    { key: "page", value: currentPage.toString() },
-    { key: "limit", value: "9" },
-  ]);
-
-  // Update event invitations when new data is fetched, ensuring no duplicate _id values
-  useEffect(() => {
-    const upComingEvent = responseData?.data?.attributes?.results || [];
-    if (upComingEvent?.length > 0) {
-      setEventInvitations((prev) => {
-        const existingIds = new Set(prev.map((event) => event._id));
-        const newEvents = upComingEvent.filter(
-          (event: IEventInvitation) => !existingIds.has(event._id)
-        );
-        return currentPage === 1 ? newEvents : [...prev, ...newEvents];
-      });
-      setHasMore(currentPage < (responseData.data.attributes.totalPages || 0));
-    }
-  }, [responseData, currentPage, setEventInvitations, setHasMore]);
-
   // Set up IntersectionObserver for infinite scroll
   const lastEventElementRef = useCallback(
     (node: HTMLDivElement | null) => {
-      if (isLoading || isFetching) return;
+      if (isLoading) return;
       if (observer.current) observer.current.disconnect();
 
-      observer.current = new IntersectionObserver((entries) => {
-        if (entries[0].isIntersecting && hasMore) {
-          setCurrentPage((prevPage) => prevPage + 1);
-        }
-      });
+      observer.current = new IntersectionObserver(
+        (entries) => {
+          if (entries[0].isIntersecting && hasMore) {
+            setCurrentPage((prevPage) => prevPage + 1);
+          }
+        },
+        { threshold: 0.1 }
+      );
 
       if (node) observer.current.observe(node);
     },
-    [isLoading, isFetching, hasMore, setCurrentPage]
+    [isLoading, hasMore, setCurrentPage]
   );
 
   const renderLoading = () => (
@@ -76,9 +56,9 @@ const MyInvitationsEvent = ({
   );
 
   let content = null;
-  if (isLoading && currentPage === 1) {
+  if (isLoading && currentPage === 1 || !dataLoaded) {
     content = renderLoading();
-  } else if (eventInvitations?.length === 0 && !isLoading) {
+  } else if (eventInvitations.length === 0 && dataLoaded) {
     content = (
       <h1 className="text-center text-gray-500 py-8">
         No invitations event available
@@ -105,7 +85,7 @@ const MyInvitationsEvent = ({
   return (
     <div>
       {content}
-      {isFetching && currentPage > 1 && (
+      {isLoading && currentPage > 1 && (
         <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 mt-3">
           {Array.from({ length: 3 }).map((_, index) => (
             <MyInvitationsEventSkeleton key={`skeleton-more-${index}`} />

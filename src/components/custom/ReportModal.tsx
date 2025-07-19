@@ -12,7 +12,7 @@ import CustomModal from "./custom-modal";
 import { TError } from "@/types/error";
 import toast from "react-hot-toast";
 import { IoMdClose } from "react-icons/io";
-import { Checkbox } from "antd";
+import { Radio } from "antd";
 
 // Types matching your backend schema
 export enum ReportType {
@@ -209,13 +209,13 @@ const ReportModal: React.FC<ReportModalProps> = ({
             key={reason}
             className="flex items-center p-3 border border-gray-300 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
           >
-            <Checkbox
-              type="checkbox"
+            <Radio
+              type="radio"
               className="w-4 h-4 text-red-600 rounded border-gray-300 focus:ring-red-500"
               checked={selectedReasons.includes(reason)}
               onChange={() => handleReasonToggle(reason)}
             />
-            <span className="ml-3 text-gray-700">{reason}</span>
+            <span className="ml-3 text-gray-700 text-sm">{reason}</span>
           </label>
         ))}
       </div>
@@ -223,7 +223,7 @@ const ReportModal: React.FC<ReportModalProps> = ({
       <div className="flex gap-3 pt-4">
         <button
           onClick={handleClose}
-          className="flex-1 px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+          className="flex-1 px-4 py-3 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
           disabled={isLoading}
         >
           Cancel
@@ -231,7 +231,7 @@ const ReportModal: React.FC<ReportModalProps> = ({
         <button
           onClick={() => setStep("details")}
           disabled={selectedReasons.length === 0}
-          className="flex-1 px-4 py-2 bg-secondary cursor-pointer text-white rounded-lg  disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+          className="flex-1 px-4 py-3 bg-secondary cursor-pointer text-white rounded-lg  disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
         >
           Next
         </button>
@@ -277,7 +277,7 @@ const ReportModal: React.FC<ReportModalProps> = ({
       <div className="flex gap-3 pt-4">
         <button
           onClick={() => setStep("select")}
-          className="flex-1 px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+          className="flex-1 px-4 scroll-py-36 text-gray-600 cursor-pointer border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
           disabled={isLoading}
         >
           Back
@@ -285,7 +285,7 @@ const ReportModal: React.FC<ReportModalProps> = ({
         <button
           onClick={handleSubmit}
           disabled={isLoading}
-          className="flex-1 px-4 py-2 bg-secondary text-white rounded-lg cursor-pointer disabled:bg-red-400 disabled:cursor-not-allowed transition-colors"
+          className="flex-1 px-4 py-3 bg-secondary text-white rounded-lg cursor-pointer disabled:bg-red-400 disabled:cursor-not-allowed transition-colors"
         >
           {isLoading ? "Submitting..." : "Submit Report"}
         </button>

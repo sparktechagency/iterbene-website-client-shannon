@@ -94,7 +94,7 @@ const UserVerification = () => {
   };
 
   const handleAgeReject = () => {
-    setErrorMessage("You must be 18 or older to access Iter Bene travel services. Access is restricted.");
+    setErrorMessage("You must be 13 or older to access Iter Bene travel services. Access is restricted.");
   };
 
   if (!isClient || !isVisible) return null;
@@ -163,7 +163,7 @@ const UserVerification = () => {
         {step === 2 && (
           <motion.div>
             <h2 className="text-xl font-semibold text-gray-800 mb-6">
-              Are you 18 years or older?
+              Are you 13 years or older?
             </h2>
             <p className="text-gray-600 mb-6 text-sm">
               Age verification is required to access our travel services
@@ -172,13 +172,13 @@ const UserVerification = () => {
               onClick={handleAgeVerify}
               className="w-full bg-secondary text-white py-3 rounded-lg mb-4 transition-all duration-300 cursor-pointer"
             >
-              Yes, I'm 18 or older
+              Yes, I'm 13 or older
             </motion.button>
             <motion.button
               onClick={handleAgeReject}
               className="w-full text-gray-600 border border-gray-300 py-3 rounded-lg hover:border-gray-400 hover:text-gray-700 transition-all duration-300 cursor-pointer"
             >
-              No, I'm under 18
+              No, I'm under 13
             </motion.button>
           </motion.div>
         )}
