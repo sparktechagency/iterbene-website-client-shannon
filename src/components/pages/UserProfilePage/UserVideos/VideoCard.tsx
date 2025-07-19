@@ -270,7 +270,7 @@ const VideoCard = ({
       <video
         ref={videoRef}
         src={url}
-        className={`w-full h-full object-cover ${
+        className={`w-full h-full rounded-2xl object-cover ${
           isLoading ? "opacity-0" : "opacity-100"
         } transition-opacity duration-300`}
         controls={false}

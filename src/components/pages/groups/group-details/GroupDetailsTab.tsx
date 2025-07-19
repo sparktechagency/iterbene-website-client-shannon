@@ -7,8 +7,8 @@ import GroupDiscussion from "./GroupDiscussion/GroupDiscussion";
 const GroupDetailsTab = ({ groupDetailsData }: { groupDetailsData: IGroupDetails }) => {
   const [activeTab, setActiveTab] = useState("about");
   return (
-    <section className="w-full px-3 py-8 ">
-      <div className="w-full flex items-center gap-5 ">
+    <section className="w-full py-8 ">
+      <div className="w-full flex items-center gap-5  ">
         <button
           onClick={() => setActiveTab("about")}
           className={`px-8 py-2  rounded-xl ${activeTab === "about"

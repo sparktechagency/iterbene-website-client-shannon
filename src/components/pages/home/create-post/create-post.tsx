@@ -179,7 +179,7 @@ const CreatePost = ({
     switch (postType) {
       case "Group":
         return {
-          placeholder: `What's new, ${user?.fullName || "User"}?`,
+           placeholder: `What's new, ${user?.fullName || "User"}?`,
           showPrivacy: false,
           showLocation: true,
           showItinerary: true,

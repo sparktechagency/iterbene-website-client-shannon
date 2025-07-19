@@ -16,6 +16,7 @@ interface UserTimelineContentRenderProps {
 const UserTimelineContentRender = ({
   data,
 }: UserTimelineContentRenderProps) => {
+  console.log("UserTimelineContentRender", data);
   return (
     <div className="w-full ">
       <Swiper
@@ -38,7 +39,10 @@ const UserTimelineContentRender = ({
                   priority={index === 0} // Optimize loading for the first image
                 />
               ) : (
-                <VideoCard url={media.mediaUrl} className="w-full h-[300px] md:h-[350px]" />
+                <VideoCard
+                  url={media.mediaUrl}
+                  className="w-full h-[300px] md:h-[350px]"
+                />
               )}
             </div>
           </SwiperSlide>
