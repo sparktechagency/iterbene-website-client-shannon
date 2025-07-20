@@ -37,7 +37,6 @@ export interface LocationDetails {
 }
 
 export const useUnifiedGoogleMaps = () => {
-  console.log("API Key:", GOOGLE_MAPS_API_KEY); // Debug API key
   const { isLoaded, loadError } = useJsApiLoader({
     googleMapsApiKey: GOOGLE_MAPS_API_KEY,
     libraries: GOOGLE_MAPS_LIBRARIES,
