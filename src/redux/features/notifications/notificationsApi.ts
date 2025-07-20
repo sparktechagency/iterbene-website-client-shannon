@@ -20,11 +20,35 @@ const notificationsApi = baseApi.injectEndpoints({
       },
       providesTags: ["Notifications"],
     }),
+    getALLMessageNotifications: builder.query({
+      query: (filters) => {
+        const params = new URLSearchParams();
+        if (filters) {
+          filters?.forEach(
+            (filter: { key: string; value: string }) =>
+              filter?.value && params.append(filter?.key, filter?.value)
+          );
+        }
+        return {
+          url: "/notifications/get-all-message-notifications",
+          method: "GET",
+          params,
+        };
+      },
+      providesTags: ["Notifications"],
+    }),
     viewAllNotifications: builder.mutation({
-      query: () => ({
-        url: "/notifications/view-all-notifications",
-        method: "POST",
-      }),
+      query: (type) => {
+        const params = new URLSearchParams();
+        if (type) {
+          params.append("type", type);
+        }
+        return {
+          url: `/notifications/view-all-notifications`,
+          method: "POST",
+          params,
+        };
+      },
 
       invalidatesTags: ["Notifications"],
     }),
@@ -43,12 +67,20 @@ const notificationsApi = baseApi.injectEndpoints({
       }),
       providesTags: ["Notifications"],
     }),
+    getUnviewedMessageNotificationsCount: builder.query({
+      query: () => ({
+        url: "/notifications/unview-message-notification-count",
+        method: "GET",
+      }),
+    }),
   }),
 });
 
 export const {
+  useGetALLMessageNotificationsQuery,
   useGetAllNotificationsQuery,
   useViewAllNotificationsMutation,
   useViewSingleNotificationMutation,
   useGetUnviewedNotificationsCountQuery,
+  useGetUnviewedMessageNotificationsCountQuery,
 } = notificationsApi;

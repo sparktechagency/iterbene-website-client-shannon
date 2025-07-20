@@ -260,6 +260,17 @@ const VideoCard = ({
     setIsHovered(false);
   };
 
+  const handleClickRetry = (e: React.MouseEvent) => {
+    console.log("Clicked retry");
+    e.stopPropagation();
+    setError(null);
+    setIsLoading(true);
+    setUserPaused(false);
+    if (videoRef.current) {
+      videoRef.current.load();
+    }
+  };
+
   return (
     <div
       className={`relative w-full ${className} rounded-2xl group bg-black overflow-hidden shadow-2xl`}
@@ -300,15 +311,7 @@ const VideoCard = ({
             <div className="text-2xl mb-2">⚠️</div>
             <p className="text-sm mb-3">{error}</p>
             <button
-              onClick={(e) => {
-                e.stopPropagation();
-                setError(null);
-                setIsLoading(true);
-                setUserPaused(false);
-                if (videoRef.current) {
-                  videoRef.current.load();
-                }
-              }}
+              onClick={handleClickRetry}
               className="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg text-sm transition-colors cursor-pointer"
             >
               Retry

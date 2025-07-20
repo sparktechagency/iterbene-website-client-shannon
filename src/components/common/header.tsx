@@ -33,7 +33,10 @@ import { IHashtag, ISearchResult } from "@/types/search.types";
 import SearchDropdown from "./SearchDropdown";
 import { useGetSearchHashtagAndUsersQuery } from "@/redux/features/search/searchApi";
 import LocationPermission from "./LocationPermission";
-import { useGetUnviewedNotificationsCountQuery } from "@/redux/features/notifications/notificationsApi";
+import {
+  useGetUnviewedMessageNotificationsCountQuery,
+  useGetUnviewedNotificationsCountQuery,
+} from "@/redux/features/notifications/notificationsApi";
 
 // Mobile Menu Component
 const MobileMenu: React.FC<{
@@ -191,39 +194,63 @@ const Header: React.FC = () => {
   const { socket } = useSocket();
   const router = useRouter();
 
-  // notification
+  // User and notification states
   const user = useUser();
   const [unviewNotificationCount, setUnviewNotificationCount] =
     useState<number>(0);
+  const [unviewMessageCount, setUnviewMessageCount] = useState<number>(0);
 
-  // Get unviewed notification count
+  // Fetch unviewed message and notification counts
+  const { data: messageCountData } =
+    useGetUnviewedMessageNotificationsCountQuery(undefined, {
+      skip: !user,
+    });
   const { data: notificationCountData } = useGetUnviewedNotificationsCountQuery(
     undefined,
     {
       skip: !user,
     }
   );
-
-  // set socket
+  // Socket event listeners for notifications and messages
   useEffect(() => {
-    if (socket && user) {
-      const notificationEvent = `notification::${user?._id}`;
+    if (socket && user?._id) {
+      // Connect user
+      socket.emit("user/connect", { userId: user._id });
+
+      // Listen for general notifications
+      const notificationEvent = `notification::${user._id}`;
       socket.on(notificationEvent, () => {
-        setUnviewNotificationCount(
-          (unviewNotificationCount) => unviewNotificationCount + 1
-        );
+        console.log("Received notification for user:", user._id);
+        setUnviewNotificationCount((prev) => prev + 1);
       });
+
+      // Listen for message notifications
+      const messageNotificationEvent = `message-notification::${user._id}`;
+      socket.on(messageNotificationEvent, () => {
+        setUnviewMessageCount((prev) => prev + 1);
+      });
+
+      // Cleanup on unmount or user/socket change
+      return () => {
+        socket.emit("user/disconnect", { userId: user._id });
+        socket.off(notificationEvent);
+        socket.off(messageNotificationEvent);
+      };
     }
   }, [socket, user]);
 
-  // Set initial unviewed count from API
+  // Set initial unviewed counts from API
   useEffect(() => {
     if (notificationCountData?.data?.attributes?.count) {
-      setUnviewNotificationCount(
-        notificationCountData?.data?.attributes?.count
-      );
+      setUnviewNotificationCount(notificationCountData.data.attributes.count);
     }
   }, [notificationCountData]);
+
+  useEffect(() => {
+    if (messageCountData?.data?.attributes?.count) {
+      setUnviewMessageCount(messageCountData.data.attributes.count);
+    }
+  }, [messageCountData]);
 
   // Desktop/Tablet dropdown states
   const [isMessagesOpen, setIsMessagesOpen] = useState<boolean>(false);
@@ -253,7 +280,7 @@ const Header: React.FC = () => {
   const { data: responseData, isLoading: searchLoading } =
     useGetSearchHashtagAndUsersQuery(debouncedSearchValue, {
       refetchOnMountOrArgChange: true,
-      skip: !debouncedSearchValue.trim(), // Skip if empty or only whitespace
+      skip: !debouncedSearchValue.trim(),
     });
 
   const messagesRef = useRef<HTMLDivElement>(null);
@@ -262,15 +289,6 @@ const Header: React.FC = () => {
   const searchRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const desktopSearchRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (socket && user?._id) {
-      socket.emit("user/connect", { userId: user?._id });
-      return () => {
-        socket.emit("user/disconnect", { userId: user?._id });
-      };
-    }
-  }, [socket, user]);
 
   // Debounce search input
   useEffect(() => {
@@ -286,7 +304,6 @@ const Header: React.FC = () => {
     if (responseData?.data?.attributes) {
       setSearchResults(responseData.data.attributes);
     } else if (!debouncedSearchValue.trim()) {
-      // Clear results when search is empty
       setSearchResults({ users: [], hashtags: [] });
     }
   }, [responseData, debouncedSearchValue]);
@@ -358,7 +375,6 @@ const Header: React.FC = () => {
   const toggleSearch = () => {
     setIsSearchOpen((prev) => !prev);
     if (isSearchOpen) {
-      // Clear search when closing
       setSearchValue("");
       setDebouncedSearchValue("");
       setIsSearchDropdownOpen(false);
@@ -369,8 +385,6 @@ const Header: React.FC = () => {
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setSearchValue(value);
-
-    // Show dropdown if there's a value
     if (value.trim()) {
       setIsSearchDropdownOpen(true);
     } else {
@@ -380,7 +394,6 @@ const Header: React.FC = () => {
 
   // Handle search focus
   const handleSearchFocus = () => {
-    // Always show dropdown on focus if there's a search value
     if (searchValue.trim()) {
       setIsSearchDropdownOpen(true);
     }
@@ -398,7 +411,6 @@ const Header: React.FC = () => {
   const handleSearch = useCallback(
     (query: string) => {
       router.push(`/search/posts-locations?q=${encodeURIComponent(query)}`);
-      // Reset search state after navigation
       setIsSearchDropdownOpen(false);
       setSearchValue("");
       setDebouncedSearchValue("");
@@ -406,8 +418,6 @@ const Header: React.FC = () => {
     },
     [router]
   );
-
-  // Handle search result clicks
   const handleSearchResultClick = useCallback(
     (result: IUser | IHashtag, type: string) => {
       switch (type) {
@@ -422,8 +432,6 @@ const Header: React.FC = () => {
         default:
           console.log("Unknown result type");
       }
-
-      // Reset search state after navigation
       setIsSearchDropdownOpen(false);
       setSearchValue("");
       setDebouncedSearchValue("");
@@ -431,7 +439,6 @@ const Header: React.FC = () => {
     },
     [router]
   );
-
   return (
     <nav className="w-full bg-[#F0FAF9] h-[72px] md:h-[88px] lg:h-[112px] fixed top-0 left-0 z-40">
       <div className="w-full container mx-auto flex justify-between items-center h-full px-4 md:px-5">
@@ -498,8 +505,13 @@ const Header: React.FC = () => {
                     className="size-12 lg:size-14 rounded-full border border-[#40E0D0] bg-white flex justify-center items-center cursor-pointer hover:shadow-md transition-shadow"
                   >
                     <BsChatSquareDots size={24} />
+                    {unviewMessageCount > 0 && (
+                      <div className="absolute top-0 right-0 size-5 bg-primary rounded-full flex justify-center items-center text-xs font-bold text-white">
+                        {unviewMessageCount}
+                      </div>
+                    )}
                   </motion.button>
-                  <MessagesDropdown isOpen={isMessagesOpen} user={user} />
+                  <MessagesDropdown isOpen={isMessagesOpen} setUnviewMessageCount={setUnviewMessageCount} />
                 </div>
 
                 <div ref={notificationsRef} className="relative">
@@ -514,7 +526,10 @@ const Header: React.FC = () => {
                       </div>
                     )}
                   </motion.button>
-                  <NotificationsDropdown isOpen={isNotificationsOpen} />
+                  <NotificationsDropdown
+                    isOpen={isNotificationsOpen}
+                    setUnviewNotificationCount={setUnviewNotificationCount}
+                  />
                 </div>
 
                 <div ref={userRef} className="relative">

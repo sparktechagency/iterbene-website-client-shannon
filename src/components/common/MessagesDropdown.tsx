@@ -1,117 +1,142 @@
 "use client";
-import { useSocket } from "@/lib/socket";
 import {
-  useGetAllNotificationsQuery,
-  useViewSingleNotificationMutation,
+  useGetALLMessageNotificationsQuery,
+  useViewAllNotificationsMutation,
 } from "@/redux/features/notifications/notificationsApi";
-import { INotification } from "@/types/notification.types";
-import { IUser } from "@/types/user.types";
+import { TError } from "@/types/error";
 import { AnimatePresence, motion } from "framer-motion";
-import moment from "moment";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import Skeleton from "../custom/custom-skeleton";
+import { useRouter } from "next/navigation";
 
-interface DropdownProps {
-  user?: IUser;
-  isOpen: boolean;
+interface Notification {
+  _id: string;
+  title: string;
+  message: string;
+  senderId: string;
+  receiverId: string;
+  role: string;
+  image?: string;
+  type: string;
+  linkId?: string;
+  viewStatus: boolean;
+  createdAt: string;
+  updatedAt: string;
 }
 
-const MessagesDropdown: React.FC<DropdownProps> = ({ isOpen, user }) => {
-  const { socket } = useSocket();
+interface DropdownProps {
+  isOpen: boolean;
+  setUnviewMessageCount: React.Dispatch<React.SetStateAction<number>>;
+}
+
+const MessagesDropdown: React.FC<DropdownProps> = ({
+  isOpen,
+  setUnviewMessageCount,
+}) => {
+  const [allNotifications, setAllNotifications] = useState<Notification[]>([]);
+  const [currentPage, setCurrentPage] = useState<number>(1);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
-  const [viewSingleNotification] = useViewSingleNotificationMutation();
 
-  // Get all message notifications
+  // Notification data fetch
   const {
     data: responseData,
-    isLoading: isNotificationsLoading,
+    isLoading,
     refetch,
-  } = useGetAllNotificationsQuery(
+  } = useGetALLMessageNotificationsQuery(
     [
-      { key: "page", value: 1 },
-      { key: "limit", value: 10 },
-      { key: "type", value: "message" },
+      { key: "page", value: currentPage },
+      { key: "limit", value: "10" },
     ],
-    {
-      skip: !isOpen,
+    { refetchOnMountOrArgChange: true, skip: !isOpen }
+  );
+  // Mark all as read mutation
+  const [viewAllNotifications] = useViewAllNotificationsMutation();
+
+  useEffect(() => {
+    if (isOpen) {
+      refetch();
     }
-  );
+  }, [isOpen, refetch]);
 
-  // Local state to manage notifications
-  const [localNotifications, setLocalNotifications] = useState<INotification[]>(
-    responseData?.data?.attributes?.results || []
-  );
-
-  // Sync local state with fetched data
+  // Update notifications when data arrives
   useEffect(() => {
     if (responseData?.data?.attributes?.results) {
-      setLocalNotifications(responseData.data.attributes.results);
-    }
-  }, [responseData]);
-
-  // Handle click on notification card
-  const handleNotificationClick = async (notification: INotification) => {
-    if (!notification._id) return;
-
-    try {
-      const response = await viewSingleNotification(notification._id).unwrap();
-      if (response) {
-        const senderId = notification.linkId || notification.receiverId;
-        if (senderId) {
-          router.push(`/messages/${senderId}`);
-        }
+      if (currentPage === 1) {
+        setAllNotifications(responseData.data.attributes.results);
+      } else {
+        const existingIds = new Set(allNotifications.map((n) => n._id));
+        const uniqueNewNotifications =
+          responseData.data.attributes.results.filter(
+            (n: Notification) => !existingIds.has(n._id)
+          );
+        setAllNotifications((prev) => [...prev, ...uniqueNewNotifications]);
       }
-    } catch (error) {
-      console.error("Error viewing notification:", error);
     }
-  };
+  }, [responseData, currentPage, allNotifications]);
 
-  // Handle socket notifications
+  // Handle click inside dropdown
   useEffect(() => {
-    if (socket && user?._id) {
-      const notificationEvent = `message-notification::${user._id}`;
-      const handleNotification = (notificationData: {
-        data: INotification;
-      }) => {
-        const notification = notificationData.data;
-        if (notification.type === "message") {
-          // Add new notification to local state
-          setLocalNotifications((prev) => [notification, ...prev]);
-          toast.success(notification?.title);
-          // Optionally trigger refetch to sync with server
-          refetch();
-        }
-      };
-
-      socket.on(notificationEvent, handleNotification);
-
-      return () => {
-        socket.off(notificationEvent, handleNotification);
-      };
-    }
-  }, [socket, user, refetch]);
-
-  // Prevent dropdown from closing when clicking inside
-  useEffect(() => {
-    const handleClickInside = (event: MouseEvent) => {
-      event.stopPropagation();
-    };
-
+    const handleClickInside = (event: MouseEvent) => event.stopPropagation();
     const dropdownElement = dropdownRef.current;
     if (dropdownElement) {
       dropdownElement.addEventListener("click", handleClickInside);
     }
-
     return () => {
       if (dropdownElement) {
         dropdownElement.removeEventListener("click", handleClickInside);
       }
     };
   }, []);
+
+  // Format time difference
+  const formatTimeAgo = (dateString: string): string => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+
+    if (diffInSeconds < 60) return "Just now";
+    if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}m ago`;
+    if (diffInSeconds < 86400)
+      return `${Math.floor(diffInSeconds / 3600)}h ago`;
+    if (diffInSeconds < 604800)
+      return `${Math.floor(diffInSeconds / 86400)}d ago`;
+    return `${Math.floor(diffInSeconds / 604800)}w ago`;
+  };
+
+  // Handle notification click
+  const handleNotificationClick = (notification: Notification) => {
+    if (notification.type === "message") {
+      router.push(`/messages/${notification?.senderId}`);
+    }
+  };
+
+  // Mark all as read
+  const handleMarkAllAsRead = async () => {
+    try {
+      const type = "message";
+      await viewAllNotifications(type).unwrap();
+      setUnviewMessageCount(0);
+      toast.success("All notifications marked as read!");
+    } catch (error) {
+      const err = error as TError;
+      toast.error(err?.data?.message || "Something went wrong!");
+    }
+  };
+
+  // Load next page
+  const handlePageChange = () => {
+    if (
+      responseData?.data?.attributes?.totalPages &&
+      currentPage < responseData.data.attributes.totalPages
+    ) {
+      setCurrentPage((prev) => prev + 1);
+    }
+  };
+
+  const unviewNotificationCount = responseData?.data?.attributes?.count || 0;
 
   return (
     <AnimatePresence>
@@ -123,18 +148,24 @@ const MessagesDropdown: React.FC<DropdownProps> = ({ isOpen, user }) => {
           exit={{ opacity: 0, y: 10 }}
           transition={{ duration: 0.2 }}
           className="absolute top-16 right-0 bg-white rounded-xl shadow-lg p-6 w-[min(662px,90vw)] z-50"
+          role="menu"
+          aria-label="Notifications dropdown"
         >
-          <div className="flex justify-between items-center mb-2">
-            <h3 className="font-semibold text-lg">Messages</h3>
+          <div className="flex justify-between items-center mb-5">
+            <h3 className="font-semibold text-lg">Message Notifications</h3>
+            {unviewNotificationCount > 0 && (
+              <button
+                onClick={handleMarkAllAsRead}
+                className="text-primary cursor-pointer"
+                aria-label="Mark all as read"
+              >
+                Mark all as read
+              </button>
+            )}
           </div>
-          <div
-            className={`flex flex-col ${
-              localNotifications?.length > 0
-                ? "justify-start"
-                : "justify-center"
-            } gap-3 min-h-48 max-h-[400px] scrollbar-hide overflow-y-auto`}
-          >
-            {isNotificationsLoading ? (
+
+          <div className="space-y-3 min-h-48 max-h-[400px] scrollbar-hide overflow-y-auto">
+            {isLoading ? (
               Array(3)
                 .fill(null)
                 .map((_, index) => (
@@ -161,60 +192,73 @@ const MessagesDropdown: React.FC<DropdownProps> = ({ isOpen, user }) => {
                     </div>
                   </div>
                 ))
-            ) : localNotifications?.length === 0 ? (
+            ) : allNotifications.length > 0 ? (
+              allNotifications?.map((notification) => (
+                <div
+                  key={notification?._id}
+                  onClick={() => handleNotificationClick(notification)}
+                  className={`text-gray-800 hover:bg-[#ECFCFA] px-4 py-3 rounded-xl flex items-center gap-4 cursor-pointer transition-colors ${
+                    !notification.viewStatus ? "bg-[#ECFCFA]" : ""
+                  }`}
+                  role="button"
+                  tabIndex={0}
+                  onKeyPress={(e) =>
+                    e.key === "Enter" && handleNotificationClick(notification)
+                  }
+                >
+                  {notification?.image ? (
+                    <Image
+                      src={notification?.image}
+                      width={40}
+                      height={40}
+                      className="size-[40px] rounded-full flex-shrink-0 object-cover"
+                      alt="user"
+                    />
+                  ) : (
+                    <div className="size-[40px] rounded-full bg-gray-300 flex items-center justify-center">
+                      🔔
+                    </div>
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <p
+                      className={`truncate ${
+                        !notification.viewStatus
+                          ? "font-semibold"
+                          : "font-medium"
+                      }`}
+                    >
+                      {notification.title}
+                    </p>
+                    <p className="text-sm text-gray-500">
+                      {formatTimeAgo(notification.createdAt)}
+                    </p>
+                  </div>
+                  {!notification.viewStatus && (
+                    <span className="w-3 h-3 bg-primary rounded-full block" />
+                  )}
+                </div>
+              ))
+            ) : (
               <div className="flex flex-col items-center justify-center py-8 text-gray-500">
                 <div className="text-4xl mb-2">🔔</div>
-                <p className="text-sm">No message notifications yet</p>
+                <p className="text-sm">No notifications yet</p>
               </div>
-            ) : (
-              localNotifications?.map(
-                (notification: INotification, index: number) => (
-                  <div
-                    key={notification._id?.toString() || index}
-                    onClick={() => handleNotificationClick(notification)}
-                    className="text-gray-800 hover:bg-[#ECFCFA] px-4 py-3 rounded-xl cursor-pointer flex items-center gap-4"
-                  >
-                    {notification?.image ? (
-                      <Image
-                        src={notification?.image}
-                        width={40}
-                        height={40}
-                        className="size-[40px] rounded-full flex-shrink-0 object-cover"
-                        alt="user"
-                      />
-                    ) : (
-                      <div className="size-[40px] rounded-full bg-gray-300 flex items-center justify-center">
-                        🔔
-                      </div>
-                    )}
-                    <div className="flex-1 min-w-0">
-                      <h1 className="font-medium truncate">
-                        {notification?.title}
-                      </h1>
-                      <p className="text-sm text-gray-500">
-                        {moment(notification?.createdAt).fromNow()}
-                      </p>
-                    </div>
-                    {!notification?.viewStatus && (
-                      <div className="flex-shrink-0">
-                        <span className="w-3 h-3 bg-primary rounded-full block"></span>
-                      </div>
-                    )}
-                  </div>
-                )
-              )
             )}
           </div>
-          {localNotifications?.length > 4 && (
-            <div className="mt-3 border-t border-[#E2E8F0] pt-5 flex justify-center items-center">
-              <h1
-                className="text-primary text-sm cursor-pointer"
-                onClick={() => router.push("/messages")}
-              >
-                View all messages
-              </h1>
-            </div>
-          )}
+
+          {allNotifications.length >= 10 &&
+            responseData?.data?.attributes?.totalPages &&
+            currentPage < responseData.data.attributes.totalPages && (
+              <div className="mt-3 border-t border-[#E2E8F0] pt-5 flex justify-center items-center">
+                <button
+                  onClick={handlePageChange}
+                  className="text-primary text-sm cursor-pointer hover:underline"
+                  aria-label="View more notifications"
+                >
+                  View all notifications
+                </button>
+              </div>
+            )}
         </motion.div>
       )}
     </AnimatePresence>

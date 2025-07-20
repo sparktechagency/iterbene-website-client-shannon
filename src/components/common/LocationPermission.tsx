@@ -479,7 +479,7 @@ const LocationPermission = () => {
                 </div>
               )}
 
-              <div className="flex gap-3 justify-center">
+              <div className="flex flex-col md:flex-row gap-5  justify-center">
                 <button
                   className="px-8 py-3 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-xl font-medium transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                   onClick={handleDeny}

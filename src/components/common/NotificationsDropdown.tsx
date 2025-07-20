@@ -26,9 +26,13 @@ interface Notification {
 
 interface DropdownProps {
   isOpen: boolean;
+  setUnviewNotificationCount: React.Dispatch<React.SetStateAction<number>>
 }
 
-const NotificationsDropdown: React.FC<DropdownProps> = ({ isOpen }) => {
+const NotificationsDropdown: React.FC<DropdownProps> = ({
+  isOpen,
+  setUnviewNotificationCount
+}) => {
   const [allNotifications, setAllNotifications] = useState<Notification[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -37,7 +41,7 @@ const NotificationsDropdown: React.FC<DropdownProps> = ({ isOpen }) => {
   const {
     data: responseData,
     isLoading,
-    refetch,
+    refetch: refetchNotifications,
   } = useGetAllNotificationsQuery(
     [
       { key: "page", value: currentPage },
@@ -51,9 +55,9 @@ const NotificationsDropdown: React.FC<DropdownProps> = ({ isOpen }) => {
 
   useEffect(() => {
     if (isOpen) {
-      refetch();
+      refetchNotifications();
     }
-  }, [isOpen, refetch]);
+  }, [isOpen, refetchNotifications]);
 
   // Update notifications when data arrives
   useEffect(() => {
@@ -102,7 +106,7 @@ const NotificationsDropdown: React.FC<DropdownProps> = ({ isOpen }) => {
 
   // Handle notification click
   const handleNotificationClick = (notification: Notification) => {
-    console.log("Notification clicked:", notification);
+    if (notification.viewStatus) return;
     // Navigation logic here based on type and linkId
   };
 
@@ -110,6 +114,7 @@ const NotificationsDropdown: React.FC<DropdownProps> = ({ isOpen }) => {
   const handleMarkAllAsRead = async () => {
     try {
       await viewAllNotifications(undefined).unwrap();
+      setUnviewNotificationCount(0);
       toast.success("All notifications marked as read!");
     } catch (error) {
       const err = error as TError;

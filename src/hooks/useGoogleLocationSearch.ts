@@ -1,19 +1,24 @@
-// lib/unified-google-maps.ts
 import { useJsApiLoader } from "@react-google-maps/api";
 import { useState, useEffect, useRef, useCallback } from "react";
 
 const GOOGLE_MAPS_API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAP_API_KEY || "";
 
-// Consistent libraries configuration for both map display and places search
+interface UseGoogleLocationSearchOptions {
+  debounceMs?: number;
+  minQueryLength?: number;
+  maxResults?: number;
+  types?: string[];
+  defaultQuery?: string;
+}
+
 export const GOOGLE_MAPS_LIBRARIES: (
   | "maps"
   | "places"
   | "geometry"
   | "drawing"
   | "visualization"
-)[] = ["places"];
+)[] = ["maps", "places"]; // Include both maps and places
 
-// Types for location search
 export interface LocationPrediction {
   description: string;
   place_id: string;
@@ -31,37 +36,23 @@ export interface LocationDetails {
   place_id: string;
 }
 
-// Global unified hook for Google Maps
 export const useUnifiedGoogleMaps = () => {
+  console.log("API Key:", GOOGLE_MAPS_API_KEY); // Debug API key
   const { isLoaded, loadError } = useJsApiLoader({
     googleMapsApiKey: GOOGLE_MAPS_API_KEY,
-    libraries: GOOGLE_MAPS_LIBRARIES, // This will load both maps and places
+    libraries: GOOGLE_MAPS_LIBRARIES,
   });
+
+  useEffect(() => {
+    console.log("Google Maps Loaded:", isLoaded, "Load Error:", loadError);
+  }, [isLoaded, loadError]);
 
   return { isLoaded, loadError };
 };
 
-// Updated location search hook that uses the unified loader
-interface UseGoogleLocationSearchOptions {
-  debounceMs?: number;
-  minQueryLength?: number;
-  maxResults?: number;
-  types?: string[];
-  defaultQuery?: string;
-}
-
-interface UseGoogleLocationSearchReturn {
-  predictions: LocationPrediction[];
-  isLoading: boolean;
-  searchLocations: (query: string) => Promise<void>;
-  getLocationDetails: (placeId: string) => Promise<LocationDetails | null>;
-  clearPredictions: () => void;
-  error: string | null;
-}
-
 export const useGoogleLocationSearch = (
   options: UseGoogleLocationSearchOptions = {}
-): UseGoogleLocationSearchReturn => {
+) => {
   const {
     debounceMs = 300,
     minQueryLength = 1,
@@ -70,40 +61,32 @@ export const useGoogleLocationSearch = (
     defaultQuery = "",
   } = options;
 
-  // Use the unified Google Maps loader
   const { isLoaded } = useUnifiedGoogleMaps();
-
-  // States
   const [predictions, setPredictions] = useState<LocationPrediction[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Refs for services
   const autocompleteService =
     useRef<google.maps.places.AutocompleteService | null>(null);
   const placesService = useRef<google.maps.places.PlacesService | null>(null);
   const debounceTimer = useRef<NodeJS.Timeout | null>(null);
   const servicesInitialized = useRef(false);
 
-  // Initialize services when Google Maps is loaded
   const initializeServices = useCallback(() => {
     if (isLoaded && !servicesInitialized.current) {
+      console.log("Initializing Google Maps services...");
       try {
         autocompleteService.current =
           new window.google.maps.places.AutocompleteService();
-
-        // Create a dummy div for PlacesService
         const dummyDiv = document.createElement("div");
         dummyDiv.style.display = "none";
         document.body.appendChild(dummyDiv);
         placesService.current = new window.google.maps.places.PlacesService(
           dummyDiv
         );
-
+        console.log("Services initialized successfully");
         servicesInitialized.current = true;
         setError(null);
-
-        // Execute default query if provided
         if (defaultQuery && defaultQuery.length >= minQueryLength) {
           setTimeout(() => searchLocations(defaultQuery), 100);
         }
@@ -114,29 +97,25 @@ export const useGoogleLocationSearch = (
     }
   }, [isLoaded, defaultQuery, minQueryLength]);
 
-  // Initialize services when Google Maps loads
   useEffect(() => {
     initializeServices();
   }, [initializeServices]);
 
-  // Search locations
   const searchLocations = useCallback(
     async (query: string): Promise<void> => {
       const effectiveQuery = query.trim() || defaultQuery?.trim() || "";
-
       if (!effectiveQuery || effectiveQuery.length < minQueryLength) {
         setPredictions([]);
         return;
       }
-
       if (!isLoaded || !autocompleteService.current) {
         console.warn(
           "Google Maps not loaded or AutocompleteService not available"
         );
+        setError("Google Maps not loaded or AutocompleteService not available");
         return;
       }
 
-      // Clear existing timer
       if (debounceTimer.current) {
         clearTimeout(debounceTimer.current);
       }
@@ -148,6 +127,7 @@ export const useGoogleLocationSearch = (
         const request: google.maps.places.AutocompletionRequest = {
           input: effectiveQuery,
           types: types as string[],
+          sessionToken: new google.maps.places.AutocompleteSessionToken(), // Add session token
         };
 
         try {
@@ -155,7 +135,7 @@ export const useGoogleLocationSearch = (
             request,
             (predictions, status) => {
               setIsLoading(false);
-
+              console.log("Autocomplete Response:", { predictions, status });
               if (
                 status === google.maps.places.PlacesServiceStatus.OK &&
                 predictions
@@ -171,14 +151,12 @@ export const useGoogleLocationSearch = (
               } else {
                 console.error("Places prediction error:", status);
                 setPredictions([]);
-
-                // Handle specific errors
                 if (
                   status ===
                   google.maps.places.PlacesServiceStatus.REQUEST_DENIED
                 ) {
                   setError(
-                    "Location search access denied. Please check API key."
+                    "Location search access denied. Please check API key permissions."
                   );
                 } else if (
                   status ===
@@ -202,11 +180,11 @@ export const useGoogleLocationSearch = (
     [defaultQuery, minQueryLength, isLoaded, debounceMs, maxResults, types]
   );
 
-  // Get location details
   const getLocationDetails = useCallback(
     async (placeId: string): Promise<LocationDetails | null> => {
       if (!isLoaded || !placesService.current) {
         console.warn("Google Maps not loaded or PlacesService not initialized");
+        setError("Google Maps not loaded or PlacesService not initialized");
         return null;
       }
 
@@ -218,6 +196,7 @@ export const useGoogleLocationSearch = (
 
         try {
           placesService.current!.getDetails(request, (place, status) => {
+            console.log("Place Details Response:", { place, status });
             if (status === google.maps.places.PlacesServiceStatus.OK && place) {
               const locationDetails: LocationDetails = {
                 name: place?.name || "",
@@ -229,11 +208,13 @@ export const useGoogleLocationSearch = (
               resolve(locationDetails);
             } else {
               console.error("Place details error:", status);
+              setError("Failed to fetch place details");
               resolve(null);
             }
           });
         } catch (err) {
           console.error("Error getting place details:", err);
+          setError("Error getting place details");
           resolve(null);
         }
       });
@@ -241,12 +222,10 @@ export const useGoogleLocationSearch = (
     [isLoaded]
   );
 
-  // Clear predictions
   const clearPredictions = useCallback((): void => {
     setPredictions([]);
   }, []);
 
-  // Cleanup
   useEffect(() => {
     return () => {
       if (debounceTimer.current) {
