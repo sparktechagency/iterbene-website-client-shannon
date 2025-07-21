@@ -92,11 +92,7 @@ const MapSection = ({
     };
   };
 
-  // Handle marker clicks without button nesting
-  const handleMarkerClick = (type: string, index?: number) => {
-    console.log(`Clicked ${type} marker`, index);
-    // Add your marker click logic here
-  };
+
 
   // Handle map toggle without button nesting
   const handleMapToggle = () => {
@@ -199,25 +195,23 @@ const MapSection = ({
         >
           {/* Markers for places you're interested in */}
           {customIcons &&
-            interestedPlaces.map((place, index) => (
+            interestedPlaces?.map((place, index) => (
               <Marker
                 key={`interested-${index}`}
                 position={place}
                 icon={customIcons.interested}
                 title={`Interested Place ${index + 1}`}
-                onClick={() => handleMarkerClick("interested", index)}
               />
             ))}
 
           {/* Markers for places you've visited */}
           {customIcons &&
-            visitedPlaces.map((place, index) => (
+            visitedPlaces?.map((place, index) => (
               <Marker
                 key={`visited-${index}`}
                 position={place}
                 icon={customIcons.visited}
                 title={`Visited Place ${index + 1}`}
-                onClick={() => handleMarkerClick("visited", index)}
               />
             ))}
 
@@ -227,7 +221,6 @@ const MapSection = ({
               position={homeLocation}
               icon={customIcons.home}
               title="Home - Current Location"
-              onClick={() => handleMarkerClick("home")}
             />
           )}
         </GoogleMap>

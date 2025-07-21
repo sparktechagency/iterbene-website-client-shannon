@@ -261,7 +261,6 @@ const VideoCard = ({
   };
 
   const handleClickRetry = (e: React.MouseEvent) => {
-    console.log("Clicked retry");
     e.stopPropagation();
     setError(null);
     setIsLoading(true);

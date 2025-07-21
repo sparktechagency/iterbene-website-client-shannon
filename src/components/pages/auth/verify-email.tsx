@@ -29,8 +29,7 @@ const VerifyEmail = () => {
         router.push(`/login`);
       }
     } catch (error) {
-      const err = error as TError;
-      console.log("Error:", error);
+      const err = error as TError
       toast.error(err?.data?.message || "Something went wrong!");
     }
   };

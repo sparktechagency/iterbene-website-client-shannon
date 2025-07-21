@@ -41,11 +41,6 @@ export const useUnifiedGoogleMaps = () => {
     googleMapsApiKey: GOOGLE_MAPS_API_KEY,
     libraries: GOOGLE_MAPS_LIBRARIES,
   });
-
-  useEffect(() => {
-    console.log("Google Maps Loaded:", isLoaded, "Load Error:", loadError);
-  }, [isLoaded, loadError]);
-
   return { isLoaded, loadError };
 };
 
@@ -73,7 +68,6 @@ export const useGoogleLocationSearch = (
 
   const initializeServices = useCallback(() => {
     if (isLoaded && !servicesInitialized.current) {
-      console.log("Initializing Google Maps services...");
       try {
         autocompleteService.current =
           new window.google.maps.places.AutocompleteService();
@@ -83,7 +77,6 @@ export const useGoogleLocationSearch = (
         placesService.current = new window.google.maps.places.PlacesService(
           dummyDiv
         );
-        console.log("Services initialized successfully");
         servicesInitialized.current = true;
         setError(null);
         if (defaultQuery && defaultQuery.length >= minQueryLength) {
@@ -108,9 +101,6 @@ export const useGoogleLocationSearch = (
         return;
       }
       if (!isLoaded || !autocompleteService.current) {
-        console.warn(
-          "Google Maps not loaded or AutocompleteService not available"
-        );
         setError("Google Maps not loaded or AutocompleteService not available");
         return;
       }
@@ -134,7 +124,6 @@ export const useGoogleLocationSearch = (
             request,
             (predictions, status) => {
               setIsLoading(false);
-              console.log("Autocomplete Response:", { predictions, status });
               if (
                 status === google.maps.places.PlacesServiceStatus.OK &&
                 predictions
@@ -148,7 +137,6 @@ export const useGoogleLocationSearch = (
                 setPredictions([]);
                 setError(null);
               } else {
-                console.error("Places prediction error:", status);
                 setPredictions([]);
                 if (
                   status ===
@@ -182,7 +170,6 @@ export const useGoogleLocationSearch = (
   const getLocationDetails = useCallback(
     async (placeId: string): Promise<LocationDetails | null> => {
       if (!isLoaded || !placesService.current) {
-        console.warn("Google Maps not loaded or PlacesService not initialized");
         setError("Google Maps not loaded or PlacesService not initialized");
         return null;
       }
@@ -195,7 +182,6 @@ export const useGoogleLocationSearch = (
 
         try {
           placesService.current!.getDetails(request, (place, status) => {
-            console.log("Place Details Response:", { place, status });
             if (status === google.maps.places.PlacesServiceStatus.OK && place) {
               const locationDetails: LocationDetails = {
                 name: place?.name || "",

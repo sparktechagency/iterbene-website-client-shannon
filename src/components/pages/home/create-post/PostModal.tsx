@@ -24,12 +24,8 @@ export default function PostModal({ visible, onClose }: PostModalProps) {
   };
 
   const handleCreatePost = () => {
-    console.log({
-      content: postContent,
-      files: selectedFiles,
-      visitedLocation,
-      visitedLocationName,
-    });
+    // Handle post creation
+    console.log("Visited Location:", visitedLocation);
     setPostContent("");
     setSelectedFiles([]);
     setVisitedLocation(null);

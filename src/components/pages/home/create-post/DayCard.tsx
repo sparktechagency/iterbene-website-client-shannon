@@ -60,9 +60,6 @@ const DayCard = ({ control }: DayCardProps) => {
   const handleLocationInputChange = (value: string, dayIndex: number) => {
     setValue(`days.${dayIndex}.locationName`, value);
   };
-
-  console.log("Watched Days:", watchedDays);
-
   return (
     <div>
       <div className="flex justify-between items-center mb-2">

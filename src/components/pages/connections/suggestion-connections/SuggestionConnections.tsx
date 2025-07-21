@@ -37,18 +37,10 @@ const SuggestionConnections: React.FC = () => {
       } else {
         // Additional pages - append only new unique connections
         setAllConnections((prev) => {
-          console.log("Prev", prev?.length);
-          console.log("suggestionsConnections", suggestionsConnections?.length);
           const existingIds = new Set(prev.map((conn) => conn._id));
-          const suggationIds = new Set(
-            suggestionsConnections.map((conn: IConnection) => conn._id)
-          );
-          console.log("Existing IDs", existingIds);
-          console.log("Suggation IDs", suggationIds);
           const newConnections = suggestionsConnections.filter(
             (conn: IConnection) => !existingIds.has(conn._id)
           );
-          console.log("New Connections", newConnections?.length);
           return [...prev, ...newConnections];
         });
       }

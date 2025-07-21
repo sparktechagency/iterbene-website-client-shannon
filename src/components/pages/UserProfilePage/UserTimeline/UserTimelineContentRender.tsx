@@ -16,7 +16,6 @@ interface UserTimelineContentRenderProps {
 const UserTimelineContentRender = ({
   data,
 }: UserTimelineContentRenderProps) => {
-  console.log("UserTimelineContentRender", data);
   return (
     <div className="w-full ">
       <Swiper

@@ -220,7 +220,6 @@ const Header: React.FC = () => {
       // Listen for general notifications
       const notificationEvent = `notification::${user._id}`;
       socket.on(notificationEvent, () => {
-        console.log("Received notification for user:", user._id);
         setUnviewNotificationCount((prev) => prev + 1);
       });
 
@@ -429,8 +428,6 @@ const Header: React.FC = () => {
           const hashtagResult = result as IHashtag;
           router.push(`/search/hashtag?q=${hashtagResult?.name}`);
           break;
-        default:
-          console.log("Unknown result type");
       }
       setIsSearchDropdownOpen(false);
       setSearchValue("");
@@ -511,7 +508,10 @@ const Header: React.FC = () => {
                       </div>
                     )}
                   </motion.button>
-                  <MessagesDropdown isOpen={isMessagesOpen} setUnviewMessageCount={setUnviewMessageCount} />
+                  <MessagesDropdown
+                    isOpen={isMessagesOpen}
+                    setUnviewMessageCount={setUnviewMessageCount}
+                  />
                 </div>
 
                 <div ref={notificationsRef} className="relative">

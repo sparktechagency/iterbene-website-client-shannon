@@ -50,8 +50,6 @@ const SearchHashTagPostContent = () => {
     );
   }
 
-  console.log("Response Data:", responseData?.data?.attributes?.results);
-
   const posts = responseData?.data?.attributes?.results[0]?.posts || [];
   const postCount = responseData?.data?.attributes?.results[0]?.postCount || 0;
 

@@ -24,8 +24,7 @@ export const socket = io(socketUrl, {
 
 export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
-    console.log(socket.on("connect", () => console.log("Socket connected")));
-    socket.on("connect", () => console.log("Socket connected"));
+    socket.on("connect", () => console.warn("Socket connected"));
     socket.on("disconnect", (reason) =>
       console.log(`Socket disconnected: ${reason}`)
     );
