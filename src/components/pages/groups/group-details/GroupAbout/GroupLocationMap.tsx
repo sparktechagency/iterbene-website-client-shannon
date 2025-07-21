@@ -1,5 +1,5 @@
 "use client";
-import { useUnifiedGoogleMaps } from "@/hooks/useGoogleLocationSearch";
+import { useUnifiedGoogleMaps } from "@/hooks/useUnifiedGoogleMaps";
 import { IGroupDetails } from "@/types/group.types";
 import { GoogleMap, Marker } from "@react-google-maps/api";
 import { Loader2 } from "lucide-react";

@@ -1,5 +1,5 @@
 "use client";
-import { useUnifiedGoogleMaps } from "@/hooks/useGoogleLocationSearch";
+import { useUnifiedGoogleMaps } from "@/hooks/useUnifiedGoogleMaps";
 import { useGetMyMapsQuery } from "@/redux/features/maps/mapsApi";
 import { ITripVisitedLocation } from "@/types/trip.types";
 import { GoogleMap, Marker } from "@react-google-maps/api";
@@ -91,8 +91,6 @@ const MapSection = ({
       },
     };
   };
-
-
 
   // Handle map toggle without button nesting
   const handleMapToggle = () => {

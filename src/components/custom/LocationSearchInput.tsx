@@ -41,6 +41,7 @@ const LocationSearchInput: React.FC<LocationSearchInputProps> = ({
   const {
     predictions,
     isLoading,
+    isInitialized,
     searchLocations,
     getLocationDetails,
     clearPredictions,
@@ -116,8 +117,7 @@ const LocationSearchInput: React.FC<LocationSearchInputProps> = ({
     if (value !== inputValue) {
       setInputValue(value);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [value]);
+  }, [inputValue, value]);
 
   return (
     <div className={`flex flex-col gap-2 ${className}`}>
@@ -134,8 +134,10 @@ const LocationSearchInput: React.FC<LocationSearchInputProps> = ({
             type="text"
             value={inputValue}
             onChange={handleInputChange}
-            placeholder={placeholder}
-            disabled={disabled}
+            placeholder={
+              !isInitialized ? "Loading location services..." : placeholder
+            }
+            disabled={disabled || !isInitialized}
             className="w-full px-4 py-3 pl-12 border border-gray-300 rounded-lg outline-none transition-colors  "
             onFocus={() => {
               if (predictions.length > 0) {
