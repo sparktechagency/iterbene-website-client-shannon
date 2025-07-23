@@ -26,7 +26,7 @@ const VerifyEmail = () => {
       if (type == "forgot-password") {
         router.push(`/reset-password`);
       } else {
-        router.push(`/login`);
+        router.push(`/`);
       }
     } catch (error) {
       const err = error as TError

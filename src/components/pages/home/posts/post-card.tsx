@@ -168,7 +168,7 @@ const PostCard = ({ post, refetch }: PostCardProps) => {
         onEditClick={() => setShowEditModal(true)}
         refetch={refetch}
       />
-      <p className="text-gray-700 mb-4">
+      <p className="text-gray-700 mb-4 text-sm md:text-base">
         {post?.content?.split(/(\s+)/)?.map((word, index) => {
           const isHashtag = word?.match(/^#\w+/);
           return (

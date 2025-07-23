@@ -28,6 +28,15 @@ const Login = () => {
         toast.error("You are admin you can't login here!");
         return;
       }
+      if (res?.message == "Email is not verified. Please verify your email.") {
+        toast.success(res?.message);
+        storeTokens(
+          res?.data?.attributes?.accessToken,
+          res?.data?.attributes?.refreshToken
+        );
+        router.push("/verify-email");
+        return;
+      }
       toast.success(res.message || "Login successful!");
       storeTokens(
         res?.data?.attributes?.tokens?.accessToken,

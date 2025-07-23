@@ -18,6 +18,7 @@ import toast from "react-hot-toast";
 import ReportModal, { ReportType } from "@/components/custom/ReportModal";
 import { openAuthModal } from "@/redux/features/auth/authModalSlice";
 import { useAppDispatch } from "@/redux/hooks";
+import Link from "next/link";
 
 interface PostCommentSectionProps {
   post: IPost;
@@ -215,22 +216,26 @@ const PostCommentSection = ({
             <div key={comment?._id} className="mb-4">
               <div className="flex items-start space-x-3 relative">
                 {comment?.userId?.profileImage && (
-                  <Image
-                    src={comment?.userId?.profileImage}
-                    alt={comment?.userId?.fullName || "User"}
-                    width={36}
-                    height={36}
-                    className="w-9 h-9 rounded-full object-cover border border-gray-300"
-                  />
+                  <Link href={`/${comment?.userId?.username}`}>
+                    <Image
+                      src={comment?.userId?.profileImage}
+                      alt={comment?.userId?.fullName || "User"}
+                      width={36}
+                      height={36}
+                      className="w-9 h-9 rounded-full object-cover border border-gray-300"
+                    />
+                  </Link>
                 )}
                 <div className="flex-1 min-w-0">
                   <div className="w-fit bg-gray-100/70 px-3 py-2 rounded-2xl max-w-full">
                     <div className="flex justify-between items-start">
-                      <p className="font-medium text-gray-800">
-                        {comment?.userId?.fullName}
-                      </p>
+                      <Link href={`/${comment?.userId?.username}`}>
+                        <p className="text-sm md:text-base font-medium text-gray-800 hover:underline">
+                          {comment?.userId?.fullName}
+                        </p>
+                      </Link>
                     </div>
-                    <p className="text-gray-700 break-all max-w-full mt-1">
+                    <p className="text-gray-700 break-all max-w-full mt-1 text-sm md:text-base">
                       {renderCommentText(comment?.comment)}
                     </p>
                   </div>

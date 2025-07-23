@@ -12,13 +12,13 @@ import moment from "moment";
     const diffDays = now.diff(postTime, "days");
 
     if (diffSeconds < 60) {
-      return diffSeconds === 1 ? "1 sec ago" : `${diffSeconds} secs ago`;
+      return diffSeconds === 1 ? "1s" : `${diffSeconds}s`;
     } else if (diffMinutes < 60) {
-      return diffMinutes === 1 ? "1 min ago" : `${diffMinutes} mins ago`;
+      return diffMinutes === 1 ? "1m" : `${diffMinutes}m`;
     } else if (diffHours < 24) {
-      return diffHours === 1 ? "1 hr ago" : `${diffHours} hrs ago`;
+      return diffHours === 1 ? "1h" : `${diffHours}h`;
     } else if (diffDays < 7) {
-      return diffDays === 1 ? "1 day ago" : `${diffDays} days ago`;
+      return diffDays === 1 ? "1d" : `${diffDays}d`;
     } else {
       return postTime.format("MMM D, YYYY");
     }
