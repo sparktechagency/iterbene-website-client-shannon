@@ -6,7 +6,7 @@ import {
   useViewStoryMutation,
   useReactToStoryMutation,
   useReplyToStoryMutation,
-  useDeleteStoryMutation,
+  // useDeleteStoryMutation,
 } from "@/redux/features/stories/storiesApi";
 import {
   IReactions,
@@ -21,8 +21,8 @@ import {
   Send,
   Volume2,
   VolumeX,
-  Trash2,
-  MoreVertical,
+  // Trash2,
+  // MoreVertical,
   X,
   Eye,
 } from "lucide-react";
@@ -55,7 +55,7 @@ const JourneyView = () => {
   const [viewStory] = useViewStoryMutation();
   const [reactToStory] = useReactToStoryMutation();
   const [replyToStory] = useReplyToStoryMutation();
-  const [deleteStory] = useDeleteStoryMutation();
+  // const [deleteStory] = useDeleteStoryMutation();
 
   // State management
   const [currentStory, setCurrentStory] = useState<IStory | null>(null);
@@ -82,7 +82,7 @@ const JourneyView = () => {
   const progressIntervalRef = useRef<number | null>(null);
   const startTimeRef = useRef<number>(0);
   const pausedTimeRef = useRef<number>(0);
-  const showMenuRef = useRef<HTMLDivElement>(null);
+  // const showMenuRef = useRef<HTMLDivElement>(null);
 
   // Constants
   const STORY_DURATION = 7000;
@@ -341,19 +341,19 @@ const JourneyView = () => {
     }
   };
 
-  const handleDeleteStory = async (mediaId: string) => {
-    try {
-      await deleteStory(mediaId).unwrap();
-      if (allStories.length > 1) {
-        handleNext();
-      } else {
-        router.push("/");
-      }
-    } catch (error) {
-      const err = error as TError;
-      toast.error(err?.data?.message || "Something went wrong!");
-    }
-  };
+  // const handleDeleteStory = async (mediaId: string) => {
+  //   try {
+  //     await deleteStory(mediaId).unwrap();
+  //     if (allStories.length > 1) {
+  //       handleNext();
+  //     } else {
+  //       router.push("/");
+  //     }
+  //   } catch (error) {
+  //     const err = error as TError;
+  //     toast.error(err?.data?.message || "Something went wrong!");
+  //   }
+  // };
 
   const formatTimeAgo = (date: Date) => {
     const now = new Date();
@@ -433,9 +433,11 @@ const JourneyView = () => {
               width={32}
               height={32}
             />
-            <span className="text-white text-sm font-medium">
-              {currentStory?.userId?.username || "Unknown User"}
-            </span>
+            <Link href={`/${currentStory?.userId?.username}`}>
+              <span className="text-white text-sm font-medium hover:underline">
+                {currentStory?.userId?.username || "Unknown User"}
+              </span>
+            </Link>
             <span className="text-gray-300 text-xs">
               {formatTimeAgo(currentStory?.createdAt)}
             </span>
@@ -453,7 +455,7 @@ const JourneyView = () => {
                 )}
               </button>
             )}
-            {isOwnStory ? (
+            {/* {isOwnStory ? (
               <div className="relative">
                 <button
                   onClick={() => setShowMenu(!showMenu)}
@@ -482,13 +484,14 @@ const JourneyView = () => {
                 </AnimatePresence>
               </div>
             ) : (
-              <button
-                onClick={() => router.push(`/`)}
-                className="p-1 rounded-full bg-black/20 cursor-pointer"
-              >
-                <X className="w-5 h-5 text-white" />
-              </button>
-            )}
+              
+            )} */}
+            <button
+              onClick={() => router.push(`/`)}
+              className="p-1 rounded-full bg-black/20 cursor-pointer"
+            >
+              <X className="w-5 h-5 text-white" />
+            </button>
           </div>
         </div>
 

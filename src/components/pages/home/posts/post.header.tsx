@@ -172,20 +172,23 @@ const PostHeader = ({ post, onEditClick, refetch }: PostHeaderProps) => {
           className="size-[50px] object-cover rounded-full mr-3 ring-2 ring-gray-200"
         />
         <div>
-          <div className="flex flex-wrap items-center gap-2">
-            <Link
-              href={`/${post?.userId?.username || ""}`}
-              className="hover:underline"
-            >
-              <p className="font-medium text-gray-800 text-sm md:text-base lg:text-lg">
+          <div className="flex items-center gap-2">
+            {user ? (
+              <Link href={`/${post?.userId?.username || ""}`} className="w-full block hover:underline">
+                <p className="font-medium text-gray-800 text-sm md:text-lg">
+                  {post?.userId?.fullName || "Unknown User"}
+                </p>
+              </Link>
+            ) : (
+              <p className="font-medium text-gray-800 text-lg">
                 {post?.userId?.fullName || "Unknown User"}
               </p>
-            </Link>
+            )}
             <span className="text-sm">
               {post?.createdAt && formatTimeAgo(post?.createdAt)}
             </span>
           </div>
-          <div className="text-sm text-gray-900 flex flex-wrap items-center gap-2 -ml-1 mt-1">
+          <div className="text-sm text-gray-900 flex items-center gap-2 -ml-1 mt-1">
             {post?.visitedLocationName && (
               <>
                 <TiLocation size={23} className="text-primary" />
@@ -193,11 +196,11 @@ const PostHeader = ({ post, onEditClick, refetch }: PostHeaderProps) => {
               </>
             )}
             {post?.privacy === "public" ? (
-              <HiGlobe size={20} className="text-primary" />
+              <HiGlobe size={23} className="text-primary" />
             ) : post?.privacy === "friends" ? (
-              <HiUsers size={20} className="text-primary" />
+              <HiUsers size={23} className="text-primary" />
             ) : (
-              <HiLockClosed size={20} className="text-primary" />
+              <HiLockClosed size={23} className="text-primary" />
             )}
           </div>
         </div>

@@ -179,7 +179,7 @@ const CreatePost = ({
     switch (postType) {
       case "Group":
         return {
-           placeholder: `What's new, ${user?.fullName || "User"}?`,
+          placeholder: `What's new, ${user?.fullName || "User"}?`,
           showPrivacy: false,
           showLocation: true,
           showItinerary: true,
@@ -714,7 +714,13 @@ const CreatePost = ({
                   </AnimatePresence>
                   {(config?.showPrivacy || initialPostData) && ( // Show privacy for user posts or when editing any post
                     <div className="flex items-center gap-2">
-                      <Globe className="w-5 h-5 text-primary" />
+                      {privacy === "public" ? (
+                        <Globe className="w-6 h-6 text-primary transition-colors" />
+                      ) : privacy === "friends" ? (
+                        <Users className="w-6 h-6 text-primary transition-colors" />
+                      ) : (
+                        <Lock className="w-6 h-6 text-primary transition-colors" />
+                      )}
                       <span className="text-sm text-gray-700 capitalize">
                         {privacy}
                       </span>

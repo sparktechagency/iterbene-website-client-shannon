@@ -16,7 +16,7 @@ import { useEffect, useRef, useState, useCallback } from "react";
 import { BiLogOut } from "react-icons/bi";
 import { BsChatSquareDots } from "react-icons/bs";
 import { FaRegCalendarAlt, FaRegUserCircle } from "react-icons/fa";
-import { FiMapPin } from "react-icons/fi";
+import { FiMapPin, FiPlayCircle } from "react-icons/fi";
 import { HiOutlineUserGroup, HiOutlineUsers } from "react-icons/hi";
 import { IoMdNotificationsOutline } from "react-icons/io";
 import { IoChatboxEllipsesOutline } from "react-icons/io5";
@@ -109,7 +109,7 @@ const MobileMenu: React.FC<{
                   href="/watch-videos"
                   className="text-gray-800 hover:bg-[#ECFCFA] px-4 py-3 rounded-xl flex items-center gap-4"
                 >
-                  <FiMapPin size={24} />
+                  <FiPlayCircle size={24} />
                   <span>Watch Videos</span>
                 </Link>
                 {/* Photos */}
