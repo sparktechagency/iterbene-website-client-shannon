@@ -427,17 +427,17 @@ const JourneyView = () => {
         <div className="absolute top-6 left-2 right-2 z-30 flex items-center justify-between pt-4">
           <div className="flex items-center gap-3">
             <Image
-              src={currentStory.userId?.profileImage || "/default-avatar.png"}
-              alt={currentStory.userId?.username || "User"}
+              src={currentStory?.userId?.profileImage || "/default-avatar.png"}
+              alt={currentStory?.userId?.username || "User"}
               className="w-8 h-8 rounded-full border-2 border-white object-cover"
               width={32}
               height={32}
             />
             <span className="text-white text-sm font-medium">
-              {currentStory.userId?.username || "Unknown User"}
+              {currentStory?.userId?.username || "Unknown User"}
             </span>
             <span className="text-gray-300 text-xs">
-              {formatTimeAgo(currentStory.createdAt)}
+              {formatTimeAgo(currentStory?.createdAt)}
             </span>
           </div>
           <div className="flex items-center gap-2">
@@ -471,7 +471,7 @@ const JourneyView = () => {
                       exit={{ opacity: 0, scale: 0.95 }}
                     >
                       <button
-                        onClick={() => handleDeleteStory(currentMedia._id)}
+                        onClick={() => handleDeleteStory(currentMedia?._id)}
                         className="flex items-center gap-2 text-white text-sm p-2"
                       >
                         <Trash2 className="w-4 h-4 text-red-500" />

@@ -14,20 +14,44 @@ import { Lock, Mail } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useState } from "react";
 import { FieldValues } from "react-hook-form";
 import toast from "react-hot-toast";
+import LoginLockModal from "./LoginLockModal";
+
 const Login = () => {
   const searchParams = useSearchParams();
   const redirectUrl = searchParams.get("redirect_url");
   const [login, { isLoading }] = useLoginMutation();
   const router = useRouter();
+
+  // State for lock modal
+  const [isLockModalVisible, setIsLockModalVisible] = useState(false);
+  const [lockData, setLockData] = useState<{
+    lockUntil: string;
+    lockTime: number;
+  } | null>(null);
+
   const handleLogin = async (values: FieldValues) => {
     try {
       const res = await login(values).unwrap();
+
       if (res?.data?.attributes?.user?.role === "admin") {
         toast.error("You are admin you can't login here!");
         return;
       }
+
+      // Check if user is locked
+      if (res?.data?.attributes?.lockTime && res?.data?.attributes?.lockUntil) {
+        setIsLockModalVisible(true);
+        setLockData({
+          lockUntil: res?.data?.attributes?.lockUntil,
+          lockTime: res?.data?.attributes?.lockTime,
+        });
+        return;
+      }
+
+      // Check if email is not verified
       if (res?.message == "Email is not verified. Please verify your email.") {
         toast.success(res?.message);
         storeTokens(
@@ -37,11 +61,13 @@ const Login = () => {
         router.push("/verify-email");
         return;
       }
+
       toast.success(res.message || "Login successful!");
       storeTokens(
         res?.data?.attributes?.tokens?.accessToken,
         res?.data?.attributes?.tokens?.refreshToken
       );
+
       if (redirectUrl) {
         router.push(redirectUrl);
       } else {
@@ -52,8 +78,14 @@ const Login = () => {
       toast.error(err?.data?.message || "Something went wrong!");
     }
   };
+
+  const handleCloseLockModal = () => {
+    setIsLockModalVisible(false);
+    setLockData(null);
+  };
+
   return (
-    <section className="w-full  h-screen flex items-center justify-center relative p-5">
+    <section className="w-full h-screen flex items-center justify-center relative p-5">
       {/* Background with blur effect */}
       <div
         style={{
@@ -67,6 +99,7 @@ const Login = () => {
       ></div>
       {/* Semi-transparent color overlay */}
       <div className="absolute top-0 left-0 w-full h-full bg-[#40E0D054]"></div>
+
       {/* Content that remains sharp */}
       <div className="w-full max-w-[500px] mx-auto px-8 xl:px-[65px] py-12 xl:py-[56px] bg-[#FFFFFF] z-30 rounded-xl border-2 border-primary shadow-xl shadow-gray-900">
         <div className="flex justify-between">
@@ -81,6 +114,7 @@ const Login = () => {
             className="ml-2 w-[90px] md:w-[100px] md:h-[90px] xl:w-[128px] xl:h-[115px]"
           />
         </div>
+
         {/* Form content */}
         <CustomForm
           onSubmit={handleLogin}
@@ -105,7 +139,7 @@ const Login = () => {
               size="lg"
               icon={<Lock size={24} className="text-secondary" />}
               fullWidth
-              placeholder="Enter your email"
+              placeholder="Enter your password"
             />
             <div className="flex items-center justify-between">
               <div className="flex items-center">
@@ -143,6 +177,16 @@ const Login = () => {
           </div>
         </CustomForm>
       </div>
+
+      {/* Lock Modal */}
+      {lockData && (
+        <LoginLockModal
+          isVisible={isLockModalVisible}
+          lockUntil={lockData.lockUntil}
+          lockTime={lockData.lockTime}
+          onClose={handleCloseLockModal}
+        />
+      )}
     </section>
   );
 };

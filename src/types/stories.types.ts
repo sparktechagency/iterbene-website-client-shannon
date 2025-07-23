@@ -25,6 +25,7 @@ export interface IStoryMedia {
   viewedBy: IViewer[];
   viewCount: number;
   reactions: IReactions[];
+  createdAt: Date;
 }
 
 interface IUser {
