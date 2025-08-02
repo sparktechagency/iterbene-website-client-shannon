@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef, memo } from "react";
-import { Search, X } from "lucide-react";
+import { Search } from "lucide-react";
 import {
   emojiService,
   EmojiData,
@@ -18,7 +18,6 @@ interface CustomEmojiPickerProps {
 const CustomEmojiPicker = memo(
   ({
     onEmojiSelect,
-    onClose,
     position = "bottom",
     className = "",
   }: CustomEmojiPickerProps) => {
@@ -99,7 +98,7 @@ const CustomEmojiPicker = memo(
     // Get container classes based on screen size
     const getPickerClasses = () => {
       const baseClasses = `
-      bg-white border border-gray-200 rounded-2xl shadow-xl h-56 overflow-y-auto 
+      bg-white border border-gray-200 rounded shadow-xl h-56 overflow-y-auto scrollbar-hide pb-2
       ${position === "top" ? "mb-2" : "mt-2"}
       ${className}
     `;
@@ -119,17 +118,6 @@ const CustomEmojiPicker = memo(
 
     return (
       <div className={getPickerClasses()}>
-        {/* Header */}
-        <div className="flex items-center justify-between p-3 border-b border-gray-100">
-          <h3 className="text-sm font-medium text-gray-800">Choose an emoji</h3>
-          <button
-            onClick={onClose}
-            className="p-1 hover:bg-gray-100 rounded-full transition-colors"
-          >
-            <X size={16} className="text-gray-500" />
-          </button>
-        </div>
-
         {/* Search */}
         <div className="p-3 border-b border-gray-100">
           <div className="relative">
@@ -155,7 +143,7 @@ const CustomEmojiPicker = memo(
                 key={category.name}
                 onClick={() => scrollToCategory(category.name)}
                 className={`
-                flex-shrink-0 p-2 mx-1 rounded-lg transition-colors text-lg emoji-font
+                flex-shrink-0 px-1.5 py-1.5 mx-1 rounded-lg transition-colors text-lg emoji-font cursor-pointer
                 ${
                   activeCategory === category.name
                     ? "bg-primary/10 border border-primary/20"
@@ -183,18 +171,18 @@ const CustomEmojiPicker = memo(
                 Search Results ({searchResults.length})
               </h4>
               <div className="grid grid-cols-8 gap-1">
-                {searchResults.map((emoji, index) => (
+                {searchResults?.map((emoji, index) => (
                   <button
                     key={`search-${index}`}
                     onClick={() => handleEmojiClick(emoji.character)}
-                    className="aspect-square flex items-center justify-center text-xl hover:bg-gray-100 rounded-lg transition-colors emoji-font active:scale-95"
+                    className="aspect-square cursor-pointer flex items-center justify-center text-xl hover:bg-gray-100 rounded-lg transition-colors emoji-font active:scale-95"
                     title={emoji.name}
                   >
                     {emoji.character}
                   </button>
                 ))}
               </div>
-              {searchResults.length === 0 && (
+              {searchResults?.length === 0 && (
                 <div className="text-center py-8 text-gray-500 text-sm">
                   No emojis found for {searchQuery}
                 </div>
@@ -214,7 +202,7 @@ const CustomEmojiPicker = memo(
                       <button
                         key={`frequent-${index}`}
                         onClick={() => handleEmojiClick(emoji)}
-                        className="aspect-square flex items-center justify-center text-xl hover:bg-gray-100 rounded-lg transition-colors emoji-font active:scale-95"
+                        className="aspect-square cursor-pointer flex items-center justify-center text-xl hover:bg-gray-100 rounded-lg transition-colors emoji-font active:scale-95"
                       >
                         {emoji}
                       </button>
@@ -241,7 +229,7 @@ const CustomEmojiPicker = memo(
                       <button
                         key={`${category.name}-${index}`}
                         onClick={() => handleEmojiClick(emoji.character)}
-                        className="aspect-square flex items-center justify-center text-xl hover:bg-gray-100 rounded-lg transition-colors emoji-font active:scale-95 hover:scale-105"
+                        className="aspect-square cursor-pointer flex items-center justify-center text-xl hover:bg-gray-100 rounded-lg transition-colors emoji-font active:scale-95 hover:scale-105"
                         title={emoji.name}
                       >
                         {emoji.character}

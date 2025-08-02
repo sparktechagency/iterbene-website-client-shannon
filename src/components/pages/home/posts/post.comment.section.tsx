@@ -7,7 +7,6 @@ import { useState, useRef, useEffect } from "react";
 import useUser from "@/hooks/useUser";
 import { BsThreeDots } from "react-icons/bs";
 import { Send, Smile } from "lucide-react";
-import EmojiPicker, { EmojiClickData, Theme } from "emoji-picker-react";
 import {
   useAddOrRemoveCommentReactionMutation,
   useCreateCommentMutation,
@@ -21,6 +20,7 @@ import { useAppDispatch } from "@/redux/hooks";
 import Link from "next/link";
 import { IUser } from "@/types/user.types";
 import formatTimeAgo from "@/utils/formatTimeAgo";
+import CustomEmojiPicker from "@/components/ui/CustomEmojiPicker";
 
 interface PostCommentSectionProps {
   post: IPost;
@@ -44,7 +44,177 @@ interface CommentItemProps {
   onReaction: (postId: string, commentId: string, reactionType: string) => void;
   onDelete: (commentId: string) => void;
   onReport: () => void;
+  // New props for reply input
+  replyInputOpen: string | null;
+  replyText: string;
+  setReplyText: (text: string) => void;
+  onSubmitReply: () => void;
+  onCancelReply: () => void;
 }
+
+// Reply Input Component
+const ReplyInput = ({
+  isOpen,
+  replyText,
+  setReplyText,
+  onSubmit,
+  onCancel,
+  user,
+  placeholder = "Write a reply...",
+  level = 0,
+}: {
+  isOpen: boolean;
+  replyText: string;
+  setReplyText: (text: string) => void;
+  onSubmit: () => void;
+  onCancel: () => void;
+  user: IUser | null;
+  placeholder?: string;
+  level?: number;
+}) => {
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const emojiPickerRef = useRef<HTMLDivElement>(null);
+
+  // Handle emoji selection
+  const handleEmojiSelect = (emoji: string) => {
+    setReplyText(replyText + emoji);
+    if (textareaRef.current) {
+      textareaRef.current.focus();
+      const length = (replyText + emoji).length;
+      textareaRef.current.setSelectionRange(length, length);
+    }
+  };
+
+  // Auto-resize textarea and focus
+  useEffect(() => {
+    if (isOpen && textareaRef.current) {
+      const textarea = textareaRef.current;
+      textarea.style.height = "auto";
+      textarea.style.height = `${textarea.scrollHeight}px`;
+      textarea.focus();
+      if (replyText) {
+        const length = replyText.length;
+        textarea.setSelectionRange(length, length);
+      }
+    }
+  }, [isOpen, replyText]);
+
+  // Close emoji picker on outside click
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        emojiPickerRef.current &&
+        !emojiPickerRef.current.contains(event.target as Node)
+      ) {
+        setShowEmojiPicker(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  // Calculate margin for nested levels
+  const getNestedMargin = (level: number) => {
+    const maxLevel = Math.min(level, 6);
+    return `ml-${Math.min(maxLevel * 8, 48)}`; // Max ml-48
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 5 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: 5 }}
+      className={`mt-3 ${level > 0 ? getNestedMargin(1) : ""} relative`}
+    >
+      {/* Connection line for nested reply inputs */}
+      {level > 0 && (
+        <div className="absolute left-[-20px] top-0 w-4 h-full border-l-2 border-gray-200"></div>
+      )}
+
+      <div className="flex space-x-3">
+        {user?.profileImage && (
+          <Image
+            src={user?.profileImage}
+            alt="Your Profile"
+            width={level > 2 ? 28 : 32}
+            height={level > 2 ? 28 : 32}
+            className={`${
+              level > 2 ? "w-7 h-7" : "w-8 h-8"
+            } rounded-full object-cover border border-gray-300`}
+          />
+        )}
+        <div className="flex-1 relative">
+          <div className="w-full relative flex flex-col bg-gray-100 rounded-xl">
+            <textarea
+              ref={textareaRef}
+              placeholder={placeholder}
+              value={replyText}
+              onChange={(e) => setReplyText(e.target.value)}
+              style={{ minHeight: "20px", height: "auto" }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !e.shiftKey) {
+                  e.preventDefault();
+                  onSubmit();
+                } else if (e.key === "Escape") {
+                  onCancel();
+                }
+              }}
+              className="w-full px-4 py-2 bg-transparent text-sm text-gray-800 placeholder-gray-500 focus:outline-none resize-none rounded-xl"
+            />
+            <div className="flex items-center justify-between gap-3 px-4 pb-2">
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={onCancel}
+                  className="text-gray-500 hover:text-gray-700 text-sm font-medium cursor-pointer"
+                >
+                  Cancel
+                </button>
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+                  className="text-gray-500 hover:text-gray-700 cursor-pointer"
+                >
+                  <Smile size={18} />
+                </button>
+                <button
+                  onClick={onSubmit}
+                  disabled={!replyText.trim()}
+                  className={`font-medium text-sm cursor-pointer ${
+                    replyText.trim()
+                      ? "text-primary hover:text-primary/80"
+                      : "text-gray-400 cursor-not-allowed"
+                  }`}
+                >
+                  <Send size={18} />
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {showEmojiPicker && (
+            <div
+              ref={emojiPickerRef}
+              className="absolute right-0 bottom-full mb-2 z-50"
+            >
+              <CustomEmojiPicker
+                onEmojiSelect={handleEmojiSelect}
+                onClose={() => setShowEmojiPicker(false)}
+                position="top"
+              />
+            </div>
+          )}
+        </div>
+      </div>
+    </motion.div>
+  );
+};
 
 // Single Comment Component with nested replies support
 const CommentItem = ({
@@ -58,9 +228,14 @@ const CommentItem = ({
   onReaction,
   onDelete,
   onReport,
+  replyInputOpen,
+  replyText,
+  setReplyText,
+  onSubmitReply,
+  onCancelReply,
 }: CommentItemProps) => {
   const [menuOpenId, setMenuOpenId] = useState<string | null>(null);
-  const [showReplies, setShowReplies] = useState(true);
+  const [showReplies, setShowReplies] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
   const isReactionAdded = comment?.reactions?.some(
@@ -113,6 +288,9 @@ const CommentItem = ({
 
   // Show connection line for nested comments
   const showConnectionLine = level > 0;
+
+  // Check if reply input should show for this comment
+  const showReplyInput = replyInputOpen === comment?._id;
 
   return (
     <motion.div
@@ -191,9 +369,8 @@ const CommentItem = ({
               Reply
             </button>
 
-            {/* Time ago (you can add actual time calculation) */}
+            {/* Time ago */}
             <span className="text-gray-400 text-xs">
-              {/* Add your time formatting logic here */}
               {formatTimeAgo(comment?.createdAt)}
             </span>
 
@@ -256,6 +433,20 @@ const CommentItem = ({
             )}
           </div>
 
+          {/* Reply Input - Shows right after the comment when replying */}
+          {showReplyInput && (
+            <ReplyInput
+              isOpen={showReplyInput}
+              replyText={replyText}
+              setReplyText={setReplyText}
+              onSubmit={onSubmitReply}
+              onCancel={onCancelReply}
+              user={user}
+              level={level}
+              placeholder={`Reply to ${comment?.userId?.fullName}...`}
+            />
+          )}
+
           {/* Show/Hide replies toggle for comments with replies */}
           {directReplies.length > 0 && (
             <button
@@ -286,6 +477,11 @@ const CommentItem = ({
                     onReaction={onReaction}
                     onDelete={onDelete}
                     onReport={onReport}
+                    replyInputOpen={replyInputOpen}
+                    replyText={replyText}
+                    setReplyText={setReplyText}
+                    onSubmitReply={onSubmitReply}
+                    onCancelReply={onCancelReply}
                   />
                 ))}
               </AnimatePresence>
@@ -294,149 +490,6 @@ const CommentItem = ({
         </div>
       </div>
     </motion.div>
-  );
-};
-
-// Reply Input Component
-const ReplyInput = ({
-  isOpen,
-  replyText,
-  setReplyText,
-  onSubmit,
-  user,
-  placeholder = "Write a reply...",
-}: {
-  isOpen: boolean;
-  replyText: string;
-  setReplyText: (text: string) => void;
-  onSubmit: () => void;
-  onCancel: () => void;
-  user: IUser | null;
-  placeholder?: string;
-}) => {
-  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
-  const emojiPickerRef = useRef<HTMLDivElement>(null);
-
-  // Handle emoji selection
-  const handleEmojiSelect = (emojiData: EmojiClickData) => {
-    setReplyText(replyText + emojiData.emoji);
-    if (textareaRef.current) {
-      textareaRef.current.focus();
-      const length = (replyText + emojiData.emoji).length;
-      textareaRef.current.setSelectionRange(length, length);
-    } else if (inputRef.current) {
-      inputRef.current.focus();
-    }
-  };
-
-  // Auto-resize textarea
-  useEffect(() => {
-    if (isOpen && replyText && textareaRef.current) {
-      const textarea = textareaRef.current;
-      textarea.style.height = "auto";
-      textarea.style.height = `${textarea.scrollHeight}px`;
-      textarea.focus();
-      const length = replyText.length;
-      textarea.setSelectionRange(length, length);
-    }
-  }, [isOpen, replyText]);
-
-  // Close emoji picker on outside click
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        emojiPickerRef.current &&
-        !emojiPickerRef.current.contains(event.target as Node)
-      ) {
-        setShowEmojiPicker(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
-
-  if (!isOpen) return null;
-
-  return (
-    <>
-      {replyText && (
-        <motion.div
-          initial={{ opacity: 0, y: 5 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: 5 }}
-          className="mt-3 ml-12"
-        >
-          <div className="flex space-x-2">
-            {user?.profileImage && (
-              <Image
-                src={user?.profileImage}
-                alt="Your Profile"
-                width={32}
-                height={32}
-                className="w-8 h-8 rounded-full object-cover border border-gray-300"
-              />
-            )}
-            <div className="flex-1 relative">
-              <div
-                className={`w-full relative flex ${
-                  replyText
-                    ? "flex-col items-end"
-                    : "flex-row gap-2 justify-between"
-                } bg-gray-100 rounded-xl`}
-              >
-                <textarea
-                  ref={textareaRef}
-                  placeholder={placeholder}
-                  value={replyText}
-                  onChange={(e) => setReplyText(e.target.value)}
-                  style={{ minHeight: "20px", height: "auto" }}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" && !e.shiftKey) {
-                      e.preventDefault();
-                      onSubmit();
-                    }
-                  }}
-                  className="w-full px-4 py-2 bg-transparent text-sm text-gray-800 placeholder-gray-500 focus:outline-none resize-none rounded-xl"
-                />
-                <div className="flex items-center gap-3 p-2">
-                  {replyText && (
-                    <button
-                      onClick={onSubmit}
-                      className="text-primary  font-medium text-sm"
-                    >
-                      <Send size={18} />
-                    </button>
-                  )}
-                  <button
-                    onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-                    className="text-gray-500 hover:text-gray-700 cursor-pointer"
-                  >
-                    <Smile size={18} />
-                  </button>
-                </div>
-              </div>
-
-              {showEmojiPicker && (
-                <div
-                  ref={emojiPickerRef}
-                  className="absolute right-0 bottom-14 z-30"
-                >
-                  <EmojiPicker
-                    onEmojiClick={handleEmojiSelect}
-                    theme={Theme.LIGHT}
-                  />
-                </div>
-              )}
-            </div>
-          </div>
-        </motion.div>
-      )}
-    </>
   );
 };
 
@@ -562,34 +615,15 @@ const PostCommentSection = ({ post, onEdit }: PostCommentSectionProps) => {
               onReaction={handleCommentReaction}
               onDelete={handleDeleteComment}
               onReport={handleReport}
+              replyInputOpen={replyInputOpen}
+              replyText={replyText}
+              setReplyText={setReplyText}
+              onSubmitReply={handleReplySubmit}
+              onCancelReply={handleReplyCancel}
             />
           </div>
         ))}
       </AnimatePresence>
-
-      {/* Reply Input */}
-      <ReplyInput
-        isOpen={!!replyInputOpen}
-        replyText={replyText}
-        setReplyText={setReplyText}
-        onSubmit={handleReplySubmit}
-        onCancel={handleReplyCancel}
-        user={user}
-      />
-
-      {/* View all comments button */}
-      {/* {post?.media?.length > 0 &&
-        isViewAllComments &&
-        post?.comments?.length > 4 && (
-          <div className="flex justify-center items-center my-4">
-            <button
-              onClick={() => setShowPostDetails?.(true)}
-              className="text-blue-600 text-base font-medium hover:underline"
-            >
-              View all {post?.comments?.length} comments
-            </button>
-          </div>
-        )} */}
 
       {/* Report Modal */}
       <ReportModal
@@ -602,5 +636,4 @@ const PostCommentSection = ({ post, onEdit }: PostCommentSectionProps) => {
     </section>
   );
 };
-
 export default PostCommentSection;
