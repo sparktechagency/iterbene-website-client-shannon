@@ -2,7 +2,7 @@
 import { useState, useRef, useEffect } from "react";
 import { Loader2, Send, Smile } from "lucide-react";
 import Image from "next/image";
-import EmojiPicker, { EmojiClickData, Theme } from "emoji-picker-react";
+import CustomEmojiPicker from "@/components/ui/CustomEmojiPicker";
 import {
   useCreateCommentMutation,
   useUpdateCommentMutation,
@@ -66,11 +66,11 @@ const PostCommentInput = ({
   }, [newComment]);
 
   // Handle emoji selection
-  const handleEmojiSelect = (emojiData: EmojiClickData) => {
-    setNewComment(newComment + emojiData.emoji);
+  const handleEmojiSelect = (emoji: string) => {
+    setNewComment(newComment + emoji);
     if (textareaRef.current) {
       textareaRef.current.focus();
-      const length = (newComment + emojiData.emoji).length;
+      const length = (newComment + emoji).length;
       textareaRef.current.setSelectionRange(length, length);
     } else if (inputRef.current) {
       inputRef.current.focus();
@@ -235,12 +235,12 @@ const PostCommentInput = ({
           {showEmojiPicker && (
             <div
               ref={emojiPickerRef}
-              className="absolute right-0 bottom-14 z-10"
+              className="absolute right-0 bottom-14 z-50"
             >
-              <EmojiPicker
-                onEmojiClick={handleEmojiSelect}
-                theme={Theme.LIGHT}
-                style={{ scrollbarColor: "gray #ffffff", zIndex: 9999 }}
+              <CustomEmojiPicker
+                onEmojiSelect={handleEmojiSelect}
+                onClose={() => setShowEmojiPicker(false)}
+                position="top"
               />
             </div>
           )}

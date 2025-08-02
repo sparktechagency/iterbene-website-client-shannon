@@ -1,12 +1,13 @@
 "use client";
 import { useSendMessageMutation } from "@/redux/features/inbox/inboxApi";
-import { Camera, Paperclip, Send, X, FileText } from "lucide-react";
+import { Camera, Paperclip, Send, X, FileText, Smile } from "lucide-react";
 import React, { useState, useRef, useEffect } from "react";
 import { useParams } from "next/navigation";
 import Image from "next/image";
 import { TError } from "@/types/error";
 import toast from "react-hot-toast";
 import { CgSpinner } from "react-icons/cg";
+import CustomEmojiPicker from "@/components/ui/CustomEmojiPicker";
 
 interface SelectedFile {
   file: File;
@@ -20,10 +21,12 @@ const MessageFooter = () => {
   const [sendMessage, { isLoading }] = useSendMessageMutation();
   const [message, setMessage] = useState("");
   const [selectedFiles, setSelectedFiles] = useState<SelectedFile[]>([]);
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const imageInputRef = useRef<HTMLInputElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const attachmentScrollRef = useRef<HTMLDivElement>(null);
+  const emojiPickerRef = useRef<HTMLDivElement>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setMessage(e.target.value);
@@ -38,6 +41,36 @@ const MessageFooter = () => {
       textarea.style.height = newHeight + "px";
     }
   }, [message]);
+
+  // Close emoji picker when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        emojiPickerRef.current &&
+        !emojiPickerRef.current.contains(event.target as Node)
+      ) {
+        setShowEmojiPicker(false);
+      }
+    };
+
+    if (showEmojiPicker) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [showEmojiPicker]);
+
+  // Handle emoji selection
+  const handleEmojiSelect = (emoji: string) => {
+    setMessage(message + emoji);
+    if (textareaRef.current) {
+      textareaRef.current.focus();
+      const length = (message + emoji).length;
+      textareaRef.current.setSelectionRange(length, length);
+    }
+  };
 
   // Handle image selection (for camera button)
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -174,6 +207,7 @@ const MessageFooter = () => {
       // Reset form
       setMessage("");
       setSelectedFiles([]);
+      setShowEmojiPicker(false);
       // Reset textarea height
       if (textareaRef.current) {
         textareaRef.current.style.height = "auto";
@@ -254,9 +288,10 @@ const MessageFooter = () => {
       )}
 
       {/* Message Input Area */}
-      <div
-        className={`px-2 py-1.5 md:px-4 border border-[#CAD1CF] flex items-center space-x-2 ${message?.length > 0 ? "rounded-2xl" : "rounded-full"
-          }`}>
+      <div className="relative">
+        <div
+          className={`px-2 py-1.5 md:px-4 border border-[#CAD1CF] flex items-center space-x-2 ${message?.length > 0 ? "rounded-2xl" : "rounded-full"
+            }`}>
         {/* Hidden file inputs */}
         <input
           type="file"
@@ -296,6 +331,16 @@ const MessageFooter = () => {
           <Camera size={20} />
         </button>
 
+        {/* Emoji button */}
+        <button
+          onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+          className="size-8 flex justify-center items-center rounded-full flex-shrink-0 text-gray-500 hover:text-gray-700 border border-[#CAD1CF] transition-colors cursor-pointer"
+          disabled={isLoading || hasOnlyNonImageAttachments}
+          title="Add emoji"
+        >
+          <Smile size={20} />
+        </button>
+
         {/* Textarea */}
         <textarea
           ref={textareaRef}
@@ -333,6 +378,21 @@ const MessageFooter = () => {
           >
             <Send size={20} />
           </button>
+        )}
+        </div>
+
+        {/* Emoji Picker */}
+        {showEmojiPicker && (
+          <div
+            ref={emojiPickerRef}
+            className="absolute bottom-full mb-2 right-0 z-50"
+          >
+            <CustomEmojiPicker
+              onEmojiSelect={handleEmojiSelect}
+              onClose={() => setShowEmojiPicker(false)}
+              position="top"
+            />
+          </div>
         )}
       </div>
     </div>

@@ -48,6 +48,31 @@ body::-webkit-scrollbar {
     @apply bg-transparent; /* Transparent track */
   }
 
+  /* Hide scrollbar utility */
+  .scrollbar-hide {
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, and other Webkit browsers */
+  }
+
+  /* Emoji font family for native rendering */
+  .emoji-font {
+    font-family: 
+      "Apple Color Emoji",
+      "Segoe UI Emoji", 
+      "Segoe UI Symbol",
+      "Noto Color Emoji", 
+      "EmojiOne Color", 
+      "Android Emoji", 
+      "Twemoji Mozilla", 
+      sans-serif;
+    font-variant-emoji: emoji;
+    font-feature-settings: "liga" off;
+  }
+
   .custom-scrollbar::-webkit-scrollbar-thumb {
     @apply bg-primary rounded-full border-2 border-transparent; /* Turquoise thumb */
     background-clip: padding-box;
