@@ -5,9 +5,9 @@ import { getAccessToken, isTokenExpired } from "@/services/auth.services";
 const useUser = () => {
   const accessToken = getAccessToken();
   const { data: response, isError } = useGetMyProfileQuery(undefined, {
-    refetchOnMountOrArgChange: true,
-    refetchOnFocus: true,
-    refetchOnReconnect: true,
+    refetchOnMountOrArgChange: false,
+    refetchOnFocus: false,
+    refetchOnReconnect: false,
     // Only fetch data if the access token is valid
     skip: !accessToken || isTokenExpired(accessToken),
   });

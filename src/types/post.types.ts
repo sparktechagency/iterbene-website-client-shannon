@@ -46,6 +46,16 @@ export interface IComment {
   parentCommentId?: string;
   reactions: ICommentReaction[];
   comment: string;
+  mentions: [
+    {
+      _id: string;
+      fullName: string;
+      username: string;
+      profileImage: string;
+      id: string;
+    }
+  ];
+  replies: IComment[];
   createdAt: Date;
   updatedAt: Date;
 }

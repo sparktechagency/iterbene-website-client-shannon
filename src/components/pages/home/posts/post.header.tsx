@@ -163,7 +163,7 @@ const PostHeader = ({ post, onEditClick, refetch }: PostHeaderProps) => {
   };
   return (
     <section className="w-full flex justify-between items-center gap-4">
-      <div className="flex items-center mb-3">
+      <div className="w-full flex items-center mb-3">
         <Image
           src={post?.userId?.profileImage || "/default-profile.png"} // Fallback image
           alt={post?.userId?.fullName || "User"}
@@ -171,10 +171,10 @@ const PostHeader = ({ post, onEditClick, refetch }: PostHeaderProps) => {
           height={50}
           className="size-[50px] object-cover rounded-full mr-3 ring-2 ring-gray-200"
         />
-        <div>
-          <div className="flex items-center gap-2">
+        <div className="w-full">
+          <div className="flex items-center gap-3">
             {user ? (
-              <Link href={`/${post?.userId?.username || ""}`} className="w-full block hover:underline">
+              <Link href={`/${post?.userId?.username || ""}`} className="hover:underline">
                 <p className="font-medium text-gray-800 text-sm md:text-lg">
                   {post?.userId?.fullName || "Unknown User"}
                 </p>
@@ -206,7 +206,7 @@ const PostHeader = ({ post, onEditClick, refetch }: PostHeaderProps) => {
         </div>
       </div>
 
-      <div className="relative">
+      <div className="relative ">
         <button
           ref={triggerRef}
           onClick={toggleDropdown}

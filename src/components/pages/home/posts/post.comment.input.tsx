@@ -122,10 +122,10 @@ const PostCommentInput = ({
             postId: post?._id,
           }).unwrap();
         }
-        setNewComment(""); // Clear the input field
-        setShowEmojiPicker(false); // Close emoji picker on submit
+        setNewComment("");
+        setShowEmojiPicker(false);
         if (inputRef.current) {
-          inputRef.current.focus(); // Focus input after submit
+          inputRef.current.focus();
         }
       } catch (error) {
         const err = error as TError;
@@ -188,19 +188,13 @@ const PostCommentInput = ({
               value={newComment}
               onChange={(e) => setNewComment(e.target.value)}
               onKeyDown={handleKeyDown}
-              className="w-full px-4 py-2.5 bg-transparent text-gray-800 placeholder-gray-500 focus:outline-none resize-none rounded-2xl"
-              style={{ minHeight: "40px", height: "auto" }}
+              className="w-full px-4 py-2 bg-transparent text-gray-800 placeholder-gray-500 focus:outline-none resize-none rounded-2xl"
+              style={{ minHeight: "20px", height: "auto" }}
             />
           )}
           <div className="flex items-end gap-4 -mt-3 pb-4 pr-4">
             {newComment ? (
               <>
-                <button
-                  onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-                  className="text-gray-500 hover:text-gray-700 cursor-pointer"
-                >
-                  <Smile size={24} />
-                </button>
                 {isCreating || isUpdating ? (
                   <div className="flex items-center justify-center ">
                     <Loader2 className="animate-spin text-primary" size={26} />
@@ -210,9 +204,15 @@ const PostCommentInput = ({
                     onClick={handleCommentSubmit}
                     className="text-gray-500 hover:text-primary cursor-pointer"
                   >
-                    <Send size={24} />
+                    <Send size={20} />
                   </button>
                 )}
+                <button
+                  onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+                  className="text-gray-500 hover:text-gray-700 cursor-pointer"
+                >
+                  <Smile size={20} />
+                </button>
                 {editCommentId && (
                   <button
                     onClick={handleCancelEdit}
