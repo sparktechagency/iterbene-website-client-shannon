@@ -73,6 +73,23 @@ const Posts = () => {
     }
   }, [allPosts?.length, currentPagePosts]);
 
+  // Force update when RTK Query cache changes (for all pages)
+  useEffect(() => {
+    if (responseData?.data?.attributes?.results) {
+      const freshPosts = responseData.data.attributes.results as IPost[];
+      if (freshPosts.length > 0 && allPosts.length > 0) {
+        setAllPosts((prevPosts) => {
+          return prevPosts.map((existingPost) => {
+            const updatedPost = freshPosts.find(
+              (p) => p?._id === existingPost?._id
+            );
+            return updatedPost || existingPost;
+          });
+        });
+      }
+    }
+  }, [allPosts?.length, responseData?.data?.attributes?.results]);
+
   // Update loading and hasMore states
   useEffect(() => {
     if (isLoading) {

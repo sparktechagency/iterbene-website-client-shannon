@@ -93,8 +93,6 @@ const baseQueryWithReauth: BaseQueryFn<
           // Retry the original request with the new token
           result = await baseQuery(args, api, extraOptions);
         } else {
-          // Refresh failed: logout user
-          toast.error("Session expired. Please log in again.");
           window.location.href = "/login";
         }
       } catch (error) {

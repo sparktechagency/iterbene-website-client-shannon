@@ -44,7 +44,6 @@ interface CommentItemProps {
   onReaction: (postId: string, commentId: string, reactionType: string) => void;
   onDelete: (commentId: string) => void;
   onReport: () => void;
-  // New props for reply input
   replyInputOpen: string | null;
   replyText: string;
   setReplyText: (text: string) => void;
@@ -52,7 +51,7 @@ interface CommentItemProps {
   onCancelReply: () => void;
 }
 
-// Reply Input Component
+// Reply Input Component (unchanged)
 const ReplyInput = ({
   isOpen,
   replyText,
@@ -76,7 +75,6 @@ const ReplyInput = ({
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const emojiPickerRef = useRef<HTMLDivElement>(null);
 
-  // Handle emoji selection
   const handleEmojiSelect = (emoji: string) => {
     setReplyText(replyText + emoji);
     if (textareaRef.current) {
@@ -86,7 +84,6 @@ const ReplyInput = ({
     }
   };
 
-  // Auto-resize textarea and focus
   useEffect(() => {
     if (isOpen && textareaRef.current) {
       const textarea = textareaRef.current;
@@ -100,7 +97,6 @@ const ReplyInput = ({
     }
   }, [isOpen, replyText]);
 
-  // Close emoji picker on outside click
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -117,10 +113,9 @@ const ReplyInput = ({
     };
   }, []);
 
-  // Calculate margin for nested levels
   const getNestedMargin = (level: number) => {
     const maxLevel = Math.min(level, 6);
-    return `ml-${Math.min(maxLevel * 8, 48)}`; // Max ml-48
+    return `ml-${Math.min(maxLevel * 8, 48)}`;
   };
 
   if (!isOpen) return null;
@@ -132,7 +127,6 @@ const ReplyInput = ({
       exit={{ opacity: 0, y: 5 }}
       className={`mt-3 ${level > 0 ? getNestedMargin(1) : ""} relative`}
     >
-      {/* Connection line for nested reply inputs */}
       {level > 0 && (
         <div className="absolute left-[-20px] top-0 w-4 h-full border-l-2 border-gray-200"></div>
       )}
@@ -216,7 +210,7 @@ const ReplyInput = ({
   );
 };
 
-// Single Comment Component with nested replies support
+// Single Comment Component with optimistic updates
 const CommentItem = ({
   comment,
   post,
@@ -242,13 +236,11 @@ const CommentItem = ({
     (r) => r?.userId?._id === user?._id
   );
 
-  // Get direct replies for this comment
   const directReplies =
     post?.comments?.filter(
       (c) => c?.parentCommentId?.toString() === comment?._id.toString()
     ) || [];
 
-  // Close menu on outside click
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
@@ -262,7 +254,6 @@ const CommentItem = ({
     };
   }, []);
 
-  // Render comment text with @mentions
   const renderCommentText = (text: string) => {
     const parts = text.split(/(@\w+)/g);
     return parts.map((part, index) =>
@@ -280,16 +271,12 @@ const CommentItem = ({
     );
   };
 
-  // Calculate margin for nested levels (max 6 levels deep)
   const getNestedMargin = (level: number) => {
     const maxLevel = Math.min(level, 6);
-    return `ml-${Math.min(maxLevel * 8, 48)}`; // Max ml-48
+    return `ml-${Math.min(maxLevel * 8, 48)}`;
   };
 
-  // Show connection line for nested comments
   const showConnectionLine = level > 0;
-
-  // Check if reply input should show for this comment
   const showReplyInput = replyInputOpen === comment?._id;
 
   return (
@@ -300,7 +287,6 @@ const CommentItem = ({
       transition={{ duration: 0.3 }}
       className={`mb-3 ${level > 0 ? getNestedMargin(1) : ""} relative`}
     >
-      {/* Connection line for nested comments */}
       {showConnectionLine && (
         <div className="absolute left-[-20px] top-0 w-4 h-8 border-l-2 border-b-2 border-gray-200 rounded-bl-lg"></div>
       )}
@@ -321,7 +307,6 @@ const CommentItem = ({
         )}
 
         <div className="flex-1 min-w-0">
-          {/* Comment bubble */}
           <div className="w-fit bg-gray-100/70 px-3 py-2 rounded-2xl max-w-full">
             <Link href={`/${comment?.userId?.username}`}>
               <p className="text-sm md:text-base font-medium text-gray-800 hover:underline">
@@ -333,9 +318,7 @@ const CommentItem = ({
             </p>
           </div>
 
-          {/* Comment actions */}
-          <div className="w-full md:w-fit flex items-center space-x-4 mt-2 ml-1 text-gray-500 relative text-xs ">
-            {/* Like button */}
+          <div className="w-full md:w-fit flex items-center space-x-4 mt-2 ml-1 text-gray-500 relative text-xs">
             <button
               onClick={() => onReaction(post?._id, comment?._id, "love")}
               className={`hover:text-rose-500 transition-colors flex items-center space-x-1 cursor-pointer ${
@@ -345,7 +328,6 @@ const CommentItem = ({
               <FaHeart size={14} />
             </button>
 
-            {/* Like count */}
             {comment?.reactions?.length > 0 && (
               <span className="text-gray-500 text-xs">
                 {comment?.reactions?.length}{" "}
@@ -353,7 +335,6 @@ const CommentItem = ({
               </span>
             )}
 
-            {/* Reply button */}
             <button
               onClick={() =>
                 onReply(
@@ -369,12 +350,10 @@ const CommentItem = ({
               Reply
             </button>
 
-            {/* Time ago */}
             <span className="text-gray-400 text-xs">
               {formatTimeAgo(comment?.createdAt)}
             </span>
 
-            {/* Menu button */}
             <button
               onClick={() =>
                 setMenuOpenId(menuOpenId === comment?._id ? null : comment?._id)
@@ -384,7 +363,6 @@ const CommentItem = ({
               <BsThreeDots size={18} />
             </button>
 
-            {/* Dropdown menu */}
             {menuOpenId === comment?._id && (
               <motion.div
                 ref={menuRef}
@@ -433,7 +411,6 @@ const CommentItem = ({
             )}
           </div>
 
-          {/* Reply Input - Shows right after the comment when replying */}
           {showReplyInput && (
             <ReplyInput
               isOpen={showReplyInput}
@@ -447,7 +424,6 @@ const CommentItem = ({
             />
           )}
 
-          {/* Show/Hide replies toggle for comments with replies */}
           {directReplies.length > 0 && (
             <button
               onClick={() => setShowReplies(!showReplies)}
@@ -460,7 +436,6 @@ const CommentItem = ({
             </button>
           )}
 
-          {/* Nested replies */}
           {showReplies && directReplies.length > 0 && (
             <div className="mt-3">
               <AnimatePresence>
@@ -493,28 +468,25 @@ const CommentItem = ({
   );
 };
 
-// Main Component
+// Main Component with optimistic updates
 const PostCommentSection = ({ post, onEdit }: PostCommentSectionProps) => {
   const user = useUser();
   const currentUserId = user?._id;
   const dispatch = useAppDispatch();
 
-  // Reply state
   const [replyInputOpen, setReplyInputOpen] = useState<string | null>(null);
   const [replyText, setReplyText] = useState<string>("");
   const [replyToUserId, setReplyToUserId] = useState<string>("");
   const [isReportModalOpen, setIsReportModalOpen] = useState<boolean>(false);
 
-  // API hooks
+  // API hooks - optimistic updates are handled in the API layer
   const [replyComment] = useCreateCommentMutation();
   const [addOrRemoveCommentReaction] = useAddOrRemoveCommentReactionMutation();
   const [deleteComment] = useDeleteCommentMutation();
 
-  // Get top-level comments only
   const topLevelComments =
     post?.comments?.filter((c) => !c.parentCommentId) || [];
 
-  // Handle reply submission
   const handleReplySubmit = async () => {
     if (replyText.trim() !== "" && replyInputOpen && replyToUserId) {
       try {
@@ -524,6 +496,7 @@ const PostCommentSection = ({ post, onEdit }: PostCommentSectionProps) => {
           parentCommentId: replyInputOpen,
           replyTo: replyToUserId,
         };
+        // Optimistic update will handle UI changes automatically
         await replyComment(payload).unwrap();
         setReplyText("");
         setReplyInputOpen(null);
@@ -532,18 +505,17 @@ const PostCommentSection = ({ post, onEdit }: PostCommentSectionProps) => {
       } catch (error) {
         const err = error as TError;
         toast.error(err?.data?.message || "Something went wrong!");
+        // Optimistic update will automatically revert on error
       }
     }
   };
 
-  // Handle reply cancel
   const handleReplyCancel = () => {
     setReplyText("");
     setReplyInputOpen(null);
     setReplyToUserId("");
   };
 
-  // Handle starting a reply
   const handleReply = (
     parentId: string,
     replyToUserId: string,
@@ -558,7 +530,7 @@ const PostCommentSection = ({ post, onEdit }: PostCommentSectionProps) => {
     setReplyText(`@${replyToUsername} `);
   };
 
-  // Handle comment reaction
+  // Simplified comment reaction handler - optimistic updates handle UI
   const handleCommentReaction = async (
     postId: string,
     commentId: string,
@@ -571,26 +543,29 @@ const PostCommentSection = ({ post, onEdit }: PostCommentSectionProps) => {
 
     try {
       const payload = { postId, commentId, reactionType };
+      // Optimistic update will handle UI changes automatically
       await addOrRemoveCommentReaction(payload).unwrap();
     } catch (error) {
       const err = error as TError;
       toast.error(err?.data?.message || "Something went wrong!");
+      // Optimistic update will automatically revert on error
     }
   };
 
-  // Handle delete comment
+  // Simplified delete handler - optimistic updates handle UI
   const handleDeleteComment = async (commentId: string) => {
     try {
       const payload = { commentId, postId: post?._id };
+      // Optimistic update will remove comment from UI immediately
       await deleteComment(payload).unwrap();
       toast.success("Comment deleted successfully!");
     } catch (error) {
       const err = error as TError;
       toast.error(err?.data?.message || "Something went wrong!");
+      // Optimistic update will automatically revert on error
     }
   };
 
-  // Handle report
   const handleReport = () => {
     if (!user) {
       dispatch(openAuthModal());
@@ -625,7 +600,6 @@ const PostCommentSection = ({ post, onEdit }: PostCommentSectionProps) => {
         ))}
       </AnimatePresence>
 
-      {/* Report Modal */}
       <ReportModal
         isOpen={isReportModalOpen}
         onClose={() => setIsReportModalOpen(false)}
@@ -636,4 +610,5 @@ const PostCommentSection = ({ post, onEdit }: PostCommentSectionProps) => {
     </section>
   );
 };
+
 export default PostCommentSection;

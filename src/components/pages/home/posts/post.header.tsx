@@ -24,7 +24,7 @@ import Link from "next/link";
 import {
   useIsPostSavedQuery,
   useSavePostMutation,
-  useUnsavePostMutation, // Import unsave mutation
+  useUnsavePostMutation,
 } from "@/redux/features/savedPost/savedPost.api";
 import { openAuthModal } from "@/redux/features/auth/authModalSlice";
 import { useAppDispatch } from "@/redux/hooks";
@@ -41,42 +41,32 @@ const PostHeader = ({ post, onEditClick, refetch }: PostHeaderProps) => {
   const triggerRef = useRef<HTMLButtonElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const isOwnPost = post?.userId?._id === user?._id;
-  //dispatch openAuthModal
   const dispatch = useAppDispatch();
 
   const [isDeletePopupOpen, setIsDeletePopupOpen] = useState<boolean>(false);
   const [isReportModalOpen, setIsReportModalOpen] = useState<boolean>(false);
 
-  // Delete post
+  // API hooks
   const [deletePost, { isLoading: isDeleting }] = useDeletePostMutation();
-
-  // Check if post is saved
   const { data: isSaved, isLoading: isCheckingSaved } = useIsPostSavedQuery(
     post?._id,
     { skip: !post?._id || !user?._id }
   );
-
-  // Save post
   const [savePost, { isLoading: isSaving }] = useSavePostMutation();
-
-  // Unsave post
   const [unsavePost, { isLoading: isUnsaving }] = useUnsavePostMutation();
 
   const toggleDropdown = () => setIsOpen(!isOpen);
 
-  // Handle edit
   const handleEdit = () => {
     setIsOpen(false);
     onEditClick?.();
   };
 
-  // Handle delete
   const handleDelete = () => {
     setIsOpen(false);
     setIsDeletePopupOpen(true);
   };
 
-  // Handle save
   const handleSave = async () => {
     if (!user) {
       dispatch(openAuthModal());
@@ -94,7 +84,6 @@ const PostHeader = ({ post, onEditClick, refetch }: PostHeaderProps) => {
     }
   };
 
-  // Handle unsave
   const handleUnsave = async () => {
     try {
       await unsavePost(post?._id).unwrap();
@@ -106,7 +95,6 @@ const PostHeader = ({ post, onEditClick, refetch }: PostHeaderProps) => {
     }
   };
 
-  // Handle report
   const handleReport = () => {
     if (!user) {
       dispatch(openAuthModal());
@@ -117,9 +105,10 @@ const PostHeader = ({ post, onEditClick, refetch }: PostHeaderProps) => {
     setIsReportModalOpen(true);
   };
 
-  // Handle confirm delete
+  // Simplified delete handler - optimistic update handles UI removal
   const handleConfirmDelete = async () => {
     try {
+      // Optimistic update will remove post from UI immediately
       await deletePost(post._id).unwrap();
       setIsDeletePopupOpen(false);
       refetch?.();
@@ -127,6 +116,7 @@ const PostHeader = ({ post, onEditClick, refetch }: PostHeaderProps) => {
     } catch (error) {
       const err = error as TError;
       toast.error(err?.data?.message || "Failed to delete post");
+      // Optimistic update will automatically revert on error
     }
   };
 
@@ -161,11 +151,12 @@ const PostHeader = ({ post, onEditClick, refetch }: PostHeaderProps) => {
       transition: { duration: 0.15, ease: "easeIn" },
     },
   };
+
   return (
     <section className="w-full flex justify-between items-center gap-4">
       <div className="w-full flex items-center mb-3">
         <Image
-          src={post?.userId?.profileImage || "/default-profile.png"} // Fallback image
+          src={post?.userId?.profileImage || "/default-profile.png"}
           alt={post?.userId?.fullName || "User"}
           width={50}
           height={50}
@@ -174,7 +165,10 @@ const PostHeader = ({ post, onEditClick, refetch }: PostHeaderProps) => {
         <div className="w-full">
           <div className="flex items-center gap-3">
             {user ? (
-              <Link href={`/${post?.userId?.username || ""}`} className="hover:underline">
+              <Link
+                href={`/${post?.userId?.username || ""}`}
+                className="hover:underline"
+              >
                 <p className="font-medium text-gray-800 text-sm md:text-lg">
                   {post?.userId?.fullName || "Unknown User"}
                 </p>
@@ -206,7 +200,7 @@ const PostHeader = ({ post, onEditClick, refetch }: PostHeaderProps) => {
         </div>
       </div>
 
-      <div className="relative ">
+      <div className="relative">
         <button
           ref={triggerRef}
           onClick={toggleDropdown}
@@ -226,7 +220,6 @@ const PostHeader = ({ post, onEditClick, refetch }: PostHeaderProps) => {
               animate="visible"
               exit="exit"
             >
-              {/* Save/Unsave Option */}
               <button
                 onClick={isSaved ? handleUnsave : handleSave}
                 disabled={isSaving || isUnsaving || isCheckingSaved}
@@ -237,7 +230,6 @@ const PostHeader = ({ post, onEditClick, refetch }: PostHeaderProps) => {
                 <span>{isSaved ? "Unsave Post" : "Save Post"}</span>
               </button>
 
-              {/* Own Post Options */}
               {isOwnPost && (
                 <>
                   <button
@@ -259,7 +251,6 @@ const PostHeader = ({ post, onEditClick, refetch }: PostHeaderProps) => {
                 </>
               )}
 
-              {/* Report Option */}
               {!isOwnPost && (
                 <button
                   onClick={handleReport}
@@ -275,7 +266,6 @@ const PostHeader = ({ post, onEditClick, refetch }: PostHeaderProps) => {
         </AnimatePresence>
       </div>
 
-      {/* Delete Confirmation Popup */}
       <ConfirmationPopup
         isOpen={isDeletePopupOpen}
         onClose={() => setIsDeletePopupOpen(false)}
@@ -288,7 +278,6 @@ const PostHeader = ({ post, onEditClick, refetch }: PostHeaderProps) => {
         isLoading={isDeleting}
       />
 
-      {/* Report Modal */}
       <ReportModal
         isOpen={isReportModalOpen}
         onClose={() => setIsReportModalOpen(false)}

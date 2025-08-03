@@ -37,6 +37,7 @@ import { openAuthModal } from "@/redux/features/auth/authModalSlice";
 interface PostCardProps {
   post: IPost;
 }
+
 const PostCard = ({ post }: PostCardProps) => {
   const user = useUser();
   const postRef = useRef<HTMLDivElement>(null);
@@ -51,12 +52,12 @@ const PostCard = ({ post }: PostCardProps) => {
   const [showItineraryModal, setShowItineraryModal] = useState<boolean>(false);
   const [showEditModal, setShowEditModal] = useState<boolean>(false);
 
-  // dispatch openAuthModal
   const dispatch = useAppDispatch();
 
   const [incrementItinerary] = useIncrementItineraryViewCountMutation();
+  const [addOrRemoveReaction] = useAddOrRemoveReactionMutation();
 
-  // define intersection observer
+  // Intersection observer for visibility
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -92,7 +93,6 @@ const PostCard = ({ post }: PostCardProps) => {
     return () => observer.disconnect();
   }, []);
 
-  // handle edit function
   const handleEdit = (commentId: string, commentText: string) => {
     setEditCommentId(commentId);
     setEditCommentText(commentText);
@@ -107,9 +107,6 @@ const PostCard = ({ post }: PostCardProps) => {
   const nonZeroReactions = post?.sortedReactions?.filter(
     (reaction: ISortedReaction) => reaction?.count > 0
   );
-
-  // Add or remove reactions
-  const [addOrRemoveReaction] = useAddOrRemoveReactionMutation();
 
   // Reaction icon mapping
   const reactionIcons: { [key: string]: JSX.Element } = {
@@ -127,22 +124,24 @@ const PostCard = ({ post }: PostCardProps) => {
     smile: "text-yellow-500",
   };
 
-  // handle reaction function
+  // Simplified reaction handler - no manual UI updates needed
   const handleReaction = async (reactionType: string) => {
     if (!user) {
       dispatch(openAuthModal());
-      return
+      return;
     }
+
     try {
+      // The optimistic update will handle UI changes automatically
       await addOrRemoveReaction({ postId: post?._id, reactionType }).unwrap();
       setShowReactions(false);
     } catch (error) {
       const err = error as TError;
       toast.error(err?.data?.message || "Something went wrong!");
+      // No need to manually revert - optimistic update handles this
     }
   };
 
-  // Function to handle post update
   const handlePostUpdated = () => {
     setShowEditModal(false);
   };
@@ -151,6 +150,7 @@ const PostCard = ({ post }: PostCardProps) => {
     try {
       setShowItineraryModal(true);
       const payload = { postId: post?._id, itineraryId: post?.itinerary?._id };
+      // Optimistic update will increment the count immediately
       await incrementItinerary(payload).unwrap();
     } catch (error) {
       const err = error as TError;
@@ -160,10 +160,8 @@ const PostCard = ({ post }: PostCardProps) => {
 
   return (
     <div ref={postRef} className="w-full bg-white rounded-xl p-4 mb-4 relative">
-      <PostHeader
-        post={post}
-        onEditClick={() => setShowEditModal(true)}
-      />
+      <PostHeader post={post} onEditClick={() => setShowEditModal(true)} />
+
       <p className="text-gray-700 mb-4">
         {post?.content?.split(/(\s+)/)?.map((word, index) => {
           const isHashtag = word?.match(/^#\w+/);
@@ -183,8 +181,10 @@ const PostCard = ({ post }: PostCardProps) => {
           );
         })}
       </p>
+
       <PostContentRender data={post?.media || []} isVisible={isVisible} />
-      {/* if post itinerary is available */}
+
+      {/* Itinerary section */}
       {post?.itinerary && (
         <div
           onClick={handleItineraryClick}
@@ -196,7 +196,8 @@ const PostCard = ({ post }: PostCardProps) => {
           </span>
         </div>
       )}
-      {/* Show reactions summary */}
+
+      {/* Reactions summary */}
       <div className="mt-5">
         {nonZeroReactions?.length > 0 && (
           <div className="relative mb-2 mt-2">
@@ -205,7 +206,6 @@ const PostCard = ({ post }: PostCardProps) => {
               className="w-fit flex items-center gap-1 cursor-pointer"
             >
               <div className="flex -space-x-1 cursor-pointer">
-                {/* Show up to 3 reaction types */}
                 {nonZeroReactions?.slice(0, 3)?.map((reaction) => (
                   <div key={reaction?.type}>
                     <span className={`${reactionColors[reaction?.type]}`}>
@@ -219,7 +219,7 @@ const PostCard = ({ post }: PostCardProps) => {
               </span>
             </div>
 
-            {/* Reaction details popup */}
+            {/* Reaction details modal */}
             <CustomModal
               header={
                 <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 rounded-t-xl">
@@ -315,6 +315,7 @@ const PostCard = ({ post }: PostCardProps) => {
                 </div>
               )}
             </button>
+
             <AnimatePresence>
               {showReactions && (
                 <motion.div
@@ -356,6 +357,7 @@ const PostCard = ({ post }: PostCardProps) => {
               )}
             </AnimatePresence>
           </div>
+
           <div className="flex items-center space-x-2">
             <svg
               width="26"
@@ -374,6 +376,7 @@ const PostCard = ({ post }: PostCardProps) => {
               {formatPostReactionNumber(post?.comments?.length || 0)}
             </span>
           </div>
+
           {post?.itinerary && (
             <div className="flex items-center space-x-2 cursor-pointer">
               <CalendarCheck className="size-6 text-gray-600" />
@@ -384,6 +387,7 @@ const PostCard = ({ post }: PostCardProps) => {
           )}
         </div>
       </div>
+
       <PostCommentInput
         post={post}
         editCommentId={editCommentId}
@@ -391,26 +395,27 @@ const PostCard = ({ post }: PostCardProps) => {
         setEditCommentId={setEditCommentId}
         setEditCommentText={setEditCommentText}
       />
+
       <PostCommentSection
         post={post}
         onEdit={handleEdit}
         setShowPostDetails={setShowPostDetails}
       />
+
       <PostDetails
         post={post}
         isOpen={showPostDetails}
         onClose={() => setShowPostDetails(false)}
       />
-      {
-        // Show itinerary modal
-        post?.itinerary && (
-          <ShowItineraryModal
-            itinerary={post?.itinerary}
-            visible={showItineraryModal}
-            onClose={() => setShowItineraryModal(false)}
-          />
-        )
-      }
+
+      {post?.itinerary && (
+        <ShowItineraryModal
+          itinerary={post?.itinerary}
+          visible={showItineraryModal}
+          onClose={() => setShowItineraryModal(false)}
+        />
+      )}
+
       {showEditModal && (
         <PostEditModal
           isOpen={showEditModal}

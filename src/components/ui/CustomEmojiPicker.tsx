@@ -98,7 +98,7 @@ const CustomEmojiPicker = memo(
     // Get container classes based on screen size
     const getPickerClasses = () => {
       const baseClasses = `
-      bg-white border border-gray-200 rounded shadow-xl h-56 overflow-y-auto scrollbar-hide pb-2
+      bg-white border border-gray-200 rounded-2xl shadow-xl h-56 overflow-y-auto scrollbar-hide pb-2
       ${position === "top" ? "mb-2" : "mt-2"}
       ${className}
     `;

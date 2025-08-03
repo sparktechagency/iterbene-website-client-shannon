@@ -102,6 +102,7 @@ const PostCommentInput = ({
       dispatch(openAuthModal());
       return;
     }
+
     if (newComment?.trim() !== "") {
       try {
         if (editCommentId) {
@@ -110,13 +111,13 @@ const PostCommentInput = ({
             postId: post?._id,
             comment: newComment,
           };
-          // Update existing comment
+          // Optimistic update will handle UI changes automatically
           await updateComment(editCommentPayload).unwrap();
           toast.success("Comment updated successfully!");
-          if (setEditCommentId) setEditCommentId(null); // Clear edit state
+          if (setEditCommentId) setEditCommentId(null);
           if (setEditCommentText) setEditCommentText("");
         } else {
-          // Create new comment
+          // Optimistic update will add comment to UI immediately
           await createComment({
             comment: newComment,
             postId: post?._id,
@@ -130,6 +131,7 @@ const PostCommentInput = ({
       } catch (error) {
         const err = error as TError;
         toast.error(err?.data?.message || "Something went wrong!");
+        // Optimistic update will automatically revert on error
       }
     }
   };
@@ -151,7 +153,7 @@ const PostCommentInput = ({
   };
 
   return (
-    <section className="mt-3 flex flex-col space-y-2 pt-5 ">
+    <section className="mt-3 flex flex-col space-y-2 pt-5">
       <div className="flex space-x-2">
         {user && (
           <Image
@@ -196,7 +198,7 @@ const PostCommentInput = ({
             {newComment ? (
               <>
                 {isCreating || isUpdating ? (
-                  <div className="flex items-center justify-center ">
+                  <div className="flex items-center justify-center">
                     <Loader2 className="animate-spin text-primary" size={26} />
                   </div>
                 ) : (
