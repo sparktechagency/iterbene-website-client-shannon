@@ -1,6 +1,9 @@
 "use client";
 import useUser from "@/hooks/useUser";
-import { useAddOrRemoveReactionMutation } from "@/redux/features/post/postApi";
+import {
+  useAddOrRemoveReactionMutation,
+  useIncrementItineraryViewCountMutation,
+} from "@/redux/features/post/postApi";
 import { TError } from "@/types/error";
 import {
   IPost,
@@ -22,16 +25,26 @@ import UserTimelineContentRender from "./UserTimelineContentRender";
 import PostHeader from "../../home/posts/post.header";
 import Link from "next/link";
 import formatPostReactionNumber from "@/utils/formatPostReactionNumber";
+import { openAuthModal } from "@/redux/features/auth/authModalSlice";
+import { useAppDispatch } from "@/redux/hooks";
+import PostEditModal from "../../home/create-post/PostEditModal";
+import ShowItineraryModal from "../../home/create-post/ShowItineraryModal";
 
 interface PostCardProps {
   post: IPost;
+  setTimelinePosts?: (posts: IPost[] | ((prev: IPost[]) => IPost[])) => void;
 }
-const UserTimelineCard = ({ post }: PostCardProps) => {
+const UserTimelineCard = ({ post, setTimelinePosts }: PostCardProps) => {
   const user = useUser();
+  const dispatch = useAppDispatch();
   const currentUserId = user?._id;
   const [showReactions, setShowReactions] = useState<boolean>(false);
   const [showReactionDetails, setShowReactionDetails] =
     useState<boolean>(false);
+
+  const [showItineraryModal, setShowItineraryModal] = useState<boolean>(false);
+  const [showPostEditModal, setShowPostEditModal] = useState<boolean>(false);
+
   // Find the user's reaction, if any
   const userReaction = post?.reactions?.find(
     (reaction: IReaction) => reaction?.userId?._id === currentUserId
@@ -44,6 +57,8 @@ const UserTimelineCard = ({ post }: PostCardProps) => {
 
   // Add or remove reactions
   const [addOrRemoveReaction] = useAddOrRemoveReactionMutation();
+  // Itinerary
+  const [incrementItinerary] = useIncrementItineraryViewCountMutation();
 
   // Reaction icon mapping
   const reactionIcons: { [key: string]: JSX.Element } = {
@@ -61,11 +76,85 @@ const UserTimelineCard = ({ post }: PostCardProps) => {
     smile: "text-yellow-500",
   };
 
+  const updateSortedReactions = (reactions: IReaction[]): ISortedReaction[] => {
+    const reactionCounts = reactions.reduce((acc, reaction) => {
+      const type = reaction.reactionType;
+      acc[type] = (acc[type] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
+
+    return Object.keys(reactionCounts).map((type) => ({
+      type: type as ReactionType,
+      count: reactionCounts[type],
+    }));
+  };
   // handle reaction function
   const handleReaction = async (reactionType: string) => {
+    if (!user) {
+      dispatch(openAuthModal());
+      return;
+    }
+
     try {
+      // Optimistic update: Update reactions and sortedReactions
+      if (setTimelinePosts) {
+        setTimelinePosts((prevPosts: IPost[]) =>
+          prevPosts.map((p) => {
+            if (p._id === post._id) {
+              const hasReaction = p.reactions.some(
+                (r) => r.userId._id === user._id
+              );
+              const updatedReactions = hasReaction
+                ? p.reactions.filter((r) => r.userId._id !== user._id)
+                : [
+                    ...p.reactions,
+                    {
+                      userId: {
+                        _id: user?._id,
+                        fullName: user?.fullName,
+                        username: user?.username,
+                        profileImage: user?.profileImage,
+                        id: user?._id,
+                      },
+                      postId: post._id,
+                      reactionType: reactionType as ReactionType,
+                      createdAt: new Date(),
+                    },
+                  ];
+              return {
+                ...p,
+                reactions: updatedReactions,
+                sortedReactions: updateSortedReactions(updatedReactions),
+              };
+            }
+            return p;
+          })
+        );
+      }
+
       await addOrRemoveReaction({ postId: post._id, reactionType }).unwrap();
       setShowReactions(false);
+    } catch (error) {
+      const err = error as TError;
+      toast.error(err?.data?.message || "Something went wrong!");
+      // Revert optimistic update
+      if (setTimelinePosts) {
+        setTimelinePosts((prevPosts: IPost[]) =>
+          prevPosts.map((p) => (p?._id === post?._id ? post : p))
+        );
+      }
+    }
+  };
+
+  const handlePostUpdated = () => {
+    setShowPostEditModal(false);
+  };
+
+  const handleItineraryClick = async () => {
+    try {
+      setShowItineraryModal(true);
+      const payload = { postId: post?._id, itineraryId: post?.itinerary?._id };
+      await incrementItinerary(payload).unwrap();
     } catch (error) {
       const err = error as TError;
       toast.error(err?.data?.message || "Something went wrong!");
@@ -74,7 +163,11 @@ const UserTimelineCard = ({ post }: PostCardProps) => {
 
   return (
     <div className="w-full flex flex-col bg-white rounded-xl p-4 mb-4 relative">
-      <PostHeader post={post} />
+      <PostHeader
+        post={post}
+        onEditClick={() => setShowPostEditModal(true)}
+        setAllPosts={setTimelinePosts}
+      />
       <p className="text-gray-700 flex-1 mb-3">
         {post?.content?.split(/(\s+)/).map((word, index) => {
           const isHashtag = word.match(/^#\w+/);
@@ -88,8 +181,23 @@ const UserTimelineCard = ({ post }: PostCardProps) => {
           );
         })}
       </p>
+
+      {/* Media */}
       <UserTimelineContentRender data={post?.media || []} />
 
+      {/* Itinerary section */}
+      {post?.itinerary && (
+        <div
+          onClick={handleItineraryClick}
+          className="px-4 py-2 mt-5 border cursor-pointer rounded-full text-gray-600 border-gray-200 flex items-center justify-between text-sm"
+        >
+          <span>Click to view full itinerary</span>
+          <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs">
+            PDF View Available
+          </span>
+        </div>
+      )}
+      {/* Reactions */}
       <div className="mt-5">
         {nonZeroReactions?.length > 0 && (
           <div className="relative mb-2 mt-2">
@@ -272,6 +380,22 @@ const UserTimelineCard = ({ post }: PostCardProps) => {
           )}
         </div>
       </div>
+      {post?.itinerary && (
+        <ShowItineraryModal
+          itinerary={post?.itinerary}
+          visible={showItineraryModal}
+          onClose={() => setShowItineraryModal(false)}
+        />
+      )}
+
+      {showPostEditModal && (
+        <PostEditModal
+          isOpen={showPostEditModal}
+          onClose={() => setShowPostEditModal(false)}
+          post={post}
+          onPostUpdated={handlePostUpdated}
+        />
+      )}
     </div>
   );
 };

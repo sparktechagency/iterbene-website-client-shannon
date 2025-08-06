@@ -51,7 +51,7 @@ const PostCard = ({ post, setAllPosts }: PostCardProps) => {
   const [editCommentText, setEditCommentText] = useState<string>("");
   const [showPostDetails, setShowPostDetails] = useState<boolean>(false);
   const [showItineraryModal, setShowItineraryModal] = useState<boolean>(false);
-  const [showEditModal, setShowEditModal] = useState<boolean>(false);
+  const [showPostEditModal, setShowPostEditModal] = useState<boolean>(false);
 
   const dispatch = useAppDispatch();
 
@@ -198,7 +198,7 @@ const PostCard = ({ post, setAllPosts }: PostCardProps) => {
   };
 
   const handlePostUpdated = () => {
-    setShowEditModal(false);
+    setShowPostEditModal(false);
   };
 
   const handleItineraryClick = async () => {
@@ -214,7 +214,11 @@ const PostCard = ({ post, setAllPosts }: PostCardProps) => {
 
   return (
     <div ref={postRef} className="w-full bg-white rounded-xl p-4 mb-4 relative">
-      <PostHeader post={post} onEditClick={() => setShowEditModal(true)} />
+      <PostHeader
+        post={post}
+        onEditClick={() => setShowPostEditModal(true)}
+        setAllPosts={setAllPosts}
+      />
 
       <p className="text-gray-700 mb-4">
         {post?.content?.split(/(\s+)/)?.map((word, index) => {
@@ -472,10 +476,10 @@ const PostCard = ({ post, setAllPosts }: PostCardProps) => {
         />
       )}
 
-      {showEditModal && (
+      {showPostEditModal && (
         <PostEditModal
-          isOpen={showEditModal}
-          onClose={() => setShowEditModal(false)}
+          isOpen={showPostEditModal}
+          onClose={() => setShowPostEditModal(false)}
           post={post}
           onPostUpdated={handlePostUpdated}
         />

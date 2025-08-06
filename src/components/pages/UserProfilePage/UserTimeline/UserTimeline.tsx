@@ -167,11 +167,11 @@ const UserTimeline = () => {
           if (index === timelinePosts?.length - 1) {
             return (
               <div key={post?._id} ref={lastPostElementRef}>
-                <UserTimelineCard post={post} />
+                <UserTimelineCard post={post} setTimelinePosts={setTimelinePosts} />
               </div>
             );
           }
-          return <UserTimelineCard key={post?._id} post={post} />;
+          return <UserTimelineCard key={post?._id} post={post} setTimelinePosts={setTimelinePosts} />;
         })}
       </div>
       {isFetching && hasMore && (
