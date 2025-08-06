@@ -5,6 +5,7 @@ import CustomButton from "@/components/custom/custom-button";
 import CustomForm from "@/components/custom/custom-form";
 import CustomInput from "@/components/custom/custom-input";
 import { useResetPasswordMutation } from "@/redux/features/auth/authApi";
+import { storeTokens } from "@/services/auth.services";
 import { TError } from "@/types/error";
 import { resetPasswordValidationSchema } from "@/validation/auth.validation";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -19,7 +20,14 @@ const ResetPassword = () => {
   const [resetPassword, { isLoading }] = useResetPasswordMutation();
   const handleResetPassword = async (values: FieldValues) => {
     try {
-      const res = await resetPassword({password:values?.newPassword}).unwrap();
+      const res = await resetPassword({
+        password: values?.newPassword,
+      }).unwrap();
+      // set access token in cookies
+      storeTokens(
+        res?.data?.attributes?.tokens?.accessToken,
+        res?.data?.attributes?.tokens?.refreshToken
+      );
       toast.success(res?.message);
       router.push("/login");
     } catch (error) {

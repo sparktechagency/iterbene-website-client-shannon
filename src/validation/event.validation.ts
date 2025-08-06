@@ -14,11 +14,7 @@ const eventValidationSchema = z.object({
     required_error: "End date is required",
     invalid_type_error: "End date must be a valid date",
   }),
-  privacy: z.enum(["public", "private"], {
-    required_error: "Privacy is required",
-    invalid_type_error: "Privacy must be either 'public' or 'private'",
-  }),
-  eventCost: z.string({
+  eventCost: z.number({
     required_error: "Event cost is required",
     invalid_type_error: "Event cost must be a number",
   }).min(0, {

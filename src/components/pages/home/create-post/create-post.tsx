@@ -1,11 +1,6 @@
 "use client";
 import CustomButton from "@/components/custom/custom-button";
 import CustomModal from "@/components/custom/custom-modal";
-import {
-  LocationDetails,
-  LocationPrediction,
-  useGoogleLocationSearch,
-} from "@/hooks/useGoogleLocationSearch";
 import useUser from "@/hooks/useUser";
 import { useGetHashtagsQuery } from "@/redux/features/hashtag/hashtagApi";
 import { useCreateItineraryMutation } from "@/redux/features/itinerary/itineraryApi";
@@ -43,6 +38,7 @@ import CreateItineraryModal from "./CreateItineraryModal";
 import ShowItineraryModal from "./ShowItineraryModal";
 import EditItineraryModal from "./EditItineraryModal";
 import { IPost } from "@/types/post.types";
+import { LocationDetails2, LocationPrediction2, useGoogleLocationSearch2 } from "@/hooks/useGoogleLocationSearch2";
 
 export interface FilePreview {
   name: string;
@@ -87,7 +83,7 @@ const CreatePost = ({
 
   // State for location
   const [selectedLocation, setSelectedLocation] =
-    useState<LocationDetails | null>(null);
+    useState<LocationDetails2 | null>(null);
   // Location search states
   const [locationQuery, setLocationQuery] = useState<string>("");
   const locationInputRef = useRef<HTMLInputElement>(null);
@@ -99,11 +95,10 @@ const CreatePost = ({
     searchLocations,
     getLocationDetails,
     clearPredictions,
-  } = useGoogleLocationSearch({
+  } = useGoogleLocationSearch2({
     debounceMs: 300,
     minQueryLength: 1,
-    maxResults: 5,
-    defaultQuery: defaultLocation,
+    maxResults: 5
   });
   const [showLocationPopup, setShowLocationPopup] = useState<boolean>(false);
 
@@ -154,10 +149,9 @@ const CreatePost = ({
       ) {
         setSelectedLocation({
           name: initialPostData.visitedLocationName,
-          formatted_address: initialPostData.visitedLocationName,
           latitude: initialPostData.visitedLocation.latitude,
           longitude: initialPostData.visitedLocation.longitude,
-          place_id: "", // Not available from backend, but required by type
+          place_id: '',
         });
       }
       if (initialPostData.itinerary) {
@@ -432,7 +426,7 @@ const CreatePost = ({
   };
 
   // Handle location selection
-  const handleLocationSelect = async (prediction: LocationPrediction) => {
+  const handleLocationSelect = async (prediction: LocationPrediction2) => {
     const locationDetails = await getLocationDetails(prediction.place_id);
     if (locationDetails) {
       setSelectedLocation(locationDetails);
@@ -876,12 +870,11 @@ const CreatePost = ({
                                 <MapPin className="size-5 text-[#9194A9]" />
                                 <div className="flex-1 min-w-0">
                                   <p className="text-sm font-medium text-gray-900 truncate">
-                                    {prediction.structured_formatting.main_text}
+                                    {prediction.main_text}
                                   </p>
                                   <p className="text-xs text-gray-500 truncate">
                                     {
-                                      prediction.structured_formatting
-                                        .secondary_text
+                                      prediction?.secondary_text
                                     }
                                   </p>
                                 </div>

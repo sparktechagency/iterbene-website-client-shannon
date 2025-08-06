@@ -28,7 +28,9 @@ const ForgotPassword = () => {
       });
       //redirect to verify email page
       toast.success(res?.message);
-      router.push("/verify-email?type=forgot-password");
+      router.push(
+        `/verify-email?type=forgot-password&email=${values?.email}`
+      );
     } catch (error) {
       const err = error as TError;
       toast.error(err?.data?.message || "Something went wrong!");

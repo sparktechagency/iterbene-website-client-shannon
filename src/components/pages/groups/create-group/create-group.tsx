@@ -18,10 +18,10 @@ import { useCreateGroupMutation } from "@/redux/features/group/groupApi";
 import { TError } from "@/types/error";
 import toast from "react-hot-toast";
 import { IMyConnections } from "@/types/connection.types";
-import { LocationDetails } from "@/hooks/useGoogleLocationSearch";
-import LocationSearchInput from "@/components/custom/LocationSearchInput";
 import { zodResolver } from "@hookform/resolvers/zod";
 import groupValidationSchema from "@/validation/group.validation";
+import LocationSearchInput2 from "@/components/custom/LocationSearchInput2";
+import { LocationDetails2 } from "@/hooks/useGoogleLocationSearch2";
 
 const { Option } = Select;
 
@@ -32,7 +32,7 @@ const CreateGroup: React.FC = () => {
   const [groupFile, setGroupFile] = useState<File | null>(null);
   const [coLeaders, setCoLeaders] = useState<string[]>([]);
   const [selectedLocation, setSelectedLocation] =
-    useState<LocationDetails | null>(null);
+    useState<LocationDetails2 | null>(null);
 
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => {
@@ -65,10 +65,6 @@ const CreateGroup: React.FC = () => {
       setGroupImage(imageUrl);
       setGroupFile(file);
     }
-  };
-
-  const handleLocationSelect = (location: LocationDetails) => {
-    setSelectedLocation(location);
   };
 
   const handleFormSubmit = async (values: FieldValues) => {
@@ -213,11 +209,11 @@ const CreateGroup: React.FC = () => {
                 />
 
                 {/* Reusable Location Search Component */}
-                <LocationSearchInput
+                <LocationSearchInput2
                   label="Location"
                   placeholder="Search for a location..."
                   required
-                  onLocationSelect={handleLocationSelect}
+                  onLocationSelect={(location) => setSelectedLocation(location)}
                   showSelectedInfo={false}
                 />
 

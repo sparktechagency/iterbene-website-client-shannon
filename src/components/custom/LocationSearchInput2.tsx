@@ -7,7 +7,7 @@ import {
   useGoogleLocationSearch2,
 } from "@/hooks/useGoogleLocationSearch2";
 
-interface LocationSearchInputProps {
+interface LocationSearchInputProps2 {
   value?: string;
   placeholder?: string;
   className?: string;
@@ -19,7 +19,7 @@ interface LocationSearchInputProps {
   disabled?: boolean;
 }
 
-const LocationSearchInput: React.FC<LocationSearchInputProps> = ({
+const LocationSearchInput2: React.FC<LocationSearchInputProps2> = ({
   value = "",
   placeholder = "Search for a location...",
   className = "",
@@ -45,17 +45,25 @@ const LocationSearchInput: React.FC<LocationSearchInputProps> = ({
     searchLocations,
     getLocationDetails,
     clearPredictions,
+    error,
   } = useGoogleLocationSearch2({
     debounceMs: 300,
     minQueryLength: 1,
-    maxResults: 20,
+    maxResults: 10, // This will be ignored by the API, but kept for consistency
   });
+
+  // Initialize inputValue with the prop value
+  useEffect(() => {
+    setInputValue(value);
+  }, [value]);
 
   // Handle input change
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;
     setInputValue(newValue);
     setSelectedLocation(null);
+
+    // Always call onInputChange to keep parent state in sync
     onInputChange?.(newValue);
 
     if (newValue.length === 0) {
@@ -66,13 +74,12 @@ const LocationSearchInput: React.FC<LocationSearchInputProps> = ({
     }
   };
 
-  // Handle location selection - THIS WAS THE MAIN ISSUE
+  // Handle location selection
   const handleLocationSelect = async (prediction: LocationPrediction2) => {
     try {
       const locationDetails = await getLocationDetails(prediction.place_id);
 
       if (locationDetails) {
-        // Update the input value with the selected location
         setInputValue(prediction.description);
         setSelectedLocation(locationDetails);
         setShowDropdown(false);
@@ -80,8 +87,6 @@ const LocationSearchInput: React.FC<LocationSearchInputProps> = ({
 
         // Call the callback with location details
         onLocationSelect?.(locationDetails);
-
-        // Also call onInputChange to keep parent updated
         onInputChange?.(prediction.description);
       }
     } catch (error) {
@@ -112,13 +117,6 @@ const LocationSearchInput: React.FC<LocationSearchInputProps> = ({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Update input when external value changes
-  useEffect(() => {
-    if (value !== inputValue) {
-      setInputValue(value);
-    }
-  }, [inputValue, value]);
-
   return (
     <div className={`flex flex-col gap-2 ${className}`}>
       {label && (
@@ -134,11 +132,13 @@ const LocationSearchInput: React.FC<LocationSearchInputProps> = ({
             type="text"
             value={inputValue}
             onChange={handleInputChange}
-            placeholder={
-              !isInitialized ? "Loading location services..." : placeholder
-            }
+            placeholder={!isInitialized ? "API key missing..." : placeholder}
             disabled={disabled || !isInitialized}
-            className="w-full px-4 py-3 pl-12 border border-gray-300 rounded-lg outline-none transition-colors  "
+            className={`w-full px-4 py-3 pl-12 border rounded-lg outline-none transition-colors ${
+              error
+                ? "border-red-500"
+                : "border-gray-300 focus:border-primary"
+            }`}
             onFocus={() => {
               if (predictions.length > 0) {
                 setShowDropdown(true);
@@ -147,7 +147,9 @@ const LocationSearchInput: React.FC<LocationSearchInputProps> = ({
           />
           <LocateIcon
             size={20}
-            className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"
+            className={`absolute left-4 top-1/2 transform -translate-y-1/2 ${
+              error ? "text-red-400" : "text-gray-400"
+            }`}
           />
           {isLoading && (
             <div className="absolute right-4 top-1/2 transform -translate-y-1/2">
@@ -156,8 +158,11 @@ const LocationSearchInput: React.FC<LocationSearchInputProps> = ({
           )}
         </div>
 
+        {/* Error message */}
+        {error && <p className="mt-1 text-xs text-red-600">{error}</p>}
+
         {/* Dropdown with predictions */}
-        {showDropdown && predictions.length > 0 && (
+        {showDropdown && predictions.length > 0 && !error && (
           <div
             ref={dropdownRef}
             className="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto"
@@ -174,18 +179,20 @@ const LocationSearchInput: React.FC<LocationSearchInputProps> = ({
                 />
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-gray-900 truncate">
-                    {prediction?.main_text}
+                    {prediction.main_text}
                   </p>
-                  <p className="text-xs text-gray-500 truncate">
-                    {prediction?.secondary_text}
-                  </p>
+                  {prediction.secondary_text && (
+                    <p className="text-xs text-gray-500 truncate">
+                      {prediction.secondary_text}
+                    </p>
+                  )}
                 </div>
               </div>
             ))}
           </div>
         )}
 
-        {/* Selected location info */}
+        {/* Selected location info - simplified to show only lat, lng, name */}
         {showSelectedInfo && selectedLocation && (
           <div className="mt-2 p-3 bg-green-50 border border-green-200 rounded-lg">
             <div className="flex items-start gap-2">
@@ -195,10 +202,7 @@ const LocationSearchInput: React.FC<LocationSearchInputProps> = ({
               />
               <div className="flex-1 min-w-0">
                 <p className="text-sm text-green-800 font-medium">
-                  Selected Location:
-                </p>
-                <p className="text-xs text-green-700 truncate">
-                  {selectedLocation.name}
+                  Selected: {selectedLocation.name}
                 </p>
                 <p className="text-xs text-green-600 mt-1">
                   Lat: {selectedLocation.latitude.toFixed(6)}, Lng:{" "}
@@ -213,4 +217,4 @@ const LocationSearchInput: React.FC<LocationSearchInputProps> = ({
   );
 };
 
-export default LocationSearchInput;
+export default LocationSearchInput2;

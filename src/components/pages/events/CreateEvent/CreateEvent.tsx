@@ -9,17 +9,17 @@ import CustomForm from "@/components/custom/custom-form";
 import CustomInput from "@/components/custom/custom-input";
 // import CustomSelectField from "@/components/custom/custom-seletectField";
 import { FieldValues } from "react-hook-form";
-import { DollarSignIcon, } from "lucide-react";
+import { DollarSignIcon } from "lucide-react";
 import CustomButton from "@/components/custom/custom-button";
 import { IoClose } from "react-icons/io5";
 import useUser from "@/hooks/useUser";
 import { TError } from "@/types/error";
 import toast from "react-hot-toast";
-import { LocationDetails } from "@/hooks/useGoogleLocationSearch";
-import LocationSearchInput from "@/components/custom/LocationSearchInput";
 import { useCreateEventMutation } from "@/redux/features/event/eventApi";
 import { zodResolver } from "@hookform/resolvers/zod";
 import eventValidationSchema from "@/validation/event.validation";
+import LocationSearchInput2 from "@/components/custom/LocationSearchInput2";
+import { LocationDetails2 } from "@/hooks/useGoogleLocationSearch2";
 
 const CreateEvent: React.FC = () => {
   const user = useUser();
@@ -27,7 +27,7 @@ const CreateEvent: React.FC = () => {
   const [eventImage, setEventImage] = useState<string | null>(null);
   const [eventFile, setEventFile] = useState<File | null>(null);
   const [selectedLocation, setSelectedLocation] =
-    useState<LocationDetails | null>(null);
+    useState<LocationDetails2 | null>(null);
   const [duration, setDuration] = useState({ days: 1, nights: 0 });
 
   const openModal = () => setIsModalOpen(true);
@@ -56,10 +56,6 @@ const CreateEvent: React.FC = () => {
     }
   };
 
-  const handleLocationSelect = (location: LocationDetails) => {
-    setSelectedLocation(location);
-  };
-
   const handleDurationChange = (type: "days" | "nights", value: number) => {
     setDuration((prev) => ({
       ...prev,
@@ -79,7 +75,7 @@ const CreateEvent: React.FC = () => {
   const handleFormSubmit = async (values: FieldValues) => {
     // Validate location selection
     if (!selectedLocation) {
-      toast.error("Please select a valid location");
+      toast.error("Please select  valid location");
       return;
     }
     if (!eventFile) {
@@ -365,7 +361,7 @@ const CreateEvent: React.FC = () => {
                 </div>
                 {/* Event Cost */}
                 <CustomInput
-                  type="number"
+                  type="text"
                   icon={<DollarSignIcon size={22} className="text-[#9194A9]" />}
                   label="Event Cost($)"
                   name="eventCost"
@@ -374,11 +370,13 @@ const CreateEvent: React.FC = () => {
                 />
 
                 {/* Reusable Location Search Component */}
-                <LocationSearchInput
+                <LocationSearchInput2
                   label="Location"
                   placeholder="Search for a location..."
+                  onLocationSelect={(location) => {
+                    setSelectedLocation(location);
+                  }}
                   required
-                  onLocationSelect={handleLocationSelect}
                   showSelectedInfo={false}
                 />
 

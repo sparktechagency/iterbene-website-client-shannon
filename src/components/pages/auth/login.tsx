@@ -61,7 +61,6 @@ const Login = () => {
         router.push("/verify-email");
         return;
       }
-
       toast.success(res.message || "Login successful!");
       storeTokens(
         res?.data?.attributes?.tokens?.accessToken,
