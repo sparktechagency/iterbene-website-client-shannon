@@ -27,14 +27,28 @@ const CustomModal: React.FC<CustomModalProps> = ({
   // Prevent background scrolling when modal is open
   useEffect(() => {
     if (isOpen) {
+      const originalBodyOverflow = document.body.style.overflow;
+      const originalHtmlOverflow = document.documentElement.style.overflow;
+      const originalBodyPosition = document.body.style.position;
+      const originalScrollY = window.scrollY;
+      
       document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "auto";
+      document.documentElement.style.overflow = "hidden";
+      document.body.style.position = "fixed";
+      document.body.style.top = `-${originalScrollY}px`;
+      document.body.style.width = "100%";
+      document.body.classList.add("modal-open");
+
+      return () => {
+        document.body.style.overflow = originalBodyOverflow;
+        document.documentElement.style.overflow = originalHtmlOverflow;
+        document.body.style.position = originalBodyPosition;
+        document.body.style.top = '';
+        document.body.style.width = '';
+        document.body.classList.remove("modal-open");
+        window.scrollTo(0, originalScrollY);
+      };
     }
-    // Cleanup on unmount
-    return () => {
-      document.body.style.overflow = "auto";
-    };
   }, [isOpen]);
 
   // Stop click event propagation to prevent closing when clicking inside the modal
@@ -54,7 +68,7 @@ const CustomModal: React.FC<CustomModalProps> = ({
           onClick={closeOnBackdropClick ? onClose : undefined}
         >
           <motion.div
-            className={`w-full bg-white rounded-xl ${className}  shadow-2xl ${maxWidth} relative`}
+            className={`w-full bg-white rounded-xl ${className} shadow-2xl ${maxWidth} relative modal-content`}
             initial={{ opacity: 0, scale: 0.9, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 20 }}

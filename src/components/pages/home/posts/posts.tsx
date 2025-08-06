@@ -3,8 +3,9 @@ import { useFeedPostsQuery } from "@/redux/features/post/postApi";
 import { IPost } from "@/types/post.types";
 import PostCard from "./post-card";
 import PostCardSkeleton from "./PostCardSkeleton";
-import { useState, useEffect, useCallback, useRef, useMemo } from "react";
+import { useState, useEffect, useMemo } from "react";
 import useUser from "@/hooks/useUser";
+import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 
 const Posts = () => {
   const user = useUser();
@@ -12,7 +13,6 @@ const Posts = () => {
   const [allPosts, setAllPosts] = useState<IPost[]>([]);
   const [hasMore, setHasMore] = useState(true);
   const [loading, setLoading] = useState(false);
-  const observer = useRef<IntersectionObserver | null>(null);
 
 
   // API query parameters
@@ -89,50 +89,15 @@ const Posts = () => {
   }, [isLoading, currentPage, totalPages]);
 
 
-  // Load more posts
-  const loadMore = useCallback(() => {
-    if (!loading && hasMore) {
-      setCurrentPage((prev) => prev + 1);
-    }
-  }, [loading, hasMore]);
-
-  // Observer for infinite scrolling
-  const lastPostElementRef = useCallback(
-    (node: HTMLDivElement | null) => {
-      if (isLoading || isFetching) return;
-      if (observer.current) observer.current.disconnect();
-
-      observer.current = new IntersectionObserver((entries) => {
-        if (entries[0].isIntersecting && hasMore) {
-          setCurrentPage((prevPage) => prevPage + 1);
-        }
-      });
-
-      if (node) observer.current.observe(node);
-    },
-    [isLoading, isFetching, hasMore]
-  );
-
-  // Observer for infinite scrolling
-  useEffect(() => {
-    if (!hasMore || loading) return;
-
-    const observerInstance = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting) {
-          loadMore();
-        }
-      },
-      { threshold: 0.1 }
-    );
-
-    const sentinel = document.getElementById("sentinel");
-    if (sentinel) observerInstance.observe(sentinel);
-
-    return () => {
-      if (sentinel) observerInstance.unobserve(sentinel);
-    };
-  }, [loadMore, loading, hasMore]);
+  // Use the reusable infinite scroll hook
+  const { lastElementRef } = useInfiniteScroll({
+    isLoading,
+    isFetching,
+    hasMore: hasMore && !loading,
+    onLoadMore: () => setCurrentPage((prev) => prev + 1),
+    threshold: 0.1,
+    rootMargin: '100px'
+  });
 
   // Render
   if (isLoading && allPosts?.length === 0) {
@@ -159,7 +124,7 @@ const Posts = () => {
       {allPosts?.map((post: IPost, index: number) => {
         if (index === allPosts?.length - 1) {
           return (
-            <div key={post?._id} ref={lastPostElementRef}>
+            <div key={post?._id} ref={lastElementRef}>
               <PostCard post={post} setAllPosts={setAllPosts} />
             </div>
           );
@@ -175,7 +140,6 @@ const Posts = () => {
           ))}
         </div>
       )}
-      <div id="sentinel" style={{ height: "1px" }} />
     </div>
   );
 };

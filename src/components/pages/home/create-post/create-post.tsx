@@ -111,6 +111,29 @@ const CreatePost = ({
   const [mediaPreviews, setMediaPreviews] = useState<FilePreview[]>([]);
   const [existingMedia, setExistingMedia] = useState<FilePreview[]>([]); // For existing media in edit mode
 
+  // State for textarea focus
+  const [isTextareaFocused, setIsTextareaFocused] = useState<boolean>(false);
+  
+  // Function to render text with highlighted hashtags
+  const renderTextWithHashtags = (text: string) => {
+    if (!text) return text;
+    
+    // Regular expression to match hashtags
+    const hashtagRegex = /(#\w+)/g;
+    const parts = text.split(hashtagRegex);
+    
+    return parts.map((part, index) => {
+      if (part.match(hashtagRegex)) {
+        return (
+          <span key={index} className="text-[#3B82F6]">
+            {part}
+          </span>
+        );
+      }
+      return part;
+    });
+  };
+
   // State for itinerary
   const [showItineraryModal, setShowItineraryModal] = useState(false);
   const [itineraryModalOpen, setItineraryModalOpen] = useState<boolean>(false);
@@ -531,15 +554,30 @@ const CreatePost = ({
               />
             )}
             <div className="relative w-full">
+              {/* Invisible textarea for input handling */}
               <textarea
                 ref={textareaRef}
-                placeholder={config.placeholder}
+                placeholder={!post ? config.placeholder : ""}
                 value={post}
                 onChange={postChangeHandler}
-                className={`w-full bg-transparent border-none text-justify mt-4 text-base focus:outline-none ${
-                  post.includes("#") ? "color-[#3B82F6]" : ""
-                } placeholder-gray-400 resize-none`}
+                onFocus={() => setIsTextareaFocused(true)}
+                onBlur={() => setIsTextareaFocused(false)}
+                className="w-full bg-transparent border-none text-justify mt-4 text-base focus:outline-none placeholder-gray-400 resize-none whitespace-pre-wrap text-transparent caret-black"
+                style={{ caretColor: 'black' }}
               />
+              
+              {/* Display overlay with hashtag highlighting */}
+              <div 
+                className="absolute top-0 left-0 w-full bg-transparent border-none text-justify mt-4 text-base pointer-events-none resize-none whitespace-pre-wrap text-gray-900"
+                style={{
+                  minHeight: textareaRef.current?.style.height || 'auto',
+                  lineHeight: '1.5'
+                }}
+              >
+                {post ? renderTextWithHashtags(post) : (
+                  <span className="text-gray-400">{config.placeholder}</span>
+                )}
+              </div>
               {/* Hashtag Suggestions Popup */}
               <AnimatePresence>
                 {showHashtagSuggestions &&
@@ -689,7 +727,8 @@ const CreatePost = ({
           {(post ||
             allMediaPreviews.length > 0 ||
             selectedLocation ||
-            initialPostData) && (
+            initialPostData ||
+            isTextareaFocused) && (
             <>
               {/* Selected Location and Privacy Display */}
               <div className="w-full flex justify-between gap-4 p-2 items-center">

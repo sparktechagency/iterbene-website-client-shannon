@@ -44,46 +44,68 @@ const AuthModal = () => {
     if (isModalOpen) {
       const originalBodyOverflow = document.body.style.overflow;
       const originalHtmlOverflow = document.documentElement.style.overflow;
+      const originalBodyPosition = document.body.style.position;
+      const originalScrollY = window.scrollY;
+      
       document.body.style.overflow = "hidden";
       document.documentElement.style.overflow = "hidden";
+      document.body.style.position = "fixed";
+      document.body.style.top = `-${originalScrollY}px`;
+      document.body.style.width = "100%";
       document.body.classList.add("modal-open");
 
       const preventScroll = (e: Event) => {
-        e.preventDefault();
-        e.stopPropagation();
+        // Only prevent scroll on the body, not inside modal content
+        if (!(e.target as Element)?.closest('.modal-content')) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
         return false;
       };
 
       const preventScrollTouch = (e: TouchEvent) => {
-        if (e.touches.length > 1) return;
-        e.preventDefault();
-        e.stopPropagation();
+        // Only prevent touch on body, not inside modal content
+        if (e.touches.length > 1 || !(e.target as Element)?.closest('.modal-content')) {
+          if (!(e.target as Element)?.closest('.modal-content')) {
+            e.preventDefault();
+            e.stopPropagation();
+          }
+        }
         return false;
+      };
+
+      const preventKeydown = (e: KeyboardEvent) => {
+        // Only prevent navigation keys, not input keys like spacebar in input fields
+        if ([33, 34, 35, 36, 37, 38, 39, 40].includes(e.keyCode)) {
+          // Don't prevent if user is in an input field
+          const activeElement = document.activeElement;
+          if (activeElement?.tagName === 'INPUT' || 
+              activeElement?.tagName === 'TEXTAREA' || 
+              activeElement?.contentEditable === 'true') {
+            return;
+          }
+          e.preventDefault();
+        }
       };
 
       document.addEventListener("wheel", preventScroll, { passive: false });
       document.addEventListener("touchmove", preventScrollTouch, {
         passive: false,
       });
-      document.addEventListener("scroll", preventScroll, { passive: false });
-      document.addEventListener("keydown", (e) => {
-        if ([32, 33, 34, 35, 36, 37, 38, 39, 40].includes(e.keyCode)) {
-          e.preventDefault();
-        }
-      });
+      document.addEventListener("keydown", preventKeydown);
 
       return () => {
         document.body.style.overflow = originalBodyOverflow;
         document.documentElement.style.overflow = originalHtmlOverflow;
+        document.body.style.position = originalBodyPosition;
+        document.body.style.top = '';
+        document.body.style.width = '';
         document.body.classList.remove("modal-open");
+        window.scrollTo(0, originalScrollY);
+        
         document.removeEventListener("wheel", preventScroll);
         document.removeEventListener("touchmove", preventScrollTouch);
-        document.removeEventListener("scroll", preventScroll);
-        document.removeEventListener("keydown", (e) => {
-          if ([32, 33, 34, 35, 36, 37, 38, 39, 40].includes(e.keyCode)) {
-            e.preventDefault();
-          }
-        });
+        document.removeEventListener("keydown", preventKeydown);
       };
     }
   }, [isModalOpen]);
@@ -115,7 +137,7 @@ const AuthModal = () => {
       style={{ touchAction: "none" }}
     >
       <motion.div
-        className="bg-white rounded-xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto relative"
+        className="bg-white rounded-xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto relative modal-content"
         initial={{ scale: 0.9, opacity: 0, y: 20 }}
         animate={{ scale: 1, opacity: 1, y: 0 }}
         exit={{ scale: 0.9, opacity: 0, y: 20 }}

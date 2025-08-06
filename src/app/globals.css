@@ -15,6 +15,28 @@ body::-webkit-scrollbar {
   display: none; /* Chrome, Safari, and other Webkit browsers */
 }
 
+/* Modal fixes */
+body.modal-open {
+  position: fixed !important;
+  overflow: hidden !important;
+  width: 100% !important;
+}
+
+.modal-content {
+  /* Allow scrolling within modal content */
+  overflow-y: auto;
+}
+
+/* Ensure modals work properly with fixed positioning */
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 9999;
+}
+
 @theme {
   /* Colors (unchanged) */
   --color-primary: #40e0d0; /* turquoise */
