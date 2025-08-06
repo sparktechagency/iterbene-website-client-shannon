@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import { HiGlobe, HiLockClosed, HiUsers } from "react-icons/hi";
 import { TiLocation } from "react-icons/ti";
@@ -14,28 +14,24 @@ import {
 } from "lucide-react";
 import useUser from "@/hooks/useUser";
 import { motion, AnimatePresence } from "framer-motion";
-import { useDeletePostMutation } from "@/redux/features/post/postApi";
 import ConfirmationPopup from "@/components/custom/custom-popup";
 import ReportModal, { ReportType } from "@/components/custom/ReportModal";
 import toast from "react-hot-toast";
 import { TError } from "@/types/error";
 import formatTimeAgo from "@/utils/formatTimeAgo";
 import Link from "next/link";
-import {
-  useIsPostSavedQuery,
-  useSavePostMutation,
-  useUnsavePostMutation,
-} from "@/redux/features/savedPost/savedPost.api";
 import { openAuthModal } from "@/redux/features/auth/authModalSlice";
 import { useAppDispatch } from "@/redux/hooks";
+import { useDeletePostMutation } from "@/redux/features/post/postApi";
+import { useIsPostSavedQuery, useSavePostMutation, useUnsavePostMutation } from "@/redux/features/savedPost/savedPost.api";
 
 interface PostHeaderProps {
   post: IPost;
   onEditClick?: () => void;
-  refetch?: () => void;
+  setAllPosts?: (posts: IPost[] | ((prev: IPost[]) => IPost[])) => void;
 }
 
-const PostHeader = ({ post, onEditClick, refetch }: PostHeaderProps) => {
+const PostHeader = ({ post, onEditClick, setAllPosts }: PostHeaderProps) => {
   const user = useUser();
   const [isOpen, setIsOpen] = useState(false);
   const triggerRef = useRef<HTMLButtonElement>(null);
@@ -46,7 +42,6 @@ const PostHeader = ({ post, onEditClick, refetch }: PostHeaderProps) => {
   const [isDeletePopupOpen, setIsDeletePopupOpen] = useState<boolean>(false);
   const [isReportModalOpen, setIsReportModalOpen] = useState<boolean>(false);
 
-  // API hooks
   const [deletePost, { isLoading: isDeleting }] = useDeletePostMutation();
   const { data: isSaved, isLoading: isCheckingSaved } = useIsPostSavedQuery(
     post?._id,
@@ -105,18 +100,25 @@ const PostHeader = ({ post, onEditClick, refetch }: PostHeaderProps) => {
     setIsReportModalOpen(true);
   };
 
-  // Simplified delete handler - optimistic update handles UI removal
   const handleConfirmDelete = async () => {
+    // Optimistic update: Remove post from UI immediately
+    if (setAllPosts) {
+      setAllPosts((prevPosts: IPost[]) =>
+        prevPosts.filter((p) => p._id !== post._id)
+      );
+    }
+
     try {
-      // Optimistic update will remove post from UI immediately
       await deletePost(post._id).unwrap();
       setIsDeletePopupOpen(false);
-      refetch?.();
       toast.success("Post deleted successfully!");
     } catch (error) {
       const err = error as TError;
       toast.error(err?.data?.message || "Failed to delete post");
-      // Optimistic update will automatically revert on error
+      // Revert optimistic update
+      if (setAllPosts) {
+        setAllPosts((prevPosts: IPost[]) => [...prevPosts, post]);
+      }
     }
   };
 

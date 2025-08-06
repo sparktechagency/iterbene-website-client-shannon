@@ -138,9 +138,9 @@ const inboxApi = baseApi.injectEndpoints({
           }
 
           const { data: responseData } = await queryFulfilled;
-          const newMessage = responseData.data.attributes;
-          const chatId = newMessage.chatId;
-          const receiverId = arg.receiverId || newMessage.receiverId?._id;
+          const newMessage = responseData?.data?.attributes;
+          const chatId = newMessage?.chatId;
+          const receiverId = arg?.receiverId || newMessage?.receiverId?._id;
 
           let receiverInfo: IUser | undefined;
           if (

@@ -7,7 +7,7 @@ import {
   useCreateCommentMutation,
   useUpdateCommentMutation,
 } from "@/redux/features/post/postApi";
-import { IPost } from "@/types/post.types";
+import { IComment, IPost } from "@/types/post.types";
 import { TError } from "@/types/error";
 import toast from "react-hot-toast";
 import useUser from "@/hooks/useUser";
@@ -20,6 +20,7 @@ interface PostCommentInputProps {
   editCommentText?: string;
   setEditCommentId?: (id: string | null) => void;
   setEditCommentText?: (text: string) => void;
+  setAllPosts?: (posts: IPost[] | ((prev: IPost[]) => IPost[])) => void;
 }
 
 const PostCommentInput = ({
@@ -28,6 +29,7 @@ const PostCommentInput = ({
   editCommentText,
   setEditCommentId,
   setEditCommentText,
+  setAllPosts,
 }: PostCommentInputProps) => {
   const user = useUser();
   const [newComment, setNewComment] = useState(editCommentText);
@@ -106,6 +108,39 @@ const PostCommentInput = ({
     if (newComment?.trim() !== "") {
       try {
         if (editCommentId) {
+          const tempCommentId = `temp-${Date.now()}`;
+          //optimistic update
+          if (setAllPosts) {
+            setAllPosts((prevPosts: IPost[]) =>
+              prevPosts.map((p: IPost) => {
+                if (p._id === post._id) {
+                  return {
+                    ...p,
+                    comments: [
+                      ...p.comments,
+                      {
+                        _id: tempCommentId,
+                        userId: {
+                          _id: user._id,
+                          fullName: user.fullName,
+                          username: user.username,
+                          profileImage: user.profileImage,
+                        },
+                        postId: post._id,
+                        comment: newComment,
+                        createdAt: new Date(),
+                        updatedAt: new Date(),
+                        reactions: [],
+                        replies: [],
+                      } as IComment,
+                    ],
+                  };
+                }
+                return p;
+              })
+            );
+          }
+          // Update comment
           const editCommentPayload = {
             commentId: editCommentId,
             postId: post?._id,
@@ -113,11 +148,41 @@ const PostCommentInput = ({
           };
           // Optimistic update will handle UI changes automatically
           await updateComment(editCommentPayload).unwrap();
-          toast.success("Comment updated successfully!");
           if (setEditCommentId) setEditCommentId(null);
           if (setEditCommentText) setEditCommentText("");
         } else {
           // Optimistic update will add comment to UI immediately
+          const tempCommentId = `temp-${Date.now()}`;
+          if (setAllPosts) {
+            setAllPosts((prevPosts: IPost[]) =>
+              prevPosts.map((p: IPost) => {
+                if (p._id === post._id) {
+                  return {
+                    ...p,
+                    comments: [
+                      ...p.comments,
+                      {
+                        _id: tempCommentId,
+                        userId: {
+                          _id: user._id,
+                          fullName: user.fullName,
+                          username: user.username,
+                          profileImage: user.profileImage,
+                        },
+                        postId: post._id,
+                        comment: newComment,
+                        createdAt: new Date(),
+                        updatedAt: new Date(),
+                        reactions: [],
+                        replies: [],
+                      } as IComment,
+                    ],
+                  };
+                }
+                return p;
+              })
+            );
+          }
           await createComment({
             comment: newComment,
             postId: post?._id,
@@ -132,6 +197,11 @@ const PostCommentInput = ({
         const err = error as TError;
         toast.error(err?.data?.message || "Something went wrong!");
         // Optimistic update will automatically revert on error
+        if (setAllPosts) {
+          setAllPosts((prevPosts: IPost[]) =>
+            prevPosts.map((p: IPost) => (p._id === post._id ? post : p))
+          );
+        }
       }
     }
   };

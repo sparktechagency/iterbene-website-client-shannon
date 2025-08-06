@@ -36,9 +36,10 @@ import { openAuthModal } from "@/redux/features/auth/authModalSlice";
 
 interface PostCardProps {
   post: IPost;
+  setAllPosts?: (posts: IPost[] | ((prev: IPost[]) => IPost[])) => void;
 }
 
-const PostCard = ({ post }: PostCardProps) => {
+const PostCard = ({ post, setAllPosts }: PostCardProps) => {
   const user = useUser();
   const postRef = useRef<HTMLDivElement>(null);
   const [isVisible, setIsVisible] = useState(false);
@@ -118,13 +119,27 @@ const PostCard = ({ post }: PostCardProps) => {
 
   // Reaction colors
   const reactionColors: { [key: string]: string } = {
-    love: "text-red-500 ",
+    love: "text-red-500",
     luggage: "text-blue-500",
     ban: "text-orange-500",
     smile: "text-yellow-500",
   };
 
-  // Simplified reaction handler - no manual UI updates needed
+  // Update sortedReactions based on reactions array
+  const updateSortedReactions = (reactions: IReaction[]): ISortedReaction[] => {
+    const reactionCounts = reactions.reduce((acc, reaction) => {
+      const type = reaction.reactionType;
+      acc[type] = (acc[type] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
+
+    return Object.keys(reactionCounts).map((type) => ({
+      type: type as ReactionType,
+      count: reactionCounts[type],
+    }));
+  };
+
+  // Reaction handler with improved optimistic update
   const handleReaction = async (reactionType: string) => {
     if (!user) {
       dispatch(openAuthModal());
@@ -132,13 +147,53 @@ const PostCard = ({ post }: PostCardProps) => {
     }
 
     try {
-      // The optimistic update will handle UI changes automatically
-      await addOrRemoveReaction({ postId: post?._id, reactionType }).unwrap();
+      // Optimistic update: Update reactions and sortedReactions
+      if (setAllPosts) {
+        setAllPosts((prevPosts: IPost[]) =>
+          prevPosts.map((p) => {
+            if (p._id === post._id) {
+              const hasReaction = p.reactions.some(
+                (r) => r.userId._id === user._id
+              );
+              const updatedReactions = hasReaction
+                ? p.reactions.filter((r) => r.userId._id !== user._id)
+                : [
+                    ...p.reactions,
+                    {
+                      userId: {
+                        _id: user._id,
+                        fullName: user.fullName,
+                        username: user.username,
+                        profileImage: user.profileImage,
+                        id: user._id,
+                      },
+                      postId: post._id,
+                      reactionType: reactionType as ReactionType,
+                      createdAt: new Date(),
+                    },
+                  ];
+              return {
+                ...p,
+                reactions: updatedReactions,
+                sortedReactions: updateSortedReactions(updatedReactions),
+              };
+            }
+            return p;
+          })
+        );
+      }
+
+      await addOrRemoveReaction({ postId: post._id, reactionType }).unwrap();
       setShowReactions(false);
     } catch (error) {
       const err = error as TError;
       toast.error(err?.data?.message || "Something went wrong!");
-      // No need to manually revert - optimistic update handles this
+      // Revert optimistic update
+      if (setAllPosts) {
+        setAllPosts((prevPosts: IPost[]) =>
+          prevPosts.map((p) => (p._id === post._id ? post : p))
+        );
+      }
     }
   };
 
@@ -150,7 +205,6 @@ const PostCard = ({ post }: PostCardProps) => {
     try {
       setShowItineraryModal(true);
       const payload = { postId: post?._id, itineraryId: post?.itinerary?._id };
-      // Optimistic update will increment the count immediately
       await incrementItinerary(payload).unwrap();
     } catch (error) {
       const err = error as TError;
@@ -390,6 +444,7 @@ const PostCard = ({ post }: PostCardProps) => {
 
       <PostCommentInput
         post={post}
+        setAllPosts={setAllPosts} // Pass setAllPosts for comment updates
         editCommentId={editCommentId}
         editCommentText={editCommentText}
         setEditCommentId={setEditCommentId}
@@ -398,6 +453,7 @@ const PostCard = ({ post }: PostCardProps) => {
 
       <PostCommentSection
         post={post}
+        setAllPosts={setAllPosts} // Pass setAllPosts for comment updates
         onEdit={handleEdit}
         setShowPostDetails={setShowPostDetails}
       />

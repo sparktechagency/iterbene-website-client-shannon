@@ -39,23 +39,20 @@ export interface IComment {
     fullName: string;
     username: string;
     profileImage: string;
-    id: string;
   };
   postId: string;
   replyTo?: string;
   parentCommentId?: string;
   reactions: ICommentReaction[];
   comment: string;
-  mentions: [
+  mentions?: [
     {
       _id: string;
       fullName: string;
       username: string;
       profileImage: string;
-      id: string;
     }
   ];
-  replies: IComment[];
   createdAt: Date;
   updatedAt: Date;
 }

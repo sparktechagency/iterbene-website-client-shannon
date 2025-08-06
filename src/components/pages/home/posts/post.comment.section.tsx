@@ -1,5 +1,5 @@
 "use client";
-import { IComment, IPost } from "@/types/post.types";
+import { IComment, IPost, ReactionType } from "@/types/post.types";
 import Image from "next/image";
 import { FaHeart } from "react-icons/fa";
 import { motion, AnimatePresence } from "framer-motion";
@@ -24,6 +24,7 @@ import CustomEmojiPicker from "@/components/ui/CustomEmojiPicker";
 
 interface PostCommentSectionProps {
   post: IPost;
+  setAllPosts?: (posts: IPost[] | ((prev: IPost[]) => IPost[])) => void;
   onEdit?: (commentId: string, commentText: string) => void;
   setShowPostDetails?: (value: boolean) => void;
   isViewAllComments?: boolean;
@@ -32,9 +33,10 @@ interface PostCommentSectionProps {
 interface CommentItemProps {
   comment: IComment;
   post: IPost;
-  user: IUser | null;
+  user: IUser | undefined;
   currentUserId: string;
   level: number;
+  setAllPosts?: (posts: IPost[] | ((prev: IPost[]) => IPost[])) => void;
   onEdit?: (commentId: string, commentText: string) => void;
   onReply: (
     parentId: string,
@@ -51,7 +53,6 @@ interface CommentItemProps {
   onCancelReply: () => void;
 }
 
-// Reply Input Component (unchanged)
 const ReplyInput = ({
   isOpen,
   replyText,
@@ -210,13 +211,13 @@ const ReplyInput = ({
   );
 };
 
-// Single Comment Component with optimistic updates
 const CommentItem = ({
   comment,
   post,
   user,
   currentUserId,
   level,
+  setAllPosts,
   onEdit,
   onReply,
   onReaction,
@@ -418,7 +419,7 @@ const CommentItem = ({
               setReplyText={setReplyText}
               onSubmit={onSubmitReply}
               onCancel={onCancelReply}
-              user={user}
+              user={user ?? null}
               level={level}
               placeholder={`Reply to ${comment?.userId?.fullName}...`}
             />
@@ -447,6 +448,7 @@ const CommentItem = ({
                     user={user}
                     currentUserId={currentUserId}
                     level={level + 1}
+                    setAllPosts={setAllPosts}
                     onEdit={onEdit}
                     onReply={onReply}
                     onReaction={onReaction}
@@ -468,10 +470,13 @@ const CommentItem = ({
   );
 };
 
-// Main Component with optimistic updates
-const PostCommentSection = ({ post, onEdit }: PostCommentSectionProps) => {
+const PostCommentSection = ({
+  post,
+  setAllPosts,
+  onEdit,
+}: PostCommentSectionProps) => {
   const user = useUser();
-  const currentUserId = user?._id;
+  const currentUserId = user?._id || "";
   const dispatch = useAppDispatch();
 
   const [replyInputOpen, setReplyInputOpen] = useState<string | null>(null);
@@ -479,7 +484,6 @@ const PostCommentSection = ({ post, onEdit }: PostCommentSectionProps) => {
   const [replyToUserId, setReplyToUserId] = useState<string>("");
   const [isReportModalOpen, setIsReportModalOpen] = useState<boolean>(false);
 
-  // API hooks - optimistic updates are handled in the API layer
   const [replyComment] = useCreateCommentMutation();
   const [addOrRemoveCommentReaction] = useAddOrRemoveCommentReactionMutation();
   const [deleteComment] = useDeleteCommentMutation();
@@ -488,24 +492,71 @@ const PostCommentSection = ({ post, onEdit }: PostCommentSectionProps) => {
     post?.comments?.filter((c) => !c.parentCommentId) || [];
 
   const handleReplySubmit = async () => {
-    if (replyText.trim() !== "" && replyInputOpen && replyToUserId) {
+    if (replyText.trim() !== "" && replyInputOpen && replyToUserId && user) {
       try {
+        // Optimistic update: Add temporary reply to comments
+        const tempCommentId = `temp-${Date.now()}`;
+        if (setAllPosts) {
+          setAllPosts((prevPosts: IPost[]) =>
+            prevPosts.map((p: IPost) => {
+              if (p._id === post._id) {
+                return {
+                  ...p,
+                  comments: [
+                    ...p.comments,
+                    {
+                      _id: tempCommentId,
+                      userId: {
+                        _id: user._id,
+                        fullName: user.fullName,
+                        username: user.username,
+                        profileImage: user.profileImage,
+                        id: user._id, // Include the id field
+                      },
+                      postId: post._id,
+                      comment: replyText,
+                      createdAt: new Date(),
+                      updatedAt: new Date(),
+                      reactions: [],
+                      parentCommentId: replyInputOpen,
+                      replyTo: replyToUserId,
+                      mentions: [
+                        {
+                          _id: replyToUserId,
+                          fullName: "", // Placeholder; server should populate
+                          username:
+                            replyText.split("@")[1]?.split(" ")[0] || "", 
+                          profileImage: ""
+                        },
+                      ],
+                      replies: [],
+                    } as IComment,
+                  ],
+                };
+              }
+              return p;
+            })
+          );
+        }
         const payload = {
           comment: replyText,
           postId: post._id,
           parentCommentId: replyInputOpen,
           replyTo: replyToUserId,
         };
-        // Optimistic update will handle UI changes automatically
         await replyComment(payload).unwrap();
         setReplyText("");
         setReplyInputOpen(null);
         setReplyToUserId("");
-        toast.success("Reply posted!");
       } catch (error) {
         const err = error as TError;
         toast.error(err?.data?.message || "Something went wrong!");
-        // Optimistic update will automatically revert on error
+        // Revert optimistic update
+        if (setAllPosts) {
+          setAllPosts((prevPosts: IPost[]) =>
+            prevPosts.map((p: IPost) => (p._id === post._id ? post : p))
+          );
+        }
       }
     }
   };
@@ -530,7 +581,6 @@ const PostCommentSection = ({ post, onEdit }: PostCommentSectionProps) => {
     setReplyText(`@${replyToUsername} `);
   };
 
-  // Simplified comment reaction handler - optimistic updates handle UI
   const handleCommentReaction = async (
     postId: string,
     commentId: string,
@@ -542,27 +592,86 @@ const PostCommentSection = ({ post, onEdit }: PostCommentSectionProps) => {
     }
 
     try {
+      if (setAllPosts) {
+        setAllPosts((prevPosts: IPost[]) =>
+          prevPosts.map((p: IPost) => {
+            if (p._id === postId) {
+              return {
+                ...p,
+                comments: p.comments.map((c) => {
+                  if (c._id === commentId) {
+                    const hasReaction = c.reactions.some(
+                      (r) => r.userId?._id === user._id
+                    );
+                    const updatedReactions = hasReaction
+                      ? c.reactions.filter((r) => r.userId?._id !== user._id)
+                      : [
+                          ...c.reactions,
+                          {
+                            userId: {
+                              _id: user._id,
+                              fullName: user.fullName,
+                              username: user.username,
+                              profileImage: user.profileImage,
+                              id: user._id,
+                            },
+                            commentId,
+                            reactionType: reactionType as ReactionType,
+                            createdAt: new Date(),
+                            updatedAt: new Date(),
+                          },
+                        ];
+                    return { ...c, reactions: updatedReactions };
+                  }
+                  return c;
+                }),
+              };
+            }
+            return p;
+          })
+        );
+      }
       const payload = { postId, commentId, reactionType };
-      // Optimistic update will handle UI changes automatically
       await addOrRemoveCommentReaction(payload).unwrap();
     } catch (error) {
       const err = error as TError;
       toast.error(err?.data?.message || "Something went wrong!");
-      // Optimistic update will automatically revert on error
+      // Revert optimistic update
+      if (setAllPosts) {
+        setAllPosts((prevPosts: IPost[]) =>
+          prevPosts.map((p: IPost) => (p._id === post._id ? post : p))
+        );
+      }
     }
   };
 
-  // Simplified delete handler - optimistic updates handle UI
   const handleDeleteComment = async (commentId: string) => {
     try {
+      // Optimistic update: Remove comment
+      if (setAllPosts) {
+        setAllPosts((prevPosts: IPost[]) =>
+          prevPosts.map((p: IPost) => {
+            if (p._id === post._id) {
+              return {
+                ...p,
+                comments: p.comments.filter((c) => c._id !== commentId),
+              };
+            }
+            return p;
+          })
+        );
+      }
       const payload = { commentId, postId: post?._id };
-      // Optimistic update will remove comment from UI immediately
       await deleteComment(payload).unwrap();
-      toast.success("Comment deleted successfully!");
     } catch (error) {
       const err = error as TError;
       toast.error(err?.data?.message || "Something went wrong!");
-      // Optimistic update will automatically revert on error
+      // Revert optimistic update
+      if (setAllPosts) {
+        setAllPosts((prevPosts: IPost[]) =>
+          prevPosts.map((p: IPost) => (p._id === post._id ? post : p))
+        );
+      }
     }
   };
 
@@ -577,26 +686,26 @@ const PostCommentSection = ({ post, onEdit }: PostCommentSectionProps) => {
   return (
     <section className="mt-4">
       <AnimatePresence>
-        {topLevelComments?.map((comment: IComment) => (
-          <div key={comment?._id}>
-            <CommentItem
-              comment={comment}
-              post={post}
-              user={user}
-              currentUserId={currentUserId || ""}
-              level={0}
-              onEdit={onEdit}
-              onReply={handleReply}
-              onReaction={handleCommentReaction}
-              onDelete={handleDeleteComment}
-              onReport={handleReport}
-              replyInputOpen={replyInputOpen}
-              replyText={replyText}
-              setReplyText={setReplyText}
-              onSubmitReply={handleReplySubmit}
-              onCancelReply={handleReplyCancel}
-            />
-          </div>
+        {topLevelComments.map((comment: IComment) => (
+          <CommentItem
+            key={comment?._id}
+            comment={comment}
+            post={post}
+            user={user}
+            currentUserId={currentUserId}
+            level={0}
+            setAllPosts={setAllPosts}
+            onEdit={onEdit}
+            onReply={handleReply}
+            onReaction={handleCommentReaction}
+            onDelete={handleDeleteComment}
+            onReport={handleReport}
+            replyInputOpen={replyInputOpen}
+            replyText={replyText}
+            setReplyText={setReplyText}
+            onSubmitReply={handleReplySubmit}
+            onCancelReply={handleReplyCancel}
+          />
         ))}
       </AnimatePresence>
 

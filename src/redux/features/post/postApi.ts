@@ -132,6 +132,7 @@ const postApi = baseApi.injectEndpoints({
         url: "/posts/reaction",
         method: "POST",
         body: data,
+        
       }),
       invalidatesTags: ["Post"],
     }),
@@ -149,7 +150,6 @@ const postApi = baseApi.injectEndpoints({
         method: "POST",
         body: data,
       }),
-      invalidatesTags: ["Post"],
     }),
     updateComment: builder.mutation({
       query: ({ commentId, postId, comment }) => ({
