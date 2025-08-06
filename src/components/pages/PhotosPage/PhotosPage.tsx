@@ -11,6 +11,7 @@ const PhotosPage = () => {
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
 
+  // API query parameters
   const { data: responseData, isLoading } = useFeedPostsQuery(
     [
       { key: "mediaType", value: "image" },
@@ -33,6 +34,7 @@ const PhotosPage = () => {
     [responseData]
   );
 
+  // Get total number of pages
   const totalPages = responseData?.data?.attributes?.totalPages;
 
   // Add new posts to allPosts when currentPagePosts changes
@@ -130,9 +132,8 @@ const PhotosPage = () => {
   return (
     <section className="w-full space-y-4">
       {allPosts?.map((post) => (
-        <PostCard key={post._id} post={post} />
+        <PostCard key={post._id} post={post} setAllPosts={setAllPosts} />
       ))}
-
       {loading && (
         <div
           className="flex justify-center items-center py-4"
@@ -142,7 +143,6 @@ const PhotosPage = () => {
           <div className="w-8 h-8 border-2 border-primary rounded-full animate-spin"></div>
         </div>
       )}
-
       {hasMore && <div id="sentinel" style={{ height: "1px" }}></div>}
     </section>
   );

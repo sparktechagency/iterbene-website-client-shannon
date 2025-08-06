@@ -33,6 +33,7 @@ const WatchVideo = () => {
     [responseData]
   );
 
+  // Get total number of pages
   const totalPages = responseData?.data?.attributes?.totalPages;
 
   // Add new posts to allPosts when currentPagePosts changes
@@ -107,6 +108,7 @@ const WatchVideo = () => {
     };
   }, [loadMore, loading, hasMore]);
 
+  // Show loading skeleton
   if (isLoading && allPosts?.length === 0) {
     return (
       <div className="w-full text-center py-4">
@@ -128,7 +130,7 @@ const WatchVideo = () => {
   return (
     <section className="w-full space-y-4">
       {allPosts?.map((post) => (
-        <PostCard key={post?._id} post={post} />
+        <PostCard key={post?._id} post={post} setAllPosts={setAllPosts}/>
       ))}
 
       {loading && (

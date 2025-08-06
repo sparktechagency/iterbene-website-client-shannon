@@ -14,6 +14,8 @@ const Posts = () => {
   const [loading, setLoading] = useState(false);
   const observer = useRef<IntersectionObserver | null>(null);
 
+
+  // API query parameters
   const {
     data: responseData,
     isLoading,
@@ -31,6 +33,8 @@ const Posts = () => {
     }
   );
 
+
+  // Get current page posts from RTK Query cache
   const currentPagePosts = useMemo(
     () =>
       Array.isArray(responseData?.data?.attributes?.results)
@@ -39,8 +43,10 @@ const Posts = () => {
     [responseData]
   );
 
+  // total number of pages
   const totalPages = responseData?.data?.attributes?.totalPages;
 
+  // Merge new posts with existing posts
   useEffect(() => {
     if (currentPagePosts?.length > 0) {
       if (currentPage === 1) {
@@ -57,6 +63,7 @@ const Posts = () => {
     }
   }, [currentPagePosts, currentPage]);
 
+  // Update existing posts
   useEffect(() => {
     if (currentPagePosts?.length > 0 && allPosts?.length > 0) {
       setAllPosts((prevPosts) => {
@@ -70,6 +77,8 @@ const Posts = () => {
     }
   }, [allPosts?.length, currentPagePosts]);
 
+
+  // Update loading state
   useEffect(() => {
     if (isLoading) {
       setLoading(true);
@@ -79,12 +88,15 @@ const Posts = () => {
     }
   }, [isLoading, currentPage, totalPages]);
 
+
+  // Load more posts
   const loadMore = useCallback(() => {
     if (!loading && hasMore) {
       setCurrentPage((prev) => prev + 1);
     }
   }, [loading, hasMore]);
 
+  // Observer for infinite scrolling
   const lastPostElementRef = useCallback(
     (node: HTMLDivElement | null) => {
       if (isLoading || isFetching) return;
@@ -101,6 +113,7 @@ const Posts = () => {
     [isLoading, isFetching, hasMore]
   );
 
+  // Observer for infinite scrolling
   useEffect(() => {
     if (!hasMore || loading) return;
 
@@ -121,6 +134,7 @@ const Posts = () => {
     };
   }, [loadMore, loading, hasMore]);
 
+  // Render
   if (isLoading && allPosts?.length === 0) {
     return (
       <div className="w-full text-center py-4">
@@ -131,6 +145,7 @@ const Posts = () => {
     );
   }
 
+  // Render
   if (!isLoading && allPosts?.length === 0 && !hasMore) {
     return (
       <section className="w-full text-center py-4">
