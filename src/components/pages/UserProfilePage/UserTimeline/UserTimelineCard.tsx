@@ -76,6 +76,7 @@ const UserTimelineCard = ({ post, setTimelinePosts }: PostCardProps) => {
     smile: "text-yellow-500",
   };
 
+  // Update sortedReactions
   const updateSortedReactions = (reactions: IReaction[]): ISortedReaction[] => {
     const reactionCounts = reactions.reduce((acc, reaction) => {
       const type = reaction.reactionType;
@@ -88,6 +89,8 @@ const UserTimelineCard = ({ post, setTimelinePosts }: PostCardProps) => {
       count: reactionCounts[type],
     }));
   };
+
+
   // handle reaction function
   const handleReaction = async (reactionType: string) => {
     if (!user) {
@@ -146,13 +149,29 @@ const UserTimelineCard = ({ post, setTimelinePosts }: PostCardProps) => {
     }
   };
 
+  // handle post updated
   const handlePostUpdated = () => {
     setShowPostEditModal(false);
   };
 
+  // handle itinerary
   const handleItineraryClick = async () => {
     try {
       setShowItineraryModal(true);
+      // handle optimistic update
+      if (setTimelinePosts) {
+        setTimelinePosts((prevPosts: IPost[]) =>
+          prevPosts.map((p) => {
+            if (p._id === post._id) {
+              return {
+                ...p,
+                itineraryViewCount: p.itineraryViewCount + 1,
+              };
+            }
+            return p;
+          })
+        );
+      }
       const payload = { postId: post?._id, itineraryId: post?.itinerary?._id };
       await incrementItinerary(payload).unwrap();
     } catch (error) {

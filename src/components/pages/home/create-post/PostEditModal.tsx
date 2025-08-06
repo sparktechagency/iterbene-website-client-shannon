@@ -9,6 +9,7 @@ interface PostEditModalProps {
   onClose: () => void;
   post: IPost;
   onPostUpdated: () => void;
+  setAllPosts?: (posts: IPost[] | ((prev: IPost[]) => IPost[])) => void;
 }
 
 const PostEditModal: React.FC<PostEditModalProps> = ({
@@ -16,6 +17,7 @@ const PostEditModal: React.FC<PostEditModalProps> = ({
   onClose,
   post,
   onPostUpdated,
+  setAllPosts
 }) => {
   const handlePostUpdated = () => {
     onPostUpdated();
@@ -45,6 +47,7 @@ const PostEditModal: React.FC<PostEditModalProps> = ({
         eventId={post?.postType === "Event" ? post?.sourceId : undefined}
         initialPostData={post} 
         onPostCreated={handlePostUpdated} 
+        setAllPosts={setAllPosts}
       />
     </CustomModal>
   );

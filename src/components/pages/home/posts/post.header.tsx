@@ -23,7 +23,11 @@ import Link from "next/link";
 import { openAuthModal } from "@/redux/features/auth/authModalSlice";
 import { useAppDispatch } from "@/redux/hooks";
 import { useDeletePostMutation } from "@/redux/features/post/postApi";
-import { useIsPostSavedQuery, useSavePostMutation, useUnsavePostMutation } from "@/redux/features/savedPost/savedPost.api";
+import {
+  useIsPostSavedQuery,
+  useSavePostMutation,
+  useUnsavePostMutation,
+} from "@/redux/features/savedPost/savedPost.api";
 
 interface PostHeaderProps {
   post: IPost;
@@ -106,12 +110,11 @@ const PostHeader = ({ post, onEditClick, setAllPosts }: PostHeaderProps) => {
       setAllPosts((prevPosts: IPost[]) =>
         prevPosts.filter((p) => p._id !== post._id)
       );
+      toast.success("Post deleted successfully!");
     }
-
     try {
       await deletePost(post._id).unwrap();
       setIsDeletePopupOpen(false);
-      toast.success("Post deleted successfully!");
     } catch (error) {
       const err = error as TError;
       toast.error(err?.data?.message || "Failed to delete post");

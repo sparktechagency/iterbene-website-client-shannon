@@ -58,16 +58,18 @@ interface CreatePostProps {
   postType?: PostType;
   groupId?: string;
   eventId?: string;
-  onPostCreated?: () => void;
   initialPostData?: IPost; // New prop for editing
+  onPostCreated?: () => void;
+  setAllPosts?: (posts: IPost[] | ((prev: IPost[]) => IPost[])) => void;
 }
 
 const CreatePost = ({
   postType = "User",
   groupId,
   eventId,
-  onPostCreated,
   initialPostData,
+  onPostCreated,
+  setAllPosts
 }: CreatePostProps) => {
   const user = useUser();
   // State for post content
@@ -478,8 +480,16 @@ const CreatePost = ({
 
     try {
       if (initialPostData) {
-        await updatePost({ id: initialPostData?._id, data: formData }).unwrap();
+        if(setAllPosts){
+          //optimistic update
+          // if (setAllPosts) {
+          //   setAllPosts((prevPosts: IPost[]) =>
+          //     prevPosts.map((p) => (p._id === initialPostData._id ? formData : p))
+          //   );
+          // }
+        }
         toast.success("Post updated successfully!");
+        await updatePost({ id: initialPostData?._id, data: formData }).unwrap();
       } else {
         await createPost(formData).unwrap();
         toast.success("Post created successfully!");
