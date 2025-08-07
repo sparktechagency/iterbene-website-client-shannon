@@ -684,7 +684,7 @@ const PostCommentSection = ({
   return (
     <section className="mt-4">
       <AnimatePresence>
-        {topLevelComments.map((comment: IComment) => (
+        {topLevelComments?.filter((c)=>c.createdAt).map((comment: IComment) => (
           <CommentItem
             key={comment?._id}
             comment={comment}

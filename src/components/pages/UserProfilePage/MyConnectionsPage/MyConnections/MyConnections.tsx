@@ -5,12 +5,17 @@ import MyConnectionsSkeleton from "./MyConnectionsSkeleton";
 import { IConnection } from "@/types/connection.types";
 import { useGetMyConnectionsQuery } from "@/redux/features/connections/connectionsApi";
 
-const MyConnections = ({ activeTab }: { activeTab: string }) => {
+const MyConnections = ({ 
+  activeTab, 
+  sortBy = "createdAt" 
+}: { 
+  activeTab: string;
+  sortBy?: string;
+}) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [allConnections, setAllConnections] = useState<IConnection[]>([]);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
-  const [sortBy] = useState<string>("createdAt");
 
   // API query parameters
   const queryParams = [
@@ -74,6 +79,13 @@ const MyConnections = ({ activeTab }: { activeTab: string }) => {
       );
     }
   }, [currentPageConnections, allConnections.length]);
+
+  // Reset data when sortBy changes
+  useEffect(() => {
+    setAllConnections([]);
+    setCurrentPage(1);
+    setHasMore(true);
+  }, [sortBy]);
 
   // Update loading and hasMore states
   useEffect(() => {

@@ -6,13 +6,12 @@ import MyRequestConnectionCard from "./MyRequestConnectionCard";
 import MyRequestConnectionSkeleton from "./MyRequestConnectionSkeleton";
 import useUser from "@/hooks/useUser";
 
-const MyRequestConnections = () => {
+const MyRequestConnections = ({ sortBy = "createdAt" }: { sortBy?: string }) => {
   const user = useUser();
   const [currentPage, setCurrentPage] = useState(1);
   const [allRequests, setAllRequests] = useState<IConnectionRequest[]>([]);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
-  const [sortBy] = useState<string>("createdAt");
 
   // API query parameters
   const queryParams = [
@@ -74,6 +73,13 @@ const MyRequestConnections = () => {
       );
     }
   }, [currentPageRequests, allRequests.length]);
+
+  // Reset data when sortBy changes
+  useEffect(() => {
+    setAllRequests([]);
+    setCurrentPage(1);
+    setHasMore(true);
+  }, [sortBy]);
 
   // Update loading and hasMore states
   useEffect(() => {

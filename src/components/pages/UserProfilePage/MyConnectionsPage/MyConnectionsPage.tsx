@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { ChevronDown } from "lucide-react";
 import MyConnections from "./MyConnections/MyConnections";
 import MyRequestConnections from "./MyRequestConnections/MyRequestConnections";
 
@@ -7,6 +8,15 @@ const MyConnectionsPage = () => {
   const [activeTab, setActiveTab] = useState<"myConnections" | "requests">(
     "myConnections"
   );
+  const [sortBy, setSortBy] = useState<string>("createdAt");
+  const [showSortDropdown, setShowSortDropdown] = useState(false);
+
+  const sortOptions = [
+    { value: "createdAt", label: "Recently Added" },
+    { value: "-createdAt", label: "Oldest First" },
+    { value: "fullName", label: "Name (A-Z)" },
+    { value: "-fullName", label: "Name (Z-A)" },
+  ];
 
   // Handle tab change
   const handleTabChange = (tab: "myConnections" | "requests") => {
@@ -37,14 +47,46 @@ const MyConnectionsPage = () => {
             Requests
           </button>
         </div>
+        
+        {/* Sort Dropdown */}
+        <div className="relative">
+          <button
+            onClick={() => setShowSortDropdown(!showSortDropdown)}
+            className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+          >
+            <span className="text-sm font-medium">
+              {sortOptions.find(option => option.value === sortBy)?.label || "Sort by"}
+            </span>
+            <ChevronDown className="w-4 h-4 text-gray-500" />
+          </button>
+          
+          {showSortDropdown && (
+            <div className="absolute top-full right-0 mt-2 w-48 bg-white border border-gray-300 rounded-lg shadow-lg z-10">
+              {sortOptions.map((option) => (
+                <button
+                  key={option.value}
+                  onClick={() => {
+                    setSortBy(option.value);
+                    setShowSortDropdown(false);
+                  }}
+                  className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 first:rounded-t-lg last:rounded-b-lg transition-colors ${
+                    sortBy === option.value ? "bg-primary/10 text-primary font-medium" : "text-gray-700"
+                  }`}
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
       {/* Content */}
       <div className="w-full">
         <div className={activeTab === "myConnections" ? "block" : "hidden"}>
-          <MyConnections activeTab={activeTab} />
+          <MyConnections activeTab={activeTab} sortBy={sortBy} />
         </div>
         <div className={activeTab === "requests" ? "block" : "hidden"}>
-          <MyRequestConnections />
+          <MyRequestConnections sortBy={sortBy} />
         </div>
       </div>
     </section>
