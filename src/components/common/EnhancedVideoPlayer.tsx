@@ -74,9 +74,10 @@ const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = ({
   const handleProgressClick = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
     if (!duration) return;
     
-    const rect = e.currentTarget.getBoundingClientRect();
-    const clickX = e.clientX - rect.left;
-    const percentage = clickX / rect.width;
+    // Use offsetX for better performance and avoid forced reflow
+    const offsetX = e.nativeEvent.offsetX;
+    const width = e.currentTarget.offsetWidth;
+    const percentage = offsetX / width;
     const newTime = percentage * duration;
     seek(newTime);
   }, [duration, seek]);

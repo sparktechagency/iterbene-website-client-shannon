@@ -24,13 +24,10 @@ export const socket = io(socketUrl, {
 
 export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
-    socket.on("connect", () => console.warn("Socket connected"));
-    socket.on("disconnect", (reason) =>
-      console.log(`Socket disconnected: ${reason}`)
-    );
-    socket.on("reconnect_failed", () =>
-      console.log("Socket reconnection failed")
-    );
+    // Remove console logs for production performance
+    socket.on("connect", () => {});
+    socket.on("disconnect", () => {});
+    socket.on("reconnect_failed", () => {});
 
     return () => {
       socket.disconnect();

@@ -3,9 +3,12 @@ import { useFeedPostsQuery } from "@/redux/features/post/postApi";
 import { IPost } from "@/types/post.types";
 import PostCard from "./post-card";
 import PostCardSkeleton from "./PostCardSkeleton";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, memo, lazy, Suspense } from "react";
 import useUser from "@/hooks/useUser";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
+
+// Lazy load PostCard for better performance
+const LazyPostCard = lazy(() => import("./post-card"));
 
 const Posts = () => {
   const user = useUser();
@@ -27,9 +30,10 @@ const Posts = () => {
       ...(user?._id ? [{ key: "userId", value: user._id }] : []),
     ],
     {
-      refetchOnMountOrArgChange: true,
-      refetchOnFocus: true,
+      refetchOnMountOrArgChange: false, // Reduce unnecessary refetches
+      refetchOnFocus: false, // Don't refetch on focus for better performance
       refetchOnReconnect: true,
+      staleTime: 5 * 60 * 1000, // 5 minutes cache
     }
   );
 
@@ -125,12 +129,16 @@ const Posts = () => {
         if (index === allPosts?.length - 1) {
           return (
             <div key={post?._id} ref={lastElementRef}>
-              <PostCard post={post} setAllPosts={setAllPosts} />
+              <Suspense fallback={<PostCardSkeleton />}>
+                <LazyPostCard post={post} setAllPosts={setAllPosts} />
+              </Suspense>
             </div>
           );
         }
         return (
-          <PostCard key={post?._id} post={post} setAllPosts={setAllPosts} />
+          <Suspense key={post?._id} fallback={<PostCardSkeleton />}>
+            <LazyPostCard post={post} setAllPosts={setAllPosts} />
+          </Suspense>
         );
       })}
       {isFetching && hasMore && (
@@ -144,4 +152,4 @@ const Posts = () => {
   );
 };
 
-export default Posts;
+export default memo(Posts);

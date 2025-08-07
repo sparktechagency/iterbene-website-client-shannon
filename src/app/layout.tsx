@@ -12,12 +12,19 @@ import { BrowserExtensionSafe } from "@/utils/hydrationUtils";
 const inter = Source_Sans_3({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
+  display: 'swap', // Use font-display: swap for better performance
+  preload: true,
 });
 
 export const metadata: Metadata = {
   title: "Iter Bene - Explore New Destinations",
   description:
     "Connect with travelers, share your adventures, and explore new destinations on Iter Bene.",
+  viewport: "width=device-width, initial-scale=1, viewport-fit=cover",
+  themeColor: "#40E0D0",
+  other: {
+    "X-UA-Compatible": "IE=edge",
+  },
 };
 
 export default function RootLayout({
