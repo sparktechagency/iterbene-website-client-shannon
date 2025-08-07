@@ -163,21 +163,13 @@ const ReplyInput = ({
               className="w-full px-4 py-2 bg-transparent text-sm text-gray-800 placeholder-gray-500 focus:outline-none resize-none rounded-xl"
             />
             <div className="flex items-center justify-between gap-3 px-4 pb-2">
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={onCancel}
-                  className="text-gray-500 hover:text-gray-700 text-sm font-medium cursor-pointer"
-                >
-                  Cancel
-                </button>
-              </div>
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-                  className="text-gray-500 hover:text-gray-700 cursor-pointer"
-                >
-                  <Smile size={18} />
-                </button>
+              <button
+                onClick={onCancel}
+                className="text-gray-500 hover:text-gray-700 text-sm font-medium cursor-pointer"
+              >
+                Cancel
+              </button>
+              <div className="flex items-center gap-3">
                 <button
                   onClick={onSubmit}
                   disabled={!replyText.trim()}
@@ -188,6 +180,12 @@ const ReplyInput = ({
                   }`}
                 >
                   <Send size={18} />
+                </button>
+                <button
+                  onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+                  className="text-gray-500 hover:text-gray-700 cursor-pointer"
+                >
+                  <Smile size={18} />
                 </button>
               </div>
             </div>
@@ -525,8 +523,8 @@ const PostCommentSection = ({
                           _id: replyToUserId,
                           fullName: "", // Placeholder; server should populate
                           username:
-                            replyText.split("@")[1]?.split(" ")[0] || "", 
-                          profileImage: ""
+                            replyText.split("@")[1]?.split(" ")[0] || "",
+                          profileImage: "",
                         },
                       ],
                       replies: [],

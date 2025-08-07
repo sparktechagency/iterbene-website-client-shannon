@@ -1,6 +1,6 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
-import { Loader2, Send, Smile } from "lucide-react";
+import {  Send, Smile } from "lucide-react";
 import Image from "next/image";
 import CustomEmojiPicker from "@/components/ui/CustomEmojiPicker";
 import {
@@ -38,8 +38,8 @@ const PostCommentInput = ({
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const [createComment, { isLoading: isCreating }] = useCreateCommentMutation();
-  const [updateComment, { isLoading: isUpdating }] = useUpdateCommentMutation();
+  const [createComment] = useCreateCommentMutation();
+  const [updateComment] = useUpdateCommentMutation();
 
   const dispatch = useAppDispatch();
 
@@ -264,27 +264,9 @@ const PostCommentInput = ({
               style={{ minHeight: "20px", height: "auto" }}
             />
           )}
-          <div className="flex items-end gap-4 -mt-3 pb-4 pr-4">
+          <div className="w-full gap-4 -mt-3 p-3">
             {newComment ? (
-              <>
-                {isCreating || isUpdating ? (
-                  <div className="flex items-center justify-center">
-                    <Loader2 className="animate-spin text-primary" size={26} />
-                  </div>
-                ) : (
-                  <button
-                    onClick={handleCommentSubmit}
-                    className="text-gray-500 hover:text-primary cursor-pointer"
-                  >
-                    <Send size={20} />
-                  </button>
-                )}
-                <button
-                  onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-                  className="text-gray-500 hover:text-gray-700 cursor-pointer"
-                >
-                  <Smile size={20} />
-                </button>
+              <div className={`flex ${editCommentId ? "justify-between" : "justify-end"} items-center gap-4 `}>
                 {editCommentId && (
                   <button
                     onClick={handleCancelEdit}
@@ -293,14 +275,30 @@ const PostCommentInput = ({
                     Cancel
                   </button>
                 )}
-              </>
+                <div className="flex gap-3">
+                  <button
+                    onClick={handleCommentSubmit}
+                    className="text-gray-500 hover:text-primary cursor-pointer"
+                  >
+                    <Send size={20} />
+                  </button>
+                  <button
+                    onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+                    className="text-gray-500 hover:text-gray-700 cursor-pointer"
+                  >
+                    <Smile size={20} />
+                  </button>
+                </div>
+              </div>
             ) : (
-              <button
-                onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-                className="text-gray-500 hover:text-gray-700 cursor-pointer"
-              >
-                <Smile size={24} />
-              </button>
+              <div className="w-full flex justify-end mt-3">
+                <button
+                  onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+                  className="text-gray-500 hover:text-gray-700 cursor-pointer"
+                >
+                  <Smile size={24} />
+                </button>
+              </div>
             )}
           </div>
           {/* Emoji Picker */}
