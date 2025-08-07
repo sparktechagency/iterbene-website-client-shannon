@@ -366,7 +366,7 @@ const UserTimeline = () => {
           <div className="relative">
             <button
               onClick={() => setShowSortDropdown(!showSortDropdown)}
-              className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:border-primary focus:border-primary transition-colors"
+              className="flex items-center gap-2 px-4 cursor-pointer py-2 border border-gray-300 rounded-lg hover:border-primary focus:border-primary transition-colors"
             >
               {sortOptions.find(option => option.value === sortBy)?.label || "Sort By"}
               <ChevronDown className="w-4 h-4" />
@@ -424,7 +424,7 @@ const UserTimeline = () => {
         <div className="relative">
           <button
             onClick={() => setShowSortDropdown(!showSortDropdown)}
-            className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:border-primary focus:border-primary transition-colors"
+            className="flex items-center gap-2 px-4 py-2 border cursor-pointer border-gray-300 rounded-lg hover:border-primary focus:border-primary transition-colors"
           >
             {sortOptions.find(option => option.value === sortBy)?.label || "Sort By"}
             <ChevronDown className="w-4 h-4" />
@@ -435,7 +435,7 @@ const UserTimeline = () => {
                 <button
                   key={option.value}
                   onClick={() => handleSortChange(option.value)}
-                  className={`w-full px-4 py-2 text-left hover:bg-gray-50 first:rounded-t-lg last:rounded-b-lg ${
+                  className={`w-full px-4 py-2 cursor-pointer text-left hover:bg-gray-50 first:rounded-t-lg last:rounded-b-lg ${
                     sortBy === option.value ? "bg-primary/5 text-primary" : ""
                   }`}
                 >

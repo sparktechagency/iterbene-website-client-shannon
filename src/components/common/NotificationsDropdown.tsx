@@ -6,7 +6,7 @@ import {
 import { TError } from "@/types/error";
 import { AnimatePresence, motion } from "framer-motion";
 import Image from "next/image";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import Skeleton from "../custom/custom-skeleton";
 
@@ -26,12 +26,12 @@ interface Notification {
 
 interface DropdownProps {
   isOpen: boolean;
-  setUnviewNotificationCount: React.Dispatch<React.SetStateAction<number>>
+  setUnviewNotificationCount: React.Dispatch<React.SetStateAction<number>>;
 }
 
 const NotificationsDropdown: React.FC<DropdownProps> = ({
   isOpen,
-  setUnviewNotificationCount
+  setUnviewNotificationCount,
 }) => {
   const [allNotifications, setAllNotifications] = useState<Notification[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -41,6 +41,7 @@ const NotificationsDropdown: React.FC<DropdownProps> = ({
   const {
     data: responseData,
     isLoading,
+    isFetching,
     refetch: refetchNotifications,
   } = useGetAllNotificationsQuery(
     [
@@ -53,6 +54,18 @@ const NotificationsDropdown: React.FC<DropdownProps> = ({
   // Mark all as read mutation
   const [viewAllNotifications] = useViewAllNotificationsMutation();
 
+  // Memoize unviewNotificationCount
+  const unviewNotificationCount = useMemo(
+    () => responseData?.data?.attributes?.count || 0,
+    [responseData]
+  );
+
+  // Update parent state with unview count
+  useEffect(() => {
+    setUnviewNotificationCount(unviewNotificationCount);
+  }, [unviewNotificationCount, setUnviewNotificationCount]);
+
+  // Refetch notifications when dropdown opens
   useEffect(() => {
     if (isOpen) {
       refetchNotifications();
@@ -65,15 +78,17 @@ const NotificationsDropdown: React.FC<DropdownProps> = ({
       if (currentPage === 1) {
         setAllNotifications(responseData.data.attributes.results);
       } else {
-        const existingIds = new Set(allNotifications.map((n) => n._id));
-        const uniqueNewNotifications =
-          responseData.data.attributes.results.filter(
-            (n: Notification) => !existingIds.has(n._id)
-          );
-        setAllNotifications((prev) => [...prev, ...uniqueNewNotifications]);
+        setAllNotifications((prev) => {
+          const existingIds = new Set(prev.map((n) => n._id));
+          const uniqueNewNotifications =
+            responseData.data.attributes.results.filter(
+              (n: Notification) => !existingIds.has(n._id)
+            );
+          return [...prev, ...uniqueNewNotifications];
+        });
       }
     }
-  }, [responseData, currentPage, allNotifications]);
+  }, [responseData, currentPage]);
 
   // Handle click inside dropdown
   useEffect(() => {
@@ -131,8 +146,6 @@ const NotificationsDropdown: React.FC<DropdownProps> = ({
       setCurrentPage((prev) => prev + 1);
     }
   };
-
-  const unviewNotificationCount = responseData?.data?.attributes?.count || 0;
 
   return (
     <AnimatePresence>
@@ -193,14 +206,15 @@ const NotificationsDropdown: React.FC<DropdownProps> = ({
                 <div
                   key={notification?._id}
                   onClick={() => handleNotificationClick(notification)}
+                  onKeyDown={(e) =>
+                    (e.key === "Enter" || e.key === " ") &&
+                    handleNotificationClick(notification)
+                  }
                   className={`text-gray-800 hover:bg-[#ECFCFA] px-4 py-3 rounded-xl flex items-center gap-4 cursor-pointer transition-colors ${
                     !notification.viewStatus ? "bg-[#ECFCFA]" : ""
                   }`}
                   role="button"
                   tabIndex={0}
-                  onKeyPress={(e) =>
-                    e.key === "Enter" && handleNotificationClick(notification)
-                  }
                 >
                   {notification?.image ? (
                     <Image
@@ -238,6 +252,11 @@ const NotificationsDropdown: React.FC<DropdownProps> = ({
               <div className="flex flex-col items-center justify-center py-8 text-gray-500">
                 <div className="text-4xl mb-2">🔔</div>
                 <p className="text-sm">No notifications yet</p>
+              </div>
+            )}
+            {isFetching && !isLoading && (
+              <div className="flex justify-center py-4">
+                <Skeleton width="100px" height="20px" className="rounded" />
               </div>
             )}
           </div>

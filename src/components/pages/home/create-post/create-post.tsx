@@ -560,8 +560,7 @@ const CreatePost = ({
                 placeholder={!post ? config.placeholder : ""}
                 value={post}
                 onChange={postChangeHandler}
-                onFocus={() => setIsTextareaFocused(true)}
-                onBlur={() => setIsTextareaFocused(false)}
+                onFocus={()=>setIsTextareaFocused(true)}
                 className="w-full bg-transparent border-none text-justify mt-4 text-base focus:outline-none placeholder-gray-400 resize-none whitespace-pre-wrap text-transparent caret-black"
                 style={{ caretColor: 'black' }}
               />

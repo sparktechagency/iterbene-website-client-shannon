@@ -108,10 +108,7 @@ const CustomEmojiPicker = memo(
     const getPickerClasses = () => {
       const baseClasses = `
         relative bg-white/95 backdrop-blur-xl border border-gray-200/50 rounded-3xl 
-        shadow-2xl shadow-purple-500/10 overflow-hidden
-      
-        ${className}
-      `;
+        shadow-2xl shadow-purple-500/10 overflow-hidden scrollbar-hide   ${className}`;
       return `${baseClasses} w-96 h-[420px] overflow-y-auto max-w-[calc(100vw-2rem)]`;
     };
 
@@ -202,7 +199,7 @@ const CustomEmojiPicker = memo(
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: index * 0.05 }}
                   onClick={() => scrollToCategory(category.name)}
-                  className={`relative p-1  mx-1 rounded-2xl transition-all duration-300 text-2xl cursor-pointer group hover:scale-125 `}
+                  className={`relative px-0.5 py-1  mx-1 rounded-2xl transition-all duration-300 text-2xl cursor-pointer group hover:scale-125 `}
                 >
                   <span className={`transition-all duration-200 ${
                     activeCategory === category.name ? 'filter drop-shadow-sm' : ''

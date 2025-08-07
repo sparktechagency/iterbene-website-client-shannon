@@ -112,14 +112,14 @@ const UserProfileHeader = ({ userData }: { userData: IUser }) => {
         </div>
         <div className="w-full flex gap-7 justify-end flex-1">
           {isConnected ? (
-            <CustomButton variant="default" className="px-8 py-3">
+            <CustomButton variant="outline" className="px-8 py-3">
               Connected
             </CustomButton>
           ) : isSentConnectionExists ? (
             <CustomButton
               onClick={handleCancelRequest}
               loading={isLoadingCancel}
-              variant="default"
+              variant="outline"
               className="px-8 py-3"
             >
               Cancel Request
