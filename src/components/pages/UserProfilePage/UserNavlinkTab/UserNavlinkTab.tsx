@@ -34,7 +34,7 @@ const UserNavlinkTab = ({ isMyProfile }: { isMyProfile: boolean }) => {
   const activeTabIndex = tabs.findIndex((tab) => tab.path === pathname);
 
   return (
-    <div className="bg-gray-100  border-gray-200 overflow-x-auto scrollbar-thin">
+    <div className="bg-gray-100 border-gray-200 overflow-x-auto scrollbar-thin">
       <nav className="flex space-x-6 px-4 py-2">
         {tabs.map((tab, index) => (
           <div key={tab.name} className="relative">

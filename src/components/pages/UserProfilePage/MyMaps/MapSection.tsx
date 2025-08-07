@@ -131,7 +131,7 @@ const MapSection = ({
         {/* Example: Full screen toggle button */}
         <button
           onClick={handleMapToggle}
-          className="bg-white hover:bg-gray-100 border border-gray-300 rounded-lg p-2 shadow-sm transition-colors"
+          className="bg-white hover:bg-gray-100 border border-gray-300 rounded-lg p-2 shadow-sm transition-colors cursor-pointer"
           aria-label={showFullMap ? "Exit full screen" : "Enter full screen"}
         >
           {showFullMap ? (
@@ -170,7 +170,7 @@ const MapSection = ({
         <GoogleMap
           mapContainerStyle={mapContainerStyle}
           center={defaultCenter}
-          zoom={3}
+          zoom={5}
           options={{
             zoomControl: false,
             streetViewControl: false,
@@ -181,7 +181,7 @@ const MapSection = ({
             keyboardShortcuts: false,
             draggable: true,
             clickableIcons: true,
-            gestureHandling: "greedy",
+            gestureHandling: "auto",
             styles: [
               {
                 featureType: "poi",

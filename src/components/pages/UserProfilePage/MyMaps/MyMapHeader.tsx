@@ -1,15 +1,68 @@
 import React, { useState } from "react";
 import { GoQuestion } from "react-icons/go";
 import { motion, AnimatePresence } from "framer-motion";
+import { Heart, MapPin, Navigation } from "lucide-react";
 
 const MyMapHeader = () => {
   const [showTooltip, setShowTooltip] = useState(false);
 
-  // Tooltip animation variants for smooth scaling
+  // Enhanced tooltip animation variants
   const tooltipVariants = {
-    hidden: { opacity: 0, y: -10, scale: 0.85 }, // Start smaller for scale-in effect
-    visible: { opacity: 1, y: 0, scale: 1 }, // Scale to full size
-    exit: { opacity: 0, y: -10, scale: 0.85 }, // Scale down on exit
+    hidden: {
+      opacity: 0,
+      y: -20,
+      scale: 0.8,
+      rotateX: -15,
+      filter: "blur(8px)",
+    },
+    visible: {
+      opacity: 1,
+      y: 0,
+      scale: 1,
+      rotateX: 0,
+      filter: "blur(0px)",
+      transition: {
+        type: "spring",
+        stiffness: 300,
+        damping: 20,
+        duration: 0.6,
+      },
+    },
+    exit: {
+      opacity: 0,
+      y: -15,
+      scale: 0.85,
+      rotateX: -10,
+      filter: "blur(4px)",
+      transition: {
+        duration: 0.3,
+      },
+    },
+  };
+
+  // Stagger animation for tooltip content
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+        delayChildren: 0.1,
+      },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, x: -20 },
+    visible: {
+      opacity: 1,
+      x: 0,
+      transition: {
+        type: "spring",
+        stiffness: 200,
+        damping: 20,
+      },
+    },
   };
 
   return (
@@ -18,22 +71,20 @@ const MyMapHeader = () => {
         <h1 className="text-xl md:text-2xl font-semibold text-gray-800">
           Travel History
         </h1>
-        
+
         <div className="relative">
           <motion.div
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.95 }}
             transition={{ type: "spring", stiffness: 300, damping: 20 }}
           >
-            <GoQuestion 
-              size={24} 
+            <GoQuestion
+              size={24}
               className="cursor-pointer text-gray-600 hover:text-gray-800 transition-colors"
               onClick={() => setShowTooltip(!showTooltip)}
-              onMouseEnter={() => setShowTooltip(true)}
-              onMouseLeave={() => setShowTooltip(false)}
             />
           </motion.div>
-          
+
           <AnimatePresence>
             {showTooltip && (
               <motion.div
@@ -41,47 +92,83 @@ const MyMapHeader = () => {
                 initial="hidden"
                 animate="visible"
                 exit="exit"
-                transition={{ 
-                  type: "spring", 
-                  stiffness: 300, 
-                  damping: 25, 
+                transition={{
+                  type: "spring",
+                  stiffness: 300,
+                  damping: 25,
                   mass: 0.8, // Slightly lower mass for smoother scaling
-                  duration: 0.3 // Slightly longer for noticeable scale effect
+                  duration: 0.3, // Slightly longer for noticeable scale effect
                 }}
-                className="absolute right-0 top-8 w-80 bg-white border border-gray-200 rounded-lg shadow-lg p-4 z-[9999]"
+                className="absolute right-0 top-8 w-[400px] bg-white border border-gray-200 rounded-lg shadow-lg p-4 z-[9999]"
               >
-                <motion.h3 
-                  className="font-semibold text-gray-900 mb-3"
-                >
+                <motion.h3 className="font-semibold text-gray-900 mb-3">
                   How Map Section Works
                 </motion.h3>
-                
-                <div className="space-y-3 text-sm text-gray-700">
-                  <motion.div
-                  >
-                    <span className="font-medium text-blue-600">📍 Current Location:</span>
-                    <p className="mt-1">Your current location is automatically added to the map by default.</p>
-                  </motion.div>
-                  
-                  <motion.div
-                  >
-                    <span className="font-medium text-green-600">🗺️ Visited Locations:</span>
-                    <p className="mt-1">When you add a visited location to your post, it will automatically appear on the map section.</p>
-                  </motion.div>
-                  
-                  <motion.div
-                  >
-                    <span className="font-medium text-purple-600">🎯 Interested Locations:</span>
-                    <p className="mt-1">When you show interest in an event or accept an event invitation, that location will be added to your map as an interested location.</p>
-                  </motion.div>
-                </div>
-                
-                <motion.div 
-                  className="mt-4 pt-3 border-t border-gray-200"
+
+                {/* Content with stagger animation */}
+                <motion.div
+                  className="w-full space-y-2"
+                  variants={containerVariants}
+                  initial="hidden"
+                  animate="visible"
                 >
-                  <p className="text-xs text-gray-500">
-                    All locations help build your travel history and discover new places to explore!
-                  </p>
+                  {/* Current Location */}
+                  <motion.div
+                    className="flex items-start space-x-4 p-4 rounded-xl bg-gradient-to-r from-green-50 to-emerald-50 border border-green-100"
+                    variants={itemVariants}
+                  >
+                    <div className="p-2 rounded-full bg-green-500 text-white flex-shrink-0">
+                      <MapPin size={16} />
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-green-800 mb-1">
+                        📍 Current Location
+                      </h4>
+                      <p className="text-sm text-green-700">
+                        Your current location is automatically added to the map
+                        by default.
+                      </p>
+                    </div>
+                  </motion.div>
+
+                  {/* Visited Locations */}
+                  <motion.div
+                    className="flex items-start space-x-4 p-4 rounded-xl bg-gradient-to-r from-blue-50 to-cyan-50 border border-blue-100"
+                    variants={itemVariants}
+                  >
+                    <div className="p-2 rounded-full bg-blue-500 text-white flex-shrink-0">
+                      <Navigation size={16} />
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-blue-800 mb-1">
+                        🗺️ Visited Locations
+                      </h4>
+                      <p className="text-sm text-blue-700">
+                        When you add a visited location to your post, it will
+                        automatically appear on the map section.
+                      </p>
+                    </div>
+                  </motion.div>
+
+                  {/* Interested Locations */}
+                  <motion.div
+                    className="flex items-start space-x-4 p-4 rounded-xl bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-100"
+                    variants={itemVariants}
+                  >
+                    <div className="p-2 rounded-full bg-purple-500 text-white flex-shrink-0">
+                      <Heart size={16} />
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-purple-800 mb-1">
+                        🎯 Interested Locations
+                      </h4>
+                      <p className="text-sm text-purple-700">
+                        When you show interest in an event or accept an event
+                        invitation, that location will be added to your map as
+                        an interested location.
+                      </p>
+                    </div>
+                  </motion.div>
                 </motion.div>
               </motion.div>
             )}

@@ -53,6 +53,37 @@ interface CommentItemProps {
   onCancelReply: () => void;
 }
 
+// Get the latest time among the comment itself and all its replies
+const getLatestCommentTime = (
+  comment: IComment,
+  allComments: IComment[]
+): Date => {
+  // Get all replies to this comment
+  const replies = allComments.filter((c) => c.parentCommentId === comment._id);
+
+  // Get the latest time among the comment itself and all its replies
+  const allTimes = [
+    new Date(comment.createdAt),
+    ...replies.map((reply) => getLatestCommentTime(reply, allComments)),
+  ];
+
+  return new Date(Math.max(...allTimes.map((date) => date.getTime())));
+};
+
+// Sort comments by latest activity
+const sortCommentsByLatestActivity = (
+  comments: IComment[],
+  allComments: IComment[]
+): IComment[] => {
+  return comments
+    .map((comment) => ({
+      comment,
+      latestTime: getLatestCommentTime(comment, allComments),
+    }))
+    .sort((a, b) => b.latestTime.getTime() - a.latestTime.getTime())
+    .map((item) => item.comment);
+};
+
 const ReplyInput = ({
   isOpen,
   replyText,
@@ -235,10 +266,14 @@ const CommentItem = ({
     (r) => r?.userId?._id === user?._id
   );
 
-  const directReplies =
+  // Sort replies by creation time (most recent first)
+  const directReplies = (
     post?.comments?.filter(
       (c) => c?.parentCommentId?.toString() === comment?._id.toString()
-    ) || [];
+    ) || []
+  ).sort(
+    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+  );
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -486,8 +521,13 @@ const PostCommentSection = ({
   const [addOrRemoveCommentReaction] = useAddOrRemoveCommentReactionMutation();
   const [deleteComment] = useDeleteCommentMutation();
 
+  // Filter and sort top-level comments by latest activity
   const topLevelComments =
     post?.comments?.filter((c) => !c.parentCommentId) || [];
+  const sortedTopLevelComments = sortCommentsByLatestActivity(
+    topLevelComments.filter((c) => c.createdAt),
+    post?.comments || []
+  );
 
   const handleReplySubmit = async () => {
     if (replyText.trim() !== "" && replyInputOpen && replyToUserId && user) {
@@ -684,7 +724,7 @@ const PostCommentSection = ({
   return (
     <section className="mt-4">
       <AnimatePresence>
-        {topLevelComments?.filter((c)=>c.createdAt).map((comment: IComment) => (
+        {sortedTopLevelComments?.map((comment: IComment) => (
           <CommentItem
             key={comment?._id}
             comment={comment}

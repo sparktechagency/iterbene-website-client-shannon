@@ -14,7 +14,7 @@ const eventValidationSchema = z.object({
     required_error: "End date is required",
     invalid_type_error: "End date must be a valid date",
   }),
-  eventCost: z.number({
+  eventCost: z.string({
     required_error: "Event cost is required",
     invalid_type_error: "Event cost must be a number",
   }).min(0, {
