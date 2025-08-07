@@ -7,6 +7,7 @@ import { Toaster } from "react-hot-toast";
 import { Providers } from "@/components/providers";
 import UserVerificationWrapper from "@/components/common/UserVerificationWrapper";
 import AuthModalWrapper from "@/components/common/AuthModalWrapper";
+import { BrowserExtensionSafe } from "@/utils/hydrationUtils";
 
 const inter = Source_Sans_3({
   subsets: ["latin"],
@@ -27,22 +28,24 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter?.className}>
-        <AntdRegistry>
-          <ConfigProvider
-            theme={{
-              token: {
-                colorPrimary: "#40E0D0",
-              },
-            }}
-          >
-            <Providers>
-              <UserVerificationWrapper />
-              <AuthModalWrapper />
-              {children}
-              <Toaster position="top-center" />
-            </Providers>
-          </ConfigProvider>
-        </AntdRegistry>
+        <BrowserExtensionSafe>
+          <AntdRegistry>
+            <ConfigProvider
+              theme={{
+                token: {
+                  colorPrimary: "#40E0D0",
+                },
+              }}
+            >
+              <Providers>
+                <UserVerificationWrapper />
+                <AuthModalWrapper />
+                {children}
+                <Toaster position="top-center" />
+              </Providers>
+            </ConfigProvider>
+          </AntdRegistry>
+        </BrowserExtensionSafe>
       </body>
     </html>
   );

@@ -224,6 +224,55 @@ const ImprovedUserProfilePage = () => {
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 initial={false}
-                animate={{\n                  boxShadow: activeTab === tab.key ? \n                    \"0 4px 12px rgba(0,0,0,0.1)\" : \n                    \"0 0px 0px rgba(0,0,0,0)\"\n                }}
+                animate={{
+                  boxShadow: activeTab === tab.key ? 
+                    "0 4px 12px rgba(0,0,0,0.1)" : 
+                    "0 0px 0px rgba(0,0,0,0)"
+                }}
               >
-                <span className="text-lg">{tab.icon}</span>\n                <span>{tab.name}</span>\n                \n                {/* Loading indicator */}\n                {loadedTabs.has(tab.key) && activeTab !== tab.key && (\n                  <motion.div\n                    className="absolute -top-1 -right-1 w-2 h-2 bg-green-400 rounded-full"\n                    initial={{ scale: 0 }}\n                    animate={{ scale: 1 }}\n                    transition={{ delay: 0.2 }}\n                  />\n                )}\n                \n                {/* Active indicator */}\n                {activeTab === tab.key && (\n                  <motion.div\n                    layoutId="activeTabBg"\n                    className="absolute inset-0 bg-primary rounded-lg -z-10"\n                    initial={false}\n                    transition={{ type: "spring", stiffness: 300, damping: 30 }}\n                  />\n                )}\n              </motion.button>\n            ))}\n          </nav>\n        </div>\n\n        {/* Optimized Tab Content with AnimatePresence */}\n        <AnimatePresence mode="wait">\n          <motion.div\n            key={activeTab}\n            initial={{ opacity: 0, y: 20 }}\n            animate={{ opacity: 1, y: 0 }}\n            exit={{ opacity: 0, y: -20 }}\n            transition={{ duration: 0.2 }}\n            className="min-h-[500px]"\n          >\n            {renderTabContent}\n          </motion.div>\n        </AnimatePresence>\n      </div>\n    </section>\n  );\n};\n\nexport default ImprovedUserProfilePage;
+                <span className="text-lg">{tab.icon}</span>
+                <span>{tab.name}</span>
+                
+                {/* Loading indicator */}
+                {loadedTabs.has(tab.key) && activeTab !== tab.key && (
+                  <motion.div
+                    className="absolute -top-1 -right-1 w-2 h-2 bg-green-400 rounded-full"
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ delay: 0.2 }}
+                  />
+                )}
+                
+                {/* Active indicator */}
+                {activeTab === tab.key && (
+                  <motion.div
+                    layoutId="activeTabBg"
+                    className="absolute inset-0 bg-primary rounded-lg -z-10"
+                    initial={false}
+                    transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                  />
+                )}
+              </motion.button>
+            ))}
+          </nav>
+        </div>
+
+        {/* Optimized Tab Content with AnimatePresence */}
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={activeTab}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.2 }}
+            className="min-h-[500px]"
+          >
+            {renderTabContent}
+          </motion.div>
+        </AnimatePresence>
+      </div>
+    </section>
+  );
+};
+
+export default ImprovedUserProfilePage;

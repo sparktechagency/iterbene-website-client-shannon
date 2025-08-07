@@ -2,6 +2,15 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   /* config options here */
+  // Suppress antd React 19 compatibility warnings
+  webpack: (config) => {
+    config.ignoreWarnings = [
+      { module: /node_modules\/@ant-design/ },
+      { module: /node_modules\/antd/ },
+      /warning.*antd.*compatible/i,
+    ];
+    return config;
+  },
   redirects: async () => [
     {
       source: "/",
