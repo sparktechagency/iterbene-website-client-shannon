@@ -117,7 +117,7 @@ const Register = () => {
                     htmlFor="remember"
                     className="ml-2 block text-sm md:text-[16px]"
                   >
-                    I agree to all terms & conditions.
+                    I agree to the <Link href="/terms-and-conditions" className="text-primary hover:underline">Terms & Conditions</Link>
                   </label>
                 </div>
               </div>

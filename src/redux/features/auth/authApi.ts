@@ -31,11 +31,10 @@ const authApi = baseApi.injectEndpoints({
       }),
     }),
     resendOtp: builder.mutation({
-      query: (email: string) => {
+      query: () => {
         return {
           url: "/auth/resend-otp",
           method: "POST",
-          body: { email },
         };
       },
     }),
@@ -61,6 +60,7 @@ export const {
   useRegisterMutation,
   useForgotPasswordMutation,
   useVerifyEmailMutation,
+  useResendOtpMutation,
   useResetPasswordMutation,
   useChangePasswordMutation,
 } = authApi;

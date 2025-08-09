@@ -6,8 +6,6 @@ import CustomInput from "@/components/custom/custom-input";
 import CustomSelectField from "@/components/custom/custom-seletectField";
 import CustomButton from "@/components/custom/custom-button";
 import { useUpdateProfileMutation } from "@/redux/features/profile/profileApi";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { editProfileValidationSchema } from "@/validation/user.validation";
 import { FieldValues } from "react-hook-form";
 import toast from "react-hot-toast";
 import { X } from "lucide-react";
@@ -35,7 +33,7 @@ const FirstTimeUserModal = ({ isOpen, onClose }: FirstTimeUserModalProps) => {
     try {
       const res = await updateProfile(values).unwrap();
       toast.success(res?.message || "Profile completed successfully!");
-      
+
       // Mark user as having completed profile
       setBooleanCookie(COOKIE_NAMES.PROFILE_COMPLETED, true);
       // Remove first-time user flag
@@ -67,7 +65,7 @@ const FirstTimeUserModal = ({ isOpen, onClose }: FirstTimeUserModalProps) => {
     referredAs: userData?.referredAs || "",
     ageRange: userData?.ageRange || "",
     profession: userData?.profession || "",
-    maritalStatus: userData?.maritalStatus || ""
+    maritalStatus: userData?.maritalStatus || "",
   };
 
   return (
@@ -112,7 +110,8 @@ const FirstTimeUserModal = ({ isOpen, onClose }: FirstTimeUserModalProps) => {
                   Complete Your Profile
                 </h1>
                 <p className="text-gray-600 text-sm md:text-base">
-                  Please fill out your information to get the best travel experience, just like Facebook!
+                  Please fill out your information to get the best travel
+                  experience, just like Facebook!
                 </p>
               </motion.div>
 
@@ -124,9 +123,8 @@ const FirstTimeUserModal = ({ isOpen, onClose }: FirstTimeUserModalProps) => {
                 <CustomForm
                   onSubmit={handleProfileCompletion}
                   defaultValues={defaultValues}
-                  resolver={zodResolver(editProfileValidationSchema)}
                 >
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <CustomInput
                       type="text"
                       required
@@ -134,6 +132,7 @@ const FirstTimeUserModal = ({ isOpen, onClose }: FirstTimeUserModalProps) => {
                       placeholder="Enter your full name"
                       label="Full Name"
                     />
+                
                     <CustomInput
                       type="text"
                       required
@@ -141,28 +140,62 @@ const FirstTimeUserModal = ({ isOpen, onClose }: FirstTimeUserModalProps) => {
                       placeholder="Enter your phone number"
                       label="Phone Number"
                     />
+                  
                     <CustomSelectField
                       items={[
-                        { label: "He/Him", value: "He/Him" },
-                        { label: "She/Her", value: "She/Her" },
-                        { label: "They/Them", value: "They/Them" },
-                        { label: "Undisclosed", value: "Undisclosed" },
+                        {
+                          label: "He/Him",
+                          value: "He/Him",
+                        },
+                        {
+                          label: "She/Her",
+                          value: "She/Her",
+                        },
+                        {
+                          label: "They/Them",
+                          value: "They/Them",
+                        },
+                        {
+                          label: "Undisclosed",
+                          value: "Undisclosed",
+                        },
                       ]}
                       name="referredAs"
-                      label="Gender (Referred As)"
+                      label="Referred As"
                       size="md"
                       required
-                      placeholder="Select your gender"
+                      placeholder="How did you know about us"
                     />
                     <CustomSelectField
                       items={[
-                        { label: "13-17", value: "13-17" },
-                        { label: "18-24", value: "18-24" },
-                        { label: "25-34", value: "25-34" },
-                        { label: "35-44", value: "35-44" },
-                        { label: "45-54", value: "45-54" },
-                        { label: "55-64", value: "55-64" },
-                        { label: "65+", value: "65+" },
+                        {
+                          label: "13-17",
+                          value: "13-17",
+                        },
+                        {
+                          label: "18-24",
+                          value: "18-24",
+                        },
+                        {
+                          label: "25-34",
+                          value: "25-34",
+                        },
+                        {
+                          label: "35-44",
+                          value: "35-44",
+                        },
+                        {
+                          label: "45-54",
+                          value: "45-54",
+                        },
+                        {
+                          label: "55-64",
+                          value: "55-64",
+                        },
+                        {
+                          label: "65+",
+                          value: "65+",
+                        },
                       ]}
                       name="ageRange"
                       label="Age Range"
@@ -184,32 +217,28 @@ const FirstTimeUserModal = ({ isOpen, onClose }: FirstTimeUserModalProps) => {
                         { label: "Divorced", value: "Divorced" },
                         { label: "Separated", value: "Separated" },
                         { label: "Widowed", value: "Widowed" },
-                        { label: "In a relationship", value: "In a relationship" },
-                        { label: "It's complicated", value: "It's complicated" },
                       ]}
                       required
                       name="maritalStatus"
                       label="Relationship Status"
                       size="md"
-                      placeholder="What is your relationship status"
+                      placeholder="What is your marital status"
                     />
                   </div>
-
-                  <div className="flex flex-col md:flex-row gap-4">
+                  <div className="mt-6 flex flex-col md:flex-row gap-4">
                     <CustomButton
                       type="button"
                       variant="outline"
-                      onClick={onClose}
-                      className="px-8 py-3"
+                      className="px-9 py-3"
                       fullWidth
                     >
-                      Skip for Now
+                      Skiip for now
                     </CustomButton>
                     <CustomButton
                       loading={isLoading}
                       type="submit"
                       variant="default"
-                      className="px-8 py-3 bg-secondary text-white"
+                      className="px-9 py-3"
                       fullWidth
                     >
                       Complete Profile
@@ -225,7 +254,8 @@ const FirstTimeUserModal = ({ isOpen, onClose }: FirstTimeUserModalProps) => {
                 className="mt-6 text-center"
               >
                 <p className="text-xs text-gray-500">
-                  This information helps us provide better travel recommendations and connect you with like-minded travelers.
+                  This information helps us provide better travel
+                  recommendations and connect you with like-minded travelers.
                 </p>
               </motion.div>
             </div>

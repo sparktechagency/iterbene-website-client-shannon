@@ -7,7 +7,7 @@ import CustomButton from "@/components/custom/custom-button";
 import { useRouter, useSearchParams } from "next/navigation";
 import OTPInput from "react-otp-input";
 import {
-  useForgotPasswordMutation,
+  useResendOtpMutation,
   useVerifyEmailMutation,
 } from "@/redux/features/auth/authApi";
 import { TError } from "@/types/error";
@@ -17,7 +17,6 @@ import { storeTokens } from "@/services/auth.services";
 const VerifyEmail = () => {
   const searchParams = useSearchParams();
   const type = searchParams.get("type");
-  const email = searchParams.get("email");
   const router = useRouter();
   const [oneTimeCode, setOneTimeCode] = useState<string>("");
   const [countdown, setCountdown] = useState<number>(60); // 1 minute = 60 seconds
@@ -27,8 +26,7 @@ const VerifyEmail = () => {
   const [verifyEmail, { isLoading }] = useVerifyEmailMutation();
 
   // resend otp api
-  const [resendOtp, { isLoading: isResendLoading }] =
-    useForgotPasswordMutation();
+  const [resendOtp, { isLoading: isResendLoading }] = useResendOtpMutation();
 
   // Countdown timer effect
   useEffect(() => {
@@ -51,6 +49,7 @@ const VerifyEmail = () => {
   const handleVerifyEmail = async () => {
     try {
       const res = await verifyEmail({ otp: oneTimeCode }).unwrap();
+      console.log("Response:", res);
       storeTokens(
         res?.data?.attributes?.result?.tokens?.accessToken,
         res?.data?.attributes?.result?.tokens?.refreshToken
@@ -72,7 +71,7 @@ const VerifyEmail = () => {
     if (!canResend) return;
 
     try {
-      await resendOtp({email}).unwrap();
+      await resendOtp(undefined).unwrap();
       toast.success("OTP sent successfully!");
       // Reset countdown
       setCountdown(60);
@@ -118,11 +117,25 @@ const VerifyEmail = () => {
             alt="logo"
             width={128}
             height={128}
-            className="ml-2 w-[90px] md:w-[100px] md:h-[90px] xl:w-[128px] xl:h-[115px]"
+            className="ml-2 w-[80px] md:w-[90px] md:h-[90px] xl:w-[100px] xl:h-[90px]"
           />
         </div>
         <div className="w-full space-y-8">
-          <div className="w-full mt-8 space-y-2">
+          {/* OTP Instructions */}
+          <div className="mt-4 text-center">
+            <p className="text-sm ">
+              <strong>
+                We&apos;ve sent a 6-digit verification code to your email address.
+              </strong>
+            </p>
+            <p className="text-xs mt-2">
+              <strong>Didn&apos;t receive the email?</strong> Please check your{" "}
+              <strong>spam/junk folder</strong> as verification emails sometimes
+              end up there.
+            </p>
+          </div>
+
+          <div className="w-full space-y-2">
             <h1 className="text-xl">OTP</h1>
             <OTPInput
               value={oneTimeCode}
@@ -145,7 +158,8 @@ const VerifyEmail = () => {
               }}
             />
           </div>
-          <div className="flex flex-col gap-2 items-center justify-center">
+
+          <div className="flex flex-col gap-3 items-center justify-center">
             <div className="flex gap-1 items-center justify-center">
               <span className="text-sm md:text-[16px] font-medium">
                 Don&apos;t receive OTP?
@@ -162,6 +176,7 @@ const VerifyEmail = () => {
                 {isResendLoading ? "Sending..." : "Resend OTP"}
               </button>
             </div>
+
             {!canResend && (
               <div className="text-sm text-gray-600">
                 Resend available in:{" "}
@@ -170,7 +185,16 @@ const VerifyEmail = () => {
                 </span>
               </div>
             )}
+
+            {/* Additional help text */}
+            <div className="text-center mt-2">
+              <p className="text-xs text-gray-500">
+                Still having trouble? Check your <strong>spam folder</strong> or
+                try resending the code.
+              </p>
+            </div>
           </div>
+
           <CustomButton
             loading={isLoading}
             onClick={handleVerifyEmail}

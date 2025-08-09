@@ -29,7 +29,7 @@ const ForgotPassword = () => {
       //redirect to verify email page
       toast.success(res?.message);
       router.push(
-        `/verify-email?type=forgot-password&email=${values?.email}`
+        `/verify-email?type=forgot-password`
       );
     } catch (error) {
       const err = error as TError;
