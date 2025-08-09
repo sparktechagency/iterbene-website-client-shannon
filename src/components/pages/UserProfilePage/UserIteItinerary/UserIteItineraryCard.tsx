@@ -1,6 +1,9 @@
 "use client";
 import useUser from "@/hooks/useUser";
-import { useAddOrRemoveReactionMutation } from "@/redux/features/post/postApi";
+import {
+  useAddOrRemoveReactionMutation,
+  useIncrementItineraryViewCountMutation,
+} from "@/redux/features/post/postApi";
 import { TError } from "@/types/error";
 import {
   IPost,
@@ -12,32 +15,39 @@ import { Tooltip } from "antd";
 import { AnimatePresence, motion } from "framer-motion";
 import { JSX, useState } from "react";
 import toast from "react-hot-toast";
-import { FaBan, FaHeart, FaRegHeart } from "react-icons/fa";
+import { FaBan, FaCalendarCheck, FaHeart, FaRegHeart } from "react-icons/fa";
 import { FaFaceSmile } from "react-icons/fa6";
 import { MdOutlineLuggage } from "react-icons/md";
 import CustomModal from "@/components/custom/custom-modal";
 import Image from "next/image";
 import { IoMdClose } from "react-icons/io";
 import UserIteItineraryContent from "./UserIteItineraryContent";
-import { CalendarCheck } from "lucide-react";
 import PostHeader from "../../home/posts/post.header";
 import formatPostReactionNumber from "@/utils/formatPostReactionNumber";
 import Link from "next/link";
+import { useAppDispatch } from "@/redux/hooks";
+import { openAuthModal } from "@/redux/features/auth/authModalSlice";
+import ShowItineraryModal from "../../home/create-post/ShowItineraryModal";
+import PostEditModal from "../../home/create-post/PostEditModal";
 
 interface PostCardProps {
   post: IPost;
-  onRemove?: () => void;
+  setTimelinePosts?: (posts: IPost[] | ((prev: IPost[]) => IPost[])) => void;
 }
 
-const UserIteItineraryCard = ({ post }: PostCardProps) => {
+const UserIteItineraryCard = ({ post, setTimelinePosts }: PostCardProps) => {
   const user = useUser();
+  const dispatch = useAppDispatch();
   const currentUserId = user?._id;
   const [showReactions, setShowReactions] = useState<boolean>(false);
   const [showReactionDetails, setShowReactionDetails] =
     useState<boolean>(false);
 
+  const [showItineraryModal, setShowItineraryModal] = useState<boolean>(false);
+  const [showPostEditModal, setShowPostEditModal] = useState<boolean>(false);
+
   // Find the user's reaction, if any
-  const userReaction = post.reactions?.find(
+  const userReaction = post?.reactions?.find(
     (reaction: IReaction) => reaction?.userId?._id === currentUserId
   );
 
@@ -48,6 +58,8 @@ const UserIteItineraryCard = ({ post }: PostCardProps) => {
 
   // Add or remove reactions
   const [addOrRemoveReaction] = useAddOrRemoveReactionMutation();
+  // Itinerary
+  const [incrementItinerary] = useIncrementItineraryViewCountMutation();
 
   // Reaction icon mapping
   const reactionIcons: { [key: string]: JSX.Element } = {
@@ -65,11 +77,103 @@ const UserIteItineraryCard = ({ post }: PostCardProps) => {
     smile: "text-yellow-500",
   };
 
-  const handleReaction = async (reactionType: string) => {
-    try {
-      await addOrRemoveReaction({ postId: post._id, reactionType }).unwrap();
+  // Update sortedReactions
+  const updateSortedReactions = (reactions: IReaction[]): ISortedReaction[] => {
+    const reactionCounts = reactions.reduce((acc, reaction) => {
+      const type = reaction.reactionType;
+      acc[type] = (acc[type] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
 
+    return Object.keys(reactionCounts).map((type) => ({
+      type: type as ReactionType,
+      count: reactionCounts[type],
+    }));
+  };
+
+  // handle reaction function
+  const handleReaction = async (reactionType: string) => {
+    if (!user) {
+      dispatch(openAuthModal());
+      return;
+    }
+
+    try {
+      // Optimistic update: Update reactions and sortedReactions
+      if (setTimelinePosts) {
+        setTimelinePosts((prevPosts: IPost[]) =>
+          prevPosts.map((p) => {
+            if (p._id === post._id) {
+              const hasReaction = p.reactions.some(
+                (r) => r.userId._id === user._id
+              );
+              const updatedReactions = hasReaction
+                ? p.reactions.filter((r) => r.userId._id !== user._id)
+                : [
+                    ...p.reactions,
+                    {
+                      userId: {
+                        _id: user?._id,
+                        fullName: user?.fullName,
+                        username: user?.username,
+                        profileImage: user?.profileImage,
+                        id: user?._id,
+                      },
+                      postId: post._id,
+                      reactionType: reactionType as ReactionType,
+                      createdAt: new Date(),
+                    },
+                  ];
+              return {
+                ...p,
+                reactions: updatedReactions,
+                sortedReactions: updateSortedReactions(updatedReactions),
+              };
+            }
+            return p;
+          })
+        );
+      }
+
+      await addOrRemoveReaction({ postId: post._id, reactionType }).unwrap();
       setShowReactions(false);
+    } catch (error) {
+      const err = error as TError;
+      toast.error(err?.data?.message || "Something went wrong!");
+      // Revert optimistic update
+      if (setTimelinePosts) {
+        setTimelinePosts((prevPosts: IPost[]) =>
+          prevPosts.map((p) => (p?._id === post?._id ? post : p))
+        );
+      }
+    }
+  };
+
+  // handle post updated
+  const handlePostUpdated = () => {
+    setShowPostEditModal(false);
+  };
+
+  // handle itinerary
+  const handleItineraryClick = async () => {
+    try {
+      setShowItineraryModal(true);
+      // handle optimistic update
+      if (setTimelinePosts) {
+        setTimelinePosts((prevPosts: IPost[]) =>
+          prevPosts.map((p) => {
+            if (p._id === post._id) {
+              return {
+                ...p,
+                itineraryViewCount: p.itineraryViewCount + 1,
+              };
+            }
+            return p;
+          })
+        );
+      }
+      const payload = { postId: post?._id, itineraryId: post?.itinerary?._id };
+      await incrementItinerary(payload).unwrap();
     } catch (error) {
       const err = error as TError;
       toast.error(err?.data?.message || "Something went wrong!");
@@ -78,7 +182,11 @@ const UserIteItineraryCard = ({ post }: PostCardProps) => {
 
   return (
     <div className="w-full flex flex-col bg-white rounded-xl p-4 mb-4 relative">
-      <PostHeader post={post}   />
+      <PostHeader
+        post={post}
+        onEditClick={() => setShowPostEditModal(true)}
+        setAllPosts={setTimelinePosts}
+      />
       <p className="text-gray-700 flex-1 mb-3">
         {post?.content?.split(/(\s+)/).map((word, index) => {
           const isHashtag = word.match(/^#\w+/);
@@ -92,8 +200,23 @@ const UserIteItineraryCard = ({ post }: PostCardProps) => {
           );
         })}
       </p>
+
+      {/* Media */}
       <UserIteItineraryContent post={post} />
-      {/* Show reactions summary */}
+
+      {/* Itinerary section */}
+      {post?.itinerary && (
+        <div
+          onClick={handleItineraryClick}
+          className="px-4 py-2 mt-5 border cursor-pointer rounded-full text-gray-600 border-gray-200 flex items-center justify-between text-sm"
+        >
+          <span>Click to view full itinerary</span>
+          <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs">
+            PDF View Available
+          </span>
+        </div>
+      )}
+      {/* Reactions */}
       <div className="mt-5">
         {nonZeroReactions?.length > 0 && (
           <div className="relative mb-2 mt-2">
@@ -101,8 +224,7 @@ const UserIteItineraryCard = ({ post }: PostCardProps) => {
               onClick={() => setShowReactionDetails(true)}
               className="w-fit flex items-center gap-1 cursor-pointer"
             >
-              <div className="flex -space-x-1 cursor-pointer ">
-                {/* Show up to 3 reaction types */}
+              <div className="flex -space-x-1 cursor-pointer">
                 {nonZeroReactions.slice(0, 3).map((reaction) => (
                   <div key={reaction.type}>
                     <span className={`${reactionColors[reaction.type]}`}>
@@ -111,12 +233,10 @@ const UserIteItineraryCard = ({ post }: PostCardProps) => {
                   </div>
                 ))}
               </div>
-              <span className="text-[18px] hover:underline cursor-pointer font-semibold text-gray-500 ">
+              <span className="text-[18px] hover:underline cursor-pointer font-semibold text-gray-500">
                 {formatPostReactionNumber(post?.reactions?.length || 0)}
               </span>
             </div>
-
-            {/* Reaction details popup */}
             <CustomModal
               header={
                 <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 rounded-t-xl">
@@ -137,7 +257,7 @@ const UserIteItineraryCard = ({ post }: PostCardProps) => {
               className="w-full p-2"
             >
               {post?.reactions?.length > 0 && (
-                <div className="w-full space-y-2 ">
+                <div className="w-full space-y-2">
                   {post?.reactions?.map((reaction) => (
                     <div key={reaction.userId._id}>
                       <div className="flex justify-between items-center gap-2 border-b border-gray-200 pb-1">
@@ -149,7 +269,7 @@ const UserIteItineraryCard = ({ post }: PostCardProps) => {
                             height={40}
                             className="size-[40px] rounded-full"
                           />
-                          <div className="flex flex-col  mt-2">
+                          <div className="flex flex-col mt-2">
                             <Link href={`/${reaction?.userId?.username}`}>
                               <h1 className="font-semibold hover:underline">
                                 {reaction?.userId?.fullName}
@@ -175,7 +295,6 @@ const UserIteItineraryCard = ({ post }: PostCardProps) => {
             </CustomModal>
           </div>
         )}
-
         <div className="flex gap-7 items-center border-y border-[#DDDDDD] py-3">
           <div
             className="relative flex items-center"
@@ -198,16 +317,16 @@ const UserIteItineraryCard = ({ post }: PostCardProps) => {
                     {reactionIcons[userReaction.reactionType]}
                   </span>
                   <span
-                    className={`font-semibold capitalize  ${
+                    className={`font-semibold capitalize ${
                       reactionColors[userReaction.reactionType]
                     }`}
                   >
-                    <span> {userReaction.reactionType}</span>
+                    <span>{userReaction.reactionType}</span>
                   </span>
                 </>
               ) : (
                 <div className="flex items-center gap-1">
-                  <FaRegHeart size={23} className=" text-gray-500" />
+                  <FaRegHeart size={23} className="text-gray-500" />
                   <span className="font-semibold text-gray-500">Love</span>
                 </div>
               )}
@@ -219,7 +338,7 @@ const UserIteItineraryCard = ({ post }: PostCardProps) => {
                   animate={{ opacity: 1, y: -9 }}
                   exit={{ opacity: 0, y: 0 }}
                   transition={{ duration: 0.2 }}
-                  className="absolute -top-12 -left-2 bg-white border border-gray-50 rounded-full shadow-lg px-3 py-2 flex space-x-3 z-10"
+                  className="absolute -top-12 -left-2 bg-white border border-gray-200 rounded-full shadow-lg px-3 py-2 flex space-x-3 z-10"
                 >
                   {Object.keys(ReactionType).map((reactionKey) => {
                     const reaction =
@@ -272,7 +391,7 @@ const UserIteItineraryCard = ({ post }: PostCardProps) => {
           </div>
           {post?.itinerary && (
             <div className="flex items-center space-x-2 cursor-pointer">
-              <CalendarCheck className="size-6 text-gray-600" />
+              <FaCalendarCheck className="h-5 w-5 text-primary" />
               <span className="font-semibold">
                 {formatPostReactionNumber(post?.itineraryViewCount)}
               </span>
@@ -280,6 +399,22 @@ const UserIteItineraryCard = ({ post }: PostCardProps) => {
           )}
         </div>
       </div>
+      {post?.itinerary && (
+        <ShowItineraryModal
+          itinerary={post?.itinerary}
+          visible={showItineraryModal}
+          onClose={() => setShowItineraryModal(false)}
+        />
+      )}
+
+      {showPostEditModal && (
+        <PostEditModal
+          isOpen={showPostEditModal}
+          onClose={() => setShowPostEditModal(false)}
+          post={post}
+          onPostUpdated={handlePostUpdated}
+        />
+      )}
     </div>
   );
 };
