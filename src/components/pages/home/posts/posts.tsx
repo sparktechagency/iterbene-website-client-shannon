@@ -1,7 +1,6 @@
 "use client";
 import { useFeedPostsQuery } from "@/redux/features/post/postApi";
 import { IPost } from "@/types/post.types";
-import PostCard from "./post-card";
 import PostCardSkeleton from "./PostCardSkeleton";
 import { useState, useEffect, useMemo, memo, lazy, Suspense } from "react";
 import useUser from "@/hooks/useUser";
@@ -30,10 +29,9 @@ const Posts = () => {
       ...(user?._id ? [{ key: "userId", value: user._id }] : []),
     ],
     {
-      refetchOnMountOrArgChange: false, // Reduce unnecessary refetches
-      refetchOnFocus: false, // Don't refetch on focus for better performance
+      refetchOnMountOrArgChange: true, 
+      refetchOnFocus: true, 
       refetchOnReconnect: true,
-      staleTime: 5 * 60 * 1000, // 5 minutes cache
     }
   );
 

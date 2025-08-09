@@ -1,6 +1,5 @@
 import Cookies from "js-cookie";
 import { jwtDecode } from "jwt-decode";
-import { cookieUtils, COOKIE_NAMES } from "@/utils/cookies";
 
 interface IDecodeData {
   userId: string;
@@ -159,7 +158,7 @@ export const clearTokens = () => {
     localStorage.removeItem("user");
     
     // Clear custom cookies
-    cookieUtils.remove(COOKIE_NAMES.ITER_BENE_VERIFIED);
+    // Note: Custom cookies are now handled by the reactive cookie context
     
     // Clear sessionStorage
     sessionStorage.clear();

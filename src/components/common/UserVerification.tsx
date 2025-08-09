@@ -4,27 +4,32 @@ import logo from "@/asset/logo/logo2.png";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import { cookieUtils, COOKIE_NAMES, migrateFromLocalStorage } from "@/utils/cookies";
+import { useCookies, COOKIE_NAMES, migrateFromLocalStorage } from "@/contexts/CookieContext";
 
 const UserVerification = () => {
   const [isClient, setIsClient] = useState<boolean>(false);
-  const [isVisible, setIsVisible] = useState<boolean>(false);
   const [step, setStep] = useState<number>(1);
   const [errorMessage, setErrorMessage] = useState<string>("");
+  const { getBooleanCookie, setBooleanCookie } = useCookies();
+  
+  // Get verification status reactively from cookies
+  const userVerified = getBooleanCookie(COOKIE_NAMES.ITER_BENE_VERIFIED);
+  const [isVisible, setIsVisible] = useState<boolean>(false);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
       setIsClient(true);
-      
       // Migrate from localStorage to cookies
       migrateFromLocalStorage();
-
-      const userVerified = cookieUtils.getBoolean(COOKIE_NAMES.ITER_BENE_VERIFIED);
-      if (!userVerified) {
-        setIsVisible(true);
-      }
     }
   }, []);
+
+  // Watch for verification status changes
+  useEffect(() => {
+    if (isClient) {
+      setIsVisible(!userVerified);
+    }
+  }, [isClient, userVerified]);
 
   // Separate useEffect to handle body overflow - Simple and Clean approach
   useEffect(() => {
@@ -86,11 +91,8 @@ const UserVerification = () => {
 
   const handleAgeVerify = () => {
     setErrorMessage("");
-    if (typeof window !== "undefined") {
-      cookieUtils.setBoolean(COOKIE_NAMES.ITER_BENE_VERIFIED, true);
-      setIsVisible(false); // This will trigger cleanup in useEffect
-      // Body overflow will be restored automatically by the cleanup function
-    }
+    setBooleanCookie(COOKIE_NAMES.ITER_BENE_VERIFIED, true);
+    // setIsVisible will be automatically updated by the reactive cookie change
   };
 
   const handleLocationReject = () => {

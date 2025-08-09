@@ -14,7 +14,7 @@ import { X } from "lucide-react";
 import Image from "next/image";
 import logo from "@/asset/logo/logo.png";
 import useUser from "@/hooks/useUser";
-import { cookieUtils, COOKIE_NAMES } from "@/utils/cookies";
+import { useCookies, COOKIE_NAMES } from "@/contexts/CookieContext";
 
 interface FirstTimeUserModalProps {
   isOpen: boolean;
@@ -25,6 +25,7 @@ const FirstTimeUserModal = ({ isOpen, onClose }: FirstTimeUserModalProps) => {
   const [isClient, setIsClient] = useState(false);
   const [updateProfile, { isLoading }] = useUpdateProfileMutation();
   const userData = useUser();
+  const { setBooleanCookie, removeCookie } = useCookies();
 
   useEffect(() => {
     setIsClient(true);
@@ -36,9 +37,9 @@ const FirstTimeUserModal = ({ isOpen, onClose }: FirstTimeUserModalProps) => {
       toast.success(res?.message || "Profile completed successfully!");
       
       // Mark user as having completed profile
-      cookieUtils.setBoolean(COOKIE_NAMES.PROFILE_COMPLETED, true);
+      setBooleanCookie(COOKIE_NAMES.PROFILE_COMPLETED, true);
       // Remove first-time user flag
-      cookieUtils.remove(COOKIE_NAMES.IS_FIRST_TIME_USER);
+      removeCookie(COOKIE_NAMES.IS_FIRST_TIME_USER);
       onClose();
     } catch (error) {
       const err = error as Error;

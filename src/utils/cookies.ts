@@ -1,80 +1,49 @@
-import Cookies from "js-cookie";
+// Re-export from the new context for backward compatibility
+export { COOKIE_NAMES, migrateFromLocalStorage } from "@/contexts/CookieContext";
 
-// Cookie names
-export const COOKIE_NAMES = {
-  ITER_BENE_VERIFIED: "iterBeneVerified",
-  LOCATION_PERMISSION_DENIED: "locationPermissionDenied", 
-  LOCATION_PERMISSION_GRANTED: "locationPermissionGranted",
-  PROFILE_COMPLETED: "profileCompleted",
-  USER_LAST_LOCATION: "userLastLocation",
-  IS_FIRST_TIME_USER: "isFirstTimeUser"
-} as const;
-
-// Cookie utilities
+// Backward compatibility - but recommend using useCookies hook instead
 export const cookieUtils = {
-  // Set a cookie with optional expiry (defaults to 30 days)
+  // Note: These are non-reactive versions. Use useCookies() hook for reactive updates
   set: (name: string, value: string, days: number = 30) => {
-    Cookies.set(name, value, { expires: days });
+    console.warn("cookieUtils.set is deprecated. Use useCookies() hook for reactive updates.");
+    document.cookie = `${name}=${value}; expires=${new Date(Date.now() + days * 24 * 60 * 60 * 1000).toUTCString()}; path=/`;
   },
 
-  // Get a cookie value
   get: (name: string): string | undefined => {
-    return Cookies.get(name);
+    console.warn("cookieUtils.get is deprecated. Use useCookies() hook for reactive updates.");
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop()?.split(';').shift();
+    return undefined;
   },
 
-  // Remove a cookie
   remove: (name: string) => {
-    Cookies.remove(name);
+    console.warn("cookieUtils.remove is deprecated. Use useCookies() hook for reactive updates.");
+    document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/`;
   },
 
-  // Check if cookie exists and has specific value
   is: (name: string, value: string): boolean => {
-    return Cookies.get(name) === value;
+    return cookieUtils.get(name) === value;
   },
 
-  // Set boolean cookie
   setBoolean: (name: string, value: boolean, days: number = 30) => {
-    Cookies.set(name, value.toString(), { expires: days });
+    cookieUtils.set(name, value.toString(), days);
   },
 
-  // Get boolean cookie
   getBoolean: (name: string): boolean => {
-    return Cookies.get(name) === "true";
+    return cookieUtils.get(name) === "true";
   },
 
-  // Set object cookie
-  setObject: (name: string, value: any, days: number = 30) => {
-    Cookies.set(name, JSON.stringify(value), { expires: days });
+  setObject: (name: string, value: unknown, days: number = 30) => {
+    cookieUtils.set(name, JSON.stringify(value), days);
   },
 
-  // Get object cookie
-  getObject: (name: string): any => {
-    const value = Cookies.get(name);
+  getObject: (name: string): unknown => {
+    const value = cookieUtils.get(name);
     try {
       return value ? JSON.parse(value) : null;
     } catch {
       return null;
     }
   }
-};
-
-// Migrate from localStorage to cookies
-export const migrateFromLocalStorage = () => {
-  if (typeof window === "undefined") return;
-
-  const migrations = [
-    { localStorage: "iterBeneVerified", cookie: COOKIE_NAMES.ITER_BENE_VERIFIED },
-    { localStorage: "locationPermissionDenied", cookie: COOKIE_NAMES.LOCATION_PERMISSION_DENIED },
-    { localStorage: "locationPermissionGranted", cookie: COOKIE_NAMES.LOCATION_PERMISSION_GRANTED },
-    { localStorage: "profileCompleted", cookie: COOKIE_NAMES.PROFILE_COMPLETED },
-    { localStorage: "userLastLocation", cookie: COOKIE_NAMES.USER_LAST_LOCATION }
-  ];
-
-  migrations.forEach(({ localStorage, cookie }) => {
-    const value = localStorage.getItem ? window.localStorage.getItem(localStorage) : null;
-    if (value) {
-      cookieUtils.set(cookie, value);
-      localStorage.removeItem ? window.localStorage.removeItem(localStorage) : null;
-    }
-  });
 };

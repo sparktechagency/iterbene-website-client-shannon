@@ -1,9 +1,10 @@
 import { useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { cookieUtils, COOKIE_NAMES } from '@/utils/cookies';
+import { useCookies, COOKIE_NAMES } from '@/contexts/CookieContext';
 
 export const useAuth = () => {
   const router = useRouter();
+  const { removeCookie } = useCookies();
 
   const logout = useCallback(() => {
     try {
@@ -18,12 +19,12 @@ export const useAuth = () => {
       sessionStorage.clear();
       
       // Clear custom cookies
-      cookieUtils.remove(COOKIE_NAMES.ITER_BENE_VERIFIED);
-      cookieUtils.remove(COOKIE_NAMES.PROFILE_COMPLETED);
-      cookieUtils.remove(COOKIE_NAMES.IS_FIRST_TIME_USER);
-      cookieUtils.remove(COOKIE_NAMES.LOCATION_PERMISSION_DENIED);
-      cookieUtils.remove(COOKIE_NAMES.LOCATION_PERMISSION_GRANTED);
-      cookieUtils.remove(COOKIE_NAMES.USER_LAST_LOCATION);
+      removeCookie(COOKIE_NAMES.ITER_BENE_VERIFIED);
+      removeCookie(COOKIE_NAMES.PROFILE_COMPLETED);
+      removeCookie(COOKIE_NAMES.IS_FIRST_TIME_USER);
+      removeCookie(COOKIE_NAMES.LOCATION_PERMISSION_DENIED);
+      removeCookie(COOKIE_NAMES.LOCATION_PERMISSION_GRANTED);
+      removeCookie(COOKIE_NAMES.USER_LAST_LOCATION);
       
       // Navigate to home before reload to prevent flash
       router.push('/');
@@ -38,7 +39,7 @@ export const useAuth = () => {
       // Fallback: force reload anyway
       window.location.href = '/';
     }
-  }, [router]);
+  }, [router, removeCookie]);
 
   const isAuthenticated = useCallback(() => {
     if (typeof window === 'undefined') return false;

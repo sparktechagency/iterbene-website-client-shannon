@@ -90,7 +90,6 @@ const UserTimelineCard = ({ post, setTimelinePosts }: PostCardProps) => {
     }));
   };
 
-
   // handle reaction function
   const handleReaction = async (reactionType: string) => {
     if (!user) {

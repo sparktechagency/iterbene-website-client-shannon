@@ -15,12 +15,28 @@ const UserTimelineSkeletonCard = () => {
             </div>
             <div className="flex gap-2">
               <div className="flex gap-2">
-                <Skeleton width="0.9rem" height="0.9rem" className="rounded-full" />
-                <Skeleton width="80px" height="0.9rem" className="rounded-full" />
+                <Skeleton
+                  width="0.9rem"
+                  height="0.9rem"
+                  className="rounded-full"
+                />
+                <Skeleton
+                  width="80px"
+                  height="0.9rem"
+                  className="rounded-full"
+                />
               </div>
               <div className="flex gap-2">
-                <Skeleton width="0.9rem" height="0.9rem" className="rounded-full" />
-                <Skeleton width="80px" height="0.9rem" className="rounded-full" />
+                <Skeleton
+                  width="0.9rem"
+                  height="0.9rem"
+                  className="rounded-full"
+                />
+                <Skeleton
+                  width="80px"
+                  height="0.9rem"
+                  className="rounded-full"
+                />
               </div>
             </div>
           </div>
@@ -28,13 +44,13 @@ const UserTimelineSkeletonCard = () => {
         <Skeleton width="40px" height="0.5rem" />
       </div>
       {/* text content section */}
-      <Skeleton height="0.6rem" className="rounded-full mb-3"/>
+      <Skeleton height="0.6rem" className="rounded-full mb-3" />
       {/* Content section */}
       <Skeleton height="20rem" className="rounded-xl" />
       <div className="border-y border-[#DDDDDD] py-3 mt-5 flex items-center gap-5">
-        <Skeleton width="8%" height="2rem" className="rounded"/>
-        <Skeleton width="8%" height="2rem" className="rounded"/>
-        <Skeleton width="8%" height="2rem" className="rounded"/>
+        <Skeleton width="8%" height="2rem" className="rounded" />
+        <Skeleton width="8%" height="2rem" className="rounded" />
+        <Skeleton width="8%" height="2rem" className="rounded" />
       </div>
     </div>
   );

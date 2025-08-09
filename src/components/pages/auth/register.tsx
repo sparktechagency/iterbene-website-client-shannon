@@ -16,10 +16,11 @@ import { FieldValues } from "react-hook-form";
 import { TError } from "@/types/error";
 import { toast } from "react-hot-toast";
 import { useRouter } from "next/navigation";
-import { cookieUtils, COOKIE_NAMES } from "@/utils/cookies";
+import { useCookies, COOKIE_NAMES } from "@/contexts/CookieContext";
 const Register = () => {
   const [register, { isLoading }] = useRegisterMutation();
   const router = useRouter();
+  const { setBooleanCookie } = useCookies();
   const handleRegister = async (values: FieldValues) => {
     try {
       const res = await register(values).unwrap();
@@ -30,7 +31,7 @@ const Register = () => {
       });
       
       // Mark user as first-time user for profile completion modal
-      cookieUtils.setBoolean(COOKIE_NAMES.IS_FIRST_TIME_USER, true);
+      setBooleanCookie(COOKIE_NAMES.IS_FIRST_TIME_USER, true);
       
       //redirect to verify email page
       router.push("/verify-email");

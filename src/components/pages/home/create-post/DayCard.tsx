@@ -5,7 +5,7 @@ import ActivityCard from "./ActivityCard";
 import CustomInput from "@/components/custom/custom-input";
 import { Control, useFieldArray, useFormContext } from "react-hook-form";
 import LocationSearchInput from "@/components/custom/LocationSearchInput";
-import { LocationDetails } from "@/hooks/useGoogleLocationSearch";
+import { LocationDetails2 } from "@/hooks/useGoogleLocationSearch2";
 
 interface DayCardProps {
   control: Control;
@@ -48,7 +48,7 @@ const DayCard = ({ control }: DayCardProps) => {
   }
 
   // Handle location select for specific day
-  const handleLocationSelect = (location: LocationDetails, dayIndex: number) => {
+  const handleLocationSelect = (location: LocationDetails2, dayIndex: number) => {
     setValue(`days.${dayIndex}.locationName`, location.name);
     setValue(`days.${dayIndex}.location`, {
       latitude: location.latitude,

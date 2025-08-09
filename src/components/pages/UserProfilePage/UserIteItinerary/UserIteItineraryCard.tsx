@@ -78,7 +78,7 @@ const UserIteItineraryCard = ({ post }: PostCardProps) => {
 
   return (
     <div className="w-full flex flex-col bg-white rounded-xl p-4 mb-4 relative">
-      <PostHeader post={post}  />
+      <PostHeader post={post}   />
       <p className="text-gray-700 flex-1 mb-3">
         {post?.content?.split(/(\s+)/).map((word, index) => {
           const isHashtag = word.match(/^#\w+/);

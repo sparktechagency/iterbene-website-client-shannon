@@ -9,7 +9,7 @@ import Image from "next/image";
 import { X } from "lucide-react";
 import logo from "@/asset/logo/logo.png";
 import { useRouter } from "next/navigation";
-import { cookieUtils, COOKIE_NAMES, migrateFromLocalStorage } from "@/utils/cookies";
+import { useCookies, COOKIE_NAMES, migrateFromLocalStorage } from "@/contexts/CookieContext";
 
 const AuthModal = () => {
   const dispatch = useAppDispatch();
@@ -18,8 +18,11 @@ const AuthModal = () => {
   );
   const isAuthenticated = useUser();
   const [isClient, setIsClient] = useState<boolean>(false);
-  const [isVerified, setIsVerified] = useState<boolean>(false);
   const router = useRouter();
+  const { getBooleanCookie } = useCookies();
+  
+  // Get verification status reactively from cookies
+  const isVerified = getBooleanCookie(COOKIE_NAMES.ITER_BENE_VERIFIED);
 
   // Debug logging (can be removed in production)
   useEffect(() => {
@@ -28,14 +31,12 @@ const AuthModal = () => {
     }
   }, [isModalOpen, isAuthenticated, isVerified, isClient]);
 
-  // Check if client-side and UserVerification status
+  // Check if client-side and migration
   useEffect(() => {
     setIsClient(true);
     if (typeof window !== "undefined") {
       // Migrate from localStorage to cookies
       migrateFromLocalStorage();
-      // Check verification status from cookies
-      setIsVerified(cookieUtils.getBoolean(COOKIE_NAMES.ITER_BENE_VERIFIED));
       // Reset modal state on app initialization to avoid hydration issues
       dispatch(closeAuthModal());
     }

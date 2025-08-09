@@ -8,7 +8,7 @@ import toast from "react-hot-toast";
 import { useSetLatestLocationMutation } from "@/redux/features/profile/profileApi";
 import { TError } from "@/types/error";
 import useUser from "@/hooks/useUser";
-import { cookieUtils, COOKIE_NAMES } from "@/utils/cookies";
+import { useCookies, COOKIE_NAMES, migrateFromLocalStorage } from "@/contexts/CookieContext";
 
 interface ILocationData {
   latitude: string;
@@ -31,15 +31,16 @@ const LocationPermission = () => {
     useState<ILocationData | null>(null);
   const [setLatestLocation] = useSetLatestLocationMutation();
   const user = useUser();
+  const { getBooleanCookie, setBooleanCookie, getObjectCookie, setObjectCookie } = useCookies();
 
   // Load previous location from cookies on component mount
   useEffect(() => {
-    const savedLocation = cookieUtils.getObject(COOKIE_NAMES.USER_LAST_LOCATION);
+    const savedLocation = getObjectCookie(COOKIE_NAMES.USER_LAST_LOCATION);
     if (savedLocation) {
       setPreviousLocationData(savedLocation);
       setLocationData(savedLocation);
     }
-  }, []);
+  }, [getObjectCookie]);
 
   // Check if locations are different
   const areLocationsDifferent = useCallback(
@@ -93,11 +94,15 @@ const LocationPermission = () => {
 
   useEffect(() => {
     setMounted(true);
+    if (typeof window !== "undefined") {
+      // Migrate from localStorage to cookies
+      migrateFromLocalStorage();
+    }
 
     // Check if user exists and doesn't have permission stored
     if (user) {
-      const hasPermission = cookieUtils.getBoolean(COOKIE_NAMES.LOCATION_PERMISSION_GRANTED);
-      const hasDeclined = cookieUtils.getBoolean(COOKIE_NAMES.LOCATION_PERMISSION_DENIED);
+      const hasPermission = getBooleanCookie(COOKIE_NAMES.LOCATION_PERMISSION_GRANTED);
+      const hasDeclined = getBooleanCookie(COOKIE_NAMES.LOCATION_PERMISSION_DENIED);
 
       // Only show modal if permission not granted and not previously declined
       if (!hasPermission && !hasDeclined) {
@@ -111,7 +116,7 @@ const LocationPermission = () => {
     }
 
     return () => setMounted(false);
-  }, [user, checkPermissionStatus]);
+  }, [user, checkPermissionStatus, getBooleanCookie]);
 
   useEffect(() => {
     if (isOpen) {
@@ -273,7 +278,7 @@ const LocationPermission = () => {
           setPreviousLocationData(locationPayload);
 
           // Save to cookies for future comparisons
-          cookieUtils.setObject(COOKIE_NAMES.USER_LAST_LOCATION, locationPayload);
+          setObjectCookie(COOKIE_NAMES.USER_LAST_LOCATION, locationPayload);
         } catch (apiError) {
           console.error("API error:", apiError);
           const err = apiError as TError;
@@ -285,7 +290,7 @@ const LocationPermission = () => {
       }
 
       setPermissionStatus("granted");
-      cookieUtils.setBoolean(COOKIE_NAMES.LOCATION_PERMISSION_GRANTED, true);
+      setBooleanCookie(COOKIE_NAMES.LOCATION_PERMISSION_GRANTED, true);
 
       // Close modal after successful location update
       setTimeout(() => {
@@ -330,7 +335,7 @@ const LocationPermission = () => {
     if (isRequesting) return;
 
     setPermissionStatus("denied");
-    cookieUtils.setBoolean(COOKIE_NAMES.LOCATION_PERMISSION_DENIED, true);
+    setBooleanCookie(COOKIE_NAMES.LOCATION_PERMISSION_DENIED, true);
     toast.error(
       "Location permission denied. You can enable it later in settings."
     );

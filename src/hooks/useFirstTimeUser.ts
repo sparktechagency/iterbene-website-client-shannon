@@ -2,13 +2,14 @@
 import { useEffect, useState } from "react";
 import useUser from "./useUser";
 import { usePathname } from "next/navigation";
-import { cookieUtils, COOKIE_NAMES, migrateFromLocalStorage } from "@/utils/cookies";
+import { useCookies, COOKIE_NAMES, migrateFromLocalStorage } from "@/contexts/CookieContext";
 
 const useFirstTimeUser = () => {
   const [showFirstTimeModal, setShowFirstTimeModal] = useState(false);
   const [isClient, setIsClient] = useState(false);
   const userData = useUser();
   const pathname = usePathname();
+  const { getBooleanCookie, setBooleanCookie, removeCookie } = useCookies();
 
   useEffect(() => {
     setIsClient(true);
@@ -33,11 +34,11 @@ const useFirstTimeUser = () => {
     if (isAuthPage || !isFeedOrHomePage) return;
 
     // Check if user is a first-time user (set during registration)
-    const isFirstTimeUser = cookieUtils.getBoolean(COOKIE_NAMES.IS_FIRST_TIME_USER);
+    const isFirstTimeUser = getBooleanCookie(COOKIE_NAMES.IS_FIRST_TIME_USER);
     if (!isFirstTimeUser) return;
 
     // Check if user has already completed profile
-    const hasCompletedProfile = cookieUtils.getBoolean(COOKIE_NAMES.PROFILE_COMPLETED);
+    const hasCompletedProfile = getBooleanCookie(COOKIE_NAMES.PROFILE_COMPLETED);
     if (hasCompletedProfile) return;
 
     // Check if profile is incomplete - user must have all required fields
@@ -58,15 +59,15 @@ const useFirstTimeUser = () => {
       return () => clearTimeout(timer);
     } else {
       // If profile is complete, mark as completed and remove first-time flag
-      cookieUtils.setBoolean(COOKIE_NAMES.PROFILE_COMPLETED, true);
-      cookieUtils.remove(COOKIE_NAMES.IS_FIRST_TIME_USER);
+      setBooleanCookie(COOKIE_NAMES.PROFILE_COMPLETED, true);
+      removeCookie(COOKIE_NAMES.IS_FIRST_TIME_USER);
     }
-  }, [isClient, userData, pathname]);
+  }, [isClient, userData, pathname, getBooleanCookie, setBooleanCookie, removeCookie]);
 
   const closeModal = () => {
     setShowFirstTimeModal(false);
     // If user closes modal without completing, remove first-time user flag to avoid showing again
-    cookieUtils.remove(COOKIE_NAMES.IS_FIRST_TIME_USER);
+    removeCookie(COOKIE_NAMES.IS_FIRST_TIME_USER);
   };
 
   return {
