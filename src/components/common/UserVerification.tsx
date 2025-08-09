@@ -4,6 +4,7 @@ import logo from "@/asset/logo/logo2.png";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { useEffect, useState } from "react";
+import { cookieUtils, COOKIE_NAMES, migrateFromLocalStorage } from "@/utils/cookies";
 
 const UserVerification = () => {
   const [isClient, setIsClient] = useState<boolean>(false);
@@ -14,8 +15,11 @@ const UserVerification = () => {
   useEffect(() => {
     if (typeof window !== "undefined") {
       setIsClient(true);
+      
+      // Migrate from localStorage to cookies
+      migrateFromLocalStorage();
 
-      const userVerified = localStorage.getItem("iterBeneVerified");
+      const userVerified = cookieUtils.getBoolean(COOKIE_NAMES.ITER_BENE_VERIFIED);
       if (!userVerified) {
         setIsVisible(true);
       }
@@ -83,7 +87,7 @@ const UserVerification = () => {
   const handleAgeVerify = () => {
     setErrorMessage("");
     if (typeof window !== "undefined") {
-      localStorage.setItem("iterBeneVerified", "true");
+      cookieUtils.setBoolean(COOKIE_NAMES.ITER_BENE_VERIFIED, true);
       setIsVisible(false); // This will trigger cleanup in useEffect
       // Body overflow will be restored automatically by the cleanup function
     }

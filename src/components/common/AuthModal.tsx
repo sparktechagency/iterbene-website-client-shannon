@@ -9,6 +9,7 @@ import Image from "next/image";
 import { X } from "lucide-react";
 import logo from "@/asset/logo/logo.png";
 import { useRouter } from "next/navigation";
+import { cookieUtils, COOKIE_NAMES, migrateFromLocalStorage } from "@/utils/cookies";
 
 const AuthModal = () => {
   const dispatch = useAppDispatch();
@@ -20,14 +21,25 @@ const AuthModal = () => {
   const [isVerified, setIsVerified] = useState<boolean>(false);
   const router = useRouter();
 
+  // Debug logging (can be removed in production)
+  useEffect(() => {
+    if (isClient) {
+      console.log("AuthModal state:", { isModalOpen, isAuthenticated, isVerified });
+    }
+  }, [isModalOpen, isAuthenticated, isVerified, isClient]);
+
   // Check if client-side and UserVerification status
   useEffect(() => {
     setIsClient(true);
     if (typeof window !== "undefined") {
-      const userVerified = localStorage.getItem("iterBeneVerified");
-      setIsVerified(userVerified === "true");
+      // Migrate from localStorage to cookies
+      migrateFromLocalStorage();
+      // Check verification status from cookies
+      setIsVerified(cookieUtils.getBoolean(COOKIE_NAMES.ITER_BENE_VERIFIED));
+      // Reset modal state on app initialization to avoid hydration issues
+      dispatch(closeAuthModal());
     }
-  }, []);
+  }, [dispatch]);
 
   // Timer for showing modal after 30 seconds if not authenticated and verified
   // useEffect(() => {

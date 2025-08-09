@@ -3,9 +3,12 @@ import { useAddOrRemoveReactionMutation } from "@/redux/features/post/postApi";
 import { IPost, IReaction, ISortedReaction, ReactionType } from "@/types/post.types";
 import { TError } from "@/types/error";
 import toast from "react-hot-toast";
+import { useAppDispatch } from "@/redux/hooks";
+import { openAuthModal } from "@/redux/features/auth/authModalSlice";
 
 export const usePostReactions = (post: IPost, userId?: string) => {
   const [addOrRemoveReaction] = useAddOrRemoveReactionMutation();
+  const dispatch = useAppDispatch();
 
   // Memoized reaction processing
   const processedReactions = useMemo(() => {
@@ -57,8 +60,10 @@ export const usePostReactions = (post: IPost, userId?: string) => {
 
   // Handle reaction toggle
   const handleReactionToggle = useCallback(async (reactionType: ReactionType) => {
+    console.log("handleReactionToggle called:", { userId, reactionType });
     if (!userId) {
-      toast.error("Please login to react");
+      console.log("No userId in usePostReactions, opening auth modal");
+      dispatch(openAuthModal("welcome"));
       return;
     }
 
@@ -73,7 +78,7 @@ export const usePostReactions = (post: IPost, userId?: string) => {
       const err = error as TError;
       toast.error(err?.data?.message || "Something went wrong!");
     }
-  }, [addOrRemoveReaction, post._id, userId]);
+  }, [addOrRemoveReaction, post._id, userId, dispatch]);
 
   return {
     ...processedReactions,

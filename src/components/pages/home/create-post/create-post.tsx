@@ -156,6 +156,7 @@ const CreatePost = ({
   const locationPopupRef = useRef<HTMLDivElement>(null);
   const privacyPopupRef = useRef<HTMLDivElement>(null);
   const swiperRef = useRef<SwiperClass>(null);
+  const createPostRef = useRef<HTMLElement>(null); // Ref for the entire create-post container
 
   // PDF modal
   const [showPdfModal, setShowPdfModal] = useState(false);
@@ -237,23 +238,37 @@ const CreatePost = ({
   // Close popups on outside click
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
+      // Handle location popup
       if (
         locationPopupRef.current &&
         !locationPopupRef.current.contains(event.target as Node)
       ) {
         setShowLocationPopup(false);
       }
+      
+      // Handle privacy popup
       if (
         privacyPopupRef.current &&
         !privacyPopupRef.current.contains(event.target as Node)
       ) {
         setShowPrivacyPopup(false);
       }
+      
+      // Handle hashtag popup
       if (
         hashtagPopupRef.current &&
         !hashtagPopupRef.current.contains(event.target as Node)
       ) {
         setShowHashtagSuggestions(false);
+      }
+      
+      // Handle textarea focus - only unfocus when clicking completely outside the create-post container
+      if (
+        isTextareaFocused &&
+        createPostRef.current &&
+        !createPostRef.current.contains(event.target as Node)
+      ) {
+        setIsTextareaFocused(false);
       }
     };
 
@@ -261,7 +276,7 @@ const CreatePost = ({
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, []);
+  }, [isTextareaFocused]); // Add isTextareaFocused as dependency
 
   // Handle post input change and detect hashtags
   const postChangeHandler = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -529,7 +544,11 @@ const CreatePost = ({
     }
   };
 
-  const handleMapIconClick = () => {
+  const handleMapIconClick = (e?: React.MouseEvent) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
     setShowLocationPopup(true);
     setLocationQuery(defaultLocation);
     searchLocations(defaultLocation); // Trigger search with default value
@@ -541,7 +560,7 @@ const CreatePost = ({
   return (
     <>
       {user && (
-        <section className="w-full bg-white rounded-xl">
+        <section ref={createPostRef} className="w-full bg-white rounded-xl">
           {/* Post Input Section */}
           <div className="w-full flex px-4 pt-4 pb-2 gap-3">
             {user && (
@@ -560,7 +579,7 @@ const CreatePost = ({
                 placeholder={!post ? config.placeholder : ""}
                 value={post}
                 onChange={postChangeHandler}
-                onFocus={()=>setIsTextareaFocused(true)}
+                onFocus={() => setIsTextareaFocused(true)}
                 className="w-full bg-transparent border-none text-justify mt-4 text-base focus:outline-none placeholder-gray-400 resize-none whitespace-pre-wrap text-transparent caret-black"
                 style={{ caretColor: 'black' }}
               />
@@ -833,7 +852,11 @@ const CreatePost = ({
                 {/* Media Upload Icon - Always available */}
                 <Tooltip title="Upload media" placement="bottom">
                   <button
-                    onClick={() => mediaInputRef.current?.click()}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      mediaInputRef.current?.click();
+                    }}
                     className="cursor-pointer"
                   >
                     <ImageIcon
@@ -929,7 +952,11 @@ const CreatePost = ({
                 {(config.showItinerary || initialPostData) && ( // Show itinerary for user/group posts or when editing any post
                   <Tooltip title="Add Itinerary" placement="bottom">
                     <button
-                      onClick={() => setShowPdfModal(true)}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        setShowPdfModal(true);
+                      }}
                       className="cursor-pointer"
                     >
                       <CalendarCheck className="w-6 h-6 text-[#9194A9] hover:text-primary transition-colors" />
@@ -942,7 +969,11 @@ const CreatePost = ({
                   <div className="relative" ref={privacyPopupRef}>
                     <Tooltip title="Set privacy" placement="bottom">
                       <button
-                        onClick={() => setShowPrivacyPopup(true)}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          setShowPrivacyPopup(true);
+                        }}
                         className="cursor-pointer"
                       >
                         <Globe

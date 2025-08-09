@@ -16,6 +16,7 @@ import { FieldValues } from "react-hook-form";
 import { TError } from "@/types/error";
 import { toast } from "react-hot-toast";
 import { useRouter } from "next/navigation";
+import { cookieUtils, COOKIE_NAMES } from "@/utils/cookies";
 const Register = () => {
   const [register, { isLoading }] = useRegisterMutation();
   const router = useRouter();
@@ -27,6 +28,10 @@ const Register = () => {
       Cookies.set("accessToken", accessToken, {
         expires: 7,
       });
+      
+      // Mark user as first-time user for profile completion modal
+      cookieUtils.setBoolean(COOKIE_NAMES.IS_FIRST_TIME_USER, true);
+      
       //redirect to verify email page
       router.push("/verify-email");
       toast.success(res?.message);

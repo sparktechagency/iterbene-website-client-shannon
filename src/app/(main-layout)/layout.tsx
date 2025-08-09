@@ -10,12 +10,16 @@ import UpcomingEvent from "@/components/pages/home/upcoming-event/upcoming-event
 import useUser from "@/hooks/useUser";
 import { usePathname } from "next/navigation";
 import React from "react";
+import FirstTimeUserModal from "@/components/common/FirstTimeUserModal";
+import useFirstTimeUser from "@/hooks/useFirstTimeUser";
 
 const MainLayout = ({ children }: { children: React.ReactNode }) => {
   // Custom hook to get user data
   const user = useUser();
   // Hook to get the current URL path
   const pathname = usePathname();
+  // Hook to manage first-time user modal
+  const { showFirstTimeModal, closeModal } = useFirstTimeUser();
 
   // Memoized function to determine if the third section should be hidden based on the current path.
   // This is used to create more space for content on specific pages.
@@ -74,6 +78,9 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
           </div>
         )}
       </section>
+
+      {/* First Time User Modal */}
+      <FirstTimeUserModal isOpen={showFirstTimeModal} onClose={closeModal} />
     </section>
   );
 };

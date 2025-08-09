@@ -1,5 +1,6 @@
 import { useCallback } from 'react';
 import { useRouter } from 'next/navigation';
+import { cookieUtils, COOKIE_NAMES } from '@/utils/cookies';
 
 export const useAuth = () => {
   const router = useRouter();
@@ -11,11 +12,18 @@ export const useAuth = () => {
       document.cookie = "refreshToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC; SameSite=Lax";
       
       // Clear localStorage
-      localStorage.removeItem('iterBeneVerified');
       localStorage.removeItem('user');
       
       // Clear sessionStorage
       sessionStorage.clear();
+      
+      // Clear custom cookies
+      cookieUtils.remove(COOKIE_NAMES.ITER_BENE_VERIFIED);
+      cookieUtils.remove(COOKIE_NAMES.PROFILE_COMPLETED);
+      cookieUtils.remove(COOKIE_NAMES.IS_FIRST_TIME_USER);
+      cookieUtils.remove(COOKIE_NAMES.LOCATION_PERMISSION_DENIED);
+      cookieUtils.remove(COOKIE_NAMES.LOCATION_PERMISSION_GRANTED);
+      cookieUtils.remove(COOKIE_NAMES.USER_LAST_LOCATION);
       
       // Navigate to home before reload to prevent flash
       router.push('/');

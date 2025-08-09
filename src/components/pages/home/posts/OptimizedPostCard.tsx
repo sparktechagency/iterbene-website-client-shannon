@@ -147,7 +147,9 @@ const OptimizedPostCard: React.FC<PostCardProps> = ({ post, setAllPosts }) => {
   // Memoized handlers
   const handlers = useMemo(() => ({
     handleReactionClick: (reactionType: ReactionType) => {
+      console.log("Reaction clicked:", { user: !!user, reactionType });
       if (!user) {
+        console.log("No user, opening auth modal");
         dispatch(openAuthModal('welcome'));
         return;
       }
