@@ -218,13 +218,14 @@ const Header: React.FC = () => {
       socket.emit("user/connect", { userId: user._id });
 
       // Listen for general notifications
-      const notificationEvent = `notification::${user._id}`;
+      const notificationEvent = `notification::${user?._id}`;
+      console.log("Notification event:", notificationEvent);
       socket.on(notificationEvent, () => {
         setUnviewNotificationCount((prev) => prev + 1);
       });
 
       // Listen for message notifications
-      const messageNotificationEvent = `message-notification::${user._id}`;
+      const messageNotificationEvent = `message-notification::${user?._id}`;
       socket.on(messageNotificationEvent, () => {
         setUnviewMessageCount((prev) => prev + 1);
       });

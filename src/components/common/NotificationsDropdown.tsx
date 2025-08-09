@@ -9,6 +9,8 @@ import Image from "next/image";
 import { useEffect, useMemo, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import Skeleton from "../custom/custom-skeleton";
+import formatTimeAgo from "@/utils/formatTimeAgo";
+import { IoMdNotificationsOutline } from "react-icons/io";
 
 interface Notification {
   _id: string;
@@ -103,21 +105,6 @@ const NotificationsDropdown: React.FC<DropdownProps> = ({
       }
     };
   }, []);
-
-  // Format time difference
-  const formatTimeAgo = (dateString: string): string => {
-    const date = new Date(dateString);
-    const now = new Date();
-    const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
-
-    if (diffInSeconds < 60) return "Just now";
-    if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}m ago`;
-    if (diffInSeconds < 86400)
-      return `${Math.floor(diffInSeconds / 3600)}h ago`;
-    if (diffInSeconds < 604800)
-      return `${Math.floor(diffInSeconds / 86400)}d ago`;
-    return `${Math.floor(diffInSeconds / 604800)}w ago`;
-  };
 
   // Handle notification click
   const handleNotificationClick = (notification: Notification) => {
@@ -250,7 +237,7 @@ const NotificationsDropdown: React.FC<DropdownProps> = ({
               ))
             ) : (
               <div className="flex flex-col items-center justify-center py-8 text-gray-500">
-                <div className="text-4xl mb-2">🔔</div>
+                <IoMdNotificationsOutline className="w-8 h-8" />
                 <p className="text-sm">No notifications yet</p>
               </div>
             )}

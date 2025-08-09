@@ -53,14 +53,6 @@ const authApi = baseApi.injectEndpoints({
         body: changePasswordData,
       }),
     }),
-    completeProfile: builder.mutation({
-      query: (profileData) => ({
-        url: "/auth/complete-profile",
-        method: "POST",
-        body: profileData,
-      }),
-      invalidatesTags: ["Profile"],
-    }),
   }),
 });
 
@@ -71,5 +63,4 @@ export const {
   useVerifyEmailMutation,
   useResetPasswordMutation,
   useChangePasswordMutation,
-  useCompleteProfileMutation,
 } = authApi;

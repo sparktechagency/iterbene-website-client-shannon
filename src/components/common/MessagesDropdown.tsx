@@ -10,6 +10,8 @@ import { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import Skeleton from "../custom/custom-skeleton";
 import { useRouter } from "next/navigation";
+import formatTimeAgo from "@/utils/formatTimeAgo";
+import { IoMdNotificationsOutline } from "react-icons/io";
 
 interface Notification {
   _id: string;
@@ -91,21 +93,6 @@ const MessagesDropdown: React.FC<DropdownProps> = ({
     };
   }, []);
 
-  // Format time difference
-  const formatTimeAgo = (dateString: string): string => {
-    const date = new Date(dateString);
-    const now = new Date();
-    const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
-
-    if (diffInSeconds < 60) return "Just now";
-    if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}m ago`;
-    if (diffInSeconds < 86400)
-      return `${Math.floor(diffInSeconds / 3600)}h ago`;
-    if (diffInSeconds < 604800)
-      return `${Math.floor(diffInSeconds / 86400)}d ago`;
-    return `${Math.floor(diffInSeconds / 604800)}w ago`;
-  };
-
   // Handle notification click
   const handleNotificationClick = (notification: Notification) => {
     if (notification.type === "message") {
@@ -152,7 +139,7 @@ const MessagesDropdown: React.FC<DropdownProps> = ({
           aria-label="Notifications dropdown"
         >
           <div className="flex justify-between items-center mb-5">
-            <h3 className="font-semibold text-lg">Message Notifications</h3>
+            <h3 className="font-semibold text-lg">Messages</h3>
             {unviewNotificationCount > 0 && (
               <button
                 onClick={handleMarkAllAsRead}
@@ -222,7 +209,7 @@ const MessagesDropdown: React.FC<DropdownProps> = ({
                   <div className="flex-1 min-w-0">
                     <p
                       className={`truncate ${
-                        !notification.viewStatus
+                        !notification?.viewStatus
                           ? "font-semibold"
                           : "font-medium"
                       }`}
@@ -230,18 +217,18 @@ const MessagesDropdown: React.FC<DropdownProps> = ({
                       {notification.title}
                     </p>
                     <p className="text-sm text-gray-500">
-                      {formatTimeAgo(notification.createdAt)}
+                      {formatTimeAgo(notification?.createdAt)}
                     </p>
                   </div>
-                  {!notification.viewStatus && (
+                  {!notification?.viewStatus && (
                     <span className="w-3 h-3 bg-primary rounded-full block" />
                   )}
                 </div>
               ))
             ) : (
               <div className="flex flex-col items-center justify-center py-8 text-gray-500">
-                <div className="text-4xl mb-2">🔔</div>
-                <p className="text-sm">No notifications yet</p>
+                <IoMdNotificationsOutline className="w-8 h-8" />
+                <p className="text-sm">No messages yet</p>
               </div>
             )}
           </div>
@@ -255,7 +242,7 @@ const MessagesDropdown: React.FC<DropdownProps> = ({
                   className="text-primary text-sm cursor-pointer hover:underline"
                   aria-label="View more notifications"
                 >
-                  View all notifications
+                  View all messages
                 </button>
               </div>
             )}

@@ -44,6 +44,22 @@ const MediaUpload: React.FC<MediaUploadProps> = ({
 
   const allMediaPreviews = [...existingMedia, ...mediaPreviews];
 
+  // Get video duration helper
+  const getVideoDuration = useCallback((file: File): Promise<number> => {
+    return new Promise((resolve) => {
+      const video = document.createElement("video");
+      video.preload = "metadata";
+      video.onloadedmetadata = () => {
+        window.URL.revokeObjectURL(video.src);
+        resolve(video.duration);
+      };
+      video.onerror = () => {
+        resolve(0); // If we can't get duration, assume it's valid
+      };
+      video.src = URL.createObjectURL(file);
+    });
+  }, []);
+
   // Validate file function
   const validateFile = useCallback(async (file: File): Promise<boolean> => {
     const isImage = file.type.startsWith("image/");
@@ -76,23 +92,7 @@ const MediaUpload: React.FC<MediaUploadProps> = ({
     }
 
     return true;
-  }, [maxImageSize, maxVideoSize, maxVideoDuration]);
-
-  // Get video duration helper
-  const getVideoDuration = useCallback((file: File): Promise<number> => {
-    return new Promise((resolve) => {
-      const video = document.createElement("video");
-      video.preload = "metadata";
-      video.onloadedmetadata = () => {
-        window.URL.revokeObjectURL(video.src);
-        resolve(video.duration);
-      };
-      video.onerror = () => {
-        resolve(0); // If we can't get duration, assume it's valid
-      };
-      video.src = URL.createObjectURL(file);
-    });
-  }, []);
+  }, [maxImageSize, maxVideoSize, maxVideoDuration, getVideoDuration]);
 
   // Handle media upload
   const handleMediaUpload = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {

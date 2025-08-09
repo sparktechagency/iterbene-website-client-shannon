@@ -1,5 +1,5 @@
 import "./globals.css";
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Source_Sans_3 } from "next/font/google";
 import { ConfigProvider } from "antd";
 import { AntdRegistry } from "@ant-design/nextjs-registry";
@@ -20,11 +20,16 @@ export const metadata: Metadata = {
   title: "Iter Bene - Explore New Destinations",
   description:
     "Connect with travelers, share your adventures, and explore new destinations on Iter Bene.",
-  viewport: "width=device-width, initial-scale=1, viewport-fit=cover",
-  themeColor: "#40E0D0",
   other: {
     "X-UA-Compatible": "IE=edge",
   },
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+  themeColor: "#40E0D0",
 };
 
 export default function RootLayout({

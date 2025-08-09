@@ -9,7 +9,11 @@ import Image from "next/image";
 import { X } from "lucide-react";
 import logo from "@/asset/logo/logo.png";
 import { useRouter } from "next/navigation";
-import { useCookies, COOKIE_NAMES, migrateFromLocalStorage } from "@/contexts/CookieContext";
+import {
+  useCookies,
+  COOKIE_NAMES,
+  migrateFromLocalStorage,
+} from "@/contexts/CookieContext";
 
 const AuthModal = () => {
   const dispatch = useAppDispatch();
@@ -20,14 +24,18 @@ const AuthModal = () => {
   const [isClient, setIsClient] = useState<boolean>(false);
   const router = useRouter();
   const { getBooleanCookie } = useCookies();
-  
+
   // Get verification status reactively from cookies
   const isVerified = getBooleanCookie(COOKIE_NAMES.ITER_BENE_VERIFIED);
 
   // Debug logging (can be removed in production)
   useEffect(() => {
     if (isClient) {
-      console.log("AuthModal state:", { isModalOpen, isAuthenticated, isVerified });
+      console.log("AuthModal state:", {
+        isModalOpen,
+        isAuthenticated,
+        isVerified,
+      });
     }
   }, [isModalOpen, isAuthenticated, isVerified, isClient]);
 
@@ -59,7 +67,7 @@ const AuthModal = () => {
       const originalHtmlOverflow = document.documentElement.style.overflow;
       const originalBodyPosition = document.body.style.position;
       const originalScrollY = window.scrollY;
-      
+
       document.body.style.overflow = "hidden";
       document.documentElement.style.overflow = "hidden";
       document.body.style.position = "fixed";
@@ -69,7 +77,7 @@ const AuthModal = () => {
 
       const preventScroll = (e: Event) => {
         // Only prevent scroll on the body, not inside modal content
-        if (!(e.target as Element)?.closest('.modal-content')) {
+        if (!(e.target as Element)?.closest(".modal-content")) {
           e.preventDefault();
           e.stopPropagation();
         }
@@ -78,8 +86,11 @@ const AuthModal = () => {
 
       const preventScrollTouch = (e: TouchEvent) => {
         // Only prevent touch on body, not inside modal content
-        if (e.touches.length > 1 || !(e.target as Element)?.closest('.modal-content')) {
-          if (!(e.target as Element)?.closest('.modal-content')) {
+        if (
+          e.touches.length > 1 ||
+          !(e.target as Element)?.closest(".modal-content")
+        ) {
+          if (!(e.target as Element)?.closest(".modal-content")) {
             e.preventDefault();
             e.stopPropagation();
           }
@@ -92,9 +103,10 @@ const AuthModal = () => {
         if ([33, 34, 35, 36, 37, 38, 39, 40].includes(e.keyCode)) {
           // Don't prevent if user is in an input field
           const activeElement = document.activeElement;
-          if (activeElement?.tagName === 'INPUT' || 
-              activeElement?.tagName === 'TEXTAREA' || 
-              activeElement?.contentEditable === 'true') {
+          if (
+            activeElement?.tagName === "INPUT" ||
+            activeElement?.tagName === "TEXTAREA"
+          ) {
             return;
           }
           e.preventDefault();
@@ -111,11 +123,11 @@ const AuthModal = () => {
         document.body.style.overflow = originalBodyOverflow;
         document.documentElement.style.overflow = originalHtmlOverflow;
         document.body.style.position = originalBodyPosition;
-        document.body.style.top = '';
-        document.body.style.width = '';
+        document.body.style.top = "";
+        document.body.style.width = "";
         document.body.classList.remove("modal-open");
         window.scrollTo(0, originalScrollY);
-        
+
         document.removeEventListener("wheel", preventScroll);
         document.removeEventListener("touchmove", preventScrollTouch);
         document.removeEventListener("keydown", preventKeydown);

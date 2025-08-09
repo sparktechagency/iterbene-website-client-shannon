@@ -1,7 +1,5 @@
 "use client";
-import { useParams, usePathname } from "next/navigation";
 import { motion } from "framer-motion";
-
 interface SimpleUserNavlinkTabProps {
   isMyProfile: boolean;
   onTabChange?: (tabKey: string) => void;
@@ -13,8 +11,6 @@ const SimpleUserNavlinkTab = ({
   onTabChange,
   activeTab 
 }: SimpleUserNavlinkTabProps) => {
-  const { userName } = useParams();
-  const pathname = usePathname();
 
   const myTabs = [
     { name: "Profile", key: "profile" },

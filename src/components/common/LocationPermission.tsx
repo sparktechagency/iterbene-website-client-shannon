@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { MapPin, Check, AlertCircle, Loader2 } from "lucide-react";
 import { createPortal } from "react-dom";
@@ -8,7 +8,11 @@ import toast from "react-hot-toast";
 import { useSetLatestLocationMutation } from "@/redux/features/profile/profileApi";
 import { TError } from "@/types/error";
 import useUser from "@/hooks/useUser";
-import { useCookies, COOKIE_NAMES, migrateFromLocalStorage } from "@/contexts/CookieContext";
+import {
+  useCookies,
+  COOKIE_NAMES,
+  migrateFromLocalStorage,
+} from "@/contexts/CookieContext";
 
 interface ILocationData {
   latitude: string;
@@ -29,18 +33,18 @@ const LocationPermission = () => {
   const [locationData, setLocationData] = useState<ILocationData | null>(null);
   const [previousLocationData, setPreviousLocationData] =
     useState<ILocationData | null>(null);
+
   const [setLatestLocation] = useSetLatestLocationMutation();
   const user = useUser();
-  const { getBooleanCookie, setBooleanCookie, getObjectCookie, setObjectCookie } = useCookies();
+  const {
+    getBooleanCookie,
+    setBooleanCookie,
+    getObjectCookie,
+    setObjectCookie,
+  } = useCookies();
 
-  // Load previous location from cookies on component mount
-  useEffect(() => {
-    const savedLocation = getObjectCookie(COOKIE_NAMES.USER_LAST_LOCATION);
-    if (savedLocation) {
-      setPreviousLocationData(savedLocation);
-      setLocationData(savedLocation);
-    }
-  }, [getObjectCookie]);
+  // Use ref to track if component is still mounted
+  const isMountedRef = useRef(true);
 
   // Check if locations are different
   const areLocationsDifferent = useCallback(
@@ -69,68 +73,6 @@ const LocationPermission = () => {
     []
   );
 
-  // Memoize checkPermissionStatus to avoid useEffect dependency issues
-  const checkPermissionStatus = useCallback(async () => {
-    if (!navigator.geolocation) {
-      toast.error("Geolocation is not supported by this browser");
-      return;
-    }
-
-    try {
-      const permission = await navigator.permissions.query({
-        name: "geolocation",
-      });
-      setPermissionStatus(permission.state);
-
-      // Only fetch location if permission is granted, user exists, and we don't have recent data
-      if (permission.state === "granted" && user && !locationData) {
-        await handleRequestPermission();
-      }
-    } catch (error) {
-      console.log("Error checking permission status:", error);
-      setPermissionStatus("prompt");
-    }
-  }, [locationData, user]); // Depend on locationData and user
-
-  useEffect(() => {
-    setMounted(true);
-    if (typeof window !== "undefined") {
-      // Migrate from localStorage to cookies
-      migrateFromLocalStorage();
-    }
-
-    // Check if user exists and doesn't have permission stored
-    if (user) {
-      const hasPermission = getBooleanCookie(COOKIE_NAMES.LOCATION_PERMISSION_GRANTED);
-      const hasDeclined = getBooleanCookie(COOKIE_NAMES.LOCATION_PERMISSION_DENIED);
-
-      // Only show modal if permission not granted and not previously declined
-      if (!hasPermission && !hasDeclined) {
-        setIsOpen(true);
-      }
-
-      // If user has permission, automatically check and update location
-      if (hasPermission) {
-        checkPermissionStatus();
-      }
-    }
-
-    return () => setMounted(false);
-  }, [user, checkPermissionStatus, getBooleanCookie]);
-
-  useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = "hidden";
-      checkPermissionStatus();
-    } else {
-      document.body.style.overflow = "unset";
-    }
-
-    return () => {
-      document.body.style.overflow = "unset";
-    };
-  }, [isOpen, checkPermissionStatus]);
-
   const getAddressFromCoordinates = async (
     latitude: number,
     longitude: number
@@ -151,6 +93,7 @@ const LocationPermission = () => {
       const response = await fetch(
         `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${apiKey}`
       );
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
@@ -190,6 +133,7 @@ const LocationPermission = () => {
         };
         return addressData;
       } else {
+        console.warn("Geocoding API returned no results:", data.status);
         return {
           locationName: "Address not found",
           city: undefined,
@@ -208,7 +152,7 @@ const LocationPermission = () => {
     }
   };
 
-  const handleRequestPermission = async () => {
+  const handleRequestPermission = useCallback(async () => {
     if (!navigator.geolocation) {
       toast.error("Geolocation is not supported by this browser");
       return;
@@ -218,6 +162,8 @@ const LocationPermission = () => {
       toast.error("User not found. Please log in first.");
       return;
     }
+
+    if (isRequesting) return; // Prevent multiple simultaneous requests
 
     setIsRequesting(true);
     setPermissionStatus("checking");
@@ -233,18 +179,24 @@ const LocationPermission = () => {
             },
             {
               enableHighAccuracy: true,
-              timeout: 15000, // Increased timeout
+              timeout: 15000,
               maximumAge: 300000,
             }
           );
         }
       );
 
+      // Check if component is still mounted
+      if (!isMountedRef.current) return;
+
       const latitude = position.coords.latitude;
       const longitude = position.coords.longitude;
 
       // Get address data
       const addressData = await getAddressFromCoordinates(latitude, longitude);
+
+      // Check if component is still mounted after async operation
+      if (!isMountedRef.current) return;
 
       const newLocationData: ILocationData = {
         latitude: latitude.toString(),
@@ -272,7 +224,12 @@ const LocationPermission = () => {
             state: newLocationData.state || "",
             country: newLocationData.country || "",
           };
+
           await setLatestLocation(locationPayload).unwrap();
+
+          // Check if component is still mounted after API call
+          if (!isMountedRef.current) return;
+
           // Update both current and previous location data
           setLocationData(locationPayload);
           setPreviousLocationData(locationPayload);
@@ -287,6 +244,7 @@ const LocationPermission = () => {
         }
       } else {
         setLocationData(newLocationData);
+        toast.success("Location confirmed!");
       }
 
       setPermissionStatus("granted");
@@ -294,10 +252,15 @@ const LocationPermission = () => {
 
       // Close modal after successful location update
       setTimeout(() => {
-        setIsOpen(false);
+        if (isMountedRef.current) {
+          setIsOpen(false);
+        }
       }, 1500);
     } catch (error) {
       console.error("Permission request failed:", error);
+
+      // Check if component is still mounted
+      if (!isMountedRef.current) return;
 
       if (error instanceof GeolocationPositionError) {
         switch (error.code) {
@@ -311,27 +274,134 @@ const LocationPermission = () => {
             break;
           case error.TIMEOUT:
             toast.error("Location request timed out");
+            setPermissionStatus("prompt"); // Allow retry
             break;
           default:
             toast.error("An unknown error occurred");
+            setPermissionStatus("denied");
         }
       } else {
         toast.error("Failed to get location");
+        setPermissionStatus("denied");
+      }
+    } finally {
+      if (isMountedRef.current) {
+        setIsRequesting(false);
+      }
+    }
+  }, [
+    user,
+    isRequesting,
+    setLatestLocation,
+    previousLocationData,
+    areLocationsDifferent,
+    setObjectCookie,
+    setBooleanCookie,
+  ]);
+
+  // Memoize checkPermissionStatus to avoid useEffect dependency issues
+  const checkPermissionStatus = useCallback(async () => {
+    if (!navigator.geolocation || !navigator.permissions) {
+      return;
+    }
+
+    try {
+      const permission = await navigator.permissions.query({
+        name: "geolocation",
+      });
+
+      if (!isMountedRef.current) return;
+
+      setPermissionStatus(permission.state);
+
+      // Only automatically fetch location if permission is granted and we don't have recent data
+      if (
+        permission.state === "granted" &&
+        user &&
+        !locationData &&
+        !isRequesting
+      ) {
+        await handleRequestPermission();
+      }
+    } catch (error) {
+      console.log("Error checking permission status:", error);
+      if (isMountedRef.current) {
+        setPermissionStatus("prompt");
+      }
+    }
+  }, [handleRequestPermission, locationData, user, isRequesting]);
+
+  // Load previous location from cookies on component mount
+  useEffect(() => {
+    const savedLocation = getObjectCookie(
+      COOKIE_NAMES.USER_LAST_LOCATION
+    ) as ILocationData | null;
+    if (savedLocation) {
+      setPreviousLocationData(savedLocation);
+      setLocationData(savedLocation);
+    }
+  }, [getObjectCookie]);
+
+  useEffect(() => {
+    setMounted(true);
+    isMountedRef.current = true;
+
+    if (typeof window !== "undefined") {
+      // Migrate from localStorage to cookies
+      try {
+        migrateFromLocalStorage();
+      } catch (error) {
+        console.error("Error migrating from localStorage:", error);
+      }
+    }
+
+    // Check if user exists and doesn't have permission stored
+    if (user) {
+      const hasPermission = getBooleanCookie(
+        COOKIE_NAMES.LOCATION_PERMISSION_GRANTED
+      );
+      const hasDeclined = getBooleanCookie(
+        COOKIE_NAMES.LOCATION_PERMISSION_DENIED
+      );
+
+      // Only show modal if permission not granted and not previously declined
+      if (!hasPermission && !hasDeclined) {
+        setIsOpen(true);
       }
 
-      setPermissionStatus("denied");
-    } finally {
-      setIsRequesting(false);
+      // If user has permission, automatically check and update location
+      if (hasPermission) {
+        checkPermissionStatus();
+      }
     }
-  };
 
-  const handleCloseModal = () => {
+    return () => {
+      isMountedRef.current = false;
+      setMounted(false);
+    };
+  }, [user, getBooleanCookie, checkPermissionStatus]);
+
+  // Separate effect for checking permission status when modal opens
+  useEffect(() => {
+    if (isOpen && mounted) {
+      document.body.style.overflow = "hidden";
+      checkPermissionStatus();
+    } else {
+      document.body.style.overflow = "unset";
+    }
+
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [isOpen, mounted, checkPermissionStatus]);
+
+  const handleCloseModal = useCallback(() => {
     if (!isRequesting) {
       setIsOpen(false);
     }
-  };
+  }, [isRequesting]);
 
-  const handleDeny = () => {
+  const handleDeny = useCallback(() => {
     if (isRequesting) return;
 
     setPermissionStatus("denied");
@@ -340,11 +410,11 @@ const LocationPermission = () => {
       "Location permission denied. You can enable it later in settings."
     );
     setIsOpen(false);
-  };
+  }, [isRequesting, setBooleanCookie]);
 
-  const handleModalClick = (e: React.MouseEvent) => {
+  const handleModalClick = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
-  };
+  }, []);
 
   const getStatusConfig = () => {
     switch (permissionStatus) {
@@ -474,7 +544,7 @@ const LocationPermission = () => {
                 </div>
               )}
 
-              <div className="flex flex-col md:flex-row gap-5  justify-center">
+              <div className="flex flex-col md:flex-row gap-5 justify-center">
                 <button
                   className="px-8 py-3 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-xl font-medium transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                   onClick={handleDeny}
