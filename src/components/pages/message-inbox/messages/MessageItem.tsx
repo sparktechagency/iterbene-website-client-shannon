@@ -26,6 +26,8 @@ const MessageItem: React.FC<MessageItemProps> = ({
   const displayedImages = fileUrls.slice(0, 2);
   const extraImagesCount = fileUrls.length - displayedImages.length;
 
+  console.log("Story ", message?.storyMedia);
+
   return (
     <div
       className={`flex ${
@@ -255,7 +257,7 @@ const MessageItem: React.FC<MessageItemProps> = ({
                 isMyMessage ? "mr-2 mb-1" : "ml-2 mb-1"
               }`}
             >
-              {moment(message.createdAt).format("h:mm A")}
+              {moment(message?.createdAt).format("h:mm A")}
             </span>
             {/* user friendly message for story */}
             <div className="text-xs text-gray-500 mb-1">

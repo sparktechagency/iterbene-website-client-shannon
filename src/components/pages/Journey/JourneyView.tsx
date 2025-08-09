@@ -543,8 +543,8 @@ const JourneyView = () => {
                 >
                   {currentMedia.textContent && (
                     <h1
-                      className="text-white text-xl"
-                      style={{ fontFamily: currentMedia.textFontFamily }}
+                      className="text-white text-xl p-5"
+                      style={{ fontFamily: currentMedia.textFontFamily}}
                     >
                       {currentMedia.textContent}
                     </h1>
