@@ -27,7 +27,7 @@ const postApi = baseApi.injectEndpoints({
         url: `/posts/${id}`,
         method: "DELETE",
       }),
-      invalidatesTags: ["Post"],
+      invalidatesTags: ["Post", "SearchHashtagPosts"],
     }),
     sharePost: builder.mutation({
       query: (data) => ({
@@ -35,7 +35,7 @@ const postApi = baseApi.injectEndpoints({
         method: "POST",
         body: data,
       }),
-      invalidatesTags: ["Post"],
+      invalidatesTags: ["Post", "SearchHashtagPosts"],
     }),
     feedPosts: builder.query({
       query: (filters) => {
@@ -74,7 +74,7 @@ const postApi = baseApi.injectEndpoints({
         url: `/posts/${id}`,
         method: "GET",
       }),
-      providesTags: ["Post"],
+      providesTags: ["Post", "SearchHashtagPosts"],
     }),
     getUserTimelinePosts: builder.query({
       query: ({ username, filters }) => {
@@ -132,9 +132,8 @@ const postApi = baseApi.injectEndpoints({
         url: "/posts/reaction",
         method: "POST",
         body: data,
-        
       }),
-      invalidatesTags: ["Post"],
+      invalidatesTags: ["Post", "SearchHashtagPosts"],
     }),
     createComment: builder.mutation({
       query: (data) => ({
@@ -142,7 +141,7 @@ const postApi = baseApi.injectEndpoints({
         method: "POST",
         body: data,
       }),
-      invalidatesTags: ["Post"],
+      invalidatesTags: ["Post", "SearchHashtagPosts"],
     }),
     addOrRemoveCommentReaction: builder.mutation({
       query: (data) => ({
@@ -150,6 +149,7 @@ const postApi = baseApi.injectEndpoints({
         method: "POST",
         body: data,
       }),
+      invalidatesTags: ["Post", "SearchHashtagPosts"],
     }),
     updateComment: builder.mutation({
       query: ({ commentId, postId, comment }) => ({
@@ -157,7 +157,7 @@ const postApi = baseApi.injectEndpoints({
         method: "PATCH",
         body: { postId, comment },
       }),
-      invalidatesTags: ["Post"],
+      invalidatesTags: ["Post", "SearchHashtagPosts"],
     }),
     deleteComment: builder.mutation({
       query: ({ commentId, postId }) => ({
@@ -165,7 +165,7 @@ const postApi = baseApi.injectEndpoints({
         method: "DELETE",
         body: { postId },
       }),
-      invalidatesTags: ["Post"],
+      invalidatesTags: ["Post", "SearchHashtagPosts"],
     }),
     incrementItineraryViewCount: builder.mutation({
       query: (data) => ({
@@ -173,7 +173,7 @@ const postApi = baseApi.injectEndpoints({
         method: "POST",
         body: data,
       }),
-      invalidatesTags: ["Post"],
+      invalidatesTags: ["Post", "SearchHashtagPosts"],
     }),
   }),
 });

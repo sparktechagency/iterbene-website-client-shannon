@@ -83,6 +83,7 @@ export const baseApi = createApi({
     "Itinerary",
     "Notifications",
     "SavedPost",
+    "SearchHashtagPosts",
   ],
   endpoints: () => ({}),
 });

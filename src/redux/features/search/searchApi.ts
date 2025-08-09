@@ -15,6 +15,7 @@ const searchApi = baseApi.injectEndpoints({
         url: `/search/users-hashtags?searchTerm=${searchTerm}`,
         method: "GET",
       }),
+      providesTags: ["SearchHashtagPosts"],
     }),
     getLocationVisitedPlaces: builder.query({
       query: (filters) => {

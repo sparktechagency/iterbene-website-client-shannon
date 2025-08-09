@@ -13,6 +13,7 @@ const SearchHashTagPostContent = () => {
   const hashtag = useSearchParams().get("q");
   const { data: responseData, isLoading } = useGetHashtagPostsQuery(hashtag, {
     refetchOnMountOrArgChange: true,
+    refetchOnFocus: true,
     skip: !hashtag,
   });
 
