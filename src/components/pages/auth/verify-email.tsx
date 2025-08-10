@@ -123,16 +123,10 @@ const VerifyEmail = () => {
         <div className="w-full space-y-8">
           {/* OTP Instructions */}
           <div className="mt-4 text-center">
-            <p className="text-sm ">
-              <strong>
-                We&apos;ve sent a 6-digit verification code to your email address.
-              </strong>
-            </p>
-            <p className="text-xs mt-2">
-              <strong>Didn&apos;t receive the email?</strong> Please check your{" "}
-              <strong>spam/junk folder</strong> as verification emails sometimes
-              end up there.
-            </p>
+            <h1>
+              Didn&apos;t receive the email? Please check your spam/junk folder
+              as verification emails sometimes end up there.
+            </h1>
           </div>
 
           <div className="w-full space-y-2">

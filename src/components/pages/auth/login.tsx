@@ -52,7 +52,10 @@ const Login = () => {
       }
 
       // Check if email is not verified
-      if (res?.message == "Email is not verified. Please verify your email.") {
+      if (
+        res?.message == "Email is not verified. Please verify your email." ||
+        res?.message == "Please verify your email."
+      ) {
         toast.success(res?.message);
         storeTokens(
           res?.data?.attributes?.accessToken,
