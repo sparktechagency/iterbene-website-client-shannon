@@ -27,6 +27,12 @@ export interface IMessage {
   };
   storyMedia?:{
     _id: string
+    backgroundColor: string
+    mediaType: string
+    textColor: string
+    textContent: string
+    textFontFamily: string
+    textSize: number
     mediaUrl: string
   }
   content: IContent;

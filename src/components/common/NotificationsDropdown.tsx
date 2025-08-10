@@ -11,6 +11,7 @@ import toast from "react-hot-toast";
 import Skeleton from "../custom/custom-skeleton";
 import formatTimeAgo from "@/utils/formatTimeAgo";
 import { IoMdNotificationsOutline } from "react-icons/io";
+import { useRouter } from "next/navigation";
 
 interface Notification {
   _id: string;
@@ -19,7 +20,14 @@ interface Notification {
   receiverId: string;
   role: string;
   image?: string;
-  type: string;
+  type:
+    | "post"
+    | "story"
+    | "comment"
+    | "event"
+    | "group"
+    | "connection"
+    | "message";
   linkId?: string;
   viewStatus: boolean;
   createdAt: string;
@@ -38,6 +46,7 @@ const NotificationsDropdown: React.FC<DropdownProps> = ({
   const [allNotifications, setAllNotifications] = useState<Notification[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
 
   // Notification data fetch
   const {
@@ -108,8 +117,22 @@ const NotificationsDropdown: React.FC<DropdownProps> = ({
 
   // Handle notification click
   const handleNotificationClick = (notification: Notification) => {
-    if (notification.viewStatus) return;
-    // Navigation logic here based on type and linkId
+    console.log("Notification clicked:", notification.type);
+    if ((notification.type === "post")) {
+      router.push(`/feed/${notification?.linkId}`);
+    } else if ((notification.type === "story")) {
+      router.push(`/journey/${notification?.linkId}`);
+    } else if ((notification.type  === "group")) {
+      router.push(`/groups/${notification?.linkId}`);
+    } else if ((notification.type === "connection")) {
+      router.push(`/connections/${notification?.linkId}`);
+    } else if ((notification.type === "message")) {
+      router.push(`/messages/${notification?.linkId}`);
+    }else if ((notification.type === "event")) {
+      router.push(`/events/${notification?.linkId}`);
+    }else if ((notification.type === "comment")) {
+      router.push(`/feed/${notification?.linkId}`);
+    }
   };
 
   // Mark all as read

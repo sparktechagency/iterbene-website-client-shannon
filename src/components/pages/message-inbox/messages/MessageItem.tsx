@@ -267,18 +267,37 @@ const MessageItem: React.FC<MessageItemProps> = ({
             </div>
             {/* Image */}
             <div>
-              {message?.storyMedia?.mediaUrl ? (
-                <Image
-                  src={message?.storyMedia?.mediaUrl || ""}
-                  alt={`Story Image`}
-                  width={150}
-                  height={150}
-                  className="w-[120px] h-[120px] object-cover rounded-lg"
-                />
+              {message?.storyMedia?.mediaType === "image" ? (
+                message?.storyMedia?.mediaUrl ? (
+                  <Image
+                    src={message?.storyMedia?.mediaUrl || ""}
+                    alt={`Story Image`}
+                    width={150}
+                    height={150}
+                    className="w-[120px] h-[120px] object-cover rounded-lg"
+                  />
+                ) : (
+                  <div className="w-[120px] h-[120px] bg-slate-100 flex items-center justify-center rounded-lg">
+                    <h1 className="text-xs text-gray-700 text-center">
+                      Journey no longer available
+                    </h1>
+                  </div>
+                )
               ) : (
-                <div className="w-[120px] h-[120px] bg-slate-100 flex items-center justify-center rounded-lg">
-                  <h1 className="text-xs text-gray-700 text-center">
-                    Journey no longer available
+                <div
+                  className={`w-[120px] h-[120px]  flex items-center justify-center rounded-lg`}
+                  style={{
+                    backgroundColor: message?.storyMedia?.backgroundColor,
+                  }}
+                >
+                  <h1
+                    style={{
+                      color: message?.storyMedia?.textColor,
+                      fontSize: message?.storyMedia?.textSize,
+                    }}
+                    className="text-center"
+                  >
+                    {message?.storyMedia?.textContent}
                   </h1>
                 </div>
               )}

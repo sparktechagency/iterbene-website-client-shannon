@@ -544,7 +544,7 @@ const JourneyView = () => {
                   {currentMedia.textContent && (
                     <h1
                       className="text-white text-xl p-5"
-                      style={{ fontFamily: currentMedia.textFontFamily}}
+                      style={{ fontFamily: currentMedia.textFontFamily }}
                     >
                       {currentMedia.textContent}
                     </h1>
@@ -643,7 +643,7 @@ const JourneyView = () => {
             onClick={() => setShowViewers(false)}
           >
             <motion.div
-              className="bg-white rounded-lg p-6 max-w-sm w-full max-h-[80vh] overflow-y-auto"
+              className="bg-white rounded-lg px-6 pt-3 pb-6 max-w-sm w-full max-h-[80vh] overflow-y-auto"
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
@@ -651,7 +651,7 @@ const JourneyView = () => {
             >
               <div className="flex justify-between items-center mb-4">
                 <h3 className="text-gray-900 font-semibold">
-                  Views & Reactions
+                  Viewers ({currentMedia?.viewedBy?.length || 0})
                 </h3>
                 <button
                   onClick={() => setShowViewers(false)}
@@ -661,74 +661,46 @@ const JourneyView = () => {
                 </button>
               </div>
 
-              {/* Current Media Views */}
-              <div className="mb-4">
-                <h4 className="text-gray-900 text-sm mb-2">
-                  Views ({currentMedia?.viewedBy?.length || 0})
-                </h4>
+              {/* Combined Viewers and Reactions */}
+              <div>
                 {currentMedia?.viewedBy?.length > 0 ? (
                   <div className="space-y-2">
                     {currentMedia.viewedBy
                       .filter((viewer: IViewer) => viewer?._id !== user?._id)
-                      .map((viewer: IViewer) => (
-                        <div
-                          key={viewer?._id}
-                          className="flex items-center gap-3"
-                        >
-                          <Image
-                            src={viewer?.profileImage || "/default-avatar.png"}
-                            alt={viewer?.username}
-                            className="w-8 h-8 rounded-full object-cover"
-                            width={32}
-                            height={32}
-                          />
-                          <Link
-                            href={`/${viewer?.username}`}
-                            className="text-gray-900 text-sm hover:underline"
+                      .map((viewer: IViewer) => {
+                        // Find if this viewer has a reaction
+                        const reaction = currentMedia?.reactions?.find(
+                          (r: IReactions) => r?.userId?._id === viewer?._id
+                        );
+                        return (
+                          <div
+                            key={viewer?._id}
+                            className="flex items-center gap-3"
                           >
-                            {viewer?.username}
-                          </Link>
-                        </div>
-                      ))}
+                            <Image
+                              src={
+                                viewer?.profileImage || "/default-avatar.png"
+                              }
+                              alt={viewer?.username}
+                              className="w-8 h-8 rounded-full object-cover"
+                              width={32}
+                              height={32}
+                            />
+                            <Link
+                              href={`/${viewer?.username}`}
+                              className="text-gray-900 text-sm hover:underline"
+                            >
+                              {viewer?.username}
+                            </Link>
+                            {reaction && (
+                              <Heart className="w-4 h-4 text-red-500 fill-current ml-auto" />
+                            )}
+                          </div>
+                        );
+                      })}
                   </div>
                 ) : (
-                  <p className="text-gray-900 text-sm">No views yet</p>
-                )}
-              </div>
-
-              {/* Current Media Reactions */}
-              <div>
-                <h4 className="text-gray-900 text-sm mb-2">
-                  Reactions ({currentMedia?.reactions?.length || 0})
-                </h4>
-                {currentMedia?.reactions?.length > 0 ? (
-                  <div className="space-y-2">
-                    {currentMedia?.reactions
-                      ?.filter((reaction) => reaction?.userId !== user?._id)
-                      ?.map((reaction: IReactions, index: number) => (
-                        <div key={index} className="flex items-center gap-3">
-                          <Image
-                            src={
-                              reaction.userId.profileImage ||
-                              "/default-avatar.png"
-                            }
-                            alt={reaction.userId.username}
-                            className="w-8 h-8 rounded-full object-cover"
-                            width={32}
-                            height={32}
-                          />
-                          <Link
-                            href={`/${reaction?.userId?.username}`}
-                            className="text-gray-900 text-sm hover:underline"
-                          >
-                            {reaction?.userId?.username}
-                          </Link>
-                          <Heart className="w-4 h-4 text-red-500 fill-current ml-auto" />
-                        </div>
-                      ))}
-                  </div>
-                ) : (
-                  <p className="text-gray-400 text-sm">No reactions yet</p>
+                  <p className="text-gray-400 text-sm">No views yet</p>
                 )}
               </div>
             </motion.div>
@@ -778,8 +750,8 @@ const JourneyView = () => {
                 onClick={() => handleStorySelect(story, index)}
               >
                 <Image
-                  src={story.userId?.profileImage || "/default-avatar.png"}
-                  alt={story.userId?.username || "User"}
+                  src={story?.userId?.profileImage || "/default-avatar.png"}
+                  alt={story?.userId?.username || "User"}
                   className="w-full h-full rounded-full object-cover border-2 border-black"
                   width={48}
                   height={48}
