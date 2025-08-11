@@ -219,7 +219,6 @@ const Header: React.FC = () => {
 
       // Listen for general notifications
       const notificationEvent = `notification::${user?._id}`;
-      console.log("Notification event:", notificationEvent);
       socket.on(notificationEvent, () => {
         setUnviewNotificationCount((prev) => prev + 1);
       });

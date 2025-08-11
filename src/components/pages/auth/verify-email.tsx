@@ -49,7 +49,6 @@ const VerifyEmail = () => {
   const handleVerifyEmail = async () => {
     try {
       const res = await verifyEmail({ otp: oneTimeCode }).unwrap();
-      console.log("Response:", res);
       storeTokens(
         res?.data?.attributes?.result?.tokens?.accessToken,
         res?.data?.attributes?.result?.tokens?.refreshToken

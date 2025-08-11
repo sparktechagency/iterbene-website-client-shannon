@@ -162,8 +162,6 @@ export const clearTokens = () => {
     
     // Clear sessionStorage
     sessionStorage.clear();
-    
-    console.log("Tokens cleared successfully");
   } catch (error) {
     console.error("Failed to clear tokens:", error);
   }

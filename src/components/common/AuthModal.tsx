@@ -28,17 +28,6 @@ const AuthModal = () => {
   // Get verification status reactively from cookies
   const isVerified = getBooleanCookie(COOKIE_NAMES.ITER_BENE_VERIFIED);
 
-  // Debug logging (can be removed in production)
-  useEffect(() => {
-    if (isClient) {
-      console.log("AuthModal state:", {
-        isModalOpen,
-        isAuthenticated,
-        isVerified,
-      });
-    }
-  }, [isModalOpen, isAuthenticated, isVerified, isClient]);
-
   // Check if client-side and migration
   useEffect(() => {
     setIsClient(true);
@@ -49,16 +38,6 @@ const AuthModal = () => {
       dispatch(closeAuthModal());
     }
   }, [dispatch]);
-
-  // Timer for showing modal after 30 seconds if not authenticated and verified
-  // useEffect(() => {
-  //   if (!isAuthenticated && isVerified) {
-  //     const timer = setTimeout(() => {
-  //       dispatch(openAuthModal("welcome"));
-  //     }, 30000); // 30 seconds
-  //     return () => clearTimeout(timer);
-  //   }
-  // }, [isAuthenticated, isVerified, dispatch]);
 
   // Handle body overflow and prevent scrolling when modal is open
   useEffect(() => {

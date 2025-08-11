@@ -117,7 +117,6 @@ const NotificationsDropdown: React.FC<DropdownProps> = ({
 
   // Handle notification click
   const handleNotificationClick = (notification: Notification) => {
-    console.log("Notification clicked:", notification.type);
     if ((notification.type === "post")) {
       router.push(`/feed/${notification?.linkId}`);
     } else if ((notification.type === "story")) {

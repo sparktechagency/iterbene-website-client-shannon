@@ -25,9 +25,6 @@ const MessageItem: React.FC<MessageItemProps> = ({
   // Limit displayed images to 2
   const displayedImages = fileUrls.slice(0, 2);
   const extraImagesCount = fileUrls.length - displayedImages.length;
-
-  console.log("Story ", message?.storyMedia);
-
   return (
     <div
       className={`flex ${
