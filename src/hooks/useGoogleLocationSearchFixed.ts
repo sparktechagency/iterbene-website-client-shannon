@@ -1,49 +1,46 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useUnifiedGoogleMaps } from "./useUnifiedGoogleMaps";
 
-const GOOGLE_MAPS_API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAP_API_KEY || "";
-
-export interface LocationPrediction2 {
+export interface LocationPrediction {
   description: string;
   place_id: string;
   main_text: string;
   secondary_text: string;
 }
 
-export interface LocationDetails2 {
+export interface LocationDetails {
   name: string;
   latitude: number;
   longitude: number;
   place_id: string;
+  formatted_address: string;
 }
 
-interface UseGoogleLocationSearchOptions2 {
+interface UseGoogleLocationSearchOptions {
   debounceMs?: number;
   minQueryLength?: number;
-  maxResults?: number;
-  autoInitialize?: boolean;
 }
 
-interface UseGoogleLocationSearchReturn2 {
-  predictions: LocationPrediction2[];
+interface UseGoogleLocationSearchReturn {
+  predictions: LocationPrediction[];
   isLoading: boolean;
   isInitialized: boolean;
-  searchLocations: (query: string) => Promise<void>;
-  getLocationDetails: (placeId: string) => Promise<LocationDetails2 | null>;
+  searchLocations: (query: string) => void;
+  getLocationDetails: (placeId: string) => Promise<LocationDetails | null>;
   clearPredictions: () => void;
   error: string | null;
 }
 
-export const useGoogleLocationSearch2 = (
-  options: UseGoogleLocationSearchOptions2 = {}
-): UseGoogleLocationSearchReturn2 => {
+export const useGoogleLocationSearchFixed = (
+  options: UseGoogleLocationSearchOptions = {}
+): UseGoogleLocationSearchReturn => {
   const { debounceMs = 300, minQueryLength = 1 } = options;
 
-  // Use unified Google Maps loader
+  // Use the unified Google Maps loader
   const { isLoaded, loadError } = useUnifiedGoogleMaps();
 
   // States
-  const [predictions, setPredictions] = useState<LocationPrediction2[]>([]);
+  const [predictions, setPredictions] = useState<LocationPrediction[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -58,7 +55,7 @@ export const useGoogleLocationSearch2 = (
       try {
         autocompleteService.current = new window.google.maps.places.AutocompleteService();
         
-        // Create a dummy div element for PlacesService
+        // Create a dummy div element for PlacesService (it requires a div)
         const dummyDiv = document.createElement('div');
         placesService.current = new window.google.maps.places.PlacesService(dummyDiv);
         
@@ -68,11 +65,11 @@ export const useGoogleLocationSearch2 = (
         setError("Failed to initialize location services");
       }
     } else if (loadError) {
-      setError(loadError.message);
+      setError("Failed to load Google Maps");
     }
   }, [isLoaded, loadError]);
 
-  // Search locations using Google Maps SDK
+  // Search locations with debounce
   const searchLocations = useCallback(
     (query: string): void => {
       if (!query || query.length < minQueryLength) {
@@ -111,7 +108,7 @@ export const useGoogleLocationSearch2 = (
             setIsLoading(false);
 
             if (status === window.google.maps.places.PlacesServiceStatus.OK && predictions) {
-              const transformedPredictions: LocationPrediction2[] = predictions.map(
+              const transformedPredictions: LocationPrediction[] = predictions.map(
                 (prediction) => ({
                   description: prediction.description,
                   place_id: prediction.place_id,
@@ -134,9 +131,9 @@ export const useGoogleLocationSearch2 = (
     [isLoaded, minQueryLength, debounceMs]
   );
 
-  // Get place details using Google Maps SDK
+  // Get place details
   const getLocationDetails = useCallback(
-    async (placeId: string): Promise<LocationDetails2 | null> => {
+    async (placeId: string): Promise<LocationDetails | null> => {
       if (!isLoaded || !placesService.current) {
         setError("Location services not ready");
         return null;
@@ -162,6 +159,7 @@ export const useGoogleLocationSearch2 = (
                 latitude: location.lat(),
                 longitude: location.lng(),
                 place_id: placeId,
+                formatted_address: place.formatted_address || "",
               });
             } else {
               resolve(null);
@@ -197,6 +195,6 @@ export const useGoogleLocationSearch2 = (
     searchLocations,
     getLocationDetails,
     clearPredictions,
-    error,
+    error: error || (loadError ? loadError.message : null),
   };
 };

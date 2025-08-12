@@ -74,22 +74,30 @@ const MapSection = ({
 
   // Custom marker icons
   const getCustomIcons = () => {
-    if (!window.google || !window.google.maps) return null;
+    if (!isLoaded || !window.google || !window.google.maps) return null;
 
-    return {
-      interested: {
-        url: "https://iter-bene.s3.eu-north-1.amazonaws.com/basic/interested.png",
-        scaledSize: new window.google.maps.Size(40, 40),
-      },
-      visited: {
-        url: "https://iter-bene.s3.eu-north-1.amazonaws.com/basic/visit.png",
-        scaledSize: new window.google.maps.Size(40, 40),
-      },
-      home: {
-        url: "https://iter-bene.s3.eu-north-1.amazonaws.com/basic/home.png",
-        scaledSize: new window.google.maps.Size(40, 40),
-      },
-    };
+    try {
+      return {
+        interested: {
+          url: "https://iter-bene.s3.eu-north-1.amazonaws.com/basic/interested.png",
+          scaledSize: new window.google.maps.Size(40, 40),
+          optimized: false, // Helps with loading issues
+        },
+        visited: {
+          url: "https://iter-bene.s3.eu-north-1.amazonaws.com/basic/visit.png",
+          scaledSize: new window.google.maps.Size(40, 40),
+          optimized: false,
+        },
+        home: {
+          url: "https://iter-bene.s3.eu-north-1.amazonaws.com/basic/home.png",
+          scaledSize: new window.google.maps.Size(40, 40),
+          optimized: false,
+        },
+      };
+    } catch (error) {
+      console.warn("Error creating custom icons:", error);
+      return null;
+    }
   };
 
   // Handle map toggle without button nesting

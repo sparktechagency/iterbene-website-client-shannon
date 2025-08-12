@@ -67,6 +67,7 @@ const GroupLocationMap = ({
       ? {
           url: "https://iter-bene.s3.eu-north-1.amazonaws.com/basic/interested.png",
           scaledSize: new window.google.maps.Size(40, 40),
+          optimized: false, // Helps with loading issues on AWS
         }
       : undefined;
 
