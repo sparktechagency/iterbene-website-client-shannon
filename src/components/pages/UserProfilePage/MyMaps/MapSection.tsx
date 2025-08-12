@@ -72,30 +72,37 @@ const MapSection = ({
 
   const homeLocation: Location = defaultCenter;
 
-  // Custom marker icons
+  // Custom marker icons with better error handling
   const getCustomIcons = () => {
-    if (!isLoaded || !window.google || !window.google.maps) return null;
+    if (!isLoaded || !window.google || !window.google.maps) {
+      console.warn("Google Maps not loaded yet");
+      return null;
+    }
 
     try {
+      const Size = window.google.maps.Size;
       return {
         interested: {
           url: "https://iter-bene.s3.eu-north-1.amazonaws.com/basic/interested.png",
-          scaledSize: new window.google.maps.Size(40, 40),
-          optimized: false, // Helps with loading issues
+          scaledSize: new Size(40, 40),
+          optimized: false,
+          anchor: new window.google.maps.Point(20, 40),
         },
         visited: {
           url: "https://iter-bene.s3.eu-north-1.amazonaws.com/basic/visit.png",
-          scaledSize: new window.google.maps.Size(40, 40),
+          scaledSize: new Size(40, 40),
           optimized: false,
+          anchor: new window.google.maps.Point(20, 40),
         },
         home: {
           url: "https://iter-bene.s3.eu-north-1.amazonaws.com/basic/home.png",
-          scaledSize: new window.google.maps.Size(40, 40),
+          scaledSize: new Size(40, 40),
           optimized: false,
+          anchor: new window.google.maps.Point(20, 40),
         },
       };
     } catch (error) {
-      console.warn("Error creating custom icons:", error);
+      console.error("Error creating custom icons:", error);
       return null;
     }
   };

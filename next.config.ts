@@ -8,7 +8,12 @@ const nextConfig: NextConfig = {
       permanent: true,
     },
   ],
-
+  rewrites: async () => [
+    {
+      source: "/maps/:path*",
+      destination: "https://maps.googleapis.com/maps/:path*",
+    },
+  ],
   // Optimized image configuration
   images: {
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048],
@@ -70,6 +75,11 @@ const nextConfig: NextConfig = {
 
   env: {
     NEXT_PUBLIC_GOOGLE_MAP_API_KEY: process.env.NEXT_PUBLIC_GOOGLE_MAP_API_KEY,
+  },
+
+  // Ensure proper dynamic route handling
+  async generateBuildId() {
+    return `build-${Date.now()}`;
   },
 };
 

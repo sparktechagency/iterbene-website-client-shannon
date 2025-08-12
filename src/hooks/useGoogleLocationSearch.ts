@@ -50,7 +50,13 @@ export const useGoogleLocationSearch = (
   // Check if API key exists
   useEffect(() => {
     if (!GOOGLE_MAPS_API_KEY) {
-      setError("Google Maps API key is missing");
+      console.error(
+        "Google Maps API key is missing. Key length:",
+        GOOGLE_MAPS_API_KEY?.length || 0
+      );
+      setError(
+        "Google Maps API key is missing. Please check your environment variables."
+      );
       return;
     }
     setIsInitialized(true);
@@ -101,8 +107,15 @@ export const useGoogleLocationSearch = (
 
           if (!response.ok) {
             const errorText = await response.text();
-            console.error("API Response:", errorText);
-            throw new Error(`API Error: ${response.status} - ${errorText}`);
+            console.error("Places API Autocomplete Error:", {
+              status: response.status,
+              statusText: response.statusText,
+              error: errorText,
+              url: response.url,
+            });
+            throw new Error(
+              `API Error: ${response.status} - ${response.statusText}`
+            );
           }
 
           const data = await response.json();
@@ -166,8 +179,15 @@ export const useGoogleLocationSearch = (
 
         if (!response.ok) {
           const errorText = await response.text();
-          console.error("Place details API Response:", errorText);
-          throw new Error(`API Error: ${response.status} - ${errorText}`);
+          console.error("Places API Details Error:", {
+            status: response.status,
+            statusText: response.statusText,
+            error: errorText,
+            placeId: placeId,
+          });
+          throw new Error(
+            `API Error: ${response.status} - ${response.statusText}`
+          );
         }
 
         const data = await response.json();

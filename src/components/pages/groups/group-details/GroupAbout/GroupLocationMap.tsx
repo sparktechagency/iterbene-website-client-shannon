@@ -63,11 +63,12 @@ const GroupLocationMap = ({
 
   // Define custom marker icon only after Google Maps is loaded
   const customMarkerIcon =
-    isLoaded && window.google
+    isLoaded && window.google && window.google.maps
       ? {
           url: "https://iter-bene.s3.eu-north-1.amazonaws.com/basic/interested.png",
           scaledSize: new window.google.maps.Size(40, 40),
-          optimized: false, // Helps with loading issues on AWS
+          optimized: false,
+          anchor: new window.google.maps.Point(20, 40),
         }
       : undefined;
 

@@ -23,22 +23,15 @@ export function middleware(request: NextRequest) {
 // Configure the middleware to run on specific paths
 export const config = {
   matcher: [
-    /* Root protected routes */
-    "/stories/:path*",
-    "/messages/:path*",
-    "/connections/:path*",
-    "/groups/:path*",
-    "/events/:path*",
-
-    /* User-specific routes */
-    "/:userName/connections",
-    "/:userName/groups",
-    "/:userName/invitations",
-    "/:userName/itinerary",
-    "/:userName/maps",
-    "/:userName/photos",
-    "/:userName/privacy",
-    "/:userName/timeline",
-    "/:userName/videos",
+    /*
+     * Match all request paths except for the ones starting with:
+     * - api (API routes)
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     * - login, register, forgot-password, etc. (auth pages)
+     * - about-us, privacy-policy, terms-and-conditions (public pages)
+     */
+    "/((?!api|_next/static|_next/image|favicon.ico|login|register|forgot-password|reset-password|verify-email|about-us|privacy-policy|terms-and-conditions|feed|search|journeys|photos|watch-videos).*)",
   ],
 };
