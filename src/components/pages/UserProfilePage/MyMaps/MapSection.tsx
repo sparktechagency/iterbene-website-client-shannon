@@ -1,21 +1,4 @@
 "use client";
-import { useUnifiedGoogleMaps } from "@/hooks/useUnifiedGoogleMaps";
-import { useGetMyMapsQuery } from "@/redux/features/maps/mapsApi";
-import { ITripVisitedLocation } from "@/types/trip.types";
-import { GoogleMap, Marker } from "@react-google-maps/api";
-import { Loader2 } from "lucide-react";
-
-// Define the map container style
-const mapContainerStyle: React.CSSProperties = {
-  width: "100%",
-  height: "100%",
-};
-
-// Define types for location coordinates
-interface Location {
-  lat: number;
-  lng: number;
-}
 
 const MapSection = ({
   mapHide,
@@ -26,114 +9,85 @@ const MapSection = ({
   showFullMap: boolean;
   setShowFullMap: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
-  const { data: responseData } = useGetMyMapsQuery(undefined, {
-    refetchOnMountOrArgChange: true,
-  });
-
-  // Use the unified Google Maps loader (loads both maps and places)
-  const { isLoaded, loadError } = useUnifiedGoogleMaps();
 
   // Set default center to user's current location from API
-  const userCurrentLocation =
-    responseData?.data?.attributes?.userCurrentLocation;
-  const defaultCenter: Location =
-    userCurrentLocation &&
-    typeof userCurrentLocation.latitude === "number" &&
-    typeof userCurrentLocation.longitude === "number"
-      ? {
-          lat: userCurrentLocation.latitude,
-          lng: userCurrentLocation.longitude,
-        }
-      : {
-          lat: 40.7128, // Fallback to New York if API data is unavailable or invalid
-          lng: -74.006,
-        };
+  // const userCurrentLocation =
+  //   responseData?.data?.attributes?.userCurrentLocation;
+  // const defaultCenter: Location =
+  //   userCurrentLocation &&
+  //   typeof userCurrentLocation.latitude === "number" &&
+  //   typeof userCurrentLocation.longitude === "number"
+  //     ? {
+  //         lat: userCurrentLocation.latitude,
+  //         lng: userCurrentLocation.longitude,
+  //       }
+  //     : {
+  //         lat: 40.7128, // Fallback to New York if API data is unavailable or invalid
+  //         lng: -74.006,
+  //       };
 
   // Get locations from API data
-  const interestedPlaces: Location[] = responseData?.data?.attributes
-    ?.interestedLocations
-    ? responseData.data.attributes.interestedLocations.map(
-        (loc: ITripVisitedLocation) => ({
-          lat: loc.latitude,
-          lng: loc.longitude,
-        })
-      )
-    : [];
+  // const interestedPlaces: Location[] = responseData?.data?.attributes
+  //   ?.interestedLocations
+  //   ? responseData.data.attributes.interestedLocations.map(
+  //       (loc: ITripVisitedLocation) => ({
+  //         lat: loc.latitude,
+  //         lng: loc.longitude,
+  //       })
+  //     )
+  //   : [];
 
-  const visitedPlaces: Location[] = responseData?.data?.attributes
-    ?.visitedLocations
-    ? responseData.data.attributes.visitedLocations.map(
-        (loc: ITripVisitedLocation) => ({
-          lat: loc.latitude,
-          lng: loc.longitude,
-        })
-      )
-    : [];
+  // const visitedPlaces: Location[] = responseData?.data?.attributes
+  //   ?.visitedLocations
+  //   ? responseData.data.attributes.visitedLocations.map(
+  //       (loc: ITripVisitedLocation) => ({
+  //         lat: loc.latitude,
+  //         lng: loc.longitude,
+  //       })
+  //     )
+  //   : [];
 
-  const homeLocation: Location = defaultCenter;
+  // const homeLocation: Location = defaultCenter;
 
   // Custom marker icons with better error handling
-  const getCustomIcons = () => {
-    if (!isLoaded || !window.google || !window.google.maps) {
-      console.warn("Google Maps not loaded yet");
-      return null;
-    }
+  // const getCustomIcons = () => {
+  //   if (!isLoaded || !window.google || !window.google.maps) {
+  //     console.warn("Google Maps not loaded yet");
+  //     return null;
+  //   }
 
-    try {
-      const Size = window.google.maps.Size;
-      return {
-        interested: {
-          url: "https://iter-bene.s3.eu-north-1.amazonaws.com/basic/interested.png",
-          scaledSize: new Size(40, 40),
-          optimized: false,
-          anchor: new window.google.maps.Point(20, 40),
-        },
-        visited: {
-          url: "https://iter-bene.s3.eu-north-1.amazonaws.com/basic/visit.png",
-          scaledSize: new Size(40, 40),
-          optimized: false,
-          anchor: new window.google.maps.Point(20, 40),
-        },
-        home: {
-          url: "https://iter-bene.s3.eu-north-1.amazonaws.com/basic/home.png",
-          scaledSize: new Size(40, 40),
-          optimized: false,
-          anchor: new window.google.maps.Point(20, 40),
-        },
-      };
-    } catch (error) {
-      console.error("Error creating custom icons:", error);
-      return null;
-    }
-  };
+  //   try {
+  //     const Size = window.google.maps.Size;
+  //     return {
+  //       interested: {
+  //         url: "https://iter-bene.s3.eu-north-1.amazonaws.com/basic/interested.png",
+  //         scaledSize: new Size(40, 40),
+  //         optimized: false,
+  //         anchor: new window.google.maps.Point(20, 40),
+  //       },
+  //       visited: {
+  //         url: "https://iter-bene.s3.eu-north-1.amazonaws.com/basic/visit.png",
+  //         scaledSize: new Size(40, 40),
+  //         optimized: false,
+  //         anchor: new window.google.maps.Point(20, 40),
+  //       },
+  //       home: {
+  //         url: "https://iter-bene.s3.eu-north-1.amazonaws.com/basic/home.png",
+  //         scaledSize: new Size(40, 40),
+  //         optimized: false,
+  //         anchor: new window.google.maps.Point(20, 40),
+  //       },
+  //     };
+  //   } catch (error) {
+  //     console.error("Error creating custom icons:", error);
+  //     return null;
+  //   }
+  // };
 
   // Handle map toggle without button nesting
   const handleMapToggle = () => {
     setShowFullMap(!showFullMap);
   };
-
-  if (loadError) {
-    return (
-      <div className="w-full h-[600px] flex items-center justify-center bg-red-50 rounded-2xl">
-        <div className="text-center text-red-600 p-4">
-          <p className="font-medium">Map loading failed</p>
-          <p className="text-sm">{loadError.message}</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (!isLoaded) {
-    return (
-      <div className="w-full h-[600px] flex items-center justify-center bg-gray-100 rounded-2xl">
-        <div className="flex items-center justify-center py-8">
-          <Loader2 className="animate-spin text-primary" size={28} />
-        </div>
-      </div>
-    );
-  }
-
-  const customIcons = getCustomIcons();
 
   return (
     <div
@@ -179,64 +133,6 @@ const MapSection = ({
             </svg>
           )}
         </button>
-      </div>
-
-      <div className="rounded-2xl shadow-md h-full min-h-[200px] md:min-h-[450px] max-h-[720px] overflow-hidden z-20">
-        <GoogleMap
-          mapContainerStyle={mapContainerStyle}
-          center={defaultCenter}
-          zoom={5}
-          options={{
-            zoomControl: false,
-            streetViewControl: false,
-            mapTypeControl: false,
-            fullscreenControl: false,
-            scrollwheel: true,
-            disableDoubleClickZoom: false,
-            keyboardShortcuts: false,
-            draggable: true,
-            clickableIcons: true,
-            gestureHandling: "auto",
-            styles: [
-              {
-                featureType: "poi",
-                elementType: "labels",
-                stylers: [{ visibility: "on" }],
-              },
-            ],
-          }}
-        >
-          {/* Markers for places you're interested in */}
-          {customIcons &&
-            interestedPlaces?.map((place, index) => (
-              <Marker
-                key={`interested-${index}`}
-                position={place}
-                icon={customIcons.interested}
-                title={`Interested Place ${index + 1}`}
-              />
-            ))}
-
-          {/* Markers for places you've visited */}
-          {customIcons &&
-            visitedPlaces?.map((place, index) => (
-              <Marker
-                key={`visited-${index}`}
-                position={place}
-                icon={customIcons.visited}
-                title={`Visited Place ${index + 1}`}
-              />
-            ))}
-
-          {/* Marker for home location */}
-          {customIcons && (
-            <Marker
-              position={homeLocation}
-              icon={customIcons.home}
-              title="Home - Current Location"
-            />
-          )}
-        </GoogleMap>
       </div>
     </div>
   );
