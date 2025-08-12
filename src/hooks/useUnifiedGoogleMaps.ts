@@ -1,6 +1,9 @@
 import { useJsApiLoader } from "@react-google-maps/api";
 import { useMemo } from "react";
 
+// Static libraries array to prevent reloading issues
+const libraries: ("places" | "geometry")[] = ["places", "geometry"];
+
 export const useUnifiedGoogleMaps = () => {
   const GOOGLE_MAPS_API_KEY: string =
     process.env.NEXT_PUBLIC_GOOGLE_MAP_API_KEY || "";
@@ -14,11 +17,11 @@ export const useUnifiedGoogleMaps = () => {
   // Always call the hook, but with conditional configuration
   const { isLoaded, loadError } = useJsApiLoader({
     googleMapsApiKey: GOOGLE_MAPS_API_KEY,
-    libraries: ["places", "geometry"], // Add required libraries for location search
-    language: "en", // Keep English as default but maps will work globally
-    region: undefined, // Remove region restriction for global access
-    preventGoogleFontsLoading: true, // Prevent font loading issues
-    version: "3.55", // Specify Maps API version for consistency
+    libraries: libraries, // Use static libraries array
+    language: "en",
+    region: undefined,
+    preventGoogleFontsLoading: false, // Allow Google Fonts for better map display
+    version: "weekly", // Use weekly version instead of deprecated 3.55
   });
 
   // Handle missing API key after hook call

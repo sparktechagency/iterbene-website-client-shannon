@@ -1,25 +1,25 @@
 "use client";
-import React, { useState } from "react";
-import { PiPlus } from "react-icons/pi";
-import CustomModal from "@/components/custom/custom-modal";
-import Image from "next/image";
-import { FiUpload } from "react-icons/fi";
-import { MdChangeCircle } from "react-icons/md";
 import CustomForm from "@/components/custom/custom-form";
 import CustomInput from "@/components/custom/custom-input";
+import CustomModal from "@/components/custom/custom-modal";
+import Image from "next/image";
+import React, { useState } from "react";
+import { FiUpload } from "react-icons/fi";
+import { MdChangeCircle } from "react-icons/md";
+import { PiPlus } from "react-icons/pi";
 // import CustomSelectField from "@/components/custom/custom-seletectField";
-import { FieldValues } from "react-hook-form";
-import { DollarSignIcon } from "lucide-react";
 import CustomButton from "@/components/custom/custom-button";
-import { IoClose } from "react-icons/io5";
+import LocationSearchInput from "@/components/custom/LocationSearchInput";
+import { LocationDetails } from "@/hooks/useGoogleLocationSearch";
 import useUser from "@/hooks/useUser";
-import { TError } from "@/types/error";
-import toast from "react-hot-toast";
 import { useCreateEventMutation } from "@/redux/features/event/eventApi";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { TError } from "@/types/error";
 import eventValidationSchema from "@/validation/event.validation";
-import LocationSearchInput2 from "@/components/custom/LocationSearchInput2";
-import { LocationDetails2 } from "@/hooks/useGoogleLocationSearch2";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { DollarSignIcon } from "lucide-react";
+import { FieldValues } from "react-hook-form";
+import toast from "react-hot-toast";
+import { IoClose } from "react-icons/io5";
 
 const CreateEvent: React.FC = () => {
   const user = useUser();
@@ -27,7 +27,7 @@ const CreateEvent: React.FC = () => {
   const [eventImage, setEventImage] = useState<string | null>(null);
   const [eventFile, setEventFile] = useState<File | null>(null);
   const [selectedLocation, setSelectedLocation] =
-    useState<LocationDetails2 | null>(null);
+    useState<LocationDetails | null>(null);
   const [duration, setDuration] = useState({ days: 1, nights: 0 });
 
   const openModal = () => setIsModalOpen(true);
@@ -370,7 +370,7 @@ const CreateEvent: React.FC = () => {
                 />
 
                 {/* Reusable Location Search Component */}
-                <LocationSearchInput2
+                <LocationSearchInput
                   label="Location"
                   placeholder="Search for a location..."
                   onLocationSelect={(location) => {

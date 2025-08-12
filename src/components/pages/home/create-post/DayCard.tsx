@@ -1,11 +1,11 @@
 "use client";
-import { Button } from "antd";
-import { DeleteOutlined, PlusCircleOutlined } from "@ant-design/icons";
-import ActivityCard from "./ActivityCard";
 import CustomInput from "@/components/custom/custom-input";
+import { LocationDetails } from "@/hooks/useGoogleLocationSearch";
+import { DeleteOutlined, PlusCircleOutlined } from "@ant-design/icons";
+import { Button } from "antd";
 import { Control, useFieldArray, useFormContext } from "react-hook-form";
+import ActivityCard from "./ActivityCard";
 import LocationSearchInput from "@/components/custom/LocationSearchInput";
-import { LocationDetails2 } from "@/hooks/useGoogleLocationSearch2";
 
 interface DayCardProps {
   control: Control;
@@ -48,7 +48,7 @@ const DayCard = ({ control }: DayCardProps) => {
   }
 
   // Handle location select for specific day
-  const handleLocationSelect = (location: LocationDetails2, dayIndex: number) => {
+  const handleLocationSelect = (location: LocationDetails, dayIndex: number) => {
     setValue(`days.${dayIndex}.locationName`, location.name);
     setValue(`days.${dayIndex}.location`, {
       latitude: location.latitude,

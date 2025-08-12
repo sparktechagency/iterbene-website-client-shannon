@@ -1,27 +1,27 @@
 "use client";
-import React, { useState } from "react";
-import { PiPlus } from "react-icons/pi";
-import CustomModal from "@/components/custom/custom-modal";
-import Image from "next/image";
-import { FiUpload } from "react-icons/fi";
-import { MdChangeCircle } from "react-icons/md";
 import CustomForm from "@/components/custom/custom-form";
 import CustomInput from "@/components/custom/custom-input";
+import CustomModal from "@/components/custom/custom-modal";
+import Image from "next/image";
+import React, { useState } from "react";
+import { FiUpload } from "react-icons/fi";
+import { MdChangeCircle } from "react-icons/md";
+import { PiPlus } from "react-icons/pi";
 // import CustomSelectField from "@/components/custom/custom-seletectField";
-import { FieldValues } from "react-hook-form";
 import CustomButton from "@/components/custom/custom-button";
-import { IoClose } from "react-icons/io5";
+import LocationSearchInput from "@/components/custom/LocationSearchInput";
+import { LocationDetails } from "@/hooks/useGoogleLocationSearch";
 import useUser from "@/hooks/useUser";
-import { Select } from "antd";
 import { useGetMyConnectionsQuery } from "@/redux/features/connections/connectionsApi";
 import { useCreateGroupMutation } from "@/redux/features/group/groupApi";
-import { TError } from "@/types/error";
-import toast from "react-hot-toast";
 import { IMyConnections } from "@/types/connection.types";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { TError } from "@/types/error";
 import groupValidationSchema from "@/validation/group.validation";
-import LocationSearchInput2 from "@/components/custom/LocationSearchInput2";
-import { LocationDetails2 } from "@/hooks/useGoogleLocationSearch2";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Select } from "antd";
+import { FieldValues } from "react-hook-form";
+import toast from "react-hot-toast";
+import { IoClose } from "react-icons/io5";
 
 const { Option } = Select;
 
@@ -32,7 +32,7 @@ const CreateGroup: React.FC = () => {
   const [groupFile, setGroupFile] = useState<File | null>(null);
   const [coLeaders, setCoLeaders] = useState<string[]>([]);
   const [selectedLocation, setSelectedLocation] =
-    useState<LocationDetails2 | null>(null);
+    useState<LocationDetails | null>(null);
 
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => {
@@ -209,7 +209,7 @@ const CreateGroup: React.FC = () => {
                 />
 
                 {/* Reusable Location Search Component */}
-                <LocationSearchInput2
+                <LocationSearchInput
                   label="Location"
                   placeholder="Search for a location..."
                   required

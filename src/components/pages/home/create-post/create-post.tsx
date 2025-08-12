@@ -1,6 +1,7 @@
 "use client";
 import CustomButton from "@/components/custom/custom-button";
 import CustomModal from "@/components/custom/custom-modal";
+import { LocationDetails, LocationPrediction, useGoogleLocationSearch } from "@/hooks/useGoogleLocationSearch";
 import useUser from "@/hooks/useUser";
 import { useGetHashtagsQuery } from "@/redux/features/hashtag/hashtagApi";
 import { useCreateItineraryMutation } from "@/redux/features/itinerary/itineraryApi";
@@ -10,6 +11,7 @@ import {
 } from "@/redux/features/post/postApi";
 import { TError } from "@/types/error";
 import { IActivity, IDay, IItinerary } from "@/types/itinerary.types";
+import { IPost } from "@/types/post.types";
 import { Tooltip } from "antd";
 import { AnimatePresence, motion } from "framer-motion";
 import {
@@ -35,10 +37,8 @@ import "swiper/css/pagination";
 import { Pagination } from "swiper/modules";
 import { Swiper, SwiperClass, SwiperSlide } from "swiper/react";
 import CreateItineraryModal from "./CreateItineraryModal";
-import ShowItineraryModal from "./ShowItineraryModal";
 import EditItineraryModal from "./EditItineraryModal";
-import { IPost } from "@/types/post.types";
-import { LocationDetails2, LocationPrediction2, useGoogleLocationSearch2 } from "@/hooks/useGoogleLocationSearch2";
+import ShowItineraryModal from "./ShowItineraryModal";
 
 export interface FilePreview {
   name: string;
@@ -83,7 +83,7 @@ const CreatePost = ({
 
   // State for location
   const [selectedLocation, setSelectedLocation] =
-    useState<LocationDetails2 | null>(null);
+    useState<LocationDetails | null>(null);
   // Location search states
   const [locationQuery, setLocationQuery] = useState<string>("");
   const locationInputRef = useRef<HTMLInputElement>(null);
@@ -95,10 +95,10 @@ const CreatePost = ({
     searchLocations,
     getLocationDetails,
     clearPredictions,
-  } = useGoogleLocationSearch2({
+  } = useGoogleLocationSearch({
     debounceMs: 300,
     minQueryLength: 1,
-    maxResults: 5
+    maxResults: 20
   });
   const [showLocationPopup, setShowLocationPopup] = useState<boolean>(false);
 
@@ -464,7 +464,7 @@ const CreatePost = ({
   };
 
   // Handle location selection
-  const handleLocationSelect = async (prediction: LocationPrediction2) => {
+  const handleLocationSelect = async (prediction: LocationPrediction) => {
     const locationDetails = await getLocationDetails(prediction.place_id);
     if (locationDetails) {
       setSelectedLocation(locationDetails);
