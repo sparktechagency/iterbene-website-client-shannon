@@ -47,6 +47,7 @@ const EventLocationMap = ({
               streetViewControl: false,
               mapTypeControl: false,
               fullscreenControl: false,
+              
             }}
           >
             <Marker
