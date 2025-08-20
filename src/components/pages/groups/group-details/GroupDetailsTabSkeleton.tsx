@@ -14,7 +14,7 @@ export const GroupDetailsTabSkeleton = () => {
       </div>
 
       {/* Tab content area */}
-      <div className="w-full grid grid-cols-1 md:grid-cols-12 gap-4">
+      <div className="w-full grid grid-cols-1 md:grid-cols-12 gap-4 mt-5">
         <GroupSummarySkeleton />
         <GroupLocationMapSkeleton />
         <GroupAuthorDetailsSkeleton />
