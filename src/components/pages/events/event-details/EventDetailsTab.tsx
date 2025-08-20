@@ -30,7 +30,7 @@ const EventDetailsTab = ({ eventDetailsData }: { eventDetailsData: IEventDetails
         </button>
       </div>
       <div className="w-full py-6">
-        {activeTab === "about" ? <EventAbout eventDetailsData={eventDetailsData} /> : <GroupDiscussion  />}
+        {activeTab === "about" ? <EventAbout eventDetailsData={eventDetailsData} /> : <GroupDiscussion eventDetailsData={eventDetailsData}  />}
       </div>
     </section>
   );

@@ -7,7 +7,7 @@ const GroupParticipantsList = ({
   groupDetailsData: IGroupDetails;
 }) => {
   return (
-    <div className="w-full col-span-full md:col-span-5 bg-white p-6 md:p-9 rounded-xl">
+    <div className="w-full col-span-full md:col-span-5 bg-white p-6 md:p-8 rounded-xl">
       {/* Heading and "Show more" link */}
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-xl md:text-2xl font-semibold text-gray-900">

@@ -29,7 +29,7 @@ const GroupDetailsTab = ({ groupDetailsData }: { groupDetailsData: IGroupDetails
         </button>
       </div>
       <div className="w-full py-6">
-        {activeTab === "about" ? <GroupAbout groupDetailsData={groupDetailsData} /> : <GroupDiscussion />}
+        {activeTab === "about" ? <GroupAbout groupDetailsData={groupDetailsData} /> : <GroupDiscussion groupDetailsData={groupDetailsData} />}
       </div>
     </section>
   );
