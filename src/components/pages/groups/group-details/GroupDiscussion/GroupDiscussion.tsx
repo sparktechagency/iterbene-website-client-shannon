@@ -18,7 +18,7 @@ const GroupDiscussion = ({
         <CreatePost postType="Group" groupId={groupId as string} />
         <GroupPost />
       </div>
-      <div className="w-full max-w-[260px] md:max-w-[280px] xl:max-w-[320px] 2xl:max-w-[382px] space-y-5">
+      <div className="w-full hidden md:block max-w-[260px] md:max-w-[280px] xl:max-w-[320px] 2xl:max-w-[382px] space-y-5">
          <GroupSummary groupDetailsData={groupDetailsData} />
          <GroupParticipantsList groupDetailsData={groupDetailsData} />
       </div>

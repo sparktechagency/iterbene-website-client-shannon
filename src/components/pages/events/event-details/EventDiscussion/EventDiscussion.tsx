@@ -20,7 +20,7 @@ const GroupDiscussion = ({
         <CreatePost postType="Event" eventId={eventId as string} />
         <EventPost />
       </div>
-      <div className="w-full max-w-[260px] md:max-w-[280px] xl:max-w-[320px] 2xl:max-w-[382px] space-y-5">
+      <div className="w-full hidden md:block max-w-[260px] md:max-w-[280px] xl:max-w-[320px] 2xl:max-w-[382px] space-y-5">
         <EventSummary eventDetailsData={eventDetailsData} />
         <EventParticipantsList eventDetailsData={eventDetailsData} />
       </div>
