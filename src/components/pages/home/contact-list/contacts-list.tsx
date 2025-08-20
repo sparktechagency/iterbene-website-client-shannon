@@ -63,7 +63,7 @@ const ContactList: React.FC = () => {
     <section className={`w-full hidden  md:block`}>
       {contacts?.length > 0 && (
         <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-semibold uppercase">Contacts</h1>
+          <h1 className="text-lg md:text-xl font-semibold uppercase">Contacts</h1>
           <div className="size-8 rounded-full bg-primary flex items-center justify-center text-white">
             <span>{totalResults || 0}</span>
           </div>

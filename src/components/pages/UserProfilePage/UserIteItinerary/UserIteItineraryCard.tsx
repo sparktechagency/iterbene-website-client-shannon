@@ -1,9 +1,12 @@
 "use client";
+import CustomModal from "@/components/custom/custom-modal";
 import useUser from "@/hooks/useUser";
+import { openAuthModal } from "@/redux/features/auth/authModalSlice";
 import {
   useAddOrRemoveReactionMutation,
   useIncrementItineraryViewCountMutation,
 } from "@/redux/features/post/postApi";
+import { useAppDispatch } from "@/redux/hooks";
 import { TError } from "@/types/error";
 import {
   IPost,
@@ -11,24 +14,21 @@ import {
   ISortedReaction,
   ReactionType,
 } from "@/types/post.types";
+import formatPostReactionNumber from "@/utils/formatPostReactionNumber";
 import { Tooltip } from "antd";
 import { AnimatePresence, motion } from "framer-motion";
+import Image from "next/image";
+import Link from "next/link";
 import { JSX, useState } from "react";
 import toast from "react-hot-toast";
 import { FaBan, FaCalendarCheck, FaHeart, FaRegHeart } from "react-icons/fa";
 import { FaFaceSmile } from "react-icons/fa6";
-import { MdOutlineLuggage } from "react-icons/md";
-import CustomModal from "@/components/custom/custom-modal";
-import Image from "next/image";
 import { IoMdClose } from "react-icons/io";
-import UserIteItineraryContent from "./UserIteItineraryContent";
-import PostHeader from "../../home/posts/post.header";
-import formatPostReactionNumber from "@/utils/formatPostReactionNumber";
-import Link from "next/link";
-import { useAppDispatch } from "@/redux/hooks";
-import { openAuthModal } from "@/redux/features/auth/authModalSlice";
-import ShowItineraryModal from "../../home/create-post/ShowItineraryModal";
+import { MdOutlineLuggage } from "react-icons/md";
 import PostEditModal from "../../home/create-post/PostEditModal";
+import ShowItineraryModal from "../../home/create-post/ShowItineraryModal";
+import PostHeader from "../../home/posts/post.header";
+import UserIteItineraryContent from "./UserIteItineraryContent";
 
 interface PostCardProps {
   post: IPost;
@@ -212,7 +212,7 @@ const UserIteItineraryCard = ({ post, setTimelinePosts }: PostCardProps) => {
         >
           <span>Click to view full itinerary</span>
           <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs">
-            PDF View Available
+            PDF Download Available
           </span>
         </div>
       )}

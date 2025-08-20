@@ -41,7 +41,7 @@ const FriendRequest = () => {
     <section className={`w-full hidden  md:block`}>
       {connectionsRequestData?.length > 0 && (
         <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-semibold uppercase">Request</h1>
+          <h1 className="text-lg md:text-xl font-semibold uppercase">Request</h1>
           {requestCount > 0 && (
             <div className="size-8 rounded-full bg-primary flex items-center justify-center text-white">
               <h1 className="text-sm font-semibold">{requestCount}</h1>

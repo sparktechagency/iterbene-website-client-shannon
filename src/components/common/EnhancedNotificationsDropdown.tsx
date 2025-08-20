@@ -214,7 +214,7 @@ const EnhancedNotificationsDropdown: React.FC<DropdownProps> = ({
                   <button
                     onClick={handleMarkAllAsRead}
                     disabled={markingAllAsRead}
-                    className="flex items-center gap-2 px-3 py-1.5 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors text-sm disabled:opacity-50"
+                    className="flex items-center cursor-pointer gap-2 px-3 py-1.5 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors text-sm disabled:opacity-50"
                     aria-label="Mark all as read"
                   >
                     {markingAllAsRead ? (
@@ -361,7 +361,7 @@ const EnhancedNotificationsDropdown: React.FC<DropdownProps> = ({
           <div className="border-t border-gray-200 p-3">
             <button
               onClick={() => router.push('/notifications')}
-              className="w-full bg-primary text-white text-sm font-medium py-2.5 rounded-lg hover:bg-primary/90 transition-colors"
+              className="w-full bg-primary cursor-pointer text-white text-sm font-medium py-2.5 rounded-lg hover:bg-primary/90 transition-colors"
             >
               View all notifications
             </button>

@@ -1,10 +1,10 @@
 "use client";
-import React, { useState } from "react";
-import { Calendar, Star, Train, Car, Plane, Ship } from "lucide-react";
-import { IPost } from "@/types/post.types";
 import { IItinerary } from "@/types/itinerary.types";
-import ShowItineraryModal from "../../home/create-post/ShowItineraryModal";
+import { IPost } from "@/types/post.types";
+import { Calendar, Car, Plane, Ship, Star, Train } from "lucide-react";
 import moment from "moment";
+import React, { useState } from "react";
+import ShowItineraryModal from "../../home/create-post/ShowItineraryModal";
 
 interface UserIteItineraryContentProps {
   post: IPost;
@@ -91,7 +91,7 @@ const UserIteItineraryContent: React.FC<UserIteItineraryContentProps> = ({
         <div className="mt-4 pt-4 border-t border-gray-200 flex items-center justify-between text-sm text-gray-500">
           <span>Click to view full itinerary</span>
           <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs">
-            PDF View Available
+            PDF Download Available
           </span>
         </div>
       </div>
