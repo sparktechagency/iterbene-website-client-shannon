@@ -8,7 +8,7 @@ import {
 
 // Define a base query that accesses the token from cookies
 const baseQuery = fetchBaseQuery({
-  baseUrl: process.env.NEXT_PUBLIC_BASE_URL,
+  baseUrl: 'https://api.iterbene.com/api/v1',
   prepareHeaders: (headers) => {
     const token = getAccessToken(); // Get token from cookies
     if (token) {

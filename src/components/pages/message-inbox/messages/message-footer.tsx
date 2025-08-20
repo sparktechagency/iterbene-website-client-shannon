@@ -346,7 +346,7 @@ const MessageFooter = () => {
           ref={textareaRef}
           id="input-message"
           // placeholder={hasOnlyNonImageAttachments ? "You can't send documents and texts at the same time" : "Type a message..."}
-          placeholder="Type a message..."
+          placeholder="Message"
           value={hasOnlyNonImageAttachments ? "" : message}
           onChange={hasOnlyNonImageAttachments ? () => { } : handleChange}
           onKeyPress={hasOnlyNonImageAttachments ? () => { } : handleKeyPress}

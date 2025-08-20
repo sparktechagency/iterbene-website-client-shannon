@@ -199,7 +199,7 @@ const CreatePost = ({
     switch (postType) {
       case "Group":
         return {
-          placeholder: `What's new, ${user?.fullName || "User"}?`,
+          placeholder: `What's happening?`,
           showPrivacy: false,
           showLocation: true,
           showItinerary: true,
@@ -207,7 +207,7 @@ const CreatePost = ({
         };
       case "Event":
         return {
-          placeholder: `What's new, ${user?.fullName || "User"}?`,
+          placeholder: `What's happening?`,
           showPrivacy: false,
           showLocation: true,
           showItinerary: true,
@@ -215,7 +215,7 @@ const CreatePost = ({
         };
       default: // timeline
         return {
-          placeholder: `What's new, ${user?.fullName || "User"}?`,
+          placeholder: `What's happening?`,
           showPrivacy: true,
           showLocation: true,
           showItinerary: true,
