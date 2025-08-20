@@ -93,7 +93,7 @@ const EnhancedMessagesDropdown: React.FC<DropdownProps> = ({
   // Handle notification click
   const handleNotificationClick = (notification: INotification) => {
     if (notification.type === "message") {
-      router.push(`/messages/${notification?.receiverId}`);
+      router.push(`/messages/${notification?.senderId}`);
     }
   };
 

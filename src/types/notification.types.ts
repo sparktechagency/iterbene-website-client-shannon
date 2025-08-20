@@ -3,6 +3,7 @@ export interface INotification {
   title: string;
   message: string;
   receiverId: string;
+  senderId?: string;
   role: string;
   image?: string;
   type:

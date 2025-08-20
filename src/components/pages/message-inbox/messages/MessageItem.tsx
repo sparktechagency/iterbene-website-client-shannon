@@ -25,6 +25,8 @@ const MessageItem: React.FC<MessageItemProps> = ({
   // Limit displayed images to 2
   const displayedImages = fileUrls.slice(0, 2);
   const extraImagesCount = fileUrls.length - displayedImages.length;
+
+  console.log("MessageItem:", message);
   return (
     <div
       className={`flex ${
@@ -280,27 +282,23 @@ const MessageItem: React.FC<MessageItemProps> = ({
                     </h1>
                   </div>
                 )
+              ) : message?.storyMedia?.mediaType === "mixed" ? (
+                message?.storyMedia?.mediaUrl ? (
+                  <Image
+                    src={message?.storyMedia?.mediaUrl || ""}
+                    alt={`Story Image`}
+                    width={150}
+                    height={150}
+                    className="w-[120px] h-[120px] object-cover rounded-lg"
+                  />
+                ) : (
+                  <div className="w-[120px] h-[120px] bg-slate-100 flex items-center justify-center rounded-lg">
+                    <h1 className="text-xs text-gray-700 text-center">
+                      Journey no longer available
+                    </h1>
+                  </div>
+                )
               ) : (
-                <div
-                  className={`w-[120px] h-[120px]  flex items-center justify-center rounded-lg`}
-                  style={{
-                    backgroundColor: message?.storyMedia?.backgroundColor,
-                  }}
-                >
-                  <h1
-                    style={{
-                      color: message?.storyMedia?.textColor,
-                      fontSize: message?.storyMedia?.textSize,
-                    }}
-                    className="text-center"
-                  >
-                    {message?.storyMedia?.textContent}
-                  </h1>
-                </div>
-              )}
-
-              {/* Text */}
-              {message.content.text && (
                 <div
                   className={`max-w-fit p-3 rounded-xl mt-2 ${
                     isMyMessage

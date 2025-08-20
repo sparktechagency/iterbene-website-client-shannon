@@ -70,7 +70,7 @@ const MobileBottomNavigation = () => {
       }`}
     >
       <div className="flex justify-around items-center max-w-md mx-auto">
-        {navigationItems.map((item, index) => (
+        {navigationItems?.map((item, index) => (
           <Link
             key={index + 1}
             href={item.href}
