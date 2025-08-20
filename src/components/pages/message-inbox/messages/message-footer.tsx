@@ -1,7 +1,17 @@
 "use client";
 import { useSendMessageMutation } from "@/redux/features/inbox/inboxApi";
-import { Camera, Paperclip, Send, X, FileText, Smile } from "lucide-react";
-import React, { useState, useRef, useEffect } from "react";
+import {
+  Camera,
+  Paperclip,
+  Send,
+  X,
+  FileText,
+  Smile,
+  Eye,
+  Download,
+  Play,
+} from "lucide-react";
+import React, { useState, useRef, useEffect, useMemo } from "react";
 import { useParams } from "next/navigation";
 import Image from "next/image";
 import { TError } from "@/types/error";
@@ -11,9 +21,10 @@ import CustomEmojiPicker from "@/components/ui/CustomEmojiPicker";
 
 interface SelectedFile {
   file: File;
-  preview?: string; // Optional for non-image files
+  preview?: string;
   id: string;
-  type: "image" | "file";
+  type: "image" | "file" | "pdf" | "video";
+  duration?: number;
 }
 
 const MessageFooter = () => {
@@ -28,6 +39,21 @@ const MessageFooter = () => {
   const attachmentScrollRef = useRef<HTMLDivElement>(null);
   const emojiPickerRef = useRef<HTMLDivElement>(null);
 
+  // Check if there are ONLY non-media attachments
+  const hasOnlyNonMediaAttachments = useMemo(
+    () =>
+      selectedFiles.length > 0 &&
+      selectedFiles.every(
+        (file) =>
+          !file.file.type.startsWith("image/") &&
+          !file.file.type.startsWith("video/")
+      ),
+    [selectedFiles]
+  );
+  
+  // Check if user is typing (has message or files)
+  const isTyping = message.trim().length > 0 || selectedFiles.length > 0;
+
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setMessage(e.target.value);
   };
@@ -37,10 +63,23 @@ const MessageFooter = () => {
     const textarea = textareaRef.current;
     if (textarea) {
       textarea.style.height = "auto";
-      const newHeight = Math.min(textarea.scrollHeight, 120); // max 120px height
+      const maxHeight = window.innerWidth < 768 ? 100 : 120;
+      const newHeight = Math.min(textarea.scrollHeight, maxHeight);
       textarea.style.height = newHeight + "px";
     }
   }, [message]);
+
+  // Auto focus textarea when switching to typing mode
+  useEffect(() => {
+    if (isTyping && textareaRef.current && !hasOnlyNonMediaAttachments) {
+      // Small delay to ensure layout transition is complete
+      const timer = setTimeout(() => {
+        textareaRef.current?.focus();
+      }, 150);
+
+      return () => clearTimeout(timer);
+    }
+  }, [isTyping, hasOnlyNonMediaAttachments]);
 
   // Close emoji picker when clicking outside
   useEffect(() => {
@@ -62,46 +101,80 @@ const MessageFooter = () => {
     };
   }, [showEmojiPicker]);
 
-  // Handle emoji selection
+  // Handle emoji selection with auto focus
   const handleEmojiSelect = (emoji: string) => {
     setMessage(message + emoji);
     if (textareaRef.current) {
+      // Focus and set cursor position after emoji
+      const newMessage = message + emoji;
       textareaRef.current.focus();
-      const length = (message + emoji).length;
-      textareaRef.current.setSelectionRange(length, length);
+      textareaRef.current.setSelectionRange(
+        newMessage.length,
+        newMessage.length
+      );
     }
   };
 
-  // Handle image selection (for camera button)
+  // Handle image/video selection with auto focus
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
 
     files.forEach((file) => {
+      const newFile: SelectedFile = {
+        file,
+        id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
+        type: "file",
+      };
+
       if (file.type.startsWith("image/")) {
         const reader = new FileReader();
         reader.onload = (event) => {
-          const newFile: SelectedFile = {
-            file,
-            preview: event.target?.result as string,
-            id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
-            type: "image",
-          };
-
+          newFile.preview = event.target?.result as string;
+          newFile.type = "image";
           setSelectedFiles((prev) => [...prev, newFile]);
-
-          // Auto scroll to end after adding attachment
+          // Auto focus textarea after file is added
           setTimeout(() => {
-            if (attachmentScrollRef.current) {
-              attachmentScrollRef.current.scrollLeft =
-                attachmentScrollRef.current.scrollWidth;
+            if (textareaRef.current && !hasOnlyNonMediaAttachments) {
+              textareaRef.current.focus();
             }
-          }, 100);
+          }, 200);
         };
         reader.readAsDataURL(file);
+      } else if (file.type.startsWith("video/")) {
+        const videoUrl = URL.createObjectURL(file);
+        const video = document.createElement("video");
+        video.src = videoUrl;
+        video.onloadedmetadata = () => {
+          video.currentTime = 1;
+        };
+        video.onseeked = () => {
+          const canvas = document.createElement("canvas");
+          const ctx = canvas.getContext("2d");
+          canvas.width = video.videoWidth;
+          canvas.height = video.videoHeight;
+          ctx?.drawImage(video, 0, 0);
+          newFile.preview = canvas.toDataURL();
+          newFile.type = "video";
+          newFile.duration = video.duration;
+          setSelectedFiles((prev) => [...prev, newFile]);
+          // Auto focus textarea after file is added
+          setTimeout(() => {
+            if (textareaRef.current && !hasOnlyNonMediaAttachments) {
+              textareaRef.current.focus();
+            }
+          }, 200);
+          URL.revokeObjectURL(videoUrl);
+        };
       }
+
+      setTimeout(() => {
+        if (attachmentScrollRef.current) {
+          attachmentScrollRef.current.scrollLeft =
+            attachmentScrollRef.current.scrollWidth;
+        }
+      }, 100);
     });
 
-    // Clear input
     if (imageInputRef.current) {
       imageInputRef.current.value = "";
     }
@@ -118,7 +191,6 @@ const MessageFooter = () => {
         type: "file",
       };
 
-      // If it's an image, add preview
       if (file.type.startsWith("image/")) {
         const reader = new FileReader();
         reader.onload = (event) => {
@@ -127,11 +199,32 @@ const MessageFooter = () => {
           setSelectedFiles((prev) => [...prev, newFile]);
         };
         reader.readAsDataURL(file);
+      } else if (file.type === "application/pdf") {
+        newFile.type = "pdf";
+        setSelectedFiles((prev) => [...prev, newFile]);
+      } else if (file.type.startsWith("video/")) {
+        const videoUrl = URL.createObjectURL(file);
+        const video = document.createElement("video");
+        video.src = videoUrl;
+        video.onloadedmetadata = () => {
+          video.currentTime = 1;
+        };
+        video.onseeked = () => {
+          const canvas = document.createElement("canvas");
+          const ctx = canvas.getContext("2d");
+          canvas.width = video.videoWidth;
+          canvas.height = video.videoHeight;
+          ctx?.drawImage(video, 0, 0);
+          newFile.preview = canvas.toDataURL();
+          newFile.type = "video";
+          newFile.duration = video.duration;
+          setSelectedFiles((prev) => [...prev, newFile]);
+          URL.revokeObjectURL(videoUrl);
+        };
       } else {
         setSelectedFiles((prev) => [...prev, newFile]);
       }
 
-      // Auto scroll to end after adding attachment
       setTimeout(() => {
         if (attachmentScrollRef.current) {
           attachmentScrollRef.current.scrollLeft =
@@ -140,7 +233,6 @@ const MessageFooter = () => {
       }, 100);
     });
 
-    // Clear input
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
@@ -151,12 +243,12 @@ const MessageFooter = () => {
     setSelectedFiles((prev) => prev.filter((file) => file.id !== id));
   };
 
-  // Handle camera button click (images only)
+  // Handle camera button click
   const handleCameraClick = () => {
     imageInputRef.current?.click();
   };
 
-  // Handle attachment button click (all files)
+  // Handle attachment button click
   const handleAttachmentClick = () => {
     fileInputRef.current?.click();
   };
@@ -175,10 +267,12 @@ const MessageFooter = () => {
     return filename.split(".").pop()?.toUpperCase() || "";
   };
 
-  // Check if there are ONLY non-image attachments (no images at all)
-  const hasOnlyNonImageAttachments =
-    selectedFiles.length > 0 &&
-    selectedFiles.every((file) => !file.file.type.startsWith("image/"));
+  // Format video duration
+  const formatDuration = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins}:${secs.toString().padStart(2, "0")}`;
+  };
 
   // Handle send message
   const handleSendMessage = async () => {
@@ -187,28 +281,23 @@ const MessageFooter = () => {
 
     const formData = new FormData();
 
-    // Send message text normally, unless there are only non-image attachments
-    if (!hasOnlyNonImageAttachments) {
+    if (!hasOnlyNonMediaAttachments) {
       formData.append("message", message);
     } else {
-      // For only non-image attachments, send empty message
       formData.append("message", "");
     }
 
     formData.append("receiverId", receiverId as string);
 
-    // Add files to form data
     selectedFiles.forEach((selectedFile) => {
       formData.append("files", selectedFile?.file);
     });
 
     try {
       await sendMessage(formData).unwrap();
-      // Reset form
       setMessage("");
       setSelectedFiles([]);
       setShowEmojiPicker(false);
-      // Reset textarea height
       if (textareaRef.current) {
         textareaRef.current.style.height = "auto";
       }
@@ -228,54 +317,151 @@ const MessageFooter = () => {
 
   return (
     <div className="w-full p-3 md:p-5">
-      {/* Selected Files Preview */}
+      {/* Selected Files Preview - Instagram/Facebook Style */}
       {selectedFiles?.length > 0 && (
         <div className="mb-3">
           <div
             ref={attachmentScrollRef}
-            className="flex space-x-2 overflow-x-auto p-2 scrollbar-thin bg-white scrollbar-thumb-gray-300 scrollbar-track-gray-100 scrollbar-hide"
-            style={{ scrollbarWidth: "thin" }}
+            className="flex gap-2 sm:gap-3 overflow-x-auto p-2 scrollbar-hide"
+            style={{ scrollbarWidth: "none" }}
           >
             {selectedFiles?.map((selectedFile) => (
               <div key={selectedFile.id} className="relative flex-shrink-0">
                 {selectedFile.type === "image" && selectedFile.preview ? (
-                  // Image preview
-                  <div className="relative">
-                    <Image
-                      src={selectedFile.preview}
-                      alt="Selected"
-                      width={60}
-                      height={60}
-                      className="size-[60px] rounded object-cover"
-                    />
+                  // Image preview - Instagram style with rounded corners
+                  <div className="relative group">
+                    <div className="relative overflow-hidden rounded-xl bg-gray-100">
+                      <Image
+                        src={selectedFile.preview}
+                        alt="Selected"
+                        width={80}
+                        height={80}
+                        className="w-16 h-16 sm:w-20 sm:h-20 object-cover transition-transform group-hover:scale-105"
+                      />
+                      {/* Gradient overlay on hover */}
+                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors rounded-xl"></div>
+                    </div>
                     <button
                       onClick={() => removeFile(selectedFile.id)}
-                      className="absolute -top-2 cursor-pointer -right-1 size-4 bg-red-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-red-600 transition-colors"
+                      className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-red-600 transition-all transform hover:scale-110 shadow-lg"
+                    >
+                      <X size={12} />
+                    </button>
+                  </div>
+                ) : selectedFile.type === "video" && selectedFile.preview ? (
+                  // Video preview - Instagram style
+                  <div className="relative group">
+                    <div className="relative overflow-hidden rounded-xl bg-gray-100">
+                      <Image
+                        src={selectedFile.preview}
+                        alt="Video thumbnail"
+                        width={90}
+                        height={80}
+                        className="w-20 h-16 sm:w-24 sm:h-20 object-cover transition-transform group-hover:scale-105"
+                      />
+                      {/* Play button overlay */}
+                      <div className="absolute inset-0 flex items-center justify-center bg-black/20 rounded-xl group-hover:bg-black/30 transition-colors">
+                        <div className="bg-white/95 backdrop-blur-sm rounded-full p-2 shadow-lg">
+                          <Play
+                            size={14}
+                            className="text-gray-800 ml-0.5"
+                            fill="currentColor"
+                          />
+                        </div>
+                      </div>
+                      {/* Duration badge */}
+                      {selectedFile.duration && (
+                        <div className="absolute bottom-1.5 right-1.5 bg-black/80 text-white text-xs px-1.5 py-0.5 rounded-md backdrop-blur-sm">
+                          {formatDuration(selectedFile.duration)}
+                        </div>
+                      )}
+                    </div>
+                    <button
+                      onClick={() => removeFile(selectedFile.id)}
+                      className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-red-600 transition-all transform hover:scale-110 shadow-lg"
+                    >
+                      <X size={12} />
+                    </button>
+                  </div>
+                ) : selectedFile.type === "pdf" ? (
+                  // PDF preview - Modern card style
+                  <div className="relative bg-white rounded-2xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow w-60 sm:w-72">
+                    <div className="p-3 sm:p-4">
+                      <div className="flex items-start gap-3">
+                        <div className="bg-red-50 p-2.5 rounded-xl flex-shrink-0">
+                          <FileText size={20} className="text-red-600" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h4 className="font-medium text-gray-900 text-sm truncate mb-1">
+                            {selectedFile.file.name}
+                          </h4>
+                          <p className="text-xs text-gray-500 mb-3">
+                            PDF • {formatFileSize(selectedFile.file.size)}
+                          </p>
+                          <div className="flex items-center gap-3">
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                const fileUrl = URL.createObjectURL(
+                                  selectedFile.file
+                                );
+                                window.open(fileUrl, "_blank");
+                              }}
+                              className="flex items-center gap-1.5 text-xs font-medium text-blue-600 hover:text-blue-700 transition-colors px-2 py-1 rounded-lg hover:bg-blue-50"
+                            >
+                              <Eye size={12} />
+                              <span>Preview</span>
+                            </button>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                const url = URL.createObjectURL(
+                                  selectedFile.file
+                                );
+                                const a = document.createElement("a");
+                                a.href = url;
+                                a.download = selectedFile.file.name;
+                                a.click();
+                                URL.revokeObjectURL(url);
+                              }}
+                              className="flex items-center gap-1.5 text-xs font-medium text-gray-600 hover:text-gray-700 transition-colors px-2 py-1 rounded-lg hover:bg-gray-50"
+                            >
+                              <Download size={12} />
+                              <span>Download</span>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => removeFile(selectedFile.id)}
+                      className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-red-600 transition-all transform hover:scale-110 shadow-lg"
                     >
                       <X size={12} />
                     </button>
                   </div>
                 ) : (
-                  // File preview
-                  <div className="relative bg-gray-100 rounded-lg p-2 w-32 border">
-                    <div className="flex items-center space-x-2">
-                      <FileText
-                        size={16}
-                        className="text-gray-600 flex-shrink-0"
-                      />
-                      <div className="flex-1 min-w-0">
-                        <p className="text-xs text-gray-800 truncate font-medium">
-                          {selectedFile.file.name}
-                        </p>
-                        <p className="text-xs text-gray-500">
-                          {getFileExtension(selectedFile.file.name)} •{" "}
-                          {formatFileSize(selectedFile.file.size)}
-                        </p>
+                  // Regular file preview - Modern card style
+                  <div className="relative bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow w-40 sm:w-48">
+                    <div className="p-3">
+                      <div className="flex items-center gap-2.5">
+                        <div className="bg-gray-50 p-2 rounded-lg flex-shrink-0">
+                          <FileText size={16} className="text-gray-600" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs font-medium text-gray-800 truncate">
+                            {selectedFile.file.name}
+                          </p>
+                          <p className="text-xs text-gray-500 mt-0.5">
+                            {getFileExtension(selectedFile.file.name)} •{" "}
+                            {formatFileSize(selectedFile.file.size)}
+                          </p>
+                        </div>
                       </div>
                     </div>
                     <button
                       onClick={() => removeFile(selectedFile.id)}
-                      className="absolute -top-2 cursor-pointer -right-1 size-4 bg-red-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-red-600 transition-colors"
+                      className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-red-600 transition-all transform hover:scale-110 shadow-lg"
                     >
                       <X size={12} />
                     </button>
@@ -287,17 +473,13 @@ const MessageFooter = () => {
         </div>
       )}
 
-      {/* Message Input Area */}
+      {/* Message Input Area - Dynamic Layout */}
       <div className="relative">
-        <div
-          className={`px-2 py-1.5 md:px-4 border border-[#CAD1CF] flex items-center space-x-2 ${message?.length > 0 ? "rounded-2xl" : "rounded-full"
-            }`}>
         {/* Hidden file inputs */}
         <input
           type="file"
           ref={fileInputRef}
           onChange={handleFileSelect}
-          //  only can accept pdf
           accept="application/pdf"
           multiple
           className="hidden"
@@ -306,79 +488,172 @@ const MessageFooter = () => {
           type="file"
           ref={imageInputRef}
           onChange={handleImageSelect}
-          accept="image/*"
+          accept="video/*,image/*"
           multiple
           className="hidden"
         />
 
-        {/* Attachment button (all files) */}
-        <button
-          onClick={handleAttachmentClick}
-          className="size-8 flex justify-center items-center rounded-full flex-shrink-0 text-gray-500 hover:text-gray-700 border border-[#CAD1CF] transition-colors cursor-pointer"
-          disabled={isLoading}
-          title="Attach file"
+        <div
+          className={`px-2 py-1.5 md:px-4 border border-[#CAD1CF] transition-all duration-300 ${
+            isTyping ? "rounded-2xl" : "rounded-full"
+          }`}
         >
-          <Paperclip size={20} />
-        </button>
+          {/* Typing Mode - Textarea on top, buttons below */}
+          {isTyping ? (
+            <div className="space-y-2">
+              {/* Textarea */}
+              <div className="w-full">
+                <textarea
+                  ref={textareaRef}
+                  placeholder={
+                    hasOnlyNonMediaAttachments
+                      ? "Files ready to send"
+                      : "Type a message..."
+                  }
+                  value={hasOnlyNonMediaAttachments ? "" : message}
+                  onChange={
+                    hasOnlyNonMediaAttachments ? () => {} : handleChange
+                  }
+                  onKeyPress={
+                    hasOnlyNonMediaAttachments ? () => {} : handleKeyPress
+                  }
+                  rows={1}
+                  className={`w-full p-2 py-2.5 focus:outline-none resize-none overflow-y-auto bg-transparent scrollbar-hide text-gray-800 placeholder-gray-500 ${
+                    hasOnlyNonMediaAttachments ? "cursor-not-allowed" : ""
+                  }`}
+                  style={{
+                    minHeight: "32px",
+                    maxHeight: window.innerWidth < 768 ? "100px" : "120px",
+                  }}
+                  disabled={isLoading || hasOnlyNonMediaAttachments}
+                  readOnly={hasOnlyNonMediaAttachments}
+                />
+              </div>
 
-        {/* Camera button (images only) */}
-        <button
-          onClick={handleCameraClick}
-          className="size-8 flex justify-center items-center rounded-full flex-shrink-0 text-gray-500 hover:text-gray-700 border border-[#CAD1CF] transition-colors cursor-pointer"
-          disabled={isLoading}
-          title="Add image"
-        >
-          <Camera size={20} />
-        </button>
+              {/* Buttons Row */}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-2">
+                  {/* Attachment button */}
+                  <button
+                    onClick={handleAttachmentClick}
+                    className="w-8 h-8 sm:w-9 sm:h-9 flex justify-center items-center rounded-full flex-shrink-0 text-gray-500 hover:text-gray-700 border border-[#CAD1CF] transition-colors cursor-pointer"
+                    disabled={isLoading}
+                    title="Attach PDF"
+                  >
+                    <Paperclip size={18} />
+                  </button>
 
-        {/* Emoji button */}
-        <button
-          onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-          className="size-8 flex justify-center items-center rounded-full flex-shrink-0 text-gray-500 hover:text-gray-700 border border-[#CAD1CF] transition-colors cursor-pointer"
-          disabled={isLoading || hasOnlyNonImageAttachments}
-          title="Add emoji"
-        >
-          <Smile size={20} />
-        </button>
+                  {/* Camera button */}
+                  <button
+                    onClick={handleCameraClick}
+                    className="w-8 h-8 sm:w-9 sm:h-9 flex justify-center items-center rounded-full flex-shrink-0 text-gray-500 hover:text-gray-700 border border-[#CAD1CF] transition-colors cursor-pointer"
+                    disabled={isLoading}
+                    title="Add image or video"
+                  >
+                    <Camera size={18} />
+                  </button>
 
-        {/* Textarea */}
-        <textarea
-          ref={textareaRef}
-          id="input-message"
-          // placeholder={hasOnlyNonImageAttachments ? "You can't send documents and texts at the same time" : "Type a message..."}
-          placeholder="Message"
-          value={hasOnlyNonImageAttachments ? "" : message}
-          onChange={hasOnlyNonImageAttachments ? () => { } : handleChange}
-          onKeyPress={hasOnlyNonImageAttachments ? () => { } : handleKeyPress}
-          rows={1}
-          className={`w-full p-2 focus:outline-none resize-none overflow-y-auto bg-transparent scrollbar-hide ${hasOnlyNonImageAttachments
-              ? "text-gray-800 placeholder-gray-500 cursor-not-allowed "
-              : "text-gray-800 placeholder-gray-500"
-            }`}
-          style={{
-            minHeight: "30px",
-            maxHeight: "120px",
-          }}
-          disabled={isLoading || hasOnlyNonImageAttachments}
-          readOnly={hasOnlyNonImageAttachments}
-        />
+                  {/* Emoji button */}
+                  <button
+                    onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+                    className="w-8 h-8 sm:w-9 sm:h-9 flex justify-center items-center rounded-full flex-shrink-0 text-gray-500 hover:text-gray-700 border border-[#CAD1CF] transition-colors cursor-pointer"
+                    disabled={isLoading || hasOnlyNonMediaAttachments}
+                    title="Add emoji"
+                  >
+                    <Smile size={18} />
+                  </button>
+                </div>
 
-        {/* Send button */}
-        {isLoading ? (
-          <CgSpinner className="animate-spin size-9 text-primary" />
-        ) : (
-          <button
-            onClick={handleSendMessage}
-            disabled={
-              isLoading ||
-              (!message.trim() && selectedFiles.length === 0) ||
-              (hasOnlyNonImageAttachments && selectedFiles.length === 0)
-            }
-            className="size-9 cursor-pointer flex justify-center items-center rounded-full flex-shrink-0 text-gray-500 hover:text-gray-700 border border-[#CAD1CF] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <Send size={20} />
-          </button>
-        )}
+                {/* Send button */}
+                {isLoading ? (
+                  <CgSpinner className="animate-spin w-9 h-9 sm:w-10 sm:h-10 text-primary" />
+                ) : (
+                  <button
+                    onClick={handleSendMessage}
+                    disabled={
+                      isLoading ||
+                      (!message.trim() && selectedFiles.length === 0) ||
+                      (hasOnlyNonMediaAttachments && selectedFiles.length === 0)
+                    }
+                    className="w-9 h-9 sm:w-10 sm:h-10 cursor-pointer flex justify-center items-center rounded-full flex-shrink-0 text-gray-500 hover:text-gray-700 border border-[#CAD1CF] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <Send size={18} className="sm:w-5 sm:h-5" />
+                  </button>
+                )}
+              </div>
+            </div>
+          ) : (
+            /* Default Mode - Original single row layout */
+            <div className="flex items-end space-x-2">
+              {/* Attachment button */}
+              <button
+                onClick={handleAttachmentClick}
+                className="w-8 h-8 sm:w-9 sm:h-9 flex justify-center items-center rounded-full flex-shrink-0 text-gray-500 hover:text-gray-700 border border-[#CAD1CF] transition-colors cursor-pointer mb-1"
+                disabled={isLoading}
+                title="Attach PDF"
+              >
+                <Paperclip size={18} />
+              </button>
+
+              {/* Camera button */}
+              <button
+                onClick={handleCameraClick}
+                className="w-8 h-8 sm:w-9 sm:h-9 flex justify-center items-center rounded-full flex-shrink-0 text-gray-500 hover:text-gray-700 border border-[#CAD1CF] transition-colors cursor-pointer mb-1"
+                disabled={isLoading}
+                title="Add image or video"
+              >
+                <Camera size={18} />
+              </button>
+
+              {/* Emoji button */}
+              <button
+                onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+                className="w-8 h-8 sm:w-9 sm:h-9 flex justify-center items-center rounded-full flex-shrink-0 text-gray-500 hover:text-gray-700 border border-[#CAD1CF] transition-colors cursor-pointer mb-1"
+                disabled={isLoading || hasOnlyNonMediaAttachments}
+                title="Add emoji"
+              >
+                <Smile size={18} />
+              </button>
+
+              {/* Textarea */}
+              <textarea
+                ref={textareaRef}
+                placeholder="Message"
+                value={hasOnlyNonMediaAttachments ? "" : message}
+                onChange={hasOnlyNonMediaAttachments ? () => {} : handleChange}
+                onKeyPress={
+                  hasOnlyNonMediaAttachments ? () => {} : handleKeyPress
+                }
+                rows={1}
+                className={`flex-1 min-w-0 p-2 py-2.5 focus:outline-none resize-none overflow-y-auto bg-transparent scrollbar-hide text-gray-800 placeholder-gray-500 ${
+                  hasOnlyNonMediaAttachments ? "cursor-not-allowed" : ""
+                }`}
+                style={{
+                  minHeight: "32px",
+                  maxHeight: window.innerWidth < 768 ? "100px" : "120px",
+                }}
+                disabled={isLoading || hasOnlyNonMediaAttachments}
+                readOnly={hasOnlyNonMediaAttachments}
+              />
+
+              {/* Send button */}
+              {isLoading ? (
+                <CgSpinner className="animate-spin w-9 h-9 sm:w-10 sm:h-10 text-primary mb-1" />
+              ) : (
+                <button
+                  onClick={handleSendMessage}
+                  disabled={
+                    isLoading ||
+                    (!message.trim() && selectedFiles.length === 0) ||
+                    (hasOnlyNonMediaAttachments && selectedFiles.length === 0)
+                  }
+                  className="w-9 h-9 sm:w-10 sm:h-10 cursor-pointer flex justify-center items-center rounded-full flex-shrink-0 text-gray-500 hover:text-gray-700 border border-[#CAD1CF] transition-colors disabled:opacity-50 disabled:cursor-not-allowed mb-1"
+                >
+                  <Send size={18} className="sm:w-5 sm:h-5" />
+                </button>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Emoji Picker */}

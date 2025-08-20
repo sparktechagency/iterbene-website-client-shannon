@@ -131,9 +131,7 @@ const EnhancedNotificationsDropdown: React.FC<DropdownProps> = ({
       router.push(`/journey/${notification?.linkId}`);
     } else if ((notification.type  === "group")) {
       router.push(`/groups/${notification?.linkId}`);
-    } else if ((notification.type === "connection")) {
-      router.push(`/connections/${notification?.linkId}`);
-    } else if ((notification.type === "message")) {
+    }else if ((notification.type === "message")) {
       router.push(`/messages/${notification?.linkId}`);
     }else if ((notification.type === "event")) {
       router.push(`/events/${notification?.linkId}`);
