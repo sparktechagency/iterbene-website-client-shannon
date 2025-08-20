@@ -510,6 +510,7 @@ const Header: React.FC = () => {
                   </motion.button>
                   <EnhancedMessagesDropdown
                     isOpen={isMessagesOpen}
+                    setIsMessagesOpen={setIsMessagesOpen}
                     setUnviewMessageCount={setUnviewMessageCount}
                   />
                 </div>
@@ -528,6 +529,7 @@ const Header: React.FC = () => {
                   </motion.button>
                   <EnhancedNotificationsDropdown
                     isOpen={isNotificationsOpen}
+                    setIsNotificationsOpen={setIsNotificationsOpen}
                     setUnviewNotificationCount={setUnviewNotificationCount}
                   />
                 </div>

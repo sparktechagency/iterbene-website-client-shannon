@@ -16,9 +16,9 @@ import { Bell, Check, CheckCheck, RefreshCw } from "lucide-react";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import { INotification } from "@/types/notification.types";
 
-
 interface DropdownProps {
   isOpen: boolean;
+  setIsNotificationsOpen: React.Dispatch<React.SetStateAction<boolean>>;
   setUnviewNotificationCount: React.Dispatch<React.SetStateAction<number>>;
 }
 
@@ -46,6 +46,7 @@ const getNotificationIcon = (type: string) => {
 
 const EnhancedNotificationsDropdown: React.FC<DropdownProps> = ({
   isOpen,
+  setIsNotificationsOpen,
   setUnviewNotificationCount,
 }) => {
   const [allNotifications, setAllNotifications] = useState<INotification[]>([]);
@@ -69,7 +70,8 @@ const EnhancedNotificationsDropdown: React.FC<DropdownProps> = ({
   );
 
   // Mark all as read mutation
-  const [viewAllNotifications, { isLoading: markingAllAsRead }] = useViewAllNotificationsMutation();
+  const [viewAllNotifications, { isLoading: markingAllAsRead }] =
+    useViewAllNotificationsMutation();
 
   // Memoize unviewNotificationCount
   const unviewNotificationCount = useMemo(
@@ -125,17 +127,17 @@ const EnhancedNotificationsDropdown: React.FC<DropdownProps> = ({
 
   // Handle notification click
   const handleNotificationClick = (notification: INotification) => {
-    if ((notification.type === "post")) {
+    if (notification.type === "post") {
       router.push(`/feed/${notification?.linkId}`);
-    } else if ((notification.type === "story")) {
+    } else if (notification.type === "story") {
       router.push(`/journey/${notification?.linkId}`);
-    } else if ((notification.type  === "group")) {
+    } else if (notification.type === "group") {
       router.push(`/groups/${notification?.linkId}`);
-    }else if ((notification.type === "message")) {
+    } else if (notification.type === "message") {
       router.push(`/messages/${notification?.linkId}`);
-    }else if ((notification.type === "event")) {
+    } else if (notification.type === "event") {
       router.push(`/events/${notification?.linkId}`);
-    }else if ((notification.type === "comment")) {
+    } else if (notification.type === "comment") {
       router.push(`/feed/${notification?.linkId}`);
     }
   };
@@ -145,13 +147,29 @@ const EnhancedNotificationsDropdown: React.FC<DropdownProps> = ({
     try {
       await viewAllNotifications(undefined).unwrap();
       setUnviewNotificationCount(0);
-      setAllNotifications(prev => 
-        prev.map(n => ({ ...n, viewStatus: true }))
+      setAllNotifications((prev) =>
+        prev.map((n) => ({ ...n, viewStatus: true }))
       );
       toast.success("All notifications marked as read!");
     } catch (error) {
       const err = error as TError;
       toast.error(err?.data?.message || "Something went wrong!");
+    }
+  };
+
+  // Handle View All Notifications - Fixed navigation issue
+  const handleViewAllNotifications = async () => {
+    try {
+      // Use router.push with a force refresh approach
+      router.push("/notifications");
+      setIsNotificationsOpen((prev) => !prev);
+
+      // Alternative approach if the above doesn't work:
+      // window.location.href = '/notifications';
+    } catch (error) {
+      console.error("Error navigating to notifications page:", error);
+      // Fallback to window.location if router fails
+      window.location.href = "/notifications";
     }
   };
 
@@ -166,9 +184,9 @@ const EnhancedNotificationsDropdown: React.FC<DropdownProps> = ({
     isLoading,
     isFetching,
     hasMore,
-    onLoadMore: () => setCurrentPage(prev => prev + 1),
+    onLoadMore: () => setCurrentPage((prev) => prev + 1),
     threshold: 0.1,
-    rootMargin: '50px'
+    rootMargin: "50px",
   });
 
   return (
@@ -190,7 +208,9 @@ const EnhancedNotificationsDropdown: React.FC<DropdownProps> = ({
               <div className="flex items-center gap-3">
                 <Bell className="w-5 h-5 text-primary" />
                 <div>
-                  <h3 className="font-semibold text-lg text-gray-900">Notifications</h3>
+                  <h3 className="font-semibold text-lg text-gray-900">
+                    Notifications
+                  </h3>
                   {unviewNotificationCount > 0 && (
                     <p className="text-sm text-gray-500">
                       {unviewNotificationCount} unread
@@ -198,7 +218,7 @@ const EnhancedNotificationsDropdown: React.FC<DropdownProps> = ({
                   )}
                 </div>
               </div>
-              
+
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => refetchNotifications()}
@@ -207,7 +227,7 @@ const EnhancedNotificationsDropdown: React.FC<DropdownProps> = ({
                 >
                   <RefreshCw className="w-4 h-4" />
                 </button>
-                
+
                 {unviewNotificationCount > 0 && (
                   <button
                     onClick={handleMarkAllAsRead}
@@ -268,14 +288,20 @@ const EnhancedNotificationsDropdown: React.FC<DropdownProps> = ({
                 {allNotifications?.map((notification, index) => (
                   <div
                     key={notification?._id}
-                    ref={index === allNotifications.length - 1 ? lastElementRef : null}
+                    ref={
+                      index === allNotifications.length - 1
+                        ? lastElementRef
+                        : null
+                    }
                     onClick={() => handleNotificationClick(notification)}
                     onKeyDown={(e) =>
                       (e.key === "Enter" || e.key === " ") &&
                       handleNotificationClick(notification)
                     }
                     className={`px-4 py-3 hover:bg-gray-50 cursor-pointer transition-colors flex items-start gap-3 ${
-                      !notification.viewStatus ? "bg-primary/5 border-l-4 border-l-primary" : ""
+                      !notification.viewStatus
+                        ? "bg-primary/5 border-l-4 border-l-primary"
+                        : ""
                     }`}
                     role="button"
                     tabIndex={0}
@@ -338,7 +364,9 @@ const EnhancedNotificationsDropdown: React.FC<DropdownProps> = ({
                 <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-3">
                   <IoMdNotificationsOutline className="w-8 h-8" />
                 </div>
-                <h4 className="font-medium text-gray-900 mb-1">No notifications yet</h4>
+                <h4 className="font-medium text-gray-900 mb-1">
+                  No notifications yet
+                </h4>
                 <p className="text-sm text-center max-w-xs">
                   When you have new notifications, they&apos;ll appear here.
                 </p>
@@ -354,14 +382,22 @@ const EnhancedNotificationsDropdown: React.FC<DropdownProps> = ({
                 </div>
               </div>
             )}
-          </div>          
-          {/* View All Button */}
+          </div>
+
+          {/* View All Button - Fixed */}
           <div className="border-t border-gray-200 p-3">
             <button
-              onClick={() => router.push('/notifications')}
-              className="w-full bg-primary cursor-pointer text-white text-sm font-medium py-2.5 rounded-lg hover:bg-primary/90 transition-colors"
+              onClick={handleViewAllNotifications}
+              className="w-full bg-primary cursor-pointer text-white text-sm font-medium py-2.5 rounded-lg hover:bg-primary/90 transition-colors flex items-center justify-center gap-2"
             >
-              View all notifications
+              <span>View all notifications</span>
+              <motion.div
+                initial={{ x: 0 }}
+                whileHover={{ x: 2 }}
+                transition={{ type: "spring", stiffness: 400, damping: 30 }}
+              >
+                →
+              </motion.div>
             </button>
           </div>
         </motion.div>

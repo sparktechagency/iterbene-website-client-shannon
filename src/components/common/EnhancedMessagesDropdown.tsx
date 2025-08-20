@@ -16,11 +16,13 @@ import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import { INotification } from "@/types/notification.types";
 interface DropdownProps {
   isOpen: boolean;
+  setIsMessagesOpen: React.Dispatch<React.SetStateAction<boolean>>;
   setUnviewMessageCount: React.Dispatch<React.SetStateAction<number>>;
 }
 
 const EnhancedMessagesDropdown: React.FC<DropdownProps> = ({
   isOpen,
+  setIsMessagesOpen,
   setUnviewMessageCount,
 }) => {
   const [allNotifications, setAllNotifications] = useState<INotification[]>([]);
@@ -94,6 +96,7 @@ const EnhancedMessagesDropdown: React.FC<DropdownProps> = ({
   const handleNotificationClick = (notification: INotification) => {
     if (notification.type === "message") {
       router.push(`/messages/${notification?.senderId}`);
+      setIsMessagesOpen((prev) => !prev);
     }
   };
 
