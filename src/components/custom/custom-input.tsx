@@ -11,6 +11,7 @@ type TInputProps = {
   size?: "sm" | "md" | "lg";
   required?: boolean;
   fullWidth?: boolean;
+  maxLength?: number;
   placeholder?: string;
   isTextarea?: boolean;
   icon?: React.ReactNode;
@@ -27,6 +28,7 @@ const CustomInput = ({
   type = "text",
   size = "md",
   variant = "default",
+  maxLength,
   required = false,
   placeholder = "Enter value",
   icon,
@@ -60,10 +62,7 @@ const CustomInput = ({
   return (
     <div className={`w-full relative`}>
       {label && (
-        <label
-          htmlFor={name}
-          className="block text-gray-950   text-[15px]"
-        >
+        <label htmlFor={name} className="block text-gray-950   text-[15px]">
           {label} {required && <span className="text-red-500">*</span>}
         </label>
       )}
@@ -73,7 +72,9 @@ const CustomInput = ({
         render={({ field, fieldState: { error } }) => (
           <div className="relative">
             <motion.div
-              className={`${fullWidth ? "w-full" : "w-auto"} flex items-center ${
+              className={`${
+                fullWidth ? "w-full" : "w-auto"
+              } flex items-center ${
                 variant === "outline"
                   ? "bg-transparent border-b border-primary rounded-none"
                   : "border rounded-lg"
@@ -88,6 +89,7 @@ const CustomInput = ({
                   {...field}
                   value={field.value || ""}
                   placeholder={placeholder}
+                  maxLength={maxLength}
                   onChange={(e) => {
                     field.onChange(e);
                     if (onChange) onChange(e);
@@ -100,6 +102,7 @@ const CustomInput = ({
                   {...field}
                   value={field.value || ""}
                   type={inputType}
+                  maxLength={maxLength}
                   placeholder={placeholder}
                   onChange={(e) => {
                     field.onChange(e);

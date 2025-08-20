@@ -33,6 +33,7 @@ const CreateGroup: React.FC = () => {
   const [coLeaders, setCoLeaders] = useState<string[]>([]);
   const [selectedLocation, setSelectedLocation] =
     useState<LocationDetails | null>(null);
+  const [descriptionLength, setDescriptionLength] = useState(0);
 
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => {
@@ -42,6 +43,7 @@ const CreateGroup: React.FC = () => {
     setGroupFile(null);
     setGroupImage(null);
     setCoLeaders([]);
+    setDescriptionLength(0);
   };
 
   // Get my all connections list
@@ -66,6 +68,8 @@ const CreateGroup: React.FC = () => {
       setGroupFile(file);
     }
   };
+
+
 
   const handleFormSubmit = async (values: FieldValues) => {
     // Validate location selection
@@ -230,18 +234,61 @@ const CreateGroup: React.FC = () => {
                   required
                 /> */}
 
-                {/* Description */}
-                <CustomInput
-                  type="textarea"
-                  label="Description"
-                  name="description"
-                  isTextarea
-                  placeholder="What are the details?"
-                  required
-                />
+                {/* Description with Character Counter */}
+                <div className="relative">
+                  <CustomInput
+                    type="textarea"
+                    label="Description"
+                    maxLength={395}
+                    name="description"
+                    isTextarea
+                    placeholder="What are the details?"
+                    required
+                    onChange={(e) => setDescriptionLength(e.target.value.length)}
+                  />
+
+                  {/* Character counter with dynamic styling */}
+                  <div
+                    className={`text-sm mt-2 flex justify-between items-center transition-colors duration-200 ${
+                      descriptionLength > 375 && descriptionLength < 395
+                        ? "text-orange-500"
+                        : descriptionLength === 395
+                        ? "text-red-500 font-semibold"
+                        : "text-gray-500"
+                    }`}
+                  >
+                    <span>
+                      {descriptionLength === 395
+                        ? "Character limit reached! Cannot type more."
+                        : descriptionLength > 375
+                        ? `Only ${395 - descriptionLength} characters left`
+                        : `${395 - descriptionLength} characters remaining`}
+                    </span>
+                    <span className="font-medium text-gray-700">
+                      {descriptionLength}/395
+                    </span>
+                  </div>
+
+                  {/* Progress bar */}
+                  <div className="w-full bg-gray-200 rounded-full h-1.5 mt-2">
+                    <div
+                      className={`h-1.5 rounded-full transition-all duration-300 ${
+                        descriptionLength < 300
+                          ? "bg-green-500"
+                          : descriptionLength < 375
+                          ? "bg-yellow-500"
+                          : descriptionLength < 395
+                          ? "bg-orange-500"
+                          : "bg-red-500"
+                      }`}
+                      style={{ width: `${(descriptionLength / 395) * 100}%` }}
+                    ></div>
+                  </div>
+                </div>
+
                 <div className="flex flex-col gap-3">
                   <div className="flex items-center gap-2">
-                    <button className="size-6 flex justify-center  items-center rounded-full flex-shrink-0 border-2">
+                    <button className="size-6 flex justify-center items-center rounded-full flex-shrink-0 border-2">
                       <PiPlus size={18} />
                     </button>
                     <h1 className="text-base font-semibold text-gray-900">
@@ -265,7 +312,7 @@ const CreateGroup: React.FC = () => {
                         </Option>
                       ))}
                     </Select>
-                    <h1 className=" text-gray-600 mt-2">
+                    <h1 className="text-gray-600 mt-2">
                       Co-leaders can accept or decline once you&apos;ve
                       published your group.
                     </h1>
@@ -275,7 +322,7 @@ const CreateGroup: React.FC = () => {
                 <CustomButton
                   loading={isLoading}
                   type="submit"
-                  className="px-5 py-3.5 rounded-xl border  transition cursor-pointer"
+                  className="px-5 py-3.5 rounded-xl border transition cursor-pointer"
                 >
                   <span>Create Group</span>
                 </CustomButton>

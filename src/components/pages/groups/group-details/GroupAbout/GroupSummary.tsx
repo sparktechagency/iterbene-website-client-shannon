@@ -1,9 +1,13 @@
-import {IGroupDetails } from "@/types/group.types";
+import { IGroupDetails } from "@/types/group.types";
 import { LucideUserRound } from "lucide-react";
 import { BsPeople } from "react-icons/bs";
 import { HiOutlineLocationMarker } from "react-icons/hi";
 
-const GroupSummary = ({ groupDetailsData }: { groupDetailsData: IGroupDetails }) => {
+const GroupSummary = ({
+  groupDetailsData,
+}: {
+  groupDetailsData: IGroupDetails;
+}) => {
   return (
     <div className="w-full col-span-full md:col-span-7 bg-white p-8 rounded-xl">
       <div className="w-full space-y-5 ">
@@ -29,7 +33,9 @@ const GroupSummary = ({ groupDetailsData }: { groupDetailsData: IGroupDetails })
           </h1>
         </div>
       </div>
-      <h1 className="text-lg mt-7">{groupDetailsData?.description}</h1>
+      <h1 className="text-lg mt-7 overflow-hidden  text-ellipsis">
+        {groupDetailsData?.description}
+      </h1>
     </div>
   );
 };
