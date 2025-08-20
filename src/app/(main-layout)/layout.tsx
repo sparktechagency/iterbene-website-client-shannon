@@ -12,6 +12,7 @@ import { usePathname } from "next/navigation";
 import React from "react";
 import FirstTimeUserModal from "@/components/common/FirstTimeUserModal";
 import useFirstTimeUser from "@/hooks/useFirstTimeUser";
+import MobileBottomNavigation from "@/components/common/mobile-bottom-navigation";
 
 const MainLayout = ({ children }: { children: React.ReactNode }) => {
   // Custom hook to get user data
@@ -49,7 +50,7 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
 
       {/* Layout for Mobile & Tablet screens (hidden on large screens) */}
       <section className="w-full container mx-auto px-3 sm:px-5 pt-[90px] md:pt-[130px] block lg:hidden">
-        <div className="w-full pb-10">
+        <div className="w-full pb-20">
           {/* Main content is rendered here */}
           {children}
         </div>
@@ -78,6 +79,9 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
           </div>
         )}
       </section>
+
+      {/* Mobile Bottom Navigation */}
+      <MobileBottomNavigation />
 
       {/* First Time User Modal */}
       <FirstTimeUserModal isOpen={showFirstTimeModal} onClose={closeModal} />

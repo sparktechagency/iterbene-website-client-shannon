@@ -1,16 +1,97 @@
 "use client";
 import { useGetUserTimelinePostsQuery } from "@/redux/features/post/postApi";
-import { useState, useEffect, useRef, useCallback } from "react";
-import { IPost } from "@/types/post.types";
+import React, { useState, useEffect, useRef, useCallback } from "react";
+import { IMedia, IPost } from "@/types/post.types";
 import { useParams } from "next/navigation";
 import VideoCard from "./VideoCard";
 import UserVideoSkeleton from "./UserVideoSkeleton";
+import { useInView } from "react-intersection-observer";
+import { useGlobalVideoControl } from "@/hooks/useVideoPlayer";
+
+// Simple VideoCard wrapper with global video control
+interface VideoCardWithGlobalControlProps {
+  media: IMedia;
+  isLastVideo: boolean;
+  currentPlayingVideo: string | null;
+  setCurrentPlayingVideo: (videoId: string | null) => void;
+  lastVideoElementRef: ((node: HTMLDivElement | null) => void) | null;
+  pauseAllVideos: () => void;
+}
+
+const VideoCardWithGlobalControl = React.memo<VideoCardWithGlobalControlProps>(({ 
+  media, 
+  isLastVideo, 
+  currentPlayingVideo, 
+  setCurrentPlayingVideo, 
+  lastVideoElementRef,
+  pauseAllVideos
+}) => {
+  const { ref: intersectionRef } = useInView({
+    threshold: 0.5,
+    triggerOnce: false,
+  });
+  
+  const [videoElement, setVideoElement] = useState<HTMLDivElement | null>(null);
+  
+  // Combine refs for intersection observer and infinite scroll
+  const setRefs = useCallback((node: HTMLDivElement | null) => {
+    setVideoElement(node);
+    intersectionRef(node);
+    if (isLastVideo && lastVideoElementRef) {
+      lastVideoElementRef(node);
+    }
+  }, [intersectionRef, isLastVideo, lastVideoElementRef]);
+  
+  // Handle video play events
+  const handleVideoPlay = useCallback(() => {
+    if (currentPlayingVideo && currentPlayingVideo !== media._id) {
+      pauseAllVideos();
+    }
+    setCurrentPlayingVideo(media._id);
+  }, [currentPlayingVideo, media._id, pauseAllVideos, setCurrentPlayingVideo]);
+  
+  const handleVideoPause = useCallback(() => {
+    if (currentPlayingVideo === media._id) {
+      setCurrentPlayingVideo(null);
+    }
+  }, [currentPlayingVideo, media._id, setCurrentPlayingVideo]);
+  
+  // Add event listeners to video element
+  useEffect(() => {
+    if (videoElement) {
+      const videoTag = videoElement.querySelector('video');
+      if (videoTag) {
+        videoTag.addEventListener('play', handleVideoPlay);
+        videoTag.addEventListener('pause', handleVideoPause);
+        
+        return () => {
+          videoTag.removeEventListener('play', handleVideoPlay);
+          videoTag.removeEventListener('pause', handleVideoPause);
+        };
+      }
+    }
+  }, [videoElement, handleVideoPlay, handleVideoPause]);
+  
+  return (
+    <div ref={setRefs}>
+      <VideoCard
+        url={media.mediaUrl}
+        className="h-[200px] md:h-[300px]"
+        isVisible={false}
+      />
+    </div>
+  );
+});
+
+VideoCardWithGlobalControl.displayName = 'VideoCardWithGlobalControl';
 
 const UserVideos = () => {
   const { userName } = useParams();
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [timelinePosts, setTimelinePosts] = useState<IPost[]>([]);
   const [hasMore, setHasMore] = useState(true);
+  const [currentPlayingVideo, setCurrentPlayingVideo] = useState<string | null>(null);
+  const { pauseAllVideos } = useGlobalVideoControl();
   const observer = useRef<IntersectionObserver | null>(null);
   const loaderRef = useRef<HTMLDivElement | null>(null);
 
@@ -94,22 +175,17 @@ const UserVideos = () => {
     content = (
       <div className="w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
         {videoMedia.map((media, index) => {
-          // Attach ref to the last video for infinite scroll
-          if (index === videoMedia.length - 1) {
-            return (
-              <div key={media._id} ref={lastVideoElementRef}>
-                <VideoCard
-                  url={media.mediaUrl}
-                  className="w-full h-[200px] md:h-[300px]"
-                />
-              </div>
-            );
-          }
+          const isLastVideo = index === videoMedia.length - 1;
+          
           return (
-            <VideoCard
+            <VideoCardWithGlobalControl
               key={media._id}
-              url={media.mediaUrl}
-              className="h-[200px] md:h-[300px]"
+              media={media}
+              isLastVideo={isLastVideo}
+              currentPlayingVideo={currentPlayingVideo}
+              setCurrentPlayingVideo={setCurrentPlayingVideo}
+              lastVideoElementRef={isLastVideo ? lastVideoElementRef : null}
+              pauseAllVideos={pauseAllVideos}
             />
           );
         })}

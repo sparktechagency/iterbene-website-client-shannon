@@ -78,7 +78,7 @@ const ChatCard = ({ chat }: ChatListCardProps) => {
           )}
 
           <div>
-            <h1 className="text-[18px] font-medium">
+            <h1 className="text-sm md:text-base">
               {receiverDetails?.fullName || "Unknown User"}
             </h1>
             <p className="text-[14px] text-gray-600">

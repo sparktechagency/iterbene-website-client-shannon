@@ -25,8 +25,8 @@ import CustomButton from "../custom/custom-button";
 import useUser from "@/hooks/useUser";
 import { IUser } from "@/types/user.types";
 import { useRouter } from "next/navigation";
-import MessagesDropdown from "./MessagesDropdown";
-import NotificationsDropdown from "./NotificationsDropdown";
+import EnhancedMessagesDropdown from "./EnhancedMessagesDropdown";
+import EnhancedNotificationsDropdown from "./EnhancedNotificationsDropdown";
 import UserDropdown from "./UserDropdown";
 import { useSocket } from "@/lib/socket";
 import { IHashtag, ISearchResult } from "@/types/search.types";
@@ -508,7 +508,7 @@ const Header: React.FC = () => {
                       </div>
                     )}
                   </motion.button>
-                  <MessagesDropdown
+                  <EnhancedMessagesDropdown
                     isOpen={isMessagesOpen}
                     setUnviewMessageCount={setUnviewMessageCount}
                   />
@@ -526,7 +526,7 @@ const Header: React.FC = () => {
                       </div>
                     )}
                   </motion.button>
-                  <NotificationsDropdown
+                  <EnhancedNotificationsDropdown
                     isOpen={isNotificationsOpen}
                     setUnviewNotificationCount={setUnviewNotificationCount}
                   />

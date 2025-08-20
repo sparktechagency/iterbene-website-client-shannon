@@ -1,13 +1,20 @@
 export interface INotification {
-  _id?: string;
-  receiverId?: string | string;
+  _id: string;
   title: string;
-  message?: string;
+  message: string;
+  receiverId: string;
+  role: string;
   image?: string;
-  type: string;
-  linkId?: string | string;
-  role: "admin" | "user";
-  viewStatus?: boolean;
-  createdAt?: Date;
-  updatedAt?: Date;
+  type:
+    | "post"
+    | "story"
+    | "comment"
+    | "event"
+    | "group"
+    | "connection"
+    | "message";
+  linkId?: string;
+  viewStatus: boolean;
+  createdAt: string;
+  updatedAt: string;
 }

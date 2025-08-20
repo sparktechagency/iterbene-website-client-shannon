@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from "react";
 
 // Global video manager to ensure only one video plays at a time
 class GlobalVideoManager {
@@ -27,7 +27,7 @@ class GlobalVideoManager {
   }
 
   private notifyListeners() {
-    this.listeners.forEach(listener => listener(this.currentVideo));
+    this.listeners.forEach((listener) => listener(this.currentVideo));
   }
 
   pauseAll() {
@@ -56,7 +56,7 @@ export const useVideoPlayer = ({
   onPlay,
   onPause,
   onEnded,
-  onError
+  onError,
 }: UseVideoPlayerOptions) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -102,7 +102,7 @@ export const useVideoPlayer = ({
   }, [onEnded]);
 
   const handleError = useCallback(() => {
-    setError('Video failed to load');
+    setError("Video failed to load");
     setIsLoading(false);
     setIsPlaying(false);
     onError?.();
@@ -132,8 +132,8 @@ export const useVideoPlayer = ({
       try {
         await videoRef.current.play();
       } catch (error) {
-        console.error('Failed to play video:', error);
-        setError('Failed to play video');
+        console.error("Failed to play video:", error);
+        setError("Failed to play video");
       }
     }
   }, []);
@@ -153,11 +153,14 @@ export const useVideoPlayer = ({
     }
   }, []);
 
-  const seek = useCallback((time: number) => {
-    if (videoRef.current) {
-      videoRef.current.currentTime = Math.max(0, Math.min(time, duration));
-    }
-  }, [duration]);
+  const seek = useCallback(
+    (time: number) => {
+      if (videoRef.current) {
+        videoRef.current.currentTime = Math.max(0, Math.min(time, duration));
+      }
+    },
+    [duration]
+  );
 
   const setVideoVolume = useCallback((newVolume: number) => {
     const clampedVolume = Math.max(0, Math.min(1, newVolume));
@@ -193,13 +196,13 @@ export const useVideoPlayer = ({
     video.muted = isMuted;
 
     // Add event listeners
-    video.addEventListener('play', handlePlay);
-    video.addEventListener('pause', handlePause);
-    video.addEventListener('ended', handleEnded);
-    video.addEventListener('error', handleError);
-    video.addEventListener('loadstart', handleLoadStart);
-    video.addEventListener('loadeddata', handleLoadedData);
-    video.addEventListener('timeupdate', handleTimeUpdate);
+    video.addEventListener("play", handlePlay);
+    video.addEventListener("pause", handlePause);
+    video.addEventListener("ended", handleEnded);
+    video.addEventListener("error", handleError);
+    video.addEventListener("loadstart", handleLoadStart);
+    video.addEventListener("loadeddata", handleLoadedData);
+    video.addEventListener("timeupdate", handleTimeUpdate);
 
     // Autoplay if enabled
     if (autoplay) {
@@ -207,13 +210,13 @@ export const useVideoPlayer = ({
     }
 
     return () => {
-      video.removeEventListener('play', handlePlay);
-      video.removeEventListener('pause', handlePause);
-      video.removeEventListener('ended', handleEnded);
-      video.removeEventListener('error', handleError);
-      video.removeEventListener('loadstart', handleLoadStart);
-      video.removeEventListener('loadeddata', handleLoadedData);
-      video.removeEventListener('timeupdate', handleTimeUpdate);
+      video.removeEventListener("play", handlePlay);
+      video.removeEventListener("pause", handlePause);
+      video.removeEventListener("ended", handleEnded);
+      video.removeEventListener("error", handleError);
+      video.removeEventListener("loadstart", handleLoadStart);
+      video.removeEventListener("loadeddata", handleLoadedData);
+      video.removeEventListener("timeupdate", handleTimeUpdate);
     };
   }, [
     videoId,
@@ -227,7 +230,7 @@ export const useVideoPlayer = ({
     handleError,
     handleLoadStart,
     handleLoadedData,
-    handleTimeUpdate
+    handleTimeUpdate,
   ]);
 
   return {
@@ -251,9 +254,9 @@ export const useVideoPlayer = ({
     formatTime: (time: number) => {
       const minutes = Math.floor(time / 60);
       const seconds = Math.floor(time % 60);
-      return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+      return `${minutes}:${seconds.toString().padStart(2, "0")}`;
     },
-    getProgress: () => duration ? (currentTime / duration) * 100 : 0,
+    getProgress: () => (duration ? (currentTime / duration) * 100 : 0),
   };
 };
 

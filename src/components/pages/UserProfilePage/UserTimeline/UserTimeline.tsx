@@ -5,12 +5,14 @@ import { IPost } from "@/types/post.types";
 import { useParams } from "next/navigation";
 import UserTimelineCard from "./UserTimelineCard";
 import UserTimelineSkeletonCard from "./UserTimelineSkeletonCard";
+import { useGlobalVideoControl } from "@/hooks/useVideoPlayer";
 
 const UserTimeline = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [timelinePosts, setTimelinePosts] = useState<IPost[]>([]);
   const [hasMore, setHasMore] = useState(true);
   const [loading, setLoading] = useState(false);
+  const { pauseAllVideos } = useGlobalVideoControl();
   const observer = useRef<IntersectionObserver | null>(null);
   const { userName } = useParams();
   const username =
@@ -94,7 +96,8 @@ const UserTimeline = () => {
     setTimelinePosts([]);
     setCurrentPage(1);
     setHasMore(true);
-  }, [username]);
+    pauseAllVideos();
+  }, [username, pauseAllVideos]);
 
   // Load more posts function
   const loadMore = useCallback(() => {

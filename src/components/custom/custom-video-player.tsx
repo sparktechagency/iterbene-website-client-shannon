@@ -6,6 +6,7 @@ import {
   Play,
   Volume2,
   VolumeX,
+  RotateCcw,
 } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
 
@@ -24,6 +25,9 @@ const CustomVideoPlayer: React.FC<VideoPlayerProps> = ({ url }) => {
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [showControls, setShowControls] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [hasEnded, setHasEnded] = useState(false);
 
   useEffect(() => {
     const video = videoRef.current;
@@ -44,9 +48,8 @@ const CustomVideoPlayer: React.FC<VideoPlayerProps> = ({ url }) => {
     const handleEnded = () => {
       setIsPlaying(false);
       setShowControls(false);
-      video.currentTime = 0; // Reset to the beginning
-      setProgress(0); // Reset progress bar
-      setCurrentTime(0); // Reset current time
+      setHasEnded(true);
+      // Don't auto-reset anymore, let user click replay
     };
 
     // Fallback to check duration if loadedmetadata doesn't fire
@@ -58,11 +61,28 @@ const CustomVideoPlayer: React.FC<VideoPlayerProps> = ({ url }) => {
       }
     };
 
+    const handleLoadStart = () => {
+      setIsLoading(true);
+      setError(null);
+    };
+
+    const handleCanPlay = () => {
+      setIsLoading(false);
+    };
+
+    const handleError = () => {
+      setIsLoading(false);
+      setError("Failed to load video");
+    };
+
     // Disable context menu (three-dot menu)
     video.addEventListener("contextmenu", (e) => e.preventDefault());
     video.addEventListener("timeupdate", handleTimeUpdate);
     video.addEventListener("loadedmetadata", handleLoadedMetadata);
     video.addEventListener("ended", handleEnded);
+    video.addEventListener("loadstart", handleLoadStart);
+    video.addEventListener("canplay", handleCanPlay);
+    video.addEventListener("error", handleError);
 
     // Trigger fallback check
     setTimeout(checkDuration, 100);
@@ -76,20 +96,39 @@ const CustomVideoPlayer: React.FC<VideoPlayerProps> = ({ url }) => {
       video.removeEventListener("timeupdate", handleTimeUpdate);
       video.removeEventListener("loadedmetadata", handleLoadedMetadata);
       video.removeEventListener("ended", handleEnded);
+      video.removeEventListener("loadstart", handleLoadStart);
+      video.removeEventListener("canplay", handleCanPlay);
+      video.removeEventListener("error", handleError);
       video.removeEventListener("contextmenu", (e) => e.preventDefault());
     };
   }, []);
 
   const togglePlay = () => {
     if (videoRef.current) {
+      if (hasEnded) {
+        // Reset video when replaying
+        videoRef.current.currentTime = 0;
+        setProgress(0);
+        setCurrentTime(0);
+        setHasEnded(false);
+      }
+      
       if (isPlaying) {
         videoRef.current.pause();
-        setShowControls(false); // Hide controls when paused
+        setShowControls(false);
       } else {
         videoRef.current.play();
-        setShowControls(true); // Show controls when playing
+        setShowControls(true);
       }
       setIsPlaying(!isPlaying);
+    }
+  };
+
+  const handleRetry = () => {
+    setError(null);
+    setIsLoading(true);
+    if (videoRef.current) {
+      videoRef.current.load();
     }
   };
 
@@ -158,14 +197,47 @@ const CustomVideoPlayer: React.FC<VideoPlayerProps> = ({ url }) => {
         controlsList="nodownload" // Disable download option
       />
 
-      {/* Centered Play Icon (Visible by default when not playing) */}
-      {!isPlaying && (
+      {/* Loading Spinner */}
+      {isLoading && (
+        <div className="absolute inset-0 flex items-center justify-center bg-black">
+          <div className="relative">
+            <div className="w-8 h-8 border-2 border-gray-600 border-t-white rounded-full animate-spin"></div>
+            <div className="absolute top-12 left-1/2 transform -translate-x-1/2 text-white text-xs whitespace-nowrap">
+              Loading...
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Error State */}
+      {error && !isLoading && (
+        <div className="absolute inset-0 flex items-center justify-center bg-black">
+          <div className="text-center text-white">
+            <div className="text-2xl mb-2">⚠️</div>
+            <p className="text-sm mb-3">{error}</p>
+            <button
+              onClick={handleRetry}
+              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg text-sm transition-colors cursor-pointer flex items-center gap-2 mx-auto"
+            >
+              <RotateCcw size={16} />
+              Retry
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Centered Play/Replay Icon */}
+      {!isPlaying && !isLoading && !error && (
         <div className="absolute inset-0 flex items-center justify-center">
           <button
             onClick={togglePlay}
             className="text-white size-16 flex justify-center cursor-pointer items-center opacity-80 hover:opacity-100 transition-opacity duration-300 bg-gray-900/50 rounded-full"
           >
-            <Play size={34} strokeWidth={1.5} />
+            {hasEnded ? (
+              <RotateCcw size={34} strokeWidth={1.5} />
+            ) : (
+              <Play size={34} strokeWidth={1.5} />
+            )}
           </button>
         </div>
       )}

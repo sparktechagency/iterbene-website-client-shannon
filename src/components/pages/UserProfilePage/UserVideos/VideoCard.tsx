@@ -5,7 +5,7 @@ import {
   VolumeX,
   Maximize,
   Minimize,
-  PictureInPicture,
+  RotateCcw,
 } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
 
@@ -24,7 +24,7 @@ const VideoCard = ({
   const progressRef = useRef<HTMLDivElement>(null);
   const playPromiseRef = useRef<Promise<void> | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [isMuted, setIsMuted] = useState(true);
+  const [isMuted, setIsMuted] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [progress, setProgress] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
@@ -34,6 +34,8 @@ const VideoCard = ({
   const [isHovered, setIsHovered] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isFullScreen, setIsFullScreen] = useState(false);
+  const [hasEnded, setHasEnded] = useState(false);
+  // const [userWantsReplay, setUserWantsReplay] = useState(false);
 
   const playVideo = React.useCallback(async () => {
     if (videoRef.current) {
@@ -79,15 +81,16 @@ const VideoCard = ({
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
-      if (isVisible && !isPlaying && !isLoading && !userPaused) {
+      if (isVisible && !isPlaying && !isLoading && !userPaused && !hasEnded && !userInteracted) {
         playVideo();
-      } else if (!isVisible && isPlaying && !userPaused) {
+      } else if (!isVisible && isPlaying && !userPaused && !userInteracted) {
+        // Only auto-pause if user didn't manually start the video
         pauseVideo();
       }
     }, 150);
 
     return () => clearTimeout(timeoutId);
-  }, [isVisible, isPlaying, isLoading, userPaused, playVideo, pauseVideo]);
+  }, [isVisible, isPlaying, isLoading, userPaused, hasEnded, userInteracted, playVideo, pauseVideo]);
 
   useEffect(() => {
     const video = videoRef.current;
@@ -104,7 +107,7 @@ const VideoCard = ({
 
     const handleCanPlay = () => {
       setIsLoading(false);
-      if (isVisible && !userInteracted && !userPaused) {
+      if (isVisible && !userInteracted && !userPaused && !hasEnded) {
         playVideo();
       }
     };
@@ -132,7 +135,9 @@ const VideoCard = ({
 
     const handleEnded = () => {
       setIsPlaying(false);
+      setHasEnded(true);
       setUserPaused(false);
+      // Don't auto-reset, let user decide to replay
     };
 
     const handleError = () => {
@@ -174,24 +179,45 @@ const VideoCard = ({
       video.removeEventListener("contextmenu", (e) => e.preventDefault());
       document.removeEventListener("fullscreenchange", handleFullScreenChange);
     };
-  }, [playVideo, userInteracted, isVisible, userPaused]);
+  }, [playVideo, userInteracted, isVisible, userPaused, hasEnded]);
 
   const togglePlay = async () => {
     setUserInteracted(true);
-
-    if (videoRef.current && videoRef.current.ended) {
-      videoRef.current.currentTime = 0;
-      setProgress(0);
-      setCurrentTime(0);
-      setUserPaused(false);
-    }
 
     if (isPlaying) {
       setUserPaused(true);
       pauseVideo();
     } else {
       setUserPaused(false);
+      setHasEnded(false);
       await playVideo();
+    }
+  };
+
+  const handleReplay = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setUserInteracted(true);
+    
+    if (videoRef.current) {
+      // Reset video state
+      videoRef.current.currentTime = 0;
+      setProgress(0);
+      setCurrentTime(0);
+      setHasEnded(false);
+      setUserPaused(false);
+      // setUserWantsReplay(false);
+      setError(null);
+      setIsLoading(true);
+      
+      try {
+        // Force reload and play
+        videoRef.current.load();
+        await playVideo();
+      } catch (error) {
+        console.error('Replay failed:', error);
+        setError('Failed to replay video');
+        setIsLoading(false);
+      }
     }
   };
 
@@ -218,19 +244,19 @@ const VideoCard = ({
     setUserInteracted(true);
   };
 
-  const togglePictureInPicture = async () => {
-    if (!videoRef.current) return;
-    try {
-      if (document.pictureInPictureElement) {
-        await document.exitPictureInPicture();
-      } else {
-        await videoRef.current.requestPictureInPicture();
-      }
-    } catch (err) {
-      console.error("Picture-in-Picture toggle failed:", err);
-    }
-    setUserInteracted(true);
-  };
+  // const togglePictureInPicture = async () => {
+  //   if (!videoRef.current) return;
+  //   try {
+  //     if (document.pictureInPictureElement) {
+  //       await document.exitPictureInPicture();
+  //     } else {
+  //       await videoRef.current.requestPictureInPicture();
+  //     }
+  //   } catch (err) {
+  //     console.error("Picture-in-Picture toggle failed:", err);
+  //   }
+  //   setUserInteracted(true);
+  // };
 
   const handleProgressClick = (e: React.MouseEvent<HTMLDivElement>) => {
     e.stopPropagation();
@@ -248,6 +274,11 @@ const VideoCard = ({
   };
 
   const handleVideoClick = () => {
+    // Don't handle click if video has ended (let replay button handle it)
+    if (hasEnded) {
+      return;
+    }
+    
     setUserInteracted(true);
     togglePlay();
   };
@@ -280,7 +311,7 @@ const VideoCard = ({
       <video
         ref={videoRef}
         src={url}
-        className={`w-full h-full rounded-2xl object-cover ${
+        className={`w-full h-full rounded-2xl object-cover cursor-pointer ${
           isLoading ? "opacity-0" : "opacity-100"
         } transition-opacity duration-300`}
         controls={false}
@@ -311,80 +342,89 @@ const VideoCard = ({
             <p className="text-sm mb-3">{error}</p>
             <button
               onClick={handleClickRetry}
-              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg text-sm transition-colors cursor-pointer"
+              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg text-sm transition-colors cursor-pointer flex items-center gap-2 mx-auto"
             >
+              <RotateCcw size={16} />
               Retry
             </button>
           </div>
         </div>
       )}
 
-      {/* Controls Overlay */}
-      {isHovered && !isLoading && (
-        <div className="absolute cursor-pointer inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20 z-10">
-          {/* Bottom controls */}
-          <div className="absolute bottom-4 left-4 right-4">
-            {/* Progress bar */}
-            <div
-              ref={progressRef}
-              className="w-full h-[3px] bg-white bg-opacity-30 rounded-full mb-3 cursor-pointer"
-              onClick={handleProgressClick}
-            >
-              <div
-                className="h-full bg-primary rounded-full transition-all duration-100"
-                style={{ width: `${progress}%` }}
-              />
-            </div>
 
-            {/* Time display */}
-            <div className="flex justify-between items-center text-white text-sm">
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  togglePlay();
-                }}
-                className="bg-white/40 bg-opacity-50 p-2 rounded-full hover:bg-opacity-70 transition-all cursor-pointer"
-              >
-                {isPlaying ? <Pause size={16} /> : <Play size={16} />}
-              </button>
-              <div className="flex items-center gap-3">
-                <div>
-                  <span>{formatTime(currentTime)}</span>/
-                  <span>{formatTime(duration)}</span>
-                </div>
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    toggleMute();
-                  }}
-                  className="bg-white/40 bg-opacity-50 p-2 rounded-full text-white hover:bg-opacity-70 transition-all cursor-pointer"
-                >
-                  {isMuted ? <VolumeX size={16} /> : <Volume2 size={16} />}
-                </button>
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    togglePictureInPicture();
-                  }}
-                  className="bg-white/40 bg-opacity-50 p-2 rounded-full text-white hover:bg-opacity-70 transition-all cursor-pointer"
-                >
-                  <PictureInPicture size={16} />
-                </button>
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    toggleFullScreen();
-                  }}
-                  className="bg-white/40 bg-opacity-50 p-2 rounded-full text-white hover:bg-opacity-70 transition-all cursor-pointer"
-                >
-                  {isFullScreen ? (
-                    <Minimize size={16} />
-                  ) : (
-                    <Maximize size={16} />
-                  )}
-                </button>
-              </div>
-            </div>
+      {/* Left Side Controls on Hover */}
+      {isHovered && !isLoading && (
+        <div className="absolute left-4 top-1/2 transition-all duration-300 transform -translate-y-1/2 flex flex-col gap-2 z-10">
+          {/* Play/Pause Button */}
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              if (hasEnded) {
+                handleReplay(e);
+              } else {
+                togglePlay();
+              }
+            }}
+            className="bg-black/60 hover:bg-black/80 cursor-pointer p-3 rounded-full text-white transition-all duration-200 hover:scale-110"
+            title={hasEnded ? "Replay video" : isPlaying ? "Pause" : "Play"}
+          >
+            {hasEnded ? (
+              <RotateCcw size={20} strokeWidth={1.5} />
+            ) : isPlaying ? (
+              <Pause size={20} strokeWidth={1.5} />
+            ) : (
+              <Play size={20} strokeWidth={1.5} />
+            )}
+          </button>
+
+          {/* Volume Button */}
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              toggleMute();
+            }}
+            className="bg-black/60 hover:bg-black/80 cursor-pointer p-3 rounded-full text-white transition-all duration-200 hover:scale-110"
+            title={isMuted ? "Unmute" : "Mute"}
+          >
+            {isMuted ? <VolumeX size={20} strokeWidth={1.5} /> : <Volume2 size={20} strokeWidth={1.5} />}
+          </button>
+
+          {/* Fullscreen Button */}
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              toggleFullScreen();
+            }}
+            className="bg-black/60 hover:bg-black/80 cursor-pointer p-3 rounded-full text-white transition-all duration-200 hover:scale-110"
+            title={isFullScreen ? "Exit fullscreen" : "Fullscreen"}
+          >
+            {isFullScreen ? (
+              <Minimize size={20} strokeWidth={1.5} />
+            ) : (
+              <Maximize size={20} strokeWidth={1.5} />
+            )}
+          </button>
+        </div>
+      )}
+
+      {/* Bottom Progress Bar on Hover */}
+      {isHovered && !isLoading && (
+        <div className="absolute bottom-4 transition-all duration-300 left-4 right-4 z-10">
+          {/* Progress bar */}
+          <div
+            ref={progressRef}
+            className="w-full h-[3px] bg-white bg-opacity-30 rounded-full mb-2 cursor-pointer"
+            onClick={handleProgressClick}
+          >
+            <div
+              className="h-full bg-primary rounded-full transition-all duration-100"
+              style={{ width: `${progress}%` }}
+            />
+          </div>
+
+          {/* Time display */}
+          <div className="text-center text-white text-xs">
+            <span>{formatTime(currentTime)} / {formatTime(duration)}</span>
           </div>
         </div>
       )}

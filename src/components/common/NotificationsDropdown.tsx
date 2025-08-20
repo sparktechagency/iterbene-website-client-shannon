@@ -39,6 +39,7 @@ interface DropdownProps {
   setUnviewNotificationCount: React.Dispatch<React.SetStateAction<number>>;
 }
 
+
 const NotificationsDropdown: React.FC<DropdownProps> = ({
   isOpen,
   setUnviewNotificationCount,

@@ -23,7 +23,7 @@ const CustomEmojiPicker = memo(
     className = "",
   }: CustomEmojiPickerProps) => {
     const [categories, setCategories] = useState<EmojiCategory[]>([]);
-    const [activeCategory, setActiveCategory] = useState<string>("");
+    // const [activeCategory, setActiveCategory] = useState<string>("");
     const [searchQuery, setSearchQuery] = useState("");
     const [searchResults, setSearchResults] = useState<EmojiData[]>([]);
     const [frequentEmojis, setFrequentEmojis] = useState<string[]>([]);
@@ -40,7 +40,7 @@ const CustomEmojiPicker = memo(
         await emojiService.loadEmojis();
         const cats = emojiService.getCategories();
         setCategories(cats);
-        setActiveCategory(cats[0]?.name || "");
+        // setActiveCategory(cats[0]?.name || "");
         setFrequentEmojis(emojiService.getFrequentlyUsed());
         setIsLoading(false);
         
@@ -70,39 +70,39 @@ const CustomEmojiPicker = memo(
     };
 
     // Scroll to category with smooth animation
-    const scrollToCategory = (categoryName: string) => {
-      const element = categoryRefs.current[categoryName];
-      if (element && emojiGridRef.current) {
-        const container = emojiGridRef.current;
-        const elementTop = element.offsetTop - container.offsetTop;
-        container.scrollTo({
-          top: elementTop - 10,
-          behavior: 'smooth'
-        });
-      }
-      setActiveCategory(categoryName);
-    };
+    // const scrollToCategory = (categoryName: string) => {
+    //   const element = categoryRefs.current[categoryName];
+    //   if (element && emojiGridRef.current) {
+    //     const container = emojiGridRef.current;
+    //     const elementTop = element.offsetTop - container.offsetTop;
+    //     container.scrollTo({
+    //       top: elementTop - 10,
+    //       behavior: 'smooth'
+    //     });
+    //   }
+    //   setActiveCategory(categoryName);
+    // };
 
     // Handle scroll to update active category
-    const handleScroll = () => {
-      if (!emojiGridRef.current) return;
+    // const handleScroll = () => {
+    //   if (!emojiGridRef.current) return;
 
-      const container = emojiGridRef.current;
-      const scrollTop = container.scrollTop;
+    //   const container = emojiGridRef.current;
+    //   const scrollTop = container.scrollTop;
 
-      for (const category of categories) {
-        const element = categoryRefs.current[category.name];
-        if (element) {
-          const elementTop = element.offsetTop - container.offsetTop;
-          const elementBottom = elementTop + element.offsetHeight;
+    //   for (const category of categories) {
+    //     const element = categoryRefs.current[category.name];
+    //     if (element) {
+    //       const elementTop = element.offsetTop - container.offsetTop;
+    //       const elementBottom = elementTop + element.offsetHeight;
 
-          if (scrollTop >= elementTop - 50 && scrollTop < elementBottom - 50) {
-            setActiveCategory(category.name);
-            break;
-          }
-        }
-      }
-    };
+    //       if (scrollTop >= elementTop - 50 && scrollTop < elementBottom - 50) {
+    //         setActiveCategory(category.name);
+    //         break;
+    //       }
+    //     }
+    //   }
+    // };
 
     // Get container classes with gorgeous styling
     const getPickerClasses = () => {
@@ -184,12 +184,12 @@ const CustomEmojiPicker = memo(
         </div>
 
         {/* Categories Tab */}
-        <AnimatePresence>
+        {/* <AnimatePresence>
           {!searchQuery && (
             <motion.div
-              // initial={{ opacity: 0, y: -20 }}
-              // animate={{ opacity: 1, y: 0 }}
-              // exit={{ opacity: 0, y: -20 }}
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
               className="flex overflow-x-auto px-3 py-3 border-b border-gray-200/50 bg-gray-50/30 scrollbar-hide"
             >
               {categories?.map((category, index) => (
@@ -210,12 +210,12 @@ const CustomEmojiPicker = memo(
               ))}
             </motion.div>
           )}
-        </AnimatePresence>
+        </AnimatePresence> */}
 
         {/* Emoji Grid */}
         <div
           ref={emojiGridRef}
-          onScroll={handleScroll}
+          // onScroll={handleScroll}
           className="flex-1 overflow-y-auto px-3 py-2 custom-scrollbar"
           style={{
             scrollbarWidth: 'thin',
