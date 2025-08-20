@@ -14,7 +14,7 @@ import { useRouter } from "next/navigation";
 import ConfirmationPopup from "@/components/custom/custom-popup";
 
 const GroupDetailsHeader = ({
-  groupDetailsData,
+  groupDetailsData
 }: {
   groupDetailsData: IGroupDetails;
 }) => {
@@ -24,7 +24,7 @@ const GroupDetailsHeader = ({
   const [isLeaveModalOpen, setIsLeaveModalOpen] = useState<boolean>(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
   const router = useRouter();
-  
+
   // Remove Group
   const [removeGroup, { isLoading: isRemoveLoading }] =
     useRemoveGroupMutation();
@@ -140,7 +140,6 @@ const GroupDetailsHeader = ({
           </div>
         </div>
       </div>
-
       {/* Invite Modal */}
       <GroupInviteModal
         groupDetailsData={groupDetailsData}
@@ -148,7 +147,6 @@ const GroupDetailsHeader = ({
         setIsInviteModalOpen={setIsInviteModalOpen}
         closeInviteModal={closeInviteModal}
       />
-
       {/* Leave Group Confirmation Modal */}
       <ConfirmationPopup
         isOpen={isLeaveModalOpen}
@@ -161,13 +159,12 @@ const GroupDetailsHeader = ({
         cancelText="Cancel"
         isLoading={isLeaveLoading}
       />
-
       {/* Delete Group Confirmation Modal */}
       <ConfirmationPopup
         isOpen={isDeleteModalOpen}
         onClose={closeDeleteModal}
         onConfirm={handleRemoveGroup}
-         type="delete"
+        type="delete"
         title="Delete Group"
         message="Are you sure you want to delete this group? This action cannot be undone."
         confirmText="Delete"
