@@ -45,6 +45,14 @@ const FirstTimeUserModal = ({ isOpen, onClose }: FirstTimeUserModalProps) => {
     }
   };
 
+  const handleSkip = () => {
+    // Mark user as having completed profile
+    setBooleanCookie(COOKIE_NAMES.PROFILE_COMPLETED, true);
+    // Remove first-time user flag
+    removeCookie(COOKIE_NAMES.IS_FIRST_TIME_USER);
+    onClose();
+  };
+
   // Handle body overflow when modal is open
   useEffect(() => {
     if (isOpen) {
@@ -132,7 +140,7 @@ const FirstTimeUserModal = ({ isOpen, onClose }: FirstTimeUserModalProps) => {
                       placeholder="Enter your full name"
                       label="Full Name"
                     />
-                
+
                     <CustomInput
                       type="text"
                       required
@@ -140,7 +148,7 @@ const FirstTimeUserModal = ({ isOpen, onClose }: FirstTimeUserModalProps) => {
                       placeholder="Enter your phone number"
                       label="Phone Number"
                     />
-                  
+
                     <CustomSelectField
                       items={[
                         {
@@ -228,11 +236,12 @@ const FirstTimeUserModal = ({ isOpen, onClose }: FirstTimeUserModalProps) => {
                   <div className="mt-6 flex flex-col md:flex-row gap-4">
                     <CustomButton
                       type="button"
+                      onClick={handleSkip}
                       variant="outline"
                       className="px-9 py-3"
                       fullWidth
                     >
-                      Skiip for now
+                      Skip for now
                     </CustomButton>
                     <CustomButton
                       loading={isLoading}

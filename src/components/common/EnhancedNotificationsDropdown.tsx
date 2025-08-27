@@ -1,25 +1,21 @@
 "use client";
 import {
-  useGetAllNotificationsQuery,
-  useViewAllNotificationsMutation,
+  useGetAllNotificationsQuery
 } from "@/redux/features/notifications/notificationsApi";
-import { TError } from "@/types/error";
 import { AnimatePresence, motion } from "framer-motion";
 import Image from "next/image";
 import { useEffect, useMemo, useRef, useState } from "react";
-import toast from "react-hot-toast";
 import Skeleton from "../custom/custom-skeleton";
 import formatTimeAgo from "@/utils/formatTimeAgo";
 import { IoMdNotificationsOutline } from "react-icons/io";
 import { useRouter } from "next/navigation";
-import { Bell, Check, CheckCheck, RefreshCw } from "lucide-react";
+import { Bell, Check, RefreshCw } from "lucide-react";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import { INotification } from "@/types/notification.types";
 
 interface DropdownProps {
   isOpen: boolean;
-  setIsNotificationsOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  setUnviewNotificationCount: React.Dispatch<React.SetStateAction<number>>;
+  setIsNotificationsOpen: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 // Get notification icon based on type
@@ -46,8 +42,7 @@ const getNotificationIcon = (type: string) => {
 
 const EnhancedNotificationsDropdown: React.FC<DropdownProps> = ({
   isOpen,
-  setIsNotificationsOpen,
-  setUnviewNotificationCount,
+  setIsNotificationsOpen
 }) => {
   const [allNotifications, setAllNotifications] = useState<INotification[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -69,20 +64,11 @@ const EnhancedNotificationsDropdown: React.FC<DropdownProps> = ({
     { refetchOnMountOrArgChange: true, skip: !isOpen }
   );
 
-  // Mark all as read mutation
-  const [viewAllNotifications, { isLoading: markingAllAsRead }] =
-    useViewAllNotificationsMutation();
-
   // Memoize unviewNotificationCount
   const unviewNotificationCount = useMemo(
     () => responseData?.data?.attributes?.count || 0,
     [responseData]
   );
-
-  // Update parent state with unview count
-  useEffect(() => {
-    setUnviewNotificationCount(unviewNotificationCount);
-  }, [unviewNotificationCount, setUnviewNotificationCount]);
 
   // Refetch notifications when dropdown opens
   useEffect(() => {
@@ -127,6 +113,9 @@ const EnhancedNotificationsDropdown: React.FC<DropdownProps> = ({
 
   // Handle notification click
   const handleNotificationClick = (notification: INotification) => {
+    if (notification.type === "connection") {
+      router.push(`/${notification?.username}`);
+    }
     if (notification.type === "post") {
       router.push(`/feed/${notification?.linkId}`);
     } else if (notification.type === "story") {
@@ -142,34 +131,14 @@ const EnhancedNotificationsDropdown: React.FC<DropdownProps> = ({
     }
   };
 
-  // Mark all as read
-  const handleMarkAllAsRead = async () => {
-    try {
-      await viewAllNotifications(undefined).unwrap();
-      setUnviewNotificationCount(0);
-      setAllNotifications((prev) =>
-        prev.map((n) => ({ ...n, viewStatus: true }))
-      );
-      toast.success("All notifications marked as read!");
-    } catch (error) {
-      const err = error as TError;
-      toast.error(err?.data?.message || "Something went wrong!");
-    }
-  };
 
   // Handle View All Notifications - Fixed navigation issue
   const handleViewAllNotifications = async () => {
     try {
-      // Use router.push with a force refresh approach
       router.push("/notifications");
       setIsNotificationsOpen((prev) => !prev);
-
-      // Alternative approach if the above doesn't work:
-      // window.location.href = '/notifications';
     } catch (error) {
       console.error("Error navigating to notifications page:", error);
-      // Fallback to window.location if router fails
-      window.location.href = "/notifications";
     }
   };
 
@@ -227,22 +196,6 @@ const EnhancedNotificationsDropdown: React.FC<DropdownProps> = ({
                 >
                   <RefreshCw className="w-4 h-4" />
                 </button>
-
-                {unviewNotificationCount > 0 && (
-                  <button
-                    onClick={handleMarkAllAsRead}
-                    disabled={markingAllAsRead}
-                    className="flex items-center cursor-pointer gap-2 px-3 py-1.5 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors text-sm disabled:opacity-50"
-                    aria-label="Mark all as read"
-                  >
-                    {markingAllAsRead ? (
-                      <RefreshCw className="w-4 h-4 animate-spin" />
-                    ) : (
-                      <CheckCheck className="w-4 h-4" />
-                    )}
-                    <span className="hidden sm:inline">Mark all</span>
-                  </button>
-                )}
               </div>
             </div>
           </div>

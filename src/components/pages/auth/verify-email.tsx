@@ -123,8 +123,8 @@ const VerifyEmail = () => {
           {/* OTP Instructions */}
           <div className="mt-4 text-center">
             <h1>
-              Didn&apos;t receive the email? Please check your spam/junk folder
-              as verification emails sometimes end up there.
+              If you haven&apos;t received the email, please check your spam or junk
+              folder, as verification emails may occasionally be directed there.
             </h1>
           </div>
 

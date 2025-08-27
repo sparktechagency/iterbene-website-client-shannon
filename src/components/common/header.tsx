@@ -36,7 +36,10 @@ import LocationPermission from "./LocationPermission";
 import {
   useGetUnviewedMessageNotificationsCountQuery,
   useGetUnviewedNotificationsCountQuery,
+  useViewAllMessageNotificationsMutation,
+  useViewAllNotificationsMutation,
 } from "@/redux/features/notifications/notificationsApi";
+import toast from "react-hot-toast";
 
 // Mobile Menu Component
 const MobileMenu: React.FC<{
@@ -205,12 +208,21 @@ const Header: React.FC = () => {
     useGetUnviewedMessageNotificationsCountQuery(undefined, {
       skip: !user,
     });
+  // Fetch unviewed message and notification counts
   const { data: notificationCountData } = useGetUnviewedNotificationsCountQuery(
     undefined,
     {
       skip: !user,
     }
   );
+
+  // viewall notifications
+  const [viewAllNotifications] = useViewAllNotificationsMutation();
+
+  // view all message notifications
+  const [viewAllMessageNotifications] =
+    useViewAllMessageNotificationsMutation();
+
   // Socket event listeners for notifications and messages
   useEffect(() => {
     if (socket && user?._id) {
@@ -349,16 +361,32 @@ const Header: React.FC = () => {
   }, [isSearchOpen]);
 
   // Close other dropdowns when one opens
-  const toggleMessages = () => {
-    setIsMessagesOpen((prev) => !prev);
-    setIsNotificationsOpen(false);
-    setIsUserOpen(false);
+  const toggleMessages = async () => {
+    try {
+      await viewAllMessageNotifications(undefined).unwrap();
+      // Mark all messages as read
+      setUnviewMessageCount(0);
+      setIsMessagesOpen((prev) => !prev);
+      setIsNotificationsOpen(false);
+      setIsUserOpen(false);
+    } catch (error) {
+      const err = error as Error;
+      toast.error(err?.message || "Something went wrong!");
+    }
   };
 
-  const toggleNotifications = () => {
-    setIsNotificationsOpen((prev) => !prev);
-    setIsMessagesOpen(false);
-    setIsUserOpen(false);
+  const toggleNotifications = async () => {
+    try {
+      await viewAllNotifications(undefined).unwrap();
+      // Mark all notifications as read
+      setUnviewNotificationCount(0);
+      setIsNotificationsOpen((prev) => !prev);
+      setIsMessagesOpen(false);
+      setIsUserOpen(false);
+    } catch (error) {
+      const err = error as Error;
+      toast.error(err?.message || "Something went wrong!");
+    }
   };
 
   const toggleUser = () => {
@@ -511,7 +539,6 @@ const Header: React.FC = () => {
                   <EnhancedMessagesDropdown
                     isOpen={isMessagesOpen}
                     setIsMessagesOpen={setIsMessagesOpen}
-                    setUnviewMessageCount={setUnviewMessageCount}
                   />
                 </div>
 
@@ -530,7 +557,6 @@ const Header: React.FC = () => {
                   <EnhancedNotificationsDropdown
                     isOpen={isNotificationsOpen}
                     setIsNotificationsOpen={setIsNotificationsOpen}
-                    setUnviewNotificationCount={setUnviewNotificationCount}
                   />
                 </div>
 

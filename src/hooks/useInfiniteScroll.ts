@@ -2,7 +2,7 @@ import { useCallback, useRef, useEffect } from 'react';
 
 interface UseInfiniteScrollOptions {
   isLoading: boolean;
-  isFetching: boolean;
+  isFetching?: boolean;
   hasMore: boolean;
   onLoadMore: () => void;
   threshold?: number;

@@ -2,6 +2,7 @@ export interface INotification {
   _id: string;
   title: string;
   message: string;
+  username?: string;
   receiverId: string;
   senderId?: string;
   role: string;
