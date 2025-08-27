@@ -59,10 +59,26 @@ const CustomInput = ({
   // Determine input type for password toggle
   const inputType = type === "password" && showPassword ? "text" : type;
 
+  // Handle keyboard events to ensure space and other keys work properly
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    // Prevent event propagation for important keys
+    if (e.key === ' ' || e.key === 'Enter' || e.key === 'Tab') {
+      e.stopPropagation();
+    }
+  };
+
+  // Handle focus events
+  const handleFocus = (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    e.stopPropagation();
+    // Ensure input is selectable
+    e.target.style.userSelect = 'text';
+    e.target.style.webkitUserSelect = 'text';
+  };
+
   return (
     <div className={`w-full relative`}>
       {label && (
-        <label htmlFor={name} className="block text-gray-950   text-[15px]">
+        <label htmlFor={name} className="block text-gray-950 text-[15px] mb-1">
           {label} {required && <span className="text-red-500">*</span>}
         </label>
       )}
@@ -77,7 +93,7 @@ const CustomInput = ({
               } flex items-center ${
                 variant === "outline"
                   ? "bg-transparent border-b border-primary rounded-none"
-                  : "border rounded-lg"
+                  : "border rounded-lg bg-white"
               } ${error ? "border-red-500" : "border-[#DDDDDD]"}`}
               whileFocus={{ scale: 1.02 }}
               transition={{ duration: 0.2 }}
@@ -87,6 +103,7 @@ const CustomInput = ({
               {isTextarea ? (
                 <textarea
                   {...field}
+                  id={name}
                   value={field.value || ""}
                   placeholder={placeholder}
                   maxLength={maxLength}
@@ -95,11 +112,22 @@ const CustomInput = ({
                     if (onChange) onChange(e);
                   }}
                   onClick={onClick}
-                  className={`w-full ${textareaSizeClass} outline-none  text-gray-900 resize-nonee`}
+                  onKeyDown={handleKeyDown}
+                  onFocus={handleFocus}
+                  className={`w-full ${textareaSizeClass} outline-none text-gray-900 resize-none bg-transparent`}
+                  style={{
+                    pointerEvents: 'auto',
+                    userSelect: 'text',
+                    WebkitUserSelect: 'text',
+                    zIndex: 10001
+                  }}
+                  autoComplete="off"
+                  spellCheck="false"
                 />
               ) : (
                 <input
                   {...field}
+                  id={name}
                   value={field.value || ""}
                   type={inputType}
                   maxLength={maxLength}
@@ -109,7 +137,17 @@ const CustomInput = ({
                     if (onChange) onChange(e);
                   }}
                   onClick={onClick}
-                  className={`w-full ${inputSizeClass} outline-none  text-gray-900`}
+                  onKeyDown={handleKeyDown}
+                  onFocus={handleFocus}
+                  className={`w-full ${inputSizeClass} outline-none text-gray-900 bg-transparent`}
+                  style={{
+                    pointerEvents: 'auto',
+                    userSelect: 'text',
+                    WebkitUserSelect: 'text',
+                    zIndex: 10001
+                  }}
+                  autoComplete="off"
+                  spellCheck="false"
                 />
               )}
               {/* Password visibility toggle icon (only for input with type="password") */}
@@ -117,14 +155,16 @@ const CustomInput = ({
                 <button
                   type="button"
                   onClick={togglePassword}
-                  className="text-gray-500 p-2 cursor-pointer"
+                  className="text-gray-500 p-2 cursor-pointer flex-shrink-0"
+                  style={{ pointerEvents: 'auto' }}
+                  tabIndex={-1}
                 >
-                  {showPassword ? <EyeIcon size={24} /> : <EyeOff size={24} />}
+                  {showPassword ? <EyeIcon size={20} /> : <EyeOff size={20} />}
                 </button>
               )}
             </motion.div>
             {error && (
-              <span id={`${name}-error`} className="text-red-500 text-sm mt-1">
+              <span id={`${name}-error`} className="text-red-500 text-sm mt-1 block">
                 {error.message}
               </span>
             )}

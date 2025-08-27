@@ -1,4 +1,3 @@
-import React from "react";
 import { IUser } from "@/types/user.types";
 import moment from "moment";
 
@@ -38,7 +37,7 @@ const UserDetails = ({ userData }: { userData: IUser }) => {
           </h1>
           <h1 className="text-[#9194A9]">
             {userData?.createdAt
-              ? moment(userData.createdAt).format("DD-MM-YYYY")
+              ? moment(userData.createdAt).format("MM-DD-YY")
               : "N/A"}
           </h1>
         </div>

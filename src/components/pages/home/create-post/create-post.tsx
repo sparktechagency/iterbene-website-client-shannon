@@ -103,7 +103,7 @@ const CreatePost = ({
   const [showLocationPopup, setShowLocationPopup] = useState<boolean>(false);
 
   // State for privacy
-  const [privacy, setPrivacy] = useState<string>("public");
+  const [privacy, setPrivacy] = useState<string>("friends");
   const [showPrivacyPopup, setShowPrivacyPopup] = useState<boolean>(false);
 
   // State for media

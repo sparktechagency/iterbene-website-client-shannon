@@ -4,14 +4,19 @@ import logo from "@/asset/logo/logo2.png";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import { useCookies, COOKIE_NAMES, migrateFromLocalStorage } from "@/contexts/CookieContext";
+import {
+  useCookies,
+  COOKIE_NAMES,
+  migrateFromLocalStorage,
+} from "@/contexts/CookieContext";
+import Link from "next/link";
 
 const UserVerification = () => {
   const [isClient, setIsClient] = useState<boolean>(false);
   const [step, setStep] = useState<number>(1);
   const [errorMessage, setErrorMessage] = useState<string>("");
   const { getBooleanCookie, setBooleanCookie } = useCookies();
-  
+
   // Get verification status reactively from cookies
   const userVerified = getBooleanCookie(COOKIE_NAMES.ITER_BENE_VERIFIED);
   const [isVisible, setIsVisible] = useState<boolean>(false);
@@ -37,49 +42,51 @@ const UserVerification = () => {
       // Store original overflow values
       const originalBodyOverflow = document.body.style.overflow;
       const originalHtmlOverflow = document.documentElement.style.overflow;
-      
+
       // Simple overflow hidden approach
       document.body.style.overflow = "hidden";
       document.documentElement.style.overflow = "hidden";
-      
+
       // Add CSS class for additional control
-      document.body.classList.add('modal-open');
-      
+      document.body.classList.add("modal-open");
+
       // Prevent scroll events
       const preventScroll = (e: Event) => {
         e.preventDefault();
         e.stopPropagation();
         return false;
       };
-      
+
       const preventScrollTouch = (e: TouchEvent) => {
         if (e.touches.length > 1) return;
         e.preventDefault();
         e.stopPropagation();
         return false;
       };
-      
+
       // Add event listeners
-      document.addEventListener('wheel', preventScroll, { passive: false });
-      document.addEventListener('touchmove', preventScrollTouch, { passive: false });
-      document.addEventListener('scroll', preventScroll, { passive: false });
-      document.addEventListener('keydown', (e) => {
+      document.addEventListener("wheel", preventScroll, { passive: false });
+      document.addEventListener("touchmove", preventScrollTouch, {
+        passive: false,
+      });
+      document.addEventListener("scroll", preventScroll, { passive: false });
+      document.addEventListener("keydown", (e) => {
         // Prevent arrow keys, page up/down, space, home, end from scrolling
         if ([32, 33, 34, 35, 36, 37, 38, 39, 40].includes(e.keyCode)) {
           e.preventDefault();
         }
       });
-      
+
       // Cleanup function
       return () => {
         document.body.style.overflow = originalBodyOverflow;
         document.documentElement.style.overflow = originalHtmlOverflow;
-        document.body.classList.remove('modal-open');
-        
+        document.body.classList.remove("modal-open");
+
         // Remove all event listeners
-        document.removeEventListener('wheel', preventScroll);
-        document.removeEventListener('touchmove', preventScrollTouch);
-        document.removeEventListener('scroll', preventScroll);
+        document.removeEventListener("wheel", preventScroll);
+        document.removeEventListener("touchmove", preventScrollTouch);
+        document.removeEventListener("scroll", preventScroll);
       };
     }
   }, [isVisible]);
@@ -96,11 +103,15 @@ const UserVerification = () => {
   };
 
   const handleLocationReject = () => {
-    setErrorMessage("Sorry, Iter Bene is currently only available for travelers in the United States. Access is restricted.");
+    setErrorMessage(
+      "Sorry, Iter Bene is currently only available for travelers in the United States. Access is restricted."
+    );
   };
 
   const handleAgeReject = () => {
-    setErrorMessage("You must be 13 or older to access Iter Bene travel services. Access is restricted.");
+    setErrorMessage(
+      "You must be 13 or older to access Iter Bene travel services. Access is restricted."
+    );
   };
 
   if (!isClient || !isVisible) return null;
@@ -114,7 +125,7 @@ const UserVerification = () => {
       transition={{ duration: 0.4 }}
       onWheel={(e) => e.preventDefault()}
       onTouchMove={(e) => e.preventDefault()}
-      style={{ touchAction: 'none' }}
+      style={{ touchAction: "none" }}
     >
       <motion.div
         className="bg-white p-8 rounded-xl shadow-2xl max-w-md w-full text-center mx-4"
@@ -203,8 +214,21 @@ const UserVerification = () => {
         )}
 
         <motion.div className="mt-6">
-          <p className="text-xs text-gray-500">
-            By continuing, you agree to our terms of service and privacy policy
+          <p className="text-xs text-gray-500 flex gap-1 justify-center">
+            By continuing, you agree to our {" "}
+            <Link
+              href="/terms-and-conditions"
+              className="text-secondary hover:underline"
+            >
+              terms of service
+            </Link> {" "}
+            and {" "}
+            <Link
+              href="/privacy-policy"
+              className="text-secondary hover:underline"
+            >
+              privacy policy
+            </Link>
           </p>
         </motion.div>
       </motion.div>
