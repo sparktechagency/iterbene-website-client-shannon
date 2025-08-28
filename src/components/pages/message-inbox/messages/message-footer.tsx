@@ -74,7 +74,13 @@ const MessageFooter = () => {
     if (isTyping && textareaRef.current && !hasOnlyNonMediaAttachments) {
       // Small delay to ensure layout transition is complete
       const timer = setTimeout(() => {
-        textareaRef.current?.focus();
+        const textarea = textareaRef.current;
+        if (textarea) {
+          textarea.focus();
+          // Set cursor position to the end of existing text
+          const textLength = textarea.value.length;
+          textarea.setSelectionRange(textLength, textLength);
+        }
       }, 150);
 
       return () => clearTimeout(timer);
@@ -134,8 +140,12 @@ const MessageFooter = () => {
           setSelectedFiles((prev) => [...prev, newFile]);
           // Auto focus textarea after file is added
           setTimeout(() => {
-            if (textareaRef.current && !hasOnlyNonMediaAttachments) {
-              textareaRef.current.focus();
+            const textarea = textareaRef.current;
+            if (textarea && !hasOnlyNonMediaAttachments) {
+              textarea.focus();
+              // Set cursor position to the end of existing text
+              const textLength = textarea.value.length;
+              textarea.setSelectionRange(textLength, textLength);
             }
           }, 200);
         };
@@ -159,8 +169,12 @@ const MessageFooter = () => {
           setSelectedFiles((prev) => [...prev, newFile]);
           // Auto focus textarea after file is added
           setTimeout(() => {
-            if (textareaRef.current && !hasOnlyNonMediaAttachments) {
-              textareaRef.current.focus();
+            const textarea = textareaRef.current;
+            if (textarea && !hasOnlyNonMediaAttachments) {
+              textarea.focus();
+              // Set cursor position to the end of existing text
+              const textLength = textarea.value.length;
+              textarea.setSelectionRange(textLength, textLength);
             }
           }, 200);
           URL.revokeObjectURL(videoUrl);
@@ -495,7 +509,7 @@ const MessageFooter = () => {
 
         <div
           className={`px-2 py-1.5 md:px-4 border border-[#CAD1CF] transition-all duration-300 ${
-            isTyping ? "rounded-2xl" : "rounded-full"
+            isTyping ? "rounded-2xl" : "rounded-2xl"
           }`}
         >
           {/* Typing Mode - Textarea on top, buttons below */}

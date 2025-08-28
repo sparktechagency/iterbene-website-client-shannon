@@ -8,7 +8,6 @@ export const COOKIE_NAMES = {
   LOCATION_PERMISSION_DENIED: "locationPermissionDenied", 
   LOCATION_PERMISSION_GRANTED: "locationPermissionGranted",
   PROFILE_COMPLETED: "profileCompleted",
-  USER_LAST_LOCATION: "userLastLocation",
   IS_FIRST_TIME_USER: "isFirstTimeUser"
 } as const;
 
@@ -133,7 +132,6 @@ export const migrateFromLocalStorage = () => {
     { localStorage: "locationPermissionDenied", cookie: COOKIE_NAMES.LOCATION_PERMISSION_DENIED },
     { localStorage: "locationPermissionGranted", cookie: COOKIE_NAMES.LOCATION_PERMISSION_GRANTED },
     { localStorage: "profileCompleted", cookie: COOKIE_NAMES.PROFILE_COMPLETED },
-    { localStorage: "userLastLocation", cookie: COOKIE_NAMES.USER_LAST_LOCATION }
   ];
 
   migrations.forEach(({ localStorage, cookie }) => {

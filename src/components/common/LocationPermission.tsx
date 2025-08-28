@@ -6,13 +6,13 @@ import { createPortal } from "react-dom";
 import { IoMdClose } from "react-icons/io";
 import toast from "react-hot-toast";
 import { useSetLatestLocationMutation } from "@/redux/features/profile/profileApi";
-import { TError } from "@/types/error";
 import useUser from "@/hooks/useUser";
 import {
   useCookies,
   COOKIE_NAMES,
   migrateFromLocalStorage,
 } from "@/contexts/CookieContext";
+import { TError } from "@/types/error";
 
 interface ILocationData {
   latitude: string;
@@ -30,48 +30,13 @@ const LocationPermission = () => {
   const [permissionStatus, setPermissionStatus] = useState<
     "prompt" | "granted" | "denied" | "checking"
   >("prompt");
-  const [locationData, setLocationData] = useState<ILocationData | null>(null);
-  const [previousLocationData, setPreviousLocationData] =
-    useState<ILocationData | null>(null);
 
   const [setLatestLocation] = useSetLatestLocationMutation();
   const user = useUser();
-  const {
-    getBooleanCookie,
-    setBooleanCookie,
-    getObjectCookie,
-    setObjectCookie,
-  } = useCookies();
+  const { getBooleanCookie, setBooleanCookie } = useCookies();
 
   // Use ref to track if component is still mounted
   const isMountedRef = useRef(true);
-
-  // Check if locations are different
-  const areLocationsDifferent = useCallback(
-    (
-      newLocation: ILocationData,
-      oldLocation: ILocationData | null
-    ): boolean => {
-      if (!oldLocation) return true;
-
-      const latDiff = Math.abs(
-        parseFloat(newLocation.latitude) - parseFloat(oldLocation.latitude)
-      );
-      const lonDiff = Math.abs(
-        parseFloat(newLocation.longitude) - parseFloat(oldLocation.longitude)
-      );
-
-      // Consider locations different if they're more than ~100 meters apart (roughly 0.001 degrees)
-      return (
-        latDiff > 0.001 ||
-        lonDiff > 0.001 ||
-        newLocation.city !== oldLocation.city ||
-        newLocation.state !== oldLocation.state ||
-        newLocation.country !== oldLocation.country
-      );
-    },
-    []
-  );
 
   const getAddressFromCoordinates = async (
     latitude: number,
@@ -206,45 +171,18 @@ const LocationPermission = () => {
         state: addressData?.state,
         country: addressData?.country,
       };
-
-      // Check if location data has actually changed compared to previous location
-      const hasLocationChanged = areLocationsDifferent(
-        newLocationData,
-        previousLocationData
-      );
-
-      if (hasLocationChanged) {
-        try {
-          // Ensure all fields are properly set before sending to API
-          const locationPayload: ILocationData = {
-            latitude: newLocationData.latitude,
-            longitude: newLocationData.longitude,
-            locationName: newLocationData.locationName || "Unknown location",
-            city: newLocationData.city || "",
-            state: newLocationData.state || "",
-            country: newLocationData.country || "",
-          };
-
-          await setLatestLocation(locationPayload).unwrap();
-
-          // Check if component is still mounted after API call
-          if (!isMountedRef.current) return;
-
-          // Update both current and previous location data
-          setLocationData(locationPayload);
-          setPreviousLocationData(locationPayload);
-
-          // Save to cookies for future comparisons
-          setObjectCookie(COOKIE_NAMES.USER_LAST_LOCATION, locationPayload);
-        } catch (apiError) {
-          console.error("API error:", apiError);
-          const err = apiError as TError;
-          toast.error(err?.data?.message || "Failed to update location");
-          return; // Don't set permission as granted if API call failed
-        }
-      } else {
-        setLocationData(newLocationData);
-        toast.success("Location confirmed!");
+      try {
+        await setLatestLocation({
+          latitude: newLocationData.latitude,
+          longitude: newLocationData.longitude,
+          locationName: newLocationData.locationName,
+          city: newLocationData.city,
+          state: newLocationData.state,
+          country: newLocationData.country,
+        });
+      } catch (error) {
+        const err = error as TError;
+        toast.error(err?.data?.message || "Failed to update location!");
       }
 
       setPermissionStatus("granted");
@@ -289,58 +227,9 @@ const LocationPermission = () => {
         setIsRequesting(false);
       }
     }
-  }, [
-    user,
-    isRequesting,
-    setLatestLocation,
-    previousLocationData,
-    areLocationsDifferent,
-    setObjectCookie,
-    setBooleanCookie,
-  ]);
-
-  // Memoize checkPermissionStatus to avoid useEffect dependency issues
-  const checkPermissionStatus = useCallback(async () => {
-    if (!navigator.geolocation || !navigator.permissions) {
-      return;
-    }
-
-    try {
-      const permission = await navigator.permissions.query({
-        name: "geolocation",
-      });
-
-      if (!isMountedRef.current) return;
-
-      setPermissionStatus(permission.state);
-
-      // Only automatically fetch location if permission is granted and we don't have recent data
-      if (
-        permission.state === "granted" &&
-        user &&
-        !locationData &&
-        !isRequesting
-      ) {
-        await handleRequestPermission();
-      }
-    } catch (error) {
-      console.log("Error checking permission status:", error);
-      if (isMountedRef.current) {
-        setPermissionStatus("prompt");
-      }
-    }
-  }, [handleRequestPermission, locationData, user, isRequesting]);
-
-  // Load previous location from cookies on component mount
-  useEffect(() => {
-    const savedLocation = getObjectCookie(
-      COOKIE_NAMES.USER_LAST_LOCATION
-    ) as ILocationData | null;
-    if (savedLocation) {
-      setPreviousLocationData(savedLocation);
-      setLocationData(savedLocation);
-    }
-  }, [getObjectCookie]);
+  }, [user, isRequesting, setLatestLocation, setBooleanCookie]);
+  // Initialize previous location data (removed cookie dependency)
+  useEffect(() => {}, []);
 
   useEffect(() => {
     setMounted(true);
@@ -368,24 +257,20 @@ const LocationPermission = () => {
       if (!hasPermission && !hasDeclined) {
         setIsOpen(true);
       }
-
-      // If user has permission, automatically check and update location
-      if (hasPermission) {
-        checkPermissionStatus();
-      }
     }
 
     return () => {
       isMountedRef.current = false;
       setMounted(false);
     };
-  }, [user, getBooleanCookie, checkPermissionStatus]);
+  }, [user, getBooleanCookie]);
 
-  // Separate effect for checking permission status when modal opens
+  // Handle modal open/close effects
   useEffect(() => {
     if (isOpen && mounted) {
       document.body.style.overflow = "hidden";
-      checkPermissionStatus();
+      // Don't check permission status automatically
+      // Keep it as "prompt" to ask user
     } else {
       document.body.style.overflow = "unset";
     }
@@ -393,7 +278,7 @@ const LocationPermission = () => {
     return () => {
       document.body.style.overflow = "unset";
     };
-  }, [isOpen, mounted, checkPermissionStatus]);
+  }, [isOpen, mounted]);
 
   const handleCloseModal = useCallback(() => {
     if (!isRequesting) {
@@ -406,9 +291,6 @@ const LocationPermission = () => {
 
     setPermissionStatus("denied");
     setBooleanCookie(COOKIE_NAMES.LOCATION_PERMISSION_DENIED, true);
-    toast.error(
-      "Location permission denied. You can enable it later in settings."
-    );
     setIsOpen(false);
   }, [isRequesting, setBooleanCookie]);
 
@@ -496,12 +378,12 @@ const LocationPermission = () => {
 
               <h3 className="text-lg font-semibold text-gray-900 text-center mb-2">
                 {permissionStatus === "granted"
-                  ? "Location Access Granted"
+                  ? "Location Updated Successfully!"
                   : permissionStatus === "denied"
-                  ? "Location Access Denied"
+                  ? "Location Permission Denied"
                   : permissionStatus === "checking"
                   ? "Getting Your Location..."
-                  : "Enable Location Access"}
+                  : "Location Permission"}
               </h3>
 
               <div className="text-center mb-6">
@@ -510,17 +392,6 @@ const LocationPermission = () => {
                     Your location has been updated successfully!
                   </p>
                 )}
-
-                {permissionStatus === "denied" && (
-                  <div className="space-y-2">
-                    <p className="text-red-600">Location access was denied.</p>
-                    <p className="text-sm text-gray-600">
-                      You can enable location access in your browser settings to
-                      get better matches.
-                    </p>
-                  </div>
-                )}
-
                 {permissionStatus === "checking" && (
                   <p className="text-yellow-600">
                     Please wait while we get your location...
@@ -528,10 +399,16 @@ const LocationPermission = () => {
                 )}
 
                 {permissionStatus === "prompt" && (
-                  <p className="text-gray-600">
-                    We need your location to provide better matches and
-                    experiences. Your location data is kept secure and private.
-                  </p>
+                  <div className="space-y-3">
+                    <p className="text-gray-800 font-medium">
+                      Do you want to share your location?
+                    </p>
+                    <p className="text-sm text-gray-600">
+                      We&apos;ll use your location to provide better matches and
+                      experiences. Your location data is kept secure and
+                      private.
+                    </p>
+                  </div>
                 )}
               </div>
 
@@ -545,36 +422,33 @@ const LocationPermission = () => {
               )}
 
               <div className="flex flex-col md:flex-row gap-5 justify-center">
-                <button
-                  className="px-8 py-3 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-xl font-medium transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-                  onClick={handleDeny}
-                  disabled={isRequesting}
-                >
-                  {permissionStatus === "denied" ? "Close" : "Not Now"}
-                </button>
+                {permissionStatus !== "granted" && (
+                  <button
+                    className="px-8 py-3 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-xl font-medium transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                    onClick={handleDeny}
+                    disabled={isRequesting}
+                  >
+                    No
+                  </button>
+                )}
 
-                {permissionStatus !== "denied" &&
-                  permissionStatus !== "granted" && (
-                    <button
-                      className={`px-8 py-3 rounded-xl font-medium transition-colors cursor-pointer ${statusConfig.confirmBg} text-white disabled:opacity-50 disabled:cursor-not-allowed`}
-                      onClick={handleRequestPermission}
-                      disabled={isRequesting}
-                    >
-                      {isRequesting ? (
-                        <div className="flex items-center justify-center gap-2">
-                          <Loader2 className="w-4 h-4 animate-spin" />
-                          Getting Location...
-                        </div>
-                      ) : (
-                        "Allow Location"
-                      )}
-                    </button>
-                  )}
+                {permissionStatus !== "granted" && (
+                  <button
+                    className={`px-8 py-3 rounded-xl font-medium transition-colors cursor-pointer ${statusConfig.confirmBg} text-white disabled:opacity-50 disabled:cursor-not-allowed`}
+                    onClick={handleRequestPermission}
+                    disabled={isRequesting}
+                  >
+                    {isRequesting ? (
+                      <div className="flex items-center justify-center gap-2">
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        Getting Location...
+                      </div>
+                    ) : (
+                      "Yes"
+                    )}
+                  </button>
+                )}
               </div>
-
-              <p className="text-xs text-gray-500 text-center mt-4">
-                You can change this setting anytime in your browser preferences.
-              </p>
             </div>
           </motion.div>
         </motion.div>

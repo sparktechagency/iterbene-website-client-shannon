@@ -19,8 +19,6 @@ const UserProfileHeader = ({ userData }: { userData: IUser }) => {
   const dispatch = useDispatch();
   const router = useRouter();
 
-
-
   // API hooks
   const [addConnection, { isLoading: isLoadingAdd }] =
     useAddConnectionMutation();
@@ -28,11 +26,13 @@ const UserProfileHeader = ({ userData }: { userData: IUser }) => {
     useCancelConnectionMutation();
   const [acceptConnection, { isLoading: isLoadingAccept }] =
     useAcceptConnectionMutation();
-  const { data: responseData, isLoading: isLoadingCheck } =
-    useCheckIsSentConnectionExistsQuery(userData?._id, {
+  const { data: responseData } = useCheckIsSentConnectionExistsQuery(
+    userData?._id,
+    {
       refetchOnMountOrArgChange: true,
       skip: !userData?._id || !user?._id,
-    });
+    }
+  );
 
   const isSentConnectionExists =
     responseData?.data?.attributes?.status === "pending" &&
@@ -147,11 +147,7 @@ const UserProfileHeader = ({ userData }: { userData: IUser }) => {
 
         {/* Action Buttons */}
         <div className="w-full flex flex-wrap justify-center md:justify-end gap-3 md:gap-4 flex-1">
-          {isLoadingCheck ? (
-            <CustomButton variant="outline" className="px-8 py-3" disabled>
-              Loading...
-            </CustomButton>
-          ) : isConnected ? (
+          {isConnected ? (
             <CustomButton
               variant="outline"
               className="px-8 py-3 border-green-500 text-green-500 hover:bg-green-50 transition-colors"
@@ -165,7 +161,7 @@ const UserProfileHeader = ({ userData }: { userData: IUser }) => {
               variant="outline"
               className="px-8 py-3 border-red-500 text-red-500 hover:bg-red-50 transition-colors"
             >
-             ✗ Cancel
+              ✗ Cancel
             </CustomButton>
           ) : isReceivedConnectionExists ? (
             <CustomButton
@@ -174,7 +170,7 @@ const UserProfileHeader = ({ userData }: { userData: IUser }) => {
               variant="default"
               className="px-8 py-3 bg-green-600 hover:bg-green-700 text-white transition-colors"
             >
-             ✓ Accept
+              ✓ Accept
             </CustomButton>
           ) : (
             <CustomButton
