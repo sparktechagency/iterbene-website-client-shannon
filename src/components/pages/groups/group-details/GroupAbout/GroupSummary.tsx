@@ -20,7 +20,7 @@ const GroupSummary = ({
         <div className="flex items-center gap-4">
           <LucideUserRound className="text-gray-900" size={24} />
           <h1 className="text-base font-medium mt-1">
-            Created by{" "}
+            Created by {" "}
             <span className="font-semibold text-lg ">
               {groupDetailsData?.creatorId?.fullName}
             </span>

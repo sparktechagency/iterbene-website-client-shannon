@@ -7,7 +7,7 @@ import { IEventDetails } from "@/types/event.types";
 import EventSummary from "../EventAbout/EventSummary";
 import EventParticipantsList from "../EventAbout/EventParticipantsList";
 
-const GroupDiscussion = ({
+const EventDiscussion = ({
   eventDetailsData,
 }: {
   eventDetailsData: IEventDetails;
@@ -28,4 +28,4 @@ const GroupDiscussion = ({
   );
 };
 
-export default GroupDiscussion;
+export default EventDiscussion;

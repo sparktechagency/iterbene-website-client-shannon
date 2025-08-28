@@ -36,7 +36,7 @@ const Login = () => {
     try {
       const res = await login(values).unwrap();
 
-      if (res?.data?.attributes?.user?.role === "admin") {
+      if (res?.data?.attributes?.user?.role === "Admin" || res?.data?.attributes?.user?.role === "Super_Admin") {
         toast.error("You are admin you can't login here!");
         return;
       }

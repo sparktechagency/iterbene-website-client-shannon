@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import EventAbout from "./EventAbout/EventAbout";
-import GroupDiscussion from "./EventDiscussion/EventDiscussion";
+import EventDiscussion from "./EventDiscussion/EventDiscussion";
 import { IEventDetails } from "@/types/event.types";
 
 const EventDetailsTab = ({ eventDetailsData }: { eventDetailsData: IEventDetails }) => {
@@ -30,7 +30,7 @@ const EventDetailsTab = ({ eventDetailsData }: { eventDetailsData: IEventDetails
         </button>
       </div>
       <div className="w-full py-6">
-        {activeTab === "about" ? <EventAbout eventDetailsData={eventDetailsData} /> : <GroupDiscussion eventDetailsData={eventDetailsData}  />}
+        {activeTab === "about" ? <EventAbout eventDetailsData={eventDetailsData} /> : <EventDiscussion eventDetailsData={eventDetailsData}  />}
       </div>
     </section>
   );
