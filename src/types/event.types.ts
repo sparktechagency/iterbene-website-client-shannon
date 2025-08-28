@@ -4,7 +4,8 @@ export interface IEvent {
   eventImage: string;
   creatorId: {
     _id: string;
-    fullName: string;
+    firstName?: string;
+    lastName?: string;
     username: string;
     profileImage: string;
   };
@@ -20,7 +21,8 @@ export interface IEventDetails {
   eventCost: number;
   creatorId: {
     _id: string;
-    fullName: string;
+    firstName?: string;
+    lastName?: string;
     username: string;
     profileImage: string;
     description: string;
@@ -41,13 +43,15 @@ export interface IEventDetails {
   privacy: "public" | "private";
   pendingInterestedUsers: {
     _id: string;
-    fullName: string;
+    firstName?: string;
+    lastName?: string;
     username: string;
     profileImage: string;
   }[];
   interestedUsers: {
     _id: string;
-    fullName: string;
+    firstName?: string;
+    lastName?: string;
     username: string;
     profileImage: string;
   }[];
@@ -65,7 +69,8 @@ export interface IEventInvitation {
     endDate: string;
     creatorId: {
       _id: string;
-      fullName: string;
+      firstName?: string;
+      lastName?: string;
       username: string;
       profileImage: string;
     };

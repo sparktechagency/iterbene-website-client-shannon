@@ -7,6 +7,7 @@ import Link from "next/link";
 import pdf from "@/asset/message/pdf.png";
 import { IUser } from "@/types/user.types";
 import { Eye, Download, FileText, X, Play, Pause, Volume2, VolumeX, Maximize2 } from "lucide-react";
+import { getFullName } from "@/utils/nameUtils";
 
 interface MessageItemProps {
   message: IMessage;
@@ -622,8 +623,8 @@ const MessageItem: React.FC<MessageItemProps> = ({
             {/* user friendly message for story */}
             <div className="text-xs text-gray-500 mb-1">
               {isMyMessage
-                ? `You replied to ${receiverInfo?.fullName}'s journey`
-                : `${receiverInfo?.fullName} replied to your journey`}
+                ? `You replied to ${getFullName(receiverInfo)}'s journey`
+                : `${getFullName(receiverInfo)} replied to your journey`}
             </div>
             {/* Image */}
             <div>

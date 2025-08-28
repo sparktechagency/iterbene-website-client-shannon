@@ -1,6 +1,7 @@
 export interface IViewer {
   _id: string;
-  fullName: string;
+  firstName?: string;
+  lastName?: string;
   username: string;
   profileImage: string;
 }
@@ -8,7 +9,8 @@ export interface IViewer {
 export interface IReactions {
   userId: {
     _id: string;
-    fullName: string;
+    firstName?: string;
+    lastName?: string;
     username: string;
     profileImage: string;
   };

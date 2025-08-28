@@ -4,6 +4,7 @@ import { useBlockUserMutation } from "@/redux/features/blockUser/blockUserApi";
 import { useRemoveConnectionMutation } from "@/redux/features/connections/connectionsApi";
 import { IConnection } from "@/types/connection.types";
 import { TError } from "@/types/error";
+import { getFullName } from "@/utils/nameUtils";
 import { AnimatePresence, motion } from "framer-motion";
 import { Ellipsis } from "lucide-react";
 import Image from "next/image";
@@ -87,14 +88,14 @@ const MyConnectionCard = ({ connection, onRemove }: MyConnectionCardProps) => {
         <div className="flex items-center space-x-4">
           <Image
             src={connection?.profileImage || "/default-avatar.png"}
-            alt={connection?.fullName || "User"}
+            alt={getFullName(connection) || "User"}
             width={70}
             height={70}
             className="w-[70px] h-[70px] rounded-full object-cover ring-2 ring-gray-300"
           />
           <div className="flex flex-col">
             <span className="text-gray-800 font-semibold text-lg">
-              {connection?.fullName}
+              {getFullName(connection)}
             </span>
             <span className="text-gray-600">@{connection?.username}</span>
           </div>

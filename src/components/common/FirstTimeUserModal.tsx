@@ -68,7 +68,8 @@ const FirstTimeUserModal = ({ isOpen, onClose }: FirstTimeUserModalProps) => {
   if (!isClient || !isOpen || !userData) return null;
 
   const defaultValues = {
-    fullName: userData?.fullName || "",
+    firstName: userData?.firstName || "",
+    lastName: userData?.lastName || "",
     phoneNumber: userData?.phoneNumber || "",
     referredAs: userData?.referredAs || "",
     ageRange: userData?.ageRange || "",
@@ -136,9 +137,16 @@ const FirstTimeUserModal = ({ isOpen, onClose }: FirstTimeUserModalProps) => {
                     <CustomInput
                       type="text"
                       required
-                      name="fullName"
-                      placeholder="Enter your full name"
-                      label="Full Name"
+                      name="firstName"
+                      placeholder="Enter your first name"
+                      label="FirstName Name"
+                    />
+                    <CustomInput
+                      type="text"
+                      required
+                      name="lastName"
+                      placeholder="Enter your last name"
+                      label="Last Name"
                     />
 
                     <CustomInput

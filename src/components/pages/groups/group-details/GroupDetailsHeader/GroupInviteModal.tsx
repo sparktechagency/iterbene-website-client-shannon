@@ -5,6 +5,7 @@ import { useSendGroupInviteMutation } from "@/redux/features/group/groupApi";
 import { IMyConnections } from "@/types/connection.types";
 import { TError } from "@/types/error";
 import { IGroupDetails } from "@/types/group.types";
+import { getFullName } from "@/utils/nameUtils";
 import { Checkbox } from "antd";
 import { Search, Users } from "lucide-react";
 import Image from "next/image";
@@ -90,7 +91,7 @@ const GroupInviteModal = ({
   const filteredConnections = useMemo(() => {
     const lowercaseSearchTerm = searchTerm.toLowerCase().trim();
     return allConnections?.filter((connection) => {
-      const fullNameMatch = connection.fullName
+      const fullNameMatch = getFullName(connection)
         ?.toLowerCase()
         .includes(lowercaseSearchTerm);
       const usernameMatch = connection.username
@@ -232,7 +233,7 @@ const GroupInviteModal = ({
                             src={
                               connection?.profileImage || "/default-avatar.png"
                             }
-                            alt={connection?.fullName}
+                            alt={getFullName(connection) || "User"}
                             width={40}
                             height={40}
                             className="w-10 h-10 rounded-full object-cover"
@@ -240,7 +241,7 @@ const GroupInviteModal = ({
                         </div>
                         <div>
                           <h4 className="font-medium text-gray-800">
-                            {connection?.fullName}
+                            {getFullName(connection)}
                           </h4>
                           <p className="text-sm text-gray-500">
                             @{connection?.username}
@@ -263,7 +264,7 @@ const GroupInviteModal = ({
                             src={
                               connection?.profileImage || "/default-avatar.png"
                             }
-                            alt={connection?.fullName}
+                            alt={getFullName(connection) || "User"}
                             width={40}
                             height={40}
                             className="w-10 h-10 rounded-full object-cover"
@@ -271,7 +272,7 @@ const GroupInviteModal = ({
                         </div>
                         <div>
                           <h4 className="font-medium text-gray-800">
-                            {connection?.fullName}
+                            {getFullName(connection)}
                           </h4>
                           <p className="text-sm text-gray-500">
                             @{connection?.username}
@@ -294,7 +295,7 @@ const GroupInviteModal = ({
                             src={
                               connection?.profileImage || "/default-avatar.png"
                             }
-                            alt={connection?.fullName}
+                            alt={getFullName(connection) || "User"}
                             width={40}
                             height={40}
                             className="w-10 h-10 rounded-full object-cover"
@@ -302,7 +303,7 @@ const GroupInviteModal = ({
                         </div>
                         <div>
                           <h4 className="font-medium text-gray-800">
-                            {connection?.fullName}
+                            {getFullName(connection)}
                           </h4>
                           <p className="text-sm text-gray-500">
                             @{connection?.username}

@@ -89,7 +89,7 @@ const SearchDropdown: React.FC<SearchDropdownProps> = ({
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium text-gray-900 truncate">
-                        {user?.fullName || user?.username}
+                        {`${user?.firstName} ${user?.lastName}` || user?.username}
                       </p>
                       <p className="text-xs text-gray-500 truncate">
                         @{user?.username}

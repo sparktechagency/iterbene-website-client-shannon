@@ -19,6 +19,7 @@ import { openAuthModal } from "@/redux/features/auth/authModalSlice";
 import { useAppDispatch } from "@/redux/hooks";
 import Link from "next/link";
 import { IUser } from "@/types/user.types";
+import { getFullName } from "@/utils/nameUtils";
 import formatTimeAgo from "@/utils/formatTimeAgo";
 import CustomEmojiPicker from "@/components/ui/CustomEmojiPicker";
 
@@ -330,7 +331,7 @@ const CommentItem = ({
           <Link href={`/${comment?.userId?.username}`}>
             <Image
               src={comment?.userId?.profileImage}
-              alt={comment?.userId?.fullName || "User"}
+              alt={getFullName(comment?.userId) || "User"}
               width={level > 2 ? 28 : 36}
               height={level > 2 ? 28 : 36}
               className={`${
@@ -344,7 +345,7 @@ const CommentItem = ({
           <div className="w-fit bg-gray-100/70 px-3 py-2 rounded-2xl max-w-full">
             <Link href={`/${comment?.userId?.username}`}>
               <p className="text-sm md:text-base font-medium text-gray-800 hover:underline">
-                {comment?.userId?.fullName}
+                {getFullName(comment?.userId)}
               </p>
             </Link>
             <p className="text-gray-700 break-words max-w-full mt-1 text-sm md:text-base">
@@ -454,7 +455,7 @@ const CommentItem = ({
               onCancel={onCancelReply}
               user={user ?? null}
               level={level}
-              placeholder={`Reply to ${comment?.userId?.fullName}...`}
+              placeholder={`Reply to ${getFullName(comment?.userId)}...`}
             />
           )}
 
@@ -546,7 +547,7 @@ const PostCommentSection = ({
                       _id: tempCommentId,
                       userId: {
                         _id: user._id,
-                        fullName: user.fullName,
+                        fullName: getFullName(user),
                         username: user.username,
                         profileImage: user.profileImage,
                         id: user._id, // Include the id field
@@ -648,7 +649,7 @@ const PostCommentSection = ({
                           {
                             userId: {
                               _id: user._id,
-                              fullName: user.fullName,
+                              fullName: getFullName(user),
                               username: user.username,
                               profileImage: user.profileImage,
                               id: user._id,

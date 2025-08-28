@@ -1,4 +1,5 @@
 import {IGroupDetails } from "@/types/group.types";
+import { getFullName } from "@/utils/nameUtils";
 import moment from "moment";
 import Image from "next/image";
 const GroupAuthorDetails = ({
@@ -21,7 +22,7 @@ const GroupAuthorDetails = ({
         )}
         <div className="mt-5">
           <h1 className="text-xl md:text-2xl xl:text-3xl font-semibold text-center text-gray-950">
-            {groupDetailsData?.creatorId?.fullName}
+            {getFullName(groupDetailsData?.creatorId)}
           </h1>
           <div className="flex flex-wrap gap-2 text-gray-600 text-base items-center justify-center">
             <p className="text-gray-600 text-center">

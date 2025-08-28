@@ -198,7 +198,7 @@ const CreateEvent: React.FC = () => {
                 />
               )}
               <div>
-                <p className="text-gray-800 font-semibold">{user?.fullName}</p>
+                <p className="text-gray-800 font-semibold">{user?.firstName} {user?.lastName}</p>
                 <p className="text-gray-500 text-sm">Leader</p>
               </div>
             </div>

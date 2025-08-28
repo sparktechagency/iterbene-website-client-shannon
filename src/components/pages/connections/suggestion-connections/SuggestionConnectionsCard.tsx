@@ -65,7 +65,7 @@ const SuggestionConnectionsCard = ({
       </Link>
       {/* Name */}
       <h2 className="text-lg font-semibold text-gray-800 mb-4">
-        {connection?.fullName}
+        {connection?.firstName} {connection?.lastName}
       </h2>
       {/* Buttons */}
       <div className="flex flex-col gap-4 w-full">

@@ -4,6 +4,7 @@ import React from "react";
 import { IChat } from "@/types/chatTypes";
 import useUser from "@/hooks/useUser";
 import { IUser } from "@/types/user.types";
+import { getFullName } from "@/utils/nameUtils";
 import Link from "next/link";
 import { MessageType } from "@/types/messagesType";
 interface ContactListCardProps {
@@ -66,7 +67,7 @@ const ContactListCard: React.FC<ContactListCardProps> = ({ contact }) => {
           )}
           <div>
             {/* full name */}
-            <h2 className="text-sm md:text-base ">{receiverDetails?.fullName}</h2>
+            <h2 className="text-sm md:text-base ">{getFullName(receiverDetails)}</h2>
             {/* last message */}
             <p className="text-[14px] text-gray-600">
               {renderMessageContent()}

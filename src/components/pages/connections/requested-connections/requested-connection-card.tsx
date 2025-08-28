@@ -64,7 +64,7 @@ const RequestedConnectionCard = ({
       </Link>
       {/* Name */}
       <h2 className="text-base font-semibold text-gray-800 mb-4">
-        {request?.sentBy?.fullName}
+        {request?.sentBy?.firstName} {request?.sentBy?.lastName}
       </h2>
 
       {/* Buttons */}

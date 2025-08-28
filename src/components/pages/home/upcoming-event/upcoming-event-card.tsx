@@ -1,5 +1,6 @@
 "use client";
 import { IEvent } from "@/types/event.types";
+import { getFullName } from "@/utils/nameUtils";
 import Image from "next/image";
 
 const UpcomingEventCard = ({ event }: { event: IEvent }) => {
@@ -21,7 +22,7 @@ const UpcomingEventCard = ({ event }: { event: IEvent }) => {
           {event?.creatorId?.profileImage && (
             <Image
               src={event?.creatorId?.profileImage}
-              alt={event.creatorId.fullName}
+              alt={getFullName(event.creatorId) || "Creator"}
               width={60}
               height={60}
               className="size-[60px] rounded-full object-cover mr-3 ring-2 ring-primary"

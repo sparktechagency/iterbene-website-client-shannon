@@ -1,4 +1,5 @@
 import { IGroupDetails } from "@/types/group.types";
+import { getFullName } from "@/utils/nameUtils";
 import { LucideUserRound } from "lucide-react";
 import { BsPeople } from "react-icons/bs";
 import { HiOutlineLocationMarker } from "react-icons/hi";
@@ -22,7 +23,7 @@ const GroupSummary = ({
           <h1 className="text-base font-medium mt-1">
             Created by {" "}
             <span className="font-semibold text-lg ">
-              {groupDetailsData?.creatorId?.fullName}
+              {getFullName(groupDetailsData?.creatorId)}
             </span>
           </h1>
         </div>

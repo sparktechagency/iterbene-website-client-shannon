@@ -90,14 +90,14 @@ const EventInviteModal = ({
   const filteredConnections = useMemo(() => {
     const lowercaseSearchTerm = searchTerm.toLowerCase().trim();
     return allConnections?.filter((connection) => {
-      const fullNameMatch = connection.fullName
+      const firstNameMatch = connection.firstName
         ?.toLowerCase()
         .includes(lowercaseSearchTerm);
       const usernameMatch = connection.username
         ?.toLowerCase()
         .includes(lowercaseSearchTerm);
 
-      return fullNameMatch || usernameMatch;
+      return firstNameMatch || usernameMatch;
     });
   }, [allConnections, searchTerm]);
 
@@ -232,7 +232,7 @@ const EventInviteModal = ({
                           src={
                             connection?.profileImage || "/default-avatar.png"
                           }
-                          alt={connection?.fullName}
+                          alt={`${connection?.firstName} ${connection?.lastName}`}
                           width={40}
                           height={40}
                           className="w-10 h-10 rounded-full object-cover"
@@ -240,7 +240,7 @@ const EventInviteModal = ({
                       </div>
                       <div>
                         <h4 className="font-medium text-gray-800">
-                          {connection?.fullName}
+                          {`${connection?.firstName} ${connection?.lastName}`}
                         </h4>
                         <p className="text-sm text-gray-500">
                           @{connection?.username}
@@ -267,7 +267,7 @@ const EventInviteModal = ({
                           src={
                             connection?.profileImage || "/default-avatar.png"
                           }
-                          alt={connection?.fullName}
+                          alt={`${connection?.firstName} ${connection?.lastName}`}
                           width={40}
                           height={40}
                           className="w-10 h-10 rounded-full object-cover"
@@ -275,7 +275,7 @@ const EventInviteModal = ({
                       </div>
                       <div>
                         <h4 className="font-medium text-gray-800">
-                          {connection?.fullName}
+                          {`${connection?.firstName} ${connection?.lastName}`}
                         </h4>
                         <p className="text-sm text-gray-500">
                           @{connection?.username}
@@ -301,7 +301,7 @@ const EventInviteModal = ({
                         src={
                           connection?.profileImage || "/default-avatar.png"
                         }
-                        alt={connection?.fullName}
+                        alt={`${connection?.firstName} ${connection?.lastName}`}
                         width={40}
                         height={40}
                         className="w-10 h-10 rounded-full object-cover"
@@ -309,7 +309,7 @@ const EventInviteModal = ({
                     </div>
                     <div>
                       <h4 className="font-medium text-gray-800">
-                        {connection?.fullName}
+                        {`${connection?.firstName} ${connection?.lastName}`}
                       </h4>
                       <p className="text-sm text-gray-500">
                         @{connection?.username}

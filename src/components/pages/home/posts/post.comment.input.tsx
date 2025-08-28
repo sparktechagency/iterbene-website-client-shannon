@@ -9,6 +9,7 @@ import {
 } from "@/redux/features/post/postApi";
 import { IComment, IPost } from "@/types/post.types";
 import { TError } from "@/types/error";
+import { getFullName } from "@/utils/nameUtils";
 import toast from "react-hot-toast";
 import useUser from "@/hooks/useUser";
 import { openAuthModal } from "@/redux/features/auth/authModalSlice";
@@ -122,7 +123,7 @@ const PostCommentInput = ({
                         _id: tempCommentId,
                         userId: {
                           _id: user._id,
-                          fullName: user.fullName,
+                          fullName: getFullName(user),
                           username: user.username,
                           profileImage: user.profileImage,
                         },
@@ -165,7 +166,7 @@ const PostCommentInput = ({
                         _id: tempCommentId,
                         userId: {
                           _id: user._id,
-                          fullName: user.fullName,
+                          fullName: getFullName(user),
                           username: user.username,
                           profileImage: user.profileImage,
                         },

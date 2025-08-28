@@ -1,4 +1,5 @@
 import { IGroupDetails } from "@/types/group.types";
+import { getFullName } from "@/utils/nameUtils";
 import Image from "next/image";
 
 const GroupParticipantsList = ({
@@ -23,7 +24,7 @@ const GroupParticipantsList = ({
               <div className="relative w-12 h-12 rounded-full overflow-hidden">
                 <Image
                   src={participant?.profileImage || "/default-profile.png"}
-                  alt={`${participant?.fullName}'s profile`}
+                  alt={`${getFullName(participant)}'s profile`}
                   fill
                   className="object-cover"
                   sizes="48px"
@@ -31,7 +32,7 @@ const GroupParticipantsList = ({
               </div>
               <div>
                 <p className="text-gray-900 font-medium">
-                  {participant?.fullName}
+                  {getFullName(participant)}
                 </p>
                 <p className="text-gray-500 text-sm">
                   @{participant?.username}

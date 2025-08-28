@@ -3,7 +3,8 @@ export interface ILogin {
   password: string;
 }
 export interface IRegister {
-  fullName: string;
+  firstName: string;
+  lastName: string;
   email: string;
   password: string;
 }

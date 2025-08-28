@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { getFullName } from "@/utils/nameUtils";
 import React from "react";
 import { PiUserBold } from "react-icons/pi";
 interface IAuthor {
@@ -43,7 +44,7 @@ const MyInvitationsCard: React.FC<MyInvitationsCardProps> = ({
             <div className="flex  justify-between items-center">
               <Image
                 src={invitation?.author?.profileImage?.imageUrl || ""}
-                alt={invitation.author.fullName}
+                alt={getFullName(invitation.author) || "Author"}
                 width={60}
                 height={60}
                 className="size-[60px] rounded-full ring-2 ring-primary object-cover mr-3 "

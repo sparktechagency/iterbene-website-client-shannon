@@ -24,7 +24,7 @@ const EventParticipantsList = ({
               <div className="relative w-12 h-12 rounded-full overflow-hidden">
                 <Image
                   src={participant?.profileImage || "/default-profile.png"}
-                  alt={`${participant?.fullName}'s profile`}
+                  alt={`${participant?.firstName} ${participant?.lastName} 's profile`}
                   fill
                   className="object-cover"
                   sizes="48px"
@@ -32,7 +32,7 @@ const EventParticipantsList = ({
               </div>
               <div>
                 <p className="text-gray-900 font-medium">
-                  {participant?.fullName}
+                  {`${participant?.firstName} ${participant?.lastName}`}
                 </p>
                 <p className="text-gray-500 text-sm">
                   @{participant?.username}

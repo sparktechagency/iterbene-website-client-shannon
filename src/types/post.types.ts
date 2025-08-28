@@ -8,7 +8,8 @@ export interface ISortedReaction {
 export interface IReaction {
   userId: {
     _id: string;
-    fullName: string;
+    firstName?: string;
+    lastName?: string;
     username: string;
     profileImage: string;
     id: string;
@@ -21,7 +22,8 @@ export interface IReaction {
 export interface ICommentReaction {
   userId: {
     _id: string;
-    fullName: string;
+    firstName?: string;
+    lastName?: string;
     username: string;
     profileImage: string;
     id: string;
@@ -36,7 +38,8 @@ export interface IComment {
   _id: string;
   userId: {
     _id: string;
-    fullName: string;
+    firstName?: string;
+    lastName?: string;
     username: string;
     profileImage: string;
   };
@@ -48,7 +51,8 @@ export interface IComment {
   mentions?: [
     {
       _id: string;
-      fullName: string;
+      firstName?: string;
+      lastName?: string;
       username: string;
       profileImage: string;
     }
@@ -67,7 +71,8 @@ export interface IPost {
   _id: string;
   userId: {
     _id: string;
-    fullName: string;
+    firstName?: string;
+    lastName?: string;
     username: string;
     profileImage: string;
     id: string;

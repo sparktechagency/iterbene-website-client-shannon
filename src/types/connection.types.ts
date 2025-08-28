@@ -1,6 +1,7 @@
 export interface ISuggestionUser {
   id: string;
-  fullName: string;
+  firstName?: string;
+  lastName?: string;
   username: string;
   profileImage: string;
 }
@@ -9,7 +10,8 @@ export interface IConnectionRequest {
   _id: string;
   sentBy: {
     _id: string;
-    fullName: string;
+    firstName?: string;
+    lastName?: string;
     username: string;
     profileImage: string;
   };
@@ -20,14 +22,16 @@ export interface IConnectionRequest {
 
 export interface IMyConnections {
   _id: string;
-  fullName: string;
+  firstName?: string;
+  lastName?: string;
   username: string;
   profileImage: string;
 }
 
 export interface IConnection {
   _id: string;
-  fullName: string;
+  firstName?: string;
+  lastName?: string;
   username: string;
   profileImage: string;
 }

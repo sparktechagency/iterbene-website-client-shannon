@@ -5,6 +5,7 @@ import {
 } from "@/redux/features/event/eventApi";
 import { TError } from "@/types/error";
 import { IEventInvitation } from "@/types/event.types";
+import { getFullName } from "@/utils/nameUtils";
 import Image from "next/image";
 import toast from "react-hot-toast";
 import { PiUserBold } from "react-icons/pi";
@@ -64,7 +65,7 @@ const InvitationCard = ({ event,handleAcceptInvitation }: UpcomingEventCardProps
             <div className="flex  justify-between items-center">
               <Image
                 src={event?.eventId?.creatorId?.profileImage}
-                alt={event?.eventId?.creatorId?.fullName}
+                alt={getFullName(event?.eventId?.creatorId) || "Creator"}
                 width={60}
                 height={60}
                 className="size-[60px] rounded-full object-cover mr-3 "

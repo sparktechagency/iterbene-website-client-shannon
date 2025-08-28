@@ -77,14 +77,24 @@ const Register = () => {
         >
           <div className="space-y-3 md:space-y-6 mt-8">
             <CustomInput
-              name="fullName"
-              label="Full Name"
+              name="firstName"
+              label="First Name"
               type="text"
               variant="outline"
               size="lg"
               icon={<UserRound size={24} className="text-secondary" />}
               fullWidth
-              placeholder="Enter your full name"
+              placeholder="Enter your first name"
+            />
+            <CustomInput
+              name="lastName"
+              label="Last Name"
+              type="text"
+              variant="outline"
+              size="lg"
+              icon={<UserRound size={24} className="text-secondary" />}
+              fullWidth
+              placeholder="Enter your last name"
             />
             <CustomInput
               name="email"

@@ -25,7 +25,7 @@ const EventSummary = ({
           <h1 className="text-base font-medium mt-1">
             Created by {" "}
             <span className="font-semibold text-lg ">
-              {eventDetailsData?.creatorId?.fullName}
+              {`${eventDetailsData?.creatorId?.firstName} ${eventDetailsData?.creatorId?.lastName}`}
             </span>
           </h1>
         </div>

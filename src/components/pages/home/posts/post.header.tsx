@@ -18,6 +18,7 @@ import ConfirmationPopup from "@/components/custom/custom-popup";
 import ReportModal, { ReportType } from "@/components/custom/ReportModal";
 import toast from "react-hot-toast";
 import { TError } from "@/types/error";
+import { getFullName } from "@/utils/nameUtils";
 import formatTimeAgo from "@/utils/formatTimeAgo";
 import Link from "next/link";
 import { openAuthModal } from "@/redux/features/auth/authModalSlice";
@@ -162,7 +163,7 @@ const PostHeader = ({ post, onEditClick, setAllPosts }: PostHeaderProps) => {
       <div className="w-full flex items-center mb-3">
         <Image
           src={post?.userId?.profileImage || "/default-profile.png"}
-          alt={post?.userId?.fullName || "User"}
+          alt={getFullName(post?.userId) || "User"}
           width={50}
           height={50}
           className="size-[50px] object-cover rounded-full mr-3 ring-2 ring-gray-200"
@@ -175,12 +176,12 @@ const PostHeader = ({ post, onEditClick, setAllPosts }: PostHeaderProps) => {
                 className="hover:underline"
               >
                 <p className="font-medium text-gray-800 text-sm md:text-lg">
-                  {post?.userId?.fullName || "Unknown User"}
+                  {getFullName(post?.userId) || "Unknown User"}
                 </p>
               </Link>
             ) : (
               <p className="font-medium text-gray-800 text-lg">
-                {post?.userId?.fullName || "Unknown User"}
+                {getFullName(post?.userId) || "Unknown User"}
               </p>
             )}
             <span className="text-sm">

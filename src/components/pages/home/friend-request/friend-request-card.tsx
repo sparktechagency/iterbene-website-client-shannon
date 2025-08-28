@@ -2,6 +2,7 @@ import CustomButton from "@/components/custom/custom-button";
 import { useAcceptConnectionMutation, useDeclineConnectionMutation } from "@/redux/features/connections/connectionsApi";
 import { IConnectionRequest } from "@/types/connection.types";
 import { TError } from "@/types/error";
+import { getFullName } from "@/utils/nameUtils";
 import Image from "next/image";
 import Link from "next/link";
 import toast from "react-hot-toast";
@@ -41,7 +42,7 @@ const FriendRequestCard = ({ request }: { request: IConnectionRequest }) => {
         <h1>
           <Link href={`/${request?.sentBy?.username}`}>
             <span className="text-[18px] font-bold">
-              {request?.sentBy?.fullName}
+              {getFullName(request?.sentBy)}
             </span>{" "}
           </Link>
           <span className="text-[18px] text-gray-500">

@@ -1,4 +1,5 @@
 import { IPost } from "@/types/post.types";
+import { getFullName } from "@/utils/nameUtils";
 import formatTimeAgo from "@/utils/formatTimeAgo";
 import { Lock, Users } from "lucide-react";
 import Image from "next/image";
@@ -19,7 +20,7 @@ const PostDetailsHeader = ({
       <div className="flex items-center mb-3">
         <Image
           src={post?.userId?.profileImage}
-          alt={post?.userId?.fullName}
+          alt={getFullName(post?.userId) || "User"}
           width={50}
           height={50}
           className="size-[50px] object-cover rounded-full mr-3 ring-2 ring-gray-200"
@@ -27,7 +28,7 @@ const PostDetailsHeader = ({
         <div>
           <div className="flex items-center gap-2">
             <p className="font-medium text-gray-800 text-lg">
-              {post?.userId?.fullName}
+              {getFullName(post?.userId)}
             </p>
             <span className="text-sm">
               {post?.createdAt && formatTimeAgo(post?.createdAt)}

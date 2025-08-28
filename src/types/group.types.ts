@@ -1,13 +1,15 @@
 export interface IGroupMember {
   _id: string;
-  fullName: string;
+  firstName?: string;
+  lastName?: string;
   username: string;
   profileImage: string;
 }
 
 export interface ICoLeader {
   _id: string;
-  fullName: string;
+  firstName?: string;
+  lastName?: string;
   username: string;
   profileImage: string;
 }
@@ -44,7 +46,8 @@ export interface IGroupDetails {
   groupImage: string;
   creatorId: {
     _id: string;
-    fullName: string;
+    firstName?: string;
+    lastName?: string;
     username: string;
     profileImage: string;
     description: string;

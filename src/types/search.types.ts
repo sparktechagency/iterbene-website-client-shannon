@@ -3,7 +3,8 @@ import { IMedia } from "./post.types";
 
 export interface TUser {
   _id: string;
-  fullName: string;
+  firstName?: string;
+  lastName?: string;
   username: string;
   profileImage: string;
 }

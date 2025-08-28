@@ -2,6 +2,7 @@ import CustomButton from "@/components/custom/custom-button";
 import { useNotInterestEventMutation } from "@/redux/features/event/eventApi";
 import { TError } from "@/types/error";
 import { IEvent } from "@/types/event.types";
+import { getFullName } from "@/utils/nameUtils";
 import Image from "next/image";
 import Link from "next/link";
 import toast from "react-hot-toast";
@@ -43,7 +44,7 @@ const MyUpComingTourCard = ({ event }: UpcomingEventCardProps) => {
             <div className="flex  justify-between items-center">
               <Image
                 src={event?.creatorId?.profileImage}
-                alt={event?.creatorId?.fullName}
+                alt={getFullName(event?.creatorId) || "Creator"}
                 width={60}
                 height={60}
                 className="size-[60px] rounded-full object-cover mr-3 "

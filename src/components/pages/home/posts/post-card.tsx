@@ -14,6 +14,7 @@ import {
   ISortedReaction,
   ReactionType,
 } from "@/types/post.types";
+import { getFullName } from "@/utils/nameUtils";
 import formatPostReactionNumber from "@/utils/formatPostReactionNumber";
 import { Tooltip } from "antd";
 import { AnimatePresence, motion } from "framer-motion";
@@ -162,7 +163,7 @@ const PostCard = ({ post, setAllPosts }: PostCardProps) => {
                     {
                       userId: {
                         _id: user._id,
-                        fullName: user.fullName,
+                        fullName: getFullName(user),
                         username: user.username,
                         profileImage: user.profileImage,
                         id: user._id,
@@ -305,7 +306,7 @@ const PostCard = ({ post, setAllPosts }: PostCardProps) => {
                         <div className="flex items-center gap-3">
                           <Image
                             src={reaction?.userId?.profileImage}
-                            alt={reaction?.userId?.fullName}
+                            alt={getFullName(reaction?.userId) || "User"}
                             width={40}
                             height={40}
                             className="size-[40px] rounded-full"
@@ -313,7 +314,7 @@ const PostCard = ({ post, setAllPosts }: PostCardProps) => {
                           <div className="flex flex-col mt-2">
                             <Link href={`/${reaction?.userId?.username}`}>
                               <h1 className="font-semibold hover:underline">
-                                {reaction?.userId?.fullName}
+                                {getFullName(reaction?.userId)}
                               </h1>
                             </Link>
                             <span className="text-gray-500">

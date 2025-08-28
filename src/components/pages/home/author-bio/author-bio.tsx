@@ -1,4 +1,5 @@
 import useUser from "@/hooks/useUser";
+import { getFullName } from "@/utils/nameUtils";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
@@ -14,7 +15,7 @@ const AuthorBio = () => {
               {user && (
                 <Image
                   src={user?.profileImage}
-                  alt={user?.fullName}
+                  alt={getFullName(user) || "User"}
                   width={60}
                   height={60}
                   className="size-[60px] rounded-full object-cover mr-3 ring-2 ring-primary"
@@ -23,7 +24,7 @@ const AuthorBio = () => {
 
               <div>
                 <h2 className="text-lg md:text-xl font-bold text-gray-900">
-                  {user?.fullName}
+                  {getFullName(user)}
                 </h2>
                 <p className="text-[18px] text-gray-600">@{user?.username}</p>
               </div>

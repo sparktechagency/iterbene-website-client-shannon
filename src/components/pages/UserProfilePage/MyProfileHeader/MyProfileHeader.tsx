@@ -1,4 +1,5 @@
 import { IUser } from "@/types/user.types";
+import { getFullName } from "@/utils/nameUtils";
 import Image from "next/image";
 import React from "react";
 
@@ -30,7 +31,7 @@ const MyProfileHeader = ({userData} : {userData: IUser}) => {
         <div className="space-y-1 ">
           {/* User full name */}
           <h1 className="text-center md:text-left text-lg sm:text-xl md:text-2xl font-bold text-gray-800">
-            {userData?.fullName}
+            {getFullName(userData)}
           </h1>
           <div className="flex flex-wrap gap-2 sm:gap-3 text-gray-600 text-sm md:text-base font-medium">
             <span>@{userData?.username}</span>

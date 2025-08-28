@@ -21,7 +21,7 @@ const EventAuthorDetails = ({
 
         <div className="mt-5">
           <h1 className="text-xl md:text-2xl xl:text-3xl font-semibold text-center text-gray-950">
-            {eventDetailsData?.creatorId?.fullName}
+            {`${eventDetailsData?.creatorId?.firstName} ${eventDetailsData?.creatorId?.lastName}`}
           </h1>
           <div className="flex flex-wrap gap-2 text-gray-600 text-base items-center justify-center">
             <p className="text-gray-600 text-center">

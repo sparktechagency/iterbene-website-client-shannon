@@ -106,25 +106,24 @@ const VerifyEmail = () => {
       {/* Semi-transparent color overlay */}
       <div className="absolute top-0 left-0 w-full h-full bg-[#40E0D054]"></div>
       {/* Content that remains sharp */}
-      <div className="w-full max-w-[500px] mx-auto px-8 xl:px-[65px] py-12 xl:py-[56px] bg-[#FFFFFF] z-30 rounded-xl border-2 border-primary shadow-xl shadow-gray-900">
-        <div className="flex items-center justify-between">
-          <h1 className="text-xl lg:text-3xl xl:text-4xl font-semibold">
-            Verify Email
-          </h1>
+      <div className="w-full max-w-[500px] mx-auto px-8 xl:px-[65px] pt-6 pb-12  bg-[#FFFFFF] z-30 rounded-xl border-2 border-primary shadow-xl shadow-gray-900">
+        <div className="flex flex-col items-center gap-4 justify-center">
           <Image
             src={logo}
             alt="logo"
             width={128}
             height={128}
-            className="ml-2 w-[80px] md:w-[90px] md:h-[90px] xl:w-[100px] xl:h-[90px]"
+            className="ml-2 w-[90px] md:w-[100px] md:h-[90px] "
           />
+          <h1 className="text-2xl md:text-3xl  font-semibold">Verify Otp</h1>
         </div>
         <div className="w-full space-y-8">
           {/* OTP Instructions */}
           <div className="mt-4 text-center">
             <h1>
-              If you haven&apos;t received the email, please check your spam or junk
-              folder, as verification emails may occasionally be directed there.
+              If you haven&apos;t received the email, please check your spam or
+              junk folder, as verification emails may occasionally be directed
+              there.
             </h1>
           </div>
 
@@ -178,8 +177,6 @@ const VerifyEmail = () => {
                 </span>
               </div>
             )}
-
-
           </div>
 
           <CustomButton

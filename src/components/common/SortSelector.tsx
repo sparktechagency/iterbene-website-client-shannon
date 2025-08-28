@@ -54,14 +54,14 @@ export const COMMON_SORT_OPTIONS = {
   timeline: [
     { label: "Recently Added", value: "createdAt" },
     { label: "Oldest First", value: "-createdAt" },
-    { label: "Name (A-Z)", value: "fullName" },
-    { label: "Name (Z-A)", value: "-fullName" },
+    { label: "Name (A-Z)", value: "firstName" },
+    { label: "Name (Z-A)", value: "-firstName" },
   ],
   connections: [
     { label: "Recently Added", value: "createdAt" },
     { label: "Oldest First", value: "-createdAt" },
-    { label: "Name (A-Z)", value: "fullName" },
-    { label: "Name (Z-A)", value: "-fullName" },
+    { label: "Name (A-Z)", value: "firstName" },
+    { label: "Name (Z-A)", value: "-firstName" },
   ],
   groups: [
     { label: "Recently", value: "createdAt" },

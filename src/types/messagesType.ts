@@ -21,7 +21,8 @@ export interface IMessage {
   senderId: string;
   receiverId: {
     _id: string;
-    fullName: string;
+    firstName?: string;
+    lastName?: string;
     profileImage: string
     email: string
   };

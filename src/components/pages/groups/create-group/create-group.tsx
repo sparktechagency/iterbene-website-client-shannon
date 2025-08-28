@@ -16,6 +16,7 @@ import { useGetMyConnectionsQuery } from "@/redux/features/connections/connectio
 import { useCreateGroupMutation } from "@/redux/features/group/groupApi";
 import { IMyConnections } from "@/types/connection.types";
 import { TError } from "@/types/error";
+import { getFullName } from "@/utils/nameUtils";
 import groupValidationSchema from "@/validation/group.validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Select } from "antd";
@@ -193,7 +194,7 @@ const CreateGroup: React.FC = () => {
                 />
               )}
               <div>
-                <p className="text-gray-800 font-semibold">{user?.fullName}</p>
+                <p className="text-gray-800 font-semibold">{getFullName(user)}</p>
                 <p className="text-gray-500 text-sm">Leader • Your Profile</p>
               </div>
             </div>
@@ -308,7 +309,7 @@ const CreateGroup: React.FC = () => {
                     >
                       {myConnections?.map((connection: IMyConnections) => (
                         <Option key={connection?._id} value={connection?._id}>
-                          {connection?.fullName}
+                          {getFullName(connection)}
                         </Option>
                       ))}
                     </Select>

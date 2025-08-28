@@ -3,6 +3,7 @@ import { useState, useCallback, useMemo, Suspense } from "react";
 import { useParams, useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import useUser from "@/hooks/useUser";
+import { getFullName } from "@/utils/nameUtils";
 import { useGetSingleUserQuery } from "@/redux/features/users/userApi";
 import Header from "@/components/common/header";
 import MyProfileHeader from "./MyProfileHeader/MyProfileHeader";
@@ -122,7 +123,7 @@ const ImprovedUserProfilePage = () => {
             <div className="space-y-4">
               <div className="p-4 bg-gray-50 rounded-lg">
                 <label className="text-sm font-medium text-gray-500">Full Name</label>
-                <p className="text-lg font-semibold text-gray-800">{userData?.fullName || 'N/A'}</p>
+                <p className="text-lg font-semibold text-gray-800">{getFullName(userData) || 'N/A'}</p>
               </div>
               <div className="p-4 bg-gray-50 rounded-lg">
                 <label className="text-sm font-medium text-gray-500">Username</label>

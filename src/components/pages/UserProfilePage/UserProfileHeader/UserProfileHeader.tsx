@@ -1,6 +1,7 @@
 import CustomButton from "@/components/custom/custom-button";
 import useUser from "@/hooks/useUser";
 import { openAuthModal } from "@/redux/features/auth/authModalSlice";
+import { getFullName } from "@/utils/nameUtils";
 import {
   useAddConnectionMutation,
   useCancelConnectionMutation,
@@ -132,7 +133,7 @@ const UserProfileHeader = ({ userData }: { userData: IUser }) => {
       <div className="w-full flex -mt-13 flex-col md:flex-row justify-between items-center gap-4 md:gap-8 lg:pl-[240px] p-8 md:p-10">
         <div className="space-y-2 flex-1 text-center md:text-left">
           <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-800 tracking-tight">
-            {userData?.fullName}
+            {getFullName(userData)}
           </h1>
           <div className="flex flex-wrap justify-center md:justify-start gap-2 sm:gap-3 text-gray-600 text-sm md:text-base font-medium">
             <span className="hover:text-blue-600 transition-colors">

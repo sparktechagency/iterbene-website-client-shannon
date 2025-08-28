@@ -3,6 +3,7 @@ import useUser from "@/hooks/useUser";
 import { IChat } from "@/types/chatTypes";
 import { MessageType } from "@/types/messagesType";
 import { IUser } from "@/types/user.types";
+import { getFullName } from "@/utils/nameUtils";
 import { getMessengerTimeFormat } from "@/utils/getMessengerTimeFormat";
 import Image from "next/image";
 import Link from "next/link";
@@ -79,7 +80,7 @@ const ChatCard = ({ chat }: ChatListCardProps) => {
 
           <div>
             <h1 className="text-sm md:text-base">
-              {receiverDetails?.fullName || "Unknown User"}
+              {getFullName(receiverDetails) || "Unknown User"}
             </h1>
             <p className="text-[14px] text-gray-600">
               {renderMessageContent()}

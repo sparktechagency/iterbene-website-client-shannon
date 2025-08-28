@@ -74,7 +74,7 @@ const UserDropdown: React.FC<DropdownProps> = ({ user, isOpen }) => {
                 />
               )}
               <div className="flex-1 min-w-0">
-                <p className="font-medium truncate">{user?.fullName}</p>
+                <p className="font-medium truncate">{`${user?.firstName} ${user?.lastName}`}</p>
                 <p className="text-sm text-gray-500 truncate">
                   @{user?.username}
                 </p>

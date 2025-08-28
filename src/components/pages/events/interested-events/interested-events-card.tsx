@@ -49,7 +49,7 @@ const InterestedEventCard = ({
             <div className="flex  justify-between items-center">
               <Image
                 src={event?.creatorId?.profileImage}
-                alt={event?.creatorId?.fullName}
+                alt={`${event?.creatorId?.firstName} ${event?.creatorId?.lastName} 's profile`}
                 width={60}
                 height={60}
                 className="size-[60px] rounded-full object-cover mr-3 "

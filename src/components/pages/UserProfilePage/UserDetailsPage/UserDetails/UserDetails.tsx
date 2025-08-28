@@ -1,4 +1,5 @@
 import { IUser } from "@/types/user.types";
+import { getFullName } from "@/utils/nameUtils";
 import moment from "moment";
 
 const UserDetails = ({ userData }: { userData: IUser }) => {
@@ -16,7 +17,7 @@ const UserDetails = ({ userData }: { userData: IUser }) => {
             Full name
           </h1>
           <h1 className="w-full md:w-96 text-[#9194A9]">
-            {userData?.fullName || "N/A"}
+            {getFullName(userData) || "N/A"}
           </h1>
         </div>
         <div className="flex flex-col md:flex-row gap-1 md:gap-5">
