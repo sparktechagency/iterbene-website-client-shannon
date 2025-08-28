@@ -45,14 +45,14 @@ const CustomInput = ({
   // Input/Textarea size class based on the prop
   const inputSizeClass = {
     sm: "py-1.5 px-3 text-sm",
-    md: "py-2 px-3 text-base",
-    lg: "py-2.5 px-3 text-base",
+    md: "py-1.5 px-3 text-base",
+    lg: "py-1.5 px-3 text-base",
   }[size];
 
   // Textarea-specific styles
   const textareaSizeClass = {
     sm: "py-2 px-3 text-sm min-h-[80px]",
-    md: "py-2.5 px-3 text-base min-h-[100px]",
+    md: "pt-2.5 px-3 text-base min-h-[100px]",
     lg: "py-3 px-3 text-lg min-h-[120px]",
   }[size];
 
@@ -78,7 +78,7 @@ const CustomInput = ({
   return (
     <div className={`w-full relative`}>
       {label && (
-        <label htmlFor={name} className="block text-gray-950 text-[15px] mb-1">
+        <label htmlFor={name} className="block text-gray-950 text-[15px] ">
           {label} {required && <span className="text-red-500">*</span>}
         </label>
       )}
@@ -99,7 +99,7 @@ const CustomInput = ({
               transition={{ duration: 0.2 }}
             >
               {/* Icon in front of the input/textarea */}
-              {icon && <div className="pl-2 self-start pt-3">{icon}</div>}
+              {icon && <div className="pl-2 self-start pt-[6px]">{icon}</div>}
               {isTextarea ? (
                 <textarea
                   {...field}
