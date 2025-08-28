@@ -447,9 +447,16 @@ const EditMyProfileDetails = ({
               <CustomInput
                 type="text"
                 required
-                name="fullName"
-                placeholder="Enter your full name"
-                label="Full Name"
+                name="firstName"
+                placeholder="Enter your first name"
+                label="First Name"
+              />
+              <CustomInput
+                type="text"
+                required
+                name="lastName"
+                placeholder="Enter your last name"
+                label="Last Name"
               />
               <CustomInput
                 type="text"
@@ -501,6 +508,30 @@ const EditMyProfileDetails = ({
               />
               <CustomSelectField
                 items={[
+                  { label: "Divorced", value: "Divorced" },
+                  {
+                    label: "Domestic Partnership",
+                    value: "Domestic Partnership",
+                  },
+                  { label: "Engaged", value: "Engaged" },
+                  { label: "In a relationship", value: "In a relationship" },
+                  { label: "It's Complicated", value: "It's Complicated" },
+                  { label: "Looking", value: "Looking" },
+                  {
+                    label: "Married with child/children",
+                    value: "Married with child/children",
+                  },
+                  { label: "Single", value: "Single" },
+                  { label: "Widowed", value: "Widowed" },
+                ]}
+                required
+                name="maritalStatus"
+                label="Relationship Status"
+                size="md"
+                placeholder="What is your marital status"
+              />
+              <CustomSelectField
+                items={[
                   { label: "He/Him", value: "He/Him" },
                   { label: "She/Her", value: "She/Her" },
                   { label: "They/Them", value: "They/Them" },
@@ -534,20 +565,6 @@ const EditMyProfileDetails = ({
                 required
                 placeholder="Enter your profession"
                 label="Profession"
-              />
-              <CustomSelectField
-                items={[
-                  { label: "Single", value: "Single" },
-                  { label: "Married", value: "Married" },
-                  { label: "Divorced", value: "Divorced" },
-                  { label: "Separated", value: "Separated" },
-                  { label: "Widowed", value: "Widowed" },
-                ]}
-                required
-                name="maritalStatus"
-                label="Relationship Status"
-                size="md"
-                placeholder="What is your marital status"
               />
             </div>
             <div className="mt-6 flex flex-col md:flex-row gap-4">

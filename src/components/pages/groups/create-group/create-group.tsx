@@ -34,7 +34,6 @@ const CreateGroup: React.FC = () => {
   const [coLeaders, setCoLeaders] = useState<string[]>([]);
   const [selectedLocation, setSelectedLocation] =
     useState<LocationDetails | null>(null);
-  const [descriptionLength, setDescriptionLength] = useState(0);
 
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => {
@@ -44,7 +43,6 @@ const CreateGroup: React.FC = () => {
     setGroupFile(null);
     setGroupImage(null);
     setCoLeaders([]);
-    setDescriptionLength(0);
   };
 
   // Get my all connections list
@@ -245,46 +243,7 @@ const CreateGroup: React.FC = () => {
                     isTextarea
                     placeholder="What are the details?"
                     required
-                    onChange={(e) => setDescriptionLength(e.target.value.length)}
                   />
-
-                  {/* Character counter with dynamic styling */}
-                  <div
-                    className={`text-sm mt-2 flex justify-between items-center transition-colors duration-200 ${
-                      descriptionLength > 375 && descriptionLength < 395
-                        ? "text-orange-500"
-                        : descriptionLength === 395
-                        ? "text-red-500 font-semibold"
-                        : "text-gray-500"
-                    }`}
-                  >
-                    <span>
-                      {descriptionLength === 395
-                        ? "Character limit reached! Cannot type more."
-                        : descriptionLength > 375
-                        ? `Only ${395 - descriptionLength} characters left`
-                        : `${395 - descriptionLength} characters remaining`}
-                    </span>
-                    <span className="font-medium text-gray-700">
-                      {descriptionLength}/395
-                    </span>
-                  </div>
-
-                  {/* Progress bar */}
-                  <div className="w-full bg-gray-200 rounded-full h-1.5 mt-2">
-                    <div
-                      className={`h-1.5 rounded-full transition-all duration-300 ${
-                        descriptionLength < 300
-                          ? "bg-green-500"
-                          : descriptionLength < 375
-                          ? "bg-yellow-500"
-                          : descriptionLength < 395
-                          ? "bg-orange-500"
-                          : "bg-red-500"
-                      }`}
-                      style={{ width: `${(descriptionLength / 395) * 100}%` }}
-                    ></div>
-                  </div>
                 </div>
 
                 <div className="flex flex-col gap-3">

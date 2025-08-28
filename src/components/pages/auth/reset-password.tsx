@@ -5,8 +5,8 @@ import CustomButton from "@/components/custom/custom-button";
 import CustomForm from "@/components/custom/custom-form";
 import CustomInput from "@/components/custom/custom-input";
 import { useResetPasswordMutation } from "@/redux/features/auth/authApi";
-import { storeTokens } from "@/services/auth.services";
 import { TError } from "@/types/error";
+import {  clearAllTokens } from "@/utils/tokenManager";
 import { resetPasswordValidationSchema } from "@/validation/auth.validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Lock } from "lucide-react";
@@ -23,13 +23,12 @@ const ResetPassword = () => {
       const res = await resetPassword({
         password: values?.newPassword,
       }).unwrap();
-      // set access token in cookies
-      storeTokens(
-        res?.data?.attributes?.tokens?.accessToken,
-        res?.data?.attributes?.tokens?.refreshToken
-      );
-      toast.success(res?.message);
-      router.push("/login");
+      
+      // Clear all tokens after successful password reset
+      clearAllTokens();
+      
+      toast.success(res?.message || "Password reset successful! Please login again.");
+      router.push("/auth");
     } catch (error) {
       const err = error as TError;
       toast.error(err?.data?.message || "Something went wrong!");

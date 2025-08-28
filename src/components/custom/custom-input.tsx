@@ -45,7 +45,7 @@ const CustomInput = ({
   // Input/Textarea size class based on the prop
   const inputSizeClass = {
     sm: "py-1.5 px-3 text-sm",
-    md: "py-1.5 px-3 text-base",
+    md: "py-2 px-3 text-base",
     lg: "py-1.5 px-3 text-base",
   }[size];
 
@@ -76,7 +76,7 @@ const CustomInput = ({
   };
 
   return (
-    <div className={`w-full relative`}>
+    <div className={`w-full relative z-0`}>
       {label && (
         <label htmlFor={name} className="block text-gray-950 text-[15px] ">
           {label} {required && <span className="text-red-500">*</span>}
@@ -86,20 +86,19 @@ const CustomInput = ({
         control={control}
         name={name}
         render={({ field, fieldState: { error } }) => (
-          <div className="relative">
+          <div className="relative z-0">
             <motion.div
               className={`${
                 fullWidth ? "w-full" : "w-auto"
-              } flex items-center ${
+              } flex items-center relative z-0 ${
                 variant === "outline"
                   ? "bg-transparent border-b border-primary rounded-none"
                   : "border rounded-lg bg-white"
               } ${error ? "border-red-500" : "border-[#DDDDDD]"}`}
-              whileFocus={{ scale: 1.02 }}
               transition={{ duration: 0.2 }}
             >
               {/* Icon in front of the input/textarea */}
-              {icon && <div className="pl-2 self-start pt-[6px]">{icon}</div>}
+              {icon && <div className="pl-2 self-start pt-[6px] relative z-0">{icon}</div>}
               {isTextarea ? (
                 <textarea
                   {...field}
@@ -114,12 +113,11 @@ const CustomInput = ({
                   onClick={onClick}
                   onKeyDown={handleKeyDown}
                   onFocus={handleFocus}
-                  className={`w-full ${textareaSizeClass} outline-none text-gray-900 resize-none bg-transparent`}
+                  className={`w-full ${textareaSizeClass} outline-none text-gray-900 resize-none bg-transparent relative z-0`}
                   style={{
                     pointerEvents: 'auto',
                     userSelect: 'text',
                     WebkitUserSelect: 'text',
-                    zIndex: 10001
                   }}
                   autoComplete="off"
                   spellCheck="false"
@@ -139,12 +137,11 @@ const CustomInput = ({
                   onClick={onClick}
                   onKeyDown={handleKeyDown}
                   onFocus={handleFocus}
-                  className={`w-full ${inputSizeClass} outline-none text-gray-900 bg-transparent`}
+                  className={`w-full ${inputSizeClass} outline-none text-gray-900 bg-transparent relative z-0`}
                   style={{
                     pointerEvents: 'auto',
                     userSelect: 'text',
                     WebkitUserSelect: 'text',
-                    zIndex: 10001
                   }}
                   autoComplete="off"
                   spellCheck="false"
@@ -155,7 +152,7 @@ const CustomInput = ({
                 <button
                   type="button"
                   onClick={togglePassword}
-                  className="text-gray-500 p-2 cursor-pointer flex-shrink-0"
+                  className="text-gray-500 p-2 cursor-pointer flex-shrink-0 relative z-0"
                   style={{ pointerEvents: 'auto' }}
                   tabIndex={-1}
                 >

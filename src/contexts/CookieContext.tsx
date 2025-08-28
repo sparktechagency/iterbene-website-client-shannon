@@ -1,15 +1,35 @@
 "use client";
 import React, { createContext, useContext, useState, useCallback, useEffect } from "react";
 import Cookies from "js-cookie";
+import CryptoJS from 'crypto-js';
 
-// Cookie names
+// Encryption key - should match tokenManager
+const ENCRYPTION_KEY = process.env.NEXT_PUBLIC_ENCRYPTION_KEY || 'your-secret-key-change-in-production';
+
+// Obfuscated cookie names (user won't understand what these are)
 export const COOKIE_NAMES = {
-  ITER_BENE_VERIFIED: "iterBeneVerified",
-  LOCATION_PERMISSION_DENIED: "locationPermissionDenied", 
-  LOCATION_PERMISSION_GRANTED: "locationPermissionGranted",
-  PROFILE_COMPLETED: "profileCompleted",
-  IS_FIRST_TIME_USER: "isFirstTimeUser"
+  ITER_BENE_VERIFIED: "ibv",           // iterBeneVerified -> ibv
+  LOCATION_PERMISSION_DENIED: "lpd",   // locationPermissionDenied -> lpd
+  LOCATION_PERMISSION_GRANTED: "lpg", // locationPermissionGranted -> lpg  
+  PROFILE_COMPLETED: "pc",             // profileCompleted -> pc
+  IS_FIRST_TIME_USER: "iftu",          // isFirstTimeUser -> iftu
+  USER_LAST_LOCATION: "ull"            // userLastLocation -> ull
 } as const;
+
+// Encrypt function
+const encrypt = (text: string): string => {
+  return CryptoJS.AES.encrypt(text, ENCRYPTION_KEY).toString();
+};
+
+// Decrypt function  
+const decrypt = (encryptedText: string): string => {
+  try {
+    const bytes = CryptoJS.AES.decrypt(encryptedText, ENCRYPTION_KEY);
+    return bytes.toString(CryptoJS.enc.Utf8);
+  } catch (error) {
+    return '';
+  }
+};
 
 interface CookieContextType {
   // Cookie values
@@ -37,14 +57,28 @@ const CookieContext = createContext<CookieContextType | undefined>(undefined);
 export const CookieProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [cookieValues, setCookieValues] = useState<Record<string, string | undefined>>({});
 
-  // Initialize cookie values on mount
+  // Initialize cookie values on mount and watch for changes
   useEffect(() => {
     if (typeof window !== "undefined") {
-      const initialValues: Record<string, string | undefined> = {};
-      Object.values(COOKIE_NAMES).forEach((cookieName) => {
-        initialValues[cookieName] = Cookies.get(cookieName);
-      });
-      setCookieValues(initialValues);
+      const updateAllCookieValues = () => {
+        const currentValues: Record<string, string | undefined> = {};
+        Object.values(COOKIE_NAMES).forEach((cookieName) => {
+          const encryptedValue = Cookies.get(cookieName);
+          if (encryptedValue) {
+            const decryptedValue = decrypt(encryptedValue);
+            currentValues[cookieName] = decryptedValue || undefined;
+          }
+        });
+        setCookieValues(currentValues);
+      };
+
+      // Initial load
+      updateAllCookieValues();
+
+      // Watch for cookie changes periodically (for cases where cookies change externally)
+      const interval = setInterval(updateAllCookieValues, 5000);
+      
+      return () => clearInterval(interval);
     }
   }, []);
 
@@ -57,13 +91,29 @@ export const CookieProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   }, []);
 
   const setCookie = useCallback((name: string, value: string, days: number = 30) => {
-    Cookies.set(name, value, { expires: days });
-    updateCookieState(name, value);
+    // Encrypt the value before storing
+    const encryptedValue = encrypt(value);
+    Cookies.set(name, encryptedValue, { 
+      expires: days,
+      secure: true, 
+      sameSite: 'strict' 
+    });
+    updateCookieState(name, value); // Store decrypted value in state
   }, [updateCookieState]);
 
   const getCookie = useCallback((name: string): string | undefined => {
-    // Return from state for real-time updates, fallback to Cookies.get
-    return cookieValues[name] ?? Cookies.get(name);
+    // Return from state for real-time updates
+    if (cookieValues[name] !== undefined) {
+      return cookieValues[name];
+    }
+    
+    // Fallback to direct cookie read and decrypt (without updating state during render)
+    const encryptedValue = Cookies.get(name);
+    if (encryptedValue) {
+      const decryptedValue = decrypt(encryptedValue);
+      return decryptedValue || undefined;
+    }
+    return undefined;
   }, [cookieValues]);
 
   const removeCookie = useCallback((name: string) => {
@@ -132,15 +182,44 @@ export const migrateFromLocalStorage = () => {
     { localStorage: "locationPermissionDenied", cookie: COOKIE_NAMES.LOCATION_PERMISSION_DENIED },
     { localStorage: "locationPermissionGranted", cookie: COOKIE_NAMES.LOCATION_PERMISSION_GRANTED },
     { localStorage: "profileCompleted", cookie: COOKIE_NAMES.PROFILE_COMPLETED },
+    { localStorage: "isFirstTimeUser", cookie: COOKIE_NAMES.IS_FIRST_TIME_USER },
   ];
 
   migrations.forEach(({ localStorage, cookie }) => {
     const value = window.localStorage.getItem ? window.localStorage.getItem(localStorage) : null;
     if (value) {
-      Cookies.set(cookie, value);
+      // Encrypt the value before setting cookie
+      const encryptedValue = encrypt(value);
+      Cookies.set(cookie, encryptedValue, { 
+        secure: true, 
+        sameSite: 'strict' 
+      });
       if (window.localStorage.removeItem) {
         window.localStorage.removeItem(localStorage);
       }
+    }
+  });
+  
+  // Also migrate from old unencrypted cookies to new encrypted ones
+  const oldCookieMigrations = [
+    { old: "iterBeneVerified", new: COOKIE_NAMES.ITER_BENE_VERIFIED },
+    { old: "locationPermissionDenied", new: COOKIE_NAMES.LOCATION_PERMISSION_DENIED },
+    { old: "locationPermissionGranted", new: COOKIE_NAMES.LOCATION_PERMISSION_GRANTED },
+    { old: "profileCompleted", new: COOKIE_NAMES.PROFILE_COMPLETED },
+    { old: "isFirstTimeUser", new: COOKIE_NAMES.IS_FIRST_TIME_USER },
+  ];
+
+  oldCookieMigrations.forEach(({ old, new: newCookie }) => {
+    const oldValue = Cookies.get(old);
+    if (oldValue && !Cookies.get(newCookie)) {
+      // Encrypt old value and save with new name
+      const encryptedValue = encrypt(oldValue);
+      Cookies.set(newCookie, encryptedValue, { 
+        secure: true, 
+        sameSite: 'strict' 
+      });
+      // Remove old cookie
+      Cookies.remove(old);
     }
   });
 };

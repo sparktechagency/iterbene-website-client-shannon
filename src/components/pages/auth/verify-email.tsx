@@ -12,7 +12,7 @@ import {
 } from "@/redux/features/auth/authApi";
 import { TError } from "@/types/error";
 import toast from "react-hot-toast";
-import { storeTokens } from "@/services/auth.services";
+import { handleAuthResponse } from "@/utils/tokenManager";
 
 const VerifyEmail = () => {
   const searchParams = useSearchParams();
@@ -49,10 +49,10 @@ const VerifyEmail = () => {
   const handleVerifyEmail = async () => {
     try {
       const res = await verifyEmail({ otp: oneTimeCode }).unwrap();
-      storeTokens(
-        res?.data?.attributes?.result?.tokens?.accessToken,
-        res?.data?.attributes?.result?.tokens?.refreshToken
-      );
+      
+      // Handle successful verification tokens
+      handleAuthResponse(res, 'verify-otp');
+      
       toast.success(res?.message);
       if (type == "forgot-password") {
         router.push(`/reset-password`);

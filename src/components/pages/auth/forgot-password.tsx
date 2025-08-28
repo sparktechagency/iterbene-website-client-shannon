@@ -10,27 +10,24 @@ import { forgotPasswordValidationSchema } from "@/validation/auth.validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Mail } from "lucide-react";
 import Image from "next/image";
-import Cookies from "js-cookie";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FieldValues } from "react-hook-form";
 import toast from "react-hot-toast";
+import { handleAuthResponse } from "@/utils/tokenManager";
 const ForgotPassword = () => {
   const router = useRouter();
   const [forgotPassword, { isLoading }] = useForgotPasswordMutation();
   const handleForgotPassword = async (values: FieldValues) => {
     try {
       const res = await forgotPassword(values).unwrap();
-      const accessToken = res?.data?.attributes?.accessToken;
-      //set access token in cookies
-      Cookies.set("accessToken", accessToken, {
-        expires: 7,
-      });
-      //redirect to verify email page
+      
+      // Handle reset password token
+      handleAuthResponse(res, 'forgot-password');
+      
+      // Redirect to verify email page
       toast.success(res?.message);
-      router.push(
-        `/verify-email?type=forgot-password`
-      );
+      router.push(`/verify-email?type=forgot-password`);
     } catch (error) {
       const err = error as TError;
       toast.error(err?.data?.message || "Something went wrong!");

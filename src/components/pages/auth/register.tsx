@@ -10,13 +10,13 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Checkbox } from "antd";
 import { Lock, Mail, UserRound } from "lucide-react";
 import Image from "next/image";
-import Cookies from "js-cookie";
 import Link from "next/link";
 import { FieldValues } from "react-hook-form";
 import { TError } from "@/types/error";
 import { toast } from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import { useCookies, COOKIE_NAMES } from "@/contexts/CookieContext";
+import { handleAuthResponse } from "@/utils/tokenManager";
 const Register = () => {
   const [register, { isLoading }] = useRegisterMutation();
   const router = useRouter();
@@ -24,16 +24,14 @@ const Register = () => {
   const handleRegister = async (values: FieldValues) => {
     try {
       const res = await register(values).unwrap();
-      const accessToken = res?.data?.attributes?.accessToken;
-      //set access token in cookies
-      Cookies.set("accessToken", accessToken, {
-        expires: 7,
-      });
+      
+      // Handle tokens using secure token manager
+      handleAuthResponse(res, 'register');
       
       // Mark user as first-time user for profile completion modal
       setBooleanCookie(COOKIE_NAMES.IS_FIRST_TIME_USER, true);
       
-      //redirect to verify email page
+      // Redirect to verify email page
       router.push("/verify-email");
       toast.success(res?.message);
     } catch (error) {

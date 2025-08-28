@@ -23,7 +23,7 @@ const AuthorBio = () => {
               )}
 
               <div>
-                <h2 className="text-lg md:text-xl font-bold text-gray-900">
+                <h2 className="text-lg font-semibold text-gray-900">
                   {getFullName(user)}
                 </h2>
                 <p className="text-[18px] text-gray-600">@{user?.username}</p>

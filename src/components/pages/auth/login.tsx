@@ -5,8 +5,8 @@ import CustomButton from "@/components/custom/custom-button";
 import CustomForm from "@/components/custom/custom-form";
 import CustomInput from "@/components/custom/custom-input";
 import { useLoginMutation } from "@/redux/features/auth/authApi";
-import { storeTokens } from "@/services/auth.services";
 import { TError } from "@/types/error";
+import { handleAuthResponse } from "@/utils/tokenManager";
 import { loginValidationSchema } from "@/validation/auth.validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Checkbox } from "antd";
@@ -60,18 +60,14 @@ const Login = () => {
         res?.message == "Please verify your email."
       ) {
         toast.success(res?.message);
-        storeTokens(
-          res?.data?.attributes?.accessToken,
-          res?.data?.attributes?.refreshToken
-        );
+        // Handle email verification token
+        handleAuthResponse(res, 'login-not-verified');
         router.push("/verify-email");
         return;
       }
       toast.success(res.message || "Login successful!");
-      storeTokens(
-        res?.data?.attributes?.tokens?.accessToken,
-        res?.data?.attributes?.tokens?.refreshToken
-      );
+      // Handle successful login tokens
+      handleAuthResponse(res, 'login-success');
 
       if (redirectUrl) {
         router.push(redirectUrl);

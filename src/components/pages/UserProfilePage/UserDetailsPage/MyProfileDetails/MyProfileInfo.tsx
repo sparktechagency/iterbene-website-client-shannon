@@ -1,14 +1,19 @@
 import { IUser } from "@/types/user.types";
-import { getFullName } from "@/utils/nameUtils";
 import moment from 'moment';
 const MyProfileInfo = ({ userData }: { userData: IUser }) => {
   return (
     <div className="space-y-[32px] mt-10">
       <div className="flex flex-col md:flex-row gap-1 md:gap-5">
         <h1 className="w-full md:w-96  font-medium text-[#9194A9] text-[16px]">
-          Full name
+          First name
         </h1>
-        <h1 className="w-full md:w-96  text-[#9194A9]">{getFullName(userData) || "N/A"}</h1>
+        <h1 className="w-full md:w-96  text-[#9194A9]">{userData?.firstName || "N/A"}</h1>
+      </div>
+      <div className="flex flex-col md:flex-row gap-1 md:gap-5">
+        <h1 className="w-full md:w-96  font-medium text-[#9194A9] text-[16px]">
+          Last name
+        </h1>
+        <h1 className="w-full md:w-96  text-[#9194A9]">{userData?.lastName || "N/A"}</h1>
       </div>
       <div className="flex flex-col md:flex-row gap-1 md:gap-5">
         <h1 className=" w-full md:w-96  font-medium text-[#9194A9] text-[16px]">

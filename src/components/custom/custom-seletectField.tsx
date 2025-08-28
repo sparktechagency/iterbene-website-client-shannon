@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Controller, useFormContext } from "react-hook-form";
 
@@ -37,6 +37,7 @@ const CustomSelectField = ({
 }: ITextField) => {
   const { control } = useFormContext();
   const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   const inputSizeClass = {
     sm: "py-1 px-1.5 text-sm",
@@ -44,25 +45,50 @@ const CustomSelectField = ({
     lg: "py-2 px-1.5 text-lg",
   }[size];
 
+  // Handle click outside to close dropdown
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setIsOpen(false);
+      }
+    };
+
+    // Add event listener when dropdown is open
+    if (isOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    // Cleanup event listener
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isOpen]);
+
   const toggleDropdown = () => {
     setIsOpen(!isOpen);
     if (onClick) onClick();
   };
 
-  const handleSelect = (item: ISelectItem, fieldOnChange: (value: string) => void) => {
+  const handleSelect = (
+    item: ISelectItem,
+    fieldOnChange: (value: string) => void
+  ) => {
     fieldOnChange(item.value); // Update form state with the value
     if (onChange) onChange(item.value); // Call external onChange if provided
     setIsOpen(false);
   };
 
   return (
-    <div className={`w-full relative`}>
+    <div className={`w-full relative`} ref={dropdownRef}>
       {label && (
         <label htmlFor={name} className="block text-gray-950  text-[15px]">
           {label} {required && <span className="text-red-500">*</span>}
         </label>
       )}
-      
+
       <Controller
         control={control}
         name={name}
@@ -77,11 +103,13 @@ const CustomSelectField = ({
               <motion.div
                 className={`${
                   fullWidth ? "w-full" : "w-auto"
-                } flex items-center ${
+                } flex items-center relative z-10 ${
                   variant === "outline"
                     ? "bg-transparent border-b border-primary rounded-none"
-                    : "border rounded-lg"
-                } ${error ? "border-red-500" : "border-[#DDDDDD]"} ${inputSizeClass}`}
+                    : "border rounded-lg bg-white"
+                } ${
+                  error ? "border-red-500" : "border-[#DDDDDD]"
+                } ${inputSizeClass}`}
                 whileFocus={{ scale: 1.02 }}
                 transition={{ duration: 0.2 }}
               >
@@ -122,15 +150,14 @@ const CustomSelectField = ({
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
                     transition={{ duration: 0.2 }}
-                    className={`absolute z-10 w-full mt-1 bg-white border border-[#DDDDDD] rounded-lg shadow-lg max-h-60 overflow-auto ${
+                    className={`absolute z-[1000] w-full mt-1 bg-white border border-[#DDDDDD] scrollbar-hide rounded-lg shadow-lg max-h-60 overflow-auto ${
                       variant === "outline" ? "border-b" : ""
                     }`}
                   >
                     {items.map((item) => (
                       <motion.li
                         key={item.value}
-                        whileHover={{ backgroundColor: "#f1f5f9" }}
-                        className="px-4 py-2 text-gray-900 cursor-pointer"
+                        className="px-4 py-2 text-gray-900 cursor-pointer hover:bg-gray-100"
                         onClick={() => handleSelect(item, field.onChange)}
                       >
                         {item.label}
@@ -142,7 +169,10 @@ const CustomSelectField = ({
 
               {/* Error Message */}
               {error && (
-                <span id={`${name}-error`} className="text-red-500 text-sm mt-1">
+                <span
+                  id={`${name}-error`}
+                  className="text-red-500 text-sm mt-1"
+                >
                   {error.message}
                 </span>
               )}
