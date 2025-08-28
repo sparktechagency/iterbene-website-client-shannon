@@ -75,7 +75,7 @@ const ResetPassword = () => {
               label="New Password"
               fullWidth
               size="lg"
-              icon={<Lock size={24} className="text-secondry" />}
+              icon={<Lock size={24} className="text-secondary" />}
               placeholder="Enter new password"
               variant="outline"
               type="password"
@@ -85,7 +85,7 @@ const ResetPassword = () => {
               label="Confirm Password"
               fullWidth
               size="lg"
-              icon={<Lock size={24} className="text-second" />}
+              icon={<Lock size={24} className="text-secondary" />}
               placeholder="Enter confirm password"
               variant="outline"
               type="password"

@@ -179,13 +179,7 @@ const VerifyEmail = () => {
               </div>
             )}
 
-            {/* Additional help text */}
-            <div className="text-center mt-2">
-              <p className="text-xs text-gray-500">
-                Still having trouble? Check your <strong>spam folder</strong> or
-                try resending the code.
-              </p>
-            </div>
+
           </div>
 
           <CustomButton
