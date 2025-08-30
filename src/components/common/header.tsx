@@ -567,7 +567,7 @@ const Header: React.FC = () => {
                       width={56}
                       height={56}
                       onClick={toggleUser}
-                      className="size-12 lg:size-14 ring ring-[#40E0D0] rounded-full cursor-pointer hover:ring-2 transition-all object-cover"
+                      className="size-12 lg:size-14 ring ring-[#40E0D0] rounded-full cursor-pointer transition-all object-cover"
                       alt="userImage"
                     />
                   </motion.div>

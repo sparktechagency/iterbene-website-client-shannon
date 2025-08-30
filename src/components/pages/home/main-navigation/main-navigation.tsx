@@ -60,7 +60,7 @@ const MainNavigation = () => {
     : userNotExistsMenuNavigationLinks;
   return (
     <section className="w-full bg-white p-6 rounded-2xl">
-      <div className="flex flex-col gap-6">
+      <div className="flex flex-col gap-5">
         {menuNavigationLinks?.map((link) => (
           <ActiveNavigation key={link.href} navLink={link} />
         ))}

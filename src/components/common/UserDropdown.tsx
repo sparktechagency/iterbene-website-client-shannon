@@ -69,7 +69,7 @@ const UserDropdown: React.FC<DropdownProps> = ({ user, isOpen }) => {
                   src={user?.profileImage}
                   width={40}
                   height={40}
-                  className="size-14 rounded-full flex-shrink-0"
+                  className="size-13 rounded-full flex-shrink-0"
                   alt="user"
                 />
               )}

@@ -10,7 +10,7 @@ const AuthorBio = () => {
     <>
       {user && (
         <Link href={`/${user?.username}`} className="w-full block">
-          <section className="w-full max-h-[108px] bg-white p-6 rounded-2xl">
+          <section className="w-full max-h-[108px] bg-white p-5 rounded-2xl">
             <div className="w-full h-full gap-3 flex items-center">
               {user && (
                 <Image
@@ -26,7 +26,7 @@ const AuthorBio = () => {
                 <h2 className="text-lg font-semibold text-gray-900">
                   {getFullName(user)}
                 </h2>
-                <p className="text-[18px] text-gray-600">@{user?.username}</p>
+                <p className="text-gray-600">@{user?.username}</p>
               </div>
             </div>
           </section>

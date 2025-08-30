@@ -263,7 +263,7 @@ export default function PrivacySettings() {
 
   return (
     <div className="min-h-screen">
-      <div className="w-full px-4 sm:px-6 lg:px-8 py-8">
+      <div className="w-full px-3 ">
         {/* Page Header */}
         <div className="mb-8">
           <div className="flex items-center space-x-3 mb-4">

@@ -150,7 +150,7 @@ const CustomSelectField = ({
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
                     transition={{ duration: 0.2 }}
-                    className={`absolute z-[1000] w-full mt-1 bg-white border border-[#DDDDDD] scrollbar-hide rounded-lg shadow-lg max-h-60 overflow-auto ${
+                    className={`absolute z-[1000] w-full mt-1 bg-white border border-[#DDDDDD]  rounded-lg shadow-lg max-h-60 overflow-auto ${
                       variant === "outline" ? "border-b" : ""
                     }`}
                   >
