@@ -1,14 +1,14 @@
-// components/LocationSearchInput.tsx
 import {
   LocationDetails,
   LocationPrediction,
   useGoogleLocationSearch,
 } from "@/hooks/useGoogleLocationSearch";
-import { LocateIcon, MapPin } from "lucide-react";
+import { MapPin, Loader2 } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
+import type { FieldError, UseFormRegisterReturn } from "react-hook-form";
 
 interface LocationSearchInputProps {
-  value?: string;
+  name: string;
   placeholder?: string;
   className?: string;
   label?: string;
@@ -17,23 +17,27 @@ interface LocationSearchInputProps {
   onInputChange?: (value: string) => void;
   showSelectedInfo?: boolean;
   disabled?: boolean;
+  register: UseFormRegisterReturn;
+  error?: FieldError;
 }
 
 const LocationSearchInput: React.FC<LocationSearchInputProps> = ({
-  value = "",
+  name,
   placeholder = "Search for a location...",
   className = "",
   label = "Location",
   required = false,
   onLocationSelect,
   onInputChange,
-  showSelectedInfo = true,
+  showSelectedInfo = false,
   disabled = false,
+  register,
+  error,
 }) => {
-  const [inputValue, setInputValue] = useState(value);
   const [selectedLocation, setSelectedLocation] =
     useState<LocationDetails | null>(null);
   const [showDropdown, setShowDropdown] = useState(false);
+  const [inputValue, setInputValue] = useState("");
 
   const inputRef = useRef<HTMLInputElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -45,31 +49,31 @@ const LocationSearchInput: React.FC<LocationSearchInputProps> = ({
     searchLocations,
     getLocationDetails,
     clearPredictions,
-    error,
+    error: apiError,
   } = useGoogleLocationSearch({
     debounceMs: 300,
-    minQueryLength: 1,
-    maxResults: 10, // This will be ignored by the API, but kept for consistency
+    minQueryLength: 2,
+    maxResults: 10,
   });
-
-  // Initialize inputValue with the prop value
-  useEffect(() => {
-    setInputValue(value);
-  }, [value]);
 
   // Handle input change
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;
     setInputValue(newValue);
-    setSelectedLocation(null);
 
-    // Always call onInputChange to keep parent state in sync
+    // Clear selected location when user types
+    if (selectedLocation) {
+      setSelectedLocation(null);
+    }
+
+    // Update form state
+    register.onChange(e);
     onInputChange?.(newValue);
 
     if (newValue.length === 0) {
       clearPredictions();
       setShowDropdown(false);
-    } else {
+    } else if (newValue.length >= 2) {
       searchLocations(newValue);
     }
   };
@@ -80,12 +84,17 @@ const LocationSearchInput: React.FC<LocationSearchInputProps> = ({
       const locationDetails = await getLocationDetails(prediction.place_id);
 
       if (locationDetails) {
-        setInputValue(prediction.description);
         setSelectedLocation(locationDetails);
+        setInputValue(prediction.description);
         setShowDropdown(false);
         clearPredictions();
 
-        // Call the callback with location details
+        // Update form state with the selected description
+        register.onChange({
+          target: { value: prediction.description, name },
+        });
+
+        // Call callbacks
         onLocationSelect?.(locationDetails);
         onInputChange?.(prediction.description);
       }
@@ -96,10 +105,12 @@ const LocationSearchInput: React.FC<LocationSearchInputProps> = ({
 
   // Show dropdown when predictions are available
   useEffect(() => {
-    if (predictions.length > 0) {
+    if (predictions.length > 0 && inputValue.length >= 2) {
       setShowDropdown(true);
+    } else {
+      setShowDropdown(false);
     }
-  }, [predictions]);
+  }, [predictions, inputValue]);
 
   // Handle clicks outside dropdown
   useEffect(() => {
@@ -117,65 +128,102 @@ const LocationSearchInput: React.FC<LocationSearchInputProps> = ({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  // Handle input focus
+  const handleInputFocus = () => {
+    if (predictions.length > 0 && inputValue.length >= 2) {
+      setShowDropdown(true);
+    }
+  };
+
   return (
-    <div className={`flex flex-col gap-2 ${className}`}>
+    <div className={`w-full space-y-1 ${className}`}>
+      {/* Label */}
       {label && (
-        <label className="text-sm font-medium text-gray-700">
+        <label
+          htmlFor={name}
+          className="block text-gray-950 text-[15px] font-medium"
+        >
           {label} {required && <span className="text-red-500">*</span>}
         </label>
       )}
 
-      <div className="relative">
-        <div className="relative">
+      <div className="relative" ref={dropdownRef}>
+        {/* Input Container */}
+        <div
+          className={`
+            w-full flex items-center relative
+            border rounded-lg bg-white
+            ${
+              error || apiError
+                ? "border-red-500 focus-within:border-red-500"
+                : disabled
+                ? "border-gray-200 bg-gray-50"
+                : "border-gray-300 focus-within:border-orange-500"
+            }
+            transition-colors duration-200
+          `}
+        >
+          {/* Left Icon */}
+          <div className="flex-shrink-0 pl-3">
+            <MapPin
+              size={20}
+              className={`
+                ${
+                  error || apiError
+                    ? "text-red-400"
+                    : disabled
+                    ? "text-gray-300"
+                    : "text-gray-400"
+                }
+              `}
+            />
+          </div>
+
+          {/* Input Field */}
           <input
             ref={inputRef}
+            id={name}
             type="text"
             value={inputValue}
             onChange={handleInputChange}
-            placeholder={!isInitialized ? "API key missing..." : placeholder}
+            onFocus={handleInputFocus}
+            placeholder={!isInitialized ? "Loading..." : placeholder}
             disabled={disabled || !isInitialized}
-            className={`w-full px-4 py-3 pl-12 border rounded-lg outline-none transition-colors ${
-              error
-                ? "border-red-500"
-                : "border-gray-300 focus:border-primary"
-            }`}
-            onFocus={() => {
-              if (predictions.length > 0) {
-                setShowDropdown(true);
-              }
-            }}
+            className={`
+              flex-1 py-2.5 px-3 outline-none bg-transparent
+              ${disabled ? "text-gray-400" : "text-gray-900"}
+              placeholder:text-gray-500
+            `}
+            autoComplete="off"
           />
-          <LocateIcon
-            size={20}
-            className={`absolute left-4 top-1/2 transform -translate-y-1/2 ${
-              error ? "text-red-400" : "text-gray-400"
-            }`}
-          />
+
+          {/* Loading Spinner */}
           {isLoading && (
-            <div className="absolute right-4 top-1/2 transform -translate-y-1/2">
-              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500"></div>
+            <div className="flex-shrink-0 pr-3">
+              <Loader2 size={16} className="animate-spin text-orange-500" />
             </div>
           )}
         </div>
 
-        {/* Error message */}
-        {error && <p className="mt-1 text-xs text-red-600">{error}</p>}
+        {/* Error Message */}
+        {(error || apiError) && (
+          <p className="text-red-500 text-sm mt-1">
+            {error?.message || apiError}
+          </p>
+        )}
 
-        {/* Dropdown with predictions */}
-        {showDropdown && predictions.length > 0 && !error && (
-          <div
-            ref={dropdownRef}
-            className="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto"
-          >
+        {/* Dropdown with Predictions */}
+        {showDropdown && predictions.length > 0 && !apiError && (
+          <div className="absolute top-full w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto z-[9999]">
             {predictions.map((prediction) => (
               <div
                 key={prediction.place_id}
                 onClick={() => handleLocationSelect(prediction)}
-                className="px-4 py-3 hover:bg-blue-50 cursor-pointer border-b border-gray-100 last:border-b-0 flex items-start gap-3 transition-colors"
+                className="px-4 py-3 hover:bg-orange-50 cursor-pointer border-b border-gray-100 last:border-b-0 flex items-start gap-3 transition-colors"
               >
                 <MapPin
                   size={16}
-                  className="text-blue-500 mt-1 flex-shrink-0"
+                  className="text-orange-500 mt-1 flex-shrink-0"
                 />
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-gray-900 truncate">
@@ -192,7 +240,7 @@ const LocationSearchInput: React.FC<LocationSearchInputProps> = ({
           </div>
         )}
 
-        {/* Selected location info - simplified to show only lat, lng, name */}
+        {/* Selected Location Info */}
         {showSelectedInfo && selectedLocation && (
           <div className="mt-2 p-3 bg-green-50 border border-green-200 rounded-lg">
             <div className="flex items-start gap-2">

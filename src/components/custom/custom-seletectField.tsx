@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
+import { ChevronDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Controller, useFormContext } from "react-hook-form";
+import type { FieldError, UseFormRegisterReturn } from "react-hook-form";
 
 // Define the shape of each item in the list
 interface ISelectItem {
@@ -8,7 +9,7 @@ interface ISelectItem {
   label: string;
 }
 
-interface ITextField {
+interface CustomSelectFieldProps {
   name: string;
   label?: string;
   variant?: "default" | "outline";
@@ -20,6 +21,9 @@ interface ITextField {
   onClick?: () => void;
   onChange?: (value: string) => void;
   items: ISelectItem[];
+  register: UseFormRegisterReturn;
+  error?: FieldError;
+  disabled?: boolean;
 }
 
 const CustomSelectField = ({
@@ -31,18 +35,23 @@ const CustomSelectField = ({
   icon,
   placeholder = "Select an option",
   items,
-  fullWidth,
+  fullWidth = true,
   onClick,
   onChange,
-}: ITextField) => {
-  const { control } = useFormContext();
+  register,
+  error,
+  disabled = false,
+}: CustomSelectFieldProps) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [selectedValue, setSelectedValue] = useState<string>("");
+
   const dropdownRef = useRef<HTMLDivElement>(null);
 
+  // Size classes
   const inputSizeClass = {
-    sm: "py-1 px-1.5 text-sm",
-    md: "py-[4px] px-1.5 text-base",
-    lg: "py-2 px-1.5 text-lg",
+    sm: "py-1.5 px-3 text-sm",
+    md: "py-2.5 px-3 text-base",
+    lg: "py-3 px-4 text-lg",
   }[size];
 
   // Handle click outside to close dropdown
@@ -56,130 +65,149 @@ const CustomSelectField = ({
       }
     };
 
-    // Add event listener when dropdown is open
     if (isOpen) {
       document.addEventListener("mousedown", handleClickOutside);
     }
 
-    // Cleanup event listener
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [isOpen]);
 
+  // Toggle dropdown
   const toggleDropdown = () => {
-    setIsOpen(!isOpen);
-    if (onClick) onClick();
+    if (!disabled) {
+      setIsOpen(!isOpen);
+      onClick?.();
+    }
   };
 
-  const handleSelect = (
-    item: ISelectItem,
-    fieldOnChange: (value: string) => void
-  ) => {
-    fieldOnChange(item.value); // Update form state with the value
-    if (onChange) onChange(item.value); // Call external onChange if provided
+  // Handle item selection
+  const handleSelect = (item: ISelectItem) => {
+    setSelectedValue(item.value);
+
+    // Update form state
+    register.onChange({
+      target: { value: item.value, name },
+    });
+
+    // Call onChange callback
+    onChange?.(item.value);
+
     setIsOpen(false);
   };
 
+  // Get selected item label
+  const getSelectedLabel = () => {
+    const selectedItem = items.find((item) => item.value === selectedValue);
+    return selectedItem?.label || "";
+  };
+
+  // Base styles for container
+  const containerClasses = `
+    ${fullWidth ? "w-full" : "w-auto"}
+    flex items-center relative
+    ${
+      variant === "outline"
+        ? "bg-transparent border-b border-primary rounded-none"
+        : "border rounded-lg bg-white"
+    }
+    ${
+      error
+        ? "border-red-500"
+        : disabled
+        ? "border-gray-200 bg-gray-50"
+        : "border-gray-300 hover:border-orange-400 focus-within:border-orange-500"
+    }
+    transition-colors duration-200
+    ${disabled ? "cursor-not-allowed" : "cursor-pointer"}
+  `;
+
   return (
-    <div className={`w-full relative`} ref={dropdownRef}>
+    <div className="w-full space-y-1" ref={dropdownRef}>
+      {/* Label */}
       {label && (
-        <label htmlFor={name} className="block text-gray-950  text-[15px]">
+        <label
+          htmlFor={name}
+          className="block text-gray-950 text-[15px] font-medium"
+        >
           {label} {required && <span className="text-red-500">*</span>}
         </label>
       )}
 
-      <Controller
-        control={control}
-        name={name}
-        render={({ field, fieldState: { error } }) => {
-          // Find the selected item based on the form value
-          const selectedItem = items.find((item) => item.value === field.value);
-          const displayLabel = selectedItem?.label || placeholder;
+      <div className="relative">
+        {/* Hidden input for form registration */}
+        <input {...register} type="hidden" value={selectedValue} />
 
-          return (
-            <div className="relative">
-              {/* Dropdown Trigger */}
-              <motion.div
-                className={`${
-                  fullWidth ? "w-full" : "w-auto"
-                } flex items-center relative z-10 ${
-                  variant === "outline"
-                    ? "bg-transparent border-b border-primary rounded-none"
-                    : "border rounded-lg bg-white"
-                } ${
-                  error ? "border-red-500" : "border-[#DDDDDD]"
-                } ${inputSizeClass}`}
-                whileFocus={{ scale: 1.02 }}
-                transition={{ duration: 0.2 }}
-              >
-                {icon && <div className="pl-2">{icon}</div>}
-                <button
-                  type="button"
-                  className={`w-full text-left outline-none cursor-pointer ${
-                    !field.value ? "text-gray-500" : "text-gray-900"
-                  } ${inputSizeClass}`}
-                  onClick={toggleDropdown}
-                >
-                  {displayLabel}
-                </button>
-                <div className="pr-2">
-                  <svg
-                    className={`w-4 h-4 transform transition-transform ${
-                      isOpen ? "rotate-180" : ""
-                    }`}
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M19 9l-7 7-7-7"
-                    />
-                  </svg>
+        {/* Select Trigger */}
+        <div className={containerClasses} onClick={toggleDropdown}>
+          {/* Left Icon */}
+          {icon && <div className="flex-shrink-0 pl-3">{icon}</div>}
+
+          {/* Display Value */}
+          <div
+            className={`flex-1 ${inputSizeClass} ${
+              disabled ? "text-gray-400" : "text-gray-900"
+            }`}
+          >
+            <span className={selectedValue ? "text-gray-900" : "text-gray-500"}>
+              {getSelectedLabel() || placeholder}
+            </span>
+          </div>
+
+          {/* Chevron Icon */}
+          <div className="flex-shrink-0 pr-3">
+            <ChevronDown
+              size={20}
+              className={`
+                transition-transform duration-200
+                ${isOpen ? "rotate-180" : ""}
+                ${disabled ? "text-gray-300" : "text-gray-500"}
+              `}
+            />
+          </div>
+        </div>
+
+        {/* Error Message */}
+        {error && <p className="text-red-500 text-sm mt-1">{error.message}</p>}
+
+        {/* Dropdown Menu */}
+        <AnimatePresence>
+          {isOpen && !disabled && (
+            <motion.div
+              initial={{ opacity: 0, y: -10, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -10, scale: 0.95 }}
+              transition={{ duration: 0.15 }}
+              className="absolute top-full mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto z-[9999]"
+            >
+              {items.length === 0 ? (
+                <div className="px-4 py-3 text-gray-500 text-sm">
+                  No options available
                 </div>
-              </motion.div>
-
-              {/* Animated Dropdown Menu */}
-              <AnimatePresence>
-                {isOpen && (
-                  <motion.ul
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    transition={{ duration: 0.2 }}
-                    className={`absolute z-[1000] w-full mt-1 bg-white border border-[#DDDDDD]  rounded-lg shadow-lg max-h-60 overflow-auto ${
-                      variant === "outline" ? "border-b" : ""
-                    }`}
+              ) : (
+                items.map((item) => (
+                  <div
+                    key={item.value}
+                    onClick={() => handleSelect(item)}
+                    className={`
+                      px-4 py-3 cursor-pointer transition-colors
+                      hover:bg-orange-50 border-b border-gray-100 last:border-b-0
+                      ${
+                        selectedValue === item.value
+                          ? "bg-orange-50 text-orange-700 font-medium"
+                          : "text-gray-900"
+                      }
+                    `}
                   >
-                    {items.map((item) => (
-                      <motion.li
-                        key={item.value}
-                        className="px-4 py-2 text-gray-900 cursor-pointer hover:bg-gray-100"
-                        onClick={() => handleSelect(item, field.onChange)}
-                      >
-                        {item.label}
-                      </motion.li>
-                    ))}
-                  </motion.ul>
-                )}
-              </AnimatePresence>
-
-              {/* Error Message */}
-              {error && (
-                <span
-                  id={`${name}-error`}
-                  className="text-red-500 text-sm mt-1"
-                >
-                  {error.message}
-                </span>
+                    {item.label}
+                  </div>
+                ))
               )}
-            </div>
-          );
-        }}
-      />
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
     </div>
   );
 };

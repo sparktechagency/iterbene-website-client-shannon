@@ -6,14 +6,6 @@ const eventValidationSchema = z.object({
     required_error: "Event name is required",
     invalid_type_error: "Event name must be a string",
   }),
-  startDate: z.string({
-    required_error: "Start date is required",
-    invalid_type_error: "Start date must be a valid date",
-  }),
-  endDate: z.string({
-    required_error: "End date is required",
-    invalid_type_error: "End date must be a valid date",
-  }),
   eventCost: z.string({
     required_error: "Event cost is required",
     invalid_type_error: "Event cost must be a number",

@@ -1,7 +1,6 @@
 import { EyeIcon, EyeOff } from "lucide-react";
 import { useState } from "react";
-import { Controller, useFormContext } from "react-hook-form";
-import { motion } from "framer-motion";
+import type { FieldError, UseFormRegisterReturn } from "react-hook-form";
 
 type TInputProps = {
   name: string;
@@ -19,11 +18,13 @@ type TInputProps = {
   onChange?: (
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => void;
+  register: UseFormRegisterReturn;
+  error?: FieldError;
 };
 
 const CustomInput = ({
   name,
-  fullWidth,
+  fullWidth = true,
   label,
   type = "text",
   size = "md",
@@ -35,139 +36,129 @@ const CustomInput = ({
   isTextarea = false,
   onClick,
   onChange,
+  register,
+  error,
 }: TInputProps) => {
-  const { control } = useFormContext();
   const [showPassword, setShowPassword] = useState(false);
 
   // Toggle password visibility
   const togglePassword = () => setShowPassword((prev) => !prev);
 
-  // Input/Textarea size class based on the prop
+  // Size classes
   const inputSizeClass = {
     sm: "py-1.5 px-3 text-sm",
-    md: "py-2 px-3 text-base",
-    lg: "py-1.5 px-3 text-base",
+    md: "py-2.5 px-3 text-base",
+    lg: "py-3 px-4 text-lg",
   }[size];
 
-  // Textarea-specific styles
   const textareaSizeClass = {
     sm: "py-2 px-3 text-sm min-h-[80px]",
-    md: "pt-2.5 px-3 text-base min-h-[100px]",
-    lg: "py-3 px-3 text-lg min-h-[120px]",
+    md: "py-2.5 px-3 text-base min-h-[100px]",
+    lg: "py-3 px-4 text-lg min-h-[120px]",
   }[size];
 
   // Determine input type for password toggle
   const inputType = type === "password" && showPassword ? "text" : type;
 
-  // Handle keyboard events to ensure space and other keys work properly
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    // Prevent event propagation for important keys
-    if (e.key === ' ' || e.key === 'Enter' || e.key === 'Tab') {
-      e.stopPropagation();
+  // Base styles for input container
+  const containerClasses = `
+    ${fullWidth ? "w-full" : "w-auto"}
+    flex items-start relative
+    ${
+      variant === "outline"
+        ? "bg-transparent border-b border-primary rounded-none"
+        : "border rounded-lg bg-white"
     }
-  };
-
-  // Handle focus events
-  const handleFocus = (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    e.stopPropagation();
-    // Ensure input is selectable
-    e.target.style.userSelect = 'text';
-    e.target.style.webkitUserSelect = 'text';
-  };
+    ${
+      error
+        ? "border-red-500 focus-within:border-red-500"
+        : "border-gray-300 focus-within:border-orange-500"
+    }
+    transition-colors duration-200
+  `;
 
   return (
-    <div className={`w-full relative z-0`}>
+    <div className="w-full space-y-1">
+      {/* Label */}
       {label && (
-        <label htmlFor={name} className="block text-gray-950 text-[15px] ">
+        <label
+          htmlFor={name}
+          className="block text-gray-950 text-[15px] font-medium"
+        >
           {label} {required && <span className="text-red-500">*</span>}
         </label>
       )}
-      <Controller
-        control={control}
-        name={name}
-        render={({ field, fieldState: { error } }) => (
-          <div className="relative z-0">
-            <motion.div
-              className={`${
-                fullWidth ? "w-full" : "w-auto"
-              } flex items-center relative z-0 ${
-                variant === "outline"
-                  ? "bg-transparent border-b border-primary rounded-none"
-                  : "border rounded-lg bg-white"
-              } ${error ? "border-red-500" : "border-[#DDDDDD]"}`}
-              transition={{ duration: 0.2 }}
-            >
-              {/* Icon in front of the input/textarea */}
-              {icon && <div className="pl-2 self-start pt-[6px] relative z-0">{icon}</div>}
-              {isTextarea ? (
-                <textarea
-                  {...field}
-                  id={name}
-                  value={field.value || ""}
-                  placeholder={placeholder}
-                  maxLength={maxLength}
-                  onChange={(e) => {
-                    field.onChange(e);
-                    if (onChange) onChange(e);
-                  }}
-                  onClick={onClick}
-                  onKeyDown={handleKeyDown}
-                  onFocus={handleFocus}
-                  className={`w-full ${textareaSizeClass} outline-none text-gray-900 resize-none bg-transparent relative z-0`}
-                  style={{
-                    pointerEvents: 'auto',
-                    userSelect: 'text',
-                    WebkitUserSelect: 'text',
-                  }}
-                  autoComplete="off"
-                  spellCheck="false"
-                />
-              ) : (
-                <input
-                  {...field}
-                  id={name}
-                  value={field.value || ""}
-                  type={inputType}
-                  maxLength={maxLength}
-                  placeholder={placeholder}
-                  onChange={(e) => {
-                    field.onChange(e);
-                    if (onChange) onChange(e);
-                  }}
-                  onClick={onClick}
-                  onKeyDown={handleKeyDown}
-                  onFocus={handleFocus}
-                  className={`w-full ${inputSizeClass} outline-none text-gray-900 bg-transparent relative z-0`}
-                  style={{
-                    pointerEvents: 'auto',
-                    userSelect: 'text',
-                    WebkitUserSelect: 'text',
-                  }}
-                  autoComplete="off"
-                  spellCheck="false"
-                />
-              )}
-              {/* Password visibility toggle icon (only for input with type="password") */}
-              {!isTextarea && type === "password" && (
-                <button
-                  type="button"
-                  onClick={togglePassword}
-                  className="text-gray-500 p-2 cursor-pointer flex-shrink-0 relative z-0"
-                  style={{ pointerEvents: 'auto' }}
-                  tabIndex={-1}
-                >
-                  {showPassword ? <EyeIcon size={20} /> : <EyeOff size={20} />}
-                </button>
-              )}
-            </motion.div>
-            {error && (
-              <span id={`${name}-error`} className="text-red-500 text-sm mt-1 block">
-                {error.message}
-              </span>
-            )}
+
+      {/* Input Container */}
+      <div className={containerClasses}>
+        {/* Left Icon */}
+        {icon && (
+          <div
+            className={`flex-shrink-0 ${
+              isTextarea ? "pt-3 pl-3" : "pl-3 self-center"
+            }`}
+          >
+            {icon}
           </div>
         )}
-      />
+
+        {/* Input/Textarea */}
+        {isTextarea ? (
+          <textarea
+            {...register}
+            id={name}
+            placeholder={placeholder}
+            maxLength={maxLength}
+            onChange={(e) => {
+              register.onChange(e);
+              onChange?.(e);
+            }}
+            onClick={onClick}
+            className={`
+              flex-1 ${textareaSizeClass} 
+              outline-none text-gray-900 
+              resize-none bg-transparent
+              placeholder:text-gray-500
+            `}
+            autoComplete="off"
+          />
+        ) : (
+          <input
+            {...register}
+            id={name}
+            type={inputType}
+            maxLength={maxLength}
+            placeholder={placeholder}
+            onChange={(e) => {
+              register.onChange(e);
+              onChange?.(e);
+            }}
+            onClick={onClick}
+            className={`
+              flex-1 ${inputSizeClass}
+              outline-none text-gray-900 
+              bg-transparent
+              placeholder:text-gray-500
+            `}
+            autoComplete="off"
+          />
+        )}
+
+        {/* Password Toggle */}
+        {!isTextarea && type === "password" && (
+          <button
+            type="button"
+            onClick={togglePassword}
+            className="flex-shrink-0 p-2 text-gray-500 hover:text-gray-700 self-center"
+            tabIndex={-1}
+          >
+            {showPassword ? <EyeIcon size={20} /> : <EyeOff size={20} />}
+          </button>
+        )}
+      </div>
+
+      {/* Error Message */}
+      {error && <p className="text-red-500 text-sm">{error.message}</p>}
     </div>
   );
 };

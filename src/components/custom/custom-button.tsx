@@ -10,6 +10,7 @@ interface TButtonProps {
   disabled?: boolean;
   fullWidth?: boolean;
 }
+
 const CustomButton = ({
   children,
   className = "",
@@ -20,13 +21,13 @@ const CustomButton = ({
   disabled,
   fullWidth,
 }: TButtonProps) => {
-  const baseClasses = `py-2 px-4 rounded-xl font-medium transition-colors flex items-center justify-center gap-2 ${
+  const baseClasses = `py-2 px-4 rounded-xl  font-medium transition-colors flex items-center justify-center gap-2 ${
     fullWidth ? "w-full" : "w-auto"
   }`;
 
   const variantClasses = {
-    default: " border bg-secondary hover:bg-secondary text-white ",
-    outline: "border border-[#9EA1B3]  text-gray-950",
+    default: "border bg-secondary hover:bg-secondary text-white",
+    outline: "border border-[#9EA1B3] text-gray-950",
   };
 
   const disabledClasses = "opacity-60 cursor-not-allowed";
