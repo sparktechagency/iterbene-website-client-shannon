@@ -24,6 +24,7 @@ interface CustomSelectFieldProps {
   register: UseFormRegisterReturn;
   error?: FieldError;
   disabled?: boolean;
+  defaultValue?: string; // 🔥 Simple approach - just pass defaultValue
 }
 
 const CustomSelectField = ({
@@ -41,11 +42,21 @@ const CustomSelectField = ({
   register,
   error,
   disabled = false,
+  defaultValue = "", // 🔥 Default value prop
 }: CustomSelectFieldProps) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [selectedValue, setSelectedValue] = useState<string>("");
+
+  // 🔥 Simple fix: Initialize with defaultValue, no useWatch needed
+  const [selectedValue, setSelectedValue] = useState<string>(defaultValue);
 
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // 🔥 Only sync on defaultValue change (component re-render)
+  useEffect(() => {
+    if (defaultValue && defaultValue !== selectedValue) {
+      setSelectedValue(defaultValue);
+    }
+  }, [defaultValue, selectedValue]);
 
   // Size classes
   const inputSizeClass = {

@@ -1,28 +1,58 @@
 "use client";
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useState } from "react";
-import CustomForm from "@/components/custom/custom-form";
-import CustomInput from "@/components/custom/custom-input";
 import CustomSelectField from "@/components/custom/custom-seletectField";
 import CustomButton from "@/components/custom/custom-button";
 import { useUpdateProfileMutation } from "@/redux/features/profile/profileApi";
-import { FieldValues } from "react-hook-form";
+import { FieldValues, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { X } from "lucide-react";
 import Image from "next/image";
 import logo from "@/asset/logo/logo.png";
 import useUser from "@/hooks/useUser";
 import { useCookies, COOKIE_NAMES } from "@/contexts/CookieContext";
+import CustomInput from "../custom/custom-input";
 
 interface FirstTimeUserModalProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
+// Define Zod schema type for form validation
+type FirstTimeUserFormData = {
+  firstName: string;
+  lastName: string;
+  phoneNumber: string;
+  referredAs: string;
+  ageRange: string;
+  profession: string;
+  maritalStatus: string;
+};
+
 const FirstTimeUserModal = ({ isOpen, onClose }: FirstTimeUserModalProps) => {
+  // state
   const [isClient, setIsClient] = useState(false);
-  const [updateProfile, { isLoading }] = useUpdateProfileMutation();
   const userData = useUser();
+
+   const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<FirstTimeUserFormData>({
+    defaultValues: {
+      firstName: userData?.firstName || "",
+    lastName: userData?.lastName || "",
+    phoneNumber: userData?.phoneNumber || "",
+    referredAs: userData?.referredAs || "",
+    ageRange: userData?.ageRange || "",
+    profession: userData?.profession || "",
+    maritalStatus: userData?.maritalStatus || "",
+    },
+  });
+
+
+  // hooks
+  const [updateProfile, { isLoading }] = useUpdateProfileMutation();
   const { setBooleanCookie, removeCookie } = useCookies();
 
   useEffect(() => {
@@ -66,16 +96,6 @@ const FirstTimeUserModal = ({ isOpen, onClose }: FirstTimeUserModalProps) => {
   }, [isOpen]);
 
   if (!isClient || !isOpen || !userData) return null;
-
-  const defaultValues = {
-    firstName: userData?.firstName || "",
-    lastName: userData?.lastName || "",
-    phoneNumber: userData?.phoneNumber || "",
-    referredAs: userData?.referredAs || "",
-    ageRange: userData?.ageRange || "",
-    profession: userData?.profession || "",
-    maritalStatus: userData?.maritalStatus || "",
-  };
 
   return (
     <AnimatePresence>
@@ -129,9 +149,8 @@ const FirstTimeUserModal = ({ isOpen, onClose }: FirstTimeUserModalProps) => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2, duration: 0.3 }}
               >
-                <CustomForm
-                  onSubmit={handleProfileCompletion}
-                  defaultValues={defaultValues}
+                <form
+                 onSubmit={handleSubmit(handleProfileCompletion)}
                 >
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <CustomInput
@@ -140,6 +159,8 @@ const FirstTimeUserModal = ({ isOpen, onClose }: FirstTimeUserModalProps) => {
                       name="firstName"
                       placeholder="Enter your first name"
                       label="FirstName Name"
+                      register={register("firstName")}
+                      error={errors.firstName}
                     />
                     <CustomInput
                       type="text"
@@ -147,6 +168,8 @@ const FirstTimeUserModal = ({ isOpen, onClose }: FirstTimeUserModalProps) => {
                       name="lastName"
                       placeholder="Enter your last name"
                       label="Last Name"
+                      register={register("lastName")}
+                      error={errors.lastName}
                     />
 
                     <CustomInput
@@ -155,6 +178,8 @@ const FirstTimeUserModal = ({ isOpen, onClose }: FirstTimeUserModalProps) => {
                       name="phoneNumber"
                       placeholder="Enter your phone number"
                       label="Phone Number"
+                      register={register("phoneNumber")}
+                      error={errors.phoneNumber}
                     />
 
                     <CustomSelectField
@@ -181,6 +206,9 @@ const FirstTimeUserModal = ({ isOpen, onClose }: FirstTimeUserModalProps) => {
                       size="md"
                       required
                       placeholder="How did you know about us"
+                      defaultValue={userData?.referredAs}
+                      register={register("referredAs")}
+                      error={errors.referredAs}
                     />
                     <CustomSelectField
                       items={[
@@ -218,6 +246,9 @@ const FirstTimeUserModal = ({ isOpen, onClose }: FirstTimeUserModalProps) => {
                       size="md"
                       required
                       placeholder="Select your age range"
+                      defaultValue={userData?.ageRange}
+                      register={register("ageRange")}
+                      error={errors.ageRange}
                     />
                     <CustomInput
                       type="text"
@@ -225,6 +256,8 @@ const FirstTimeUserModal = ({ isOpen, onClose }: FirstTimeUserModalProps) => {
                       required
                       placeholder="Enter your profession"
                       label="Profession"
+                      register={register("profession")}
+                      error={errors.profession}
                     />
                     <CustomSelectField
                       items={[
@@ -239,6 +272,9 @@ const FirstTimeUserModal = ({ isOpen, onClose }: FirstTimeUserModalProps) => {
                       label="Relationship Status"
                       size="md"
                       placeholder="What is your marital status"
+                      defaultValue={userData?.maritalStatus}
+                      register={register("maritalStatus")}
+                      error={errors.maritalStatus}
                     />
                   </div>
                   <div className="mt-6 flex flex-col md:flex-row gap-4">
@@ -261,7 +297,7 @@ const FirstTimeUserModal = ({ isOpen, onClose }: FirstTimeUserModalProps) => {
                       Complete Profile
                     </CustomButton>
                   </div>
-                </CustomForm>
+                </form>
               </motion.div>
 
               <motion.div

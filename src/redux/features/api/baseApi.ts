@@ -1,4 +1,4 @@
-import { getApiToken, getToken, TokenType, needsTokenRefresh, setToken } from "@/utils/tokenManager";
+import { getApiToken, getToken, TokenType, setToken } from "@/utils/tokenManager";
 import {
   createApi,
   fetchBaseQuery,
@@ -62,28 +62,23 @@ const baseQueryWithRefreshToken: BaseQueryFn<
           const retryResult = await baseQuery(args, api, extraOptions);
           return retryResult;
         } else {
-          // Clear all tokens and redirect to login
-          import("@/utils/tokenManager").then(({ clearAllTokens }) => {
-            clearAllTokens();
+          // Token refresh failed, perform complete logout
+          import("@/utils/logoutManager").then(({ performLogout }) => {
+            performLogout(null, "/login");
           });
-          if (typeof window !== 'undefined') {
-            window.location.href = "/auth";
-          }
         }
       } catch (error) {
         console.error("Error refreshing token:", error);
-        import("@/utils/tokenManager").then(({ clearAllTokens }) => {
-          clearAllTokens();
+        // Token refresh error, perform complete logout
+        import("@/utils/logoutManager").then(({ performLogout }) => {
+          performLogout(null, "/login");
         });
-        if (typeof window !== 'undefined') {
-          window.location.href = "/auth";
-        }
       }
     } else {
-      // No refresh token, redirect to login
-      if (typeof window !== 'undefined') {
-        window.location.href = "/auth";
-      }
+      // No refresh token, perform complete logout
+      import("@/utils/logoutManager").then(({ performLogout }) => {
+        performLogout(null, "/login");
+      });
     }
   }
   return result;

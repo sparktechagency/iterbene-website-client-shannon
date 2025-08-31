@@ -2,12 +2,10 @@
 import authImage from "@/asset/auth/auth.jpg";
 import logo from "@/asset/logo/logo.png";
 import CustomButton from "@/components/custom/custom-button";
-import CustomForm from "@/components/custom/custom-form";
 import CustomInput from "@/components/custom/custom-input";
 import { useLoginMutation } from "@/redux/features/auth/authApi";
 import { TError } from "@/types/error";
 import { handleAuthResponse } from "@/utils/tokenManager";
-import { loginValidationSchema } from "@/validation/auth.validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Checkbox } from "antd";
 import { Lock, Mail } from "lucide-react";
@@ -15,15 +13,34 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
-import { FieldValues } from "react-hook-form";
+import { FieldValues, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import LoginLockModal from "./LoginLockModal";
+import { z } from "zod";
+
+// define login zod validation schema
+const loginValidationSchema = z.object({
+  email: z.string().email("Invalid email").nonempty("Email is required"),
+  password: z.string().nonempty("Password is required"),
+});
+
+// Define the login form type
+type LoginFormData = z.infer<typeof loginValidationSchema>;
 
 const Login = () => {
   const searchParams = useSearchParams();
   const redirectUrl = searchParams.get("redirect_url");
   const [login, { isLoading }] = useLoginMutation();
   const router = useRouter();
+
+   const {
+    register,
+    handleSubmit,
+    formState: { errors }
+  } = useForm<LoginFormData>({
+    resolver: zodResolver(loginValidationSchema)
+  });
+
 
   // State for lock modal
   const [isLockModalVisible, setIsLockModalVisible] = useState(false);
@@ -61,13 +78,13 @@ const Login = () => {
       ) {
         toast.success(res?.message);
         // Handle email verification token
-        handleAuthResponse(res, 'login-not-verified');
+        handleAuthResponse(res, "login-not-verified");
         router.push("/verify-email");
         return;
       }
       toast.success(res.message || "Login successful!");
       // Handle successful login tokens
-      handleAuthResponse(res, 'login-success');
+      handleAuthResponse(res, "login-success");
 
       if (redirectUrl) {
         router.push(redirectUrl);
@@ -111,15 +128,12 @@ const Login = () => {
             height={128}
             className="ml-2 w-[90px] md:w-[100px] md:h-[90px] "
           />
-          <h1 className="text-2xl md:text-3xl font-semibold">
-            Login
-          </h1>
+          <h1 className="text-2xl md:text-3xl font-semibold">Login</h1>
         </div>
 
         {/* Form content */}
-        <CustomForm
-          onSubmit={handleLogin}
-          resolver={zodResolver(loginValidationSchema)}
+        <form
+          onSubmit={handleSubmit(handleLogin)}
         >
           <div className="space-y-3 md:space-y-6 mt-8">
             <CustomInput
@@ -131,6 +145,8 @@ const Login = () => {
               size="lg"
               fullWidth
               placeholder="Enter your email"
+              register={register("email")}
+              error={errors.email}
             />
             <CustomInput
               name="password"
@@ -141,6 +157,8 @@ const Login = () => {
               icon={<Lock size={24} className="text-secondary" />}
               fullWidth
               placeholder="Enter your password"
+              register={register("password")}
+              error={errors.password}
             />
             <div className="flex items-center justify-between">
               <div className="flex items-center">
@@ -176,7 +194,7 @@ const Login = () => {
               </Link>
             </div>
           </div>
-        </CustomForm>
+        </form>
       </div>
 
       {/* Lock Modal */}

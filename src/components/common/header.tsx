@@ -40,6 +40,7 @@ import {
   useViewAllNotificationsMutation,
 } from "@/redux/features/notifications/notificationsApi";
 import toast from "react-hot-toast";
+import { performLogout } from "@/utils/logoutManager";
 
 // Mobile Menu Component
 const MobileMenu: React.FC<{
@@ -49,13 +50,12 @@ const MobileMenu: React.FC<{
 }> = ({ user, isOpen, onClose }) => {
   const router = useRouter();
 
-  const handleLogout = () => {
-    document.cookie =
-      "accessToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
-    document.cookie =
-      "refreshToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
-    window.location.reload();
-    router.push("/");
+  const handleLogout = async () => {
+    // Close mobile menu first
+    onClose();
+    
+    // Perform complete logout
+    await performLogout(router, "/login");
   };
 
   return (

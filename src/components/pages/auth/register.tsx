@@ -2,35 +2,55 @@
 import authImage from "@/asset/auth/auth.jpg";
 import logo from "@/asset/logo/logo.png";
 import CustomButton from "@/components/custom/custom-button";
-import CustomForm from "@/components/custom/custom-form";
 import CustomInput from "@/components/custom/custom-input";
 import { useRegisterMutation } from "@/redux/features/auth/authApi";
-import { registerValidationSchema } from "@/validation/auth.validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Checkbox } from "antd";
 import { Lock, Mail, UserRound } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { FieldValues } from "react-hook-form";
+import { FieldValues, useForm } from "react-hook-form";
 import { TError } from "@/types/error";
 import { toast } from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import { useCookies, COOKIE_NAMES } from "@/contexts/CookieContext";
 import { handleAuthResponse } from "@/utils/tokenManager";
+import { z } from "zod";
+
+// define register zod validation schema
+const registerValidationSchema = z.object({
+  email: z.string().email("Invalid email").nonempty("Email is required"),
+  password: z.string().nonempty("Password is required"),
+  firstName: z.string().nonempty("First name is required"),
+  lastName: z.string().nonempty("Last name is required"),
+});
+
+// Define the Register component
+type RegisterFormData = z.infer<typeof registerValidationSchema>;
 const Register = () => {
-  const [register, { isLoading }] = useRegisterMutation();
+  const [userRegistation, { isLoading }] = useRegisterMutation();
   const router = useRouter();
   const { setBooleanCookie } = useCookies();
+   const {
+    register,
+    handleSubmit,
+    formState: { errors }
+  } = useForm<RegisterFormData>({
+    resolver: zodResolver(registerValidationSchema)
+  });
+
+
+
   const handleRegister = async (values: FieldValues) => {
     try {
-      const res = await register(values).unwrap();
-      
+      const res = await userRegistation(values).unwrap();
+
       // Handle tokens using secure token manager
-      handleAuthResponse(res, 'register');
-      
+      handleAuthResponse(res, "register");
+
       // Mark user as first-time user for profile completion modal
       setBooleanCookie(COOKIE_NAMES.IS_FIRST_TIME_USER, true);
-      
+
       // Redirect to verify email page
       router.push("/verify-email");
       toast.success(res?.message);
@@ -64,14 +84,11 @@ const Register = () => {
             height={128}
             className="ml-2 w-[90px] md:w-[100px] md:h-[90px] "
           />
-          <h1 className="text-2xl md:text-3xl  font-semibold">
-            Register
-          </h1>
+          <h1 className="text-2xl md:text-3xl  font-semibold">Register</h1>
         </div>
         {/* Form content */}
-        <CustomForm
-          onSubmit={handleRegister}
-          resolver={zodResolver(registerValidationSchema)}
+        <form
+          onSubmit={handleSubmit(handleRegister)}
         >
           <div className="space-y-3 md:space-y-6 mt-8">
             <CustomInput
@@ -83,6 +100,8 @@ const Register = () => {
               icon={<UserRound size={24} className="text-secondary" />}
               fullWidth
               placeholder="Enter your first name"
+              register={register("firstName")}
+              error={errors.firstName}
             />
             <CustomInput
               name="lastName"
@@ -93,6 +112,8 @@ const Register = () => {
               icon={<UserRound size={24} className="text-secondary" />}
               fullWidth
               placeholder="Enter your last name"
+              register={register("lastName")}
+              error={errors.lastName}
             />
             <CustomInput
               name="email"
@@ -103,6 +124,8 @@ const Register = () => {
               size="lg"
               fullWidth
               placeholder="Enter your email"
+              register={register("email")}
+              error={errors.email}
             />
             <CustomInput
               name="password"
@@ -113,6 +136,8 @@ const Register = () => {
               icon={<Lock size={24} className="text-secondary" />}
               fullWidth
               placeholder="Enter your password"
+              register={register("password")}
+              error={errors.password}
             />
             <div>
               <div className="flex items-center justify-between">
@@ -125,7 +150,13 @@ const Register = () => {
                     htmlFor="remember"
                     className="ml-2 block text-sm md:text-[16px]"
                   >
-                    I agree to the <Link href="/terms-and-conditions" className="text-primary hover:underline">Terms & Conditions</Link>
+                    I agree to the{" "}
+                    <Link
+                      href="/terms-and-conditions"
+                      className="text-primary hover:underline"
+                    >
+                      Terms & Conditions
+                    </Link>
                   </label>
                 </div>
               </div>
@@ -145,7 +176,7 @@ const Register = () => {
               </Link>
             </div>
           </div>
-        </CustomForm>
+        </form>
       </div>
     </section>
   );

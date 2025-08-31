@@ -12,6 +12,7 @@ import { IoChatboxEllipsesOutline, IoSettingsOutline } from "react-icons/io5";
 import { MdAlternateEmail } from "react-icons/md";
 import { AnimatePresence, motion } from "framer-motion";
 import SettingsDropdown from "./SettingsDropdown";
+import { performLogout } from "@/utils/logoutManager";
 interface DropdownProps {
   user?: IUser;
   isOpen: boolean;
@@ -42,13 +43,8 @@ const UserDropdown: React.FC<DropdownProps> = ({ user, isOpen }) => {
     setIsSettingsOpen((prev) => !prev);
   };
 
-  const handleLogout = () => {
-    document.cookie =
-      "accessToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
-    document.cookie =
-      "refreshToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
-    window.location.reload();
-    router.push("/");
+  const handleLogout = async () => {
+    await performLogout(router, "/login");
   };
 
   return (

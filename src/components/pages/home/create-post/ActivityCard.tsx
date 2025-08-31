@@ -23,7 +23,7 @@ export default function ActivityCard({ control, dayIndex }: ActivityCardProps) {
       link: "",
       duration: "",
       cost: 0,
-      rating: 0, // Initial value, will be validated
+      rating: 0, 
     });
   };
 

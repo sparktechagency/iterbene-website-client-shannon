@@ -1,5 +1,4 @@
 import CustomButton from "@/components/custom/custom-button";
-import CustomForm from "@/components/custom/custom-form";
 import CustomInput from "@/components/custom/custom-input";
 import CustomSelectField from "@/components/custom/custom-seletectField";
 import {
@@ -8,302 +7,44 @@ import {
   useUpdateProfileMutation,
 } from "@/redux/features/profile/profileApi";
 import { IUser } from "@/types/user.types";
-import { editProfileValidationSchema } from "@/validation/user.validation";
-import { zodResolver } from "@hookform/resolvers/zod";
 import Image from "next/image"; // For rendering images in React components
-import { FieldValues } from "react-hook-form";
+import { FieldValues, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
-import { useState, ChangeEvent, useCallback } from "react";
+import { useState, ChangeEvent } from "react";
 import { BsUpload } from "react-icons/bs";
-import Cropper from "react-easy-crop";
-import type { Point, Area } from "react-easy-crop";
-import CustomModal from "@/components/custom/custom-modal";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 interface IEditMyProfileDetailsProps {
   userData: IUser;
   setEditMode: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-// Modal component for cropping
-interface CropModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  imageSrc: string;
-  onCropComplete: (croppedImage: Blob) => void;
-  aspectRatio: number;
-  title: string;
-}
+// Define the EditMyProfileDetails component
+const editProfileSchema = z.object({
+  firstName: z.string().min(1, "First name is required"),
+  lastName: z.string().min(1, "Last name is required"),
+  nickname: z.string().optional().or(z.literal("")),
+  username: z.string().min(1, "Username is required"),
+  address: z.string().min(1, "Address is required"),
+  phoneNumber: z.string().min(1, "Phone number is required"),
+  country: z.string().min(1, "Country is required"),
+  city: z.string().min(1, "City is required"),
+  state: z.string().min(1, "State is required"),
+  profession: z.string().min(1, "Profession is required"),
+  // ✅ Required select fields:
+  maritalStatus: z.string().min(1, "Relationship status is required"),
+  referredAs: z.string().min(1, "Referred as is required"),
+  ageRange: z.string().min(1, "Age range is required"),
+});
 
-const CropModal = ({
-  isOpen,
-  onClose,
-  imageSrc,
-  onCropComplete,
-  aspectRatio,
-  title,
-}: CropModalProps) => {
-  const [crop, setCrop] = useState<Point>({ x: 0, y: 0 });
-  const [zoom, setZoom] = useState(1);
-  const [rotation, setRotation] = useState(0);
-  const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null);
-  const [brightness, setBrightness] = useState(100);
-  const [contrast, setContrast] = useState(100);
-  const [saturation, setSaturation] = useState(100);
-
-  const onCropCompleteHandler = useCallback(
-    (croppedArea: Area, croppedAreaPixels: Area) => {
-      setCroppedAreaPixels(croppedAreaPixels);
-    },
-    []
-  );
-
-  const createImage = (url: string): Promise<HTMLImageElement> =>
-    new Promise((resolve, reject) => {
-      const image = new window.Image();
-      image.addEventListener("load", () => resolve(image));
-      image.addEventListener("error", (error) => reject(error));
-      image.setAttribute("crossOrigin", "anonymous");
-      image.src = url;
-    });
-
-  const getCroppedImg = async (
-    imageSrc: string,
-    pixelCrop: Area,
-    rotation = 0,
-    flip = { horizontal: false, vertical: false },
-    filters = { brightness: 100, contrast: 100, saturation: 100 }
-  ): Promise<Blob> => {
-    const image = await createImage(imageSrc);
-    const canvas = document.createElement("canvas");
-    const ctx = canvas.getContext("2d");
-
-    if (!ctx) {
-      throw new Error("Could not create canvas context");
-    }
-
-    const rotRad = (rotation * Math.PI) / 180;
-
-    // Calculate bounding box of the rotated image
-    const { width: bBoxWidth, height: bBoxHeight } = rotateSize(
-      image.width,
-      image.height,
-      rotation
-    );
-
-    // Set canvas size to match the bounding box
-    canvas.width = bBoxWidth;
-    canvas.height = bBoxHeight;
-
-    // Translate canvas context to a central location to allow rotating and flipping around the center
-    ctx.translate(bBoxWidth / 2, bBoxHeight / 2);
-    ctx.rotate(rotRad);
-    ctx.scale(flip.horizontal ? -1 : 1, flip.vertical ? -1 : 1);
-    ctx.translate(-image.width / 2, -image.height / 2);
-
-    // Apply filters
-    ctx.filter = `brightness(${filters.brightness}%) contrast(${filters.contrast}%) saturate(${filters.saturation}%)`;
-
-    // Draw rotated image
-    ctx.drawImage(image, 0, 0);
-
-    // Extract the cropped area
-    const data = ctx.getImageData(
-      pixelCrop.x,
-      pixelCrop.y,
-      pixelCrop.width,
-      pixelCrop.height
-    );
-
-    // Set canvas width to final desired crop size
-    canvas.width = pixelCrop.width;
-    canvas.height = pixelCrop.height;
-
-    // Clear and paste the cropped image
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.putImageData(data, 0, 0);
-
-    return new Promise((resolve) => {
-      canvas.toBlob(resolve as BlobCallback, "image/jpeg", 0.9);
-    });
-  };
-
-  const rotateSize = (width: number, height: number, rotation: number) => {
-    const rotRad = (rotation * Math.PI) / 180;
-    return {
-      width:
-        Math.abs(Math.cos(rotRad) * width) +
-        Math.abs(Math.sin(rotRad) * height),
-      height:
-        Math.abs(Math.sin(rotRad) * width) +
-        Math.abs(Math.cos(rotRad) * height),
-    };
-  };
-
-  const handleSaveCrop = async () => {
-    if (!croppedAreaPixels) return;
-
-    try {
-      const croppedImage = await getCroppedImg(
-        imageSrc,
-        croppedAreaPixels,
-        rotation,
-        { horizontal: false, vertical: false },
-        { brightness, contrast, saturation }
-      );
-      onCropComplete(croppedImage as Blob);
-      onClose();
-    } catch (e) {
-      console.error(e);
-      toast.error("Failed to crop image");
-    }
-  };
-
-  if (!isOpen) return null;
-
-  return (
-    <CustomModal isOpen={isOpen} onClose={onClose} showCloseButton={false}>
-      {" "}
-      <div className="p-4 border-b">
-        <h2 className="text-xl font-semibold">{title}</h2>
-      </div>
-      <div className="flex-1 flex">
-        {/* Cropper Area */}
-        <div className="flex-1 relative">
-          <Cropper
-            image={imageSrc}
-            crop={crop}
-            zoom={zoom}
-            rotation={rotation}
-            aspect={aspectRatio}
-            onCropChange={setCrop}
-            onCropComplete={onCropCompleteHandler}
-            onZoomChange={setZoom}
-            onRotationChange={setRotation}
-            style={{
-              containerStyle: {
-                filter: `brightness(${brightness}%) contrast(${contrast}%) saturate(${saturation}%)`,
-              },
-            }}
-          />
-        </div>
-
-        {/* Controls Panel */}
-        <div className="w-80 p-4 border-l bg-gray-50 overflow-y-auto">
-          <div className="space-y-6">
-            {/* Zoom Control */}
-            <div>
-              <label className="block text-sm font-medium mb-2">Zoom</label>
-              <input
-                type="range"
-                value={zoom}
-                min={1}
-                max={3}
-                step={0.1}
-                onChange={(e) => setZoom(Number(e.target.value))}
-                className="w-full"
-              />
-              <span className="text-sm text-gray-600">{zoom.toFixed(1)}x</span>
-            </div>
-
-            {/* Rotation Control */}
-            <div>
-              <label className="block text-sm font-medium mb-2">Rotation</label>
-              <input
-                type="range"
-                value={rotation}
-                min={-180}
-                max={180}
-                step={1}
-                onChange={(e) => setRotation(Number(e.target.value))}
-                className="w-full"
-              />
-              <span className="text-sm text-gray-600">{rotation}°</span>
-            </div>
-
-            {/* Brightness Control */}
-            <div>
-              <label className="block text-sm font-medium mb-2">
-                Brightness
-              </label>
-              <input
-                type="range"
-                value={brightness}
-                min={50}
-                max={150}
-                step={5}
-                onChange={(e) => setBrightness(Number(e.target.value))}
-                className="w-full"
-              />
-              <span className="text-sm text-gray-600">{brightness}%</span>
-            </div>
-
-            {/* Contrast Control */}
-            <div>
-              <label className="block text-sm font-medium mb-2">Contrast</label>
-              <input
-                type="range"
-                value={contrast}
-                min={50}
-                max={150}
-                step={5}
-                onChange={(e) => setContrast(Number(e.target.value))}
-                className="w-full"
-              />
-              <span className="text-sm text-gray-600">{contrast}%</span>
-            </div>
-
-            {/* Saturation Control */}
-            <div>
-              <label className="block text-sm font-medium mb-2">
-                Saturation
-              </label>
-              <input
-                type="range"
-                value={saturation}
-                min={0}
-                max={200}
-                step={10}
-                onChange={(e) => setSaturation(Number(e.target.value))}
-                className="w-full"
-              />
-              <span className="text-sm text-gray-600">{saturation}%</span>
-            </div>
-
-            {/* Reset Button */}
-            <CustomButton
-              variant="outline"
-              onClick={() => {
-                setZoom(1);
-                setRotation(0);
-                setBrightness(100);
-                setContrast(100);
-                setSaturation(100);
-                setCrop({ x: 0, y: 0 });
-              }}
-              className="w-full"
-            >
-              Reset All
-            </CustomButton>
-          </div>
-        </div>
-      </div>
-      {/* Action Buttons */}
-      <div className="p-4 border-t flex justify-end gap-4">
-        <CustomButton variant="outline" onClick={onClose}>
-          Cancel
-        </CustomButton>
-        <CustomButton variant="default" onClick={handleSaveCrop}>
-          Apply Changes
-        </CustomButton>
-      </div>
-    </CustomModal>
-  );
-};
+type EditMyProfileDetailsFormData = z.infer<typeof editProfileSchema>;
 
 const EditMyProfileDetails = ({
   userData,
   setEditMode,
 }: IEditMyProfileDetailsProps) => {
+  // Form states
   const [profileImagePreview, setProfileImagePreview] = useState<string | null>(
     null
   );
@@ -313,11 +54,28 @@ const EditMyProfileDetails = ({
   const [profileImageFile, setProfileImageFile] = useState<File | null>(null);
   const [coverImageFile, setCoverImageFile] = useState<File | null>(null);
 
-  // Crop modal states
-  const [isCropModalOpen, setIsCropModalOpen] = useState(false);
-  const [cropImageSrc, setCropImageSrc] = useState<string>("");
-  const [cropType, setCropType] = useState<"profile" | "cover">("profile");
-  const [originalImageFile, setOriginalImageFile] = useState<File | null>(null);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<EditMyProfileDetailsFormData>({
+    resolver: zodResolver(editProfileSchema),
+    defaultValues: {
+      firstName: userData.firstName || "",
+      lastName: userData.lastName || "",
+      nickname: userData.nickname || "",
+      username: userData.username || "",
+      address: userData.address || "",
+      phoneNumber: userData.phoneNumber || "",
+      country: userData.country || "",
+      city: userData.city || "",
+      state: userData.state || "",
+      profession: userData.profession || "",
+      maritalStatus: userData.maritalStatus || "",
+      referredAs: userData.referredAs || "",
+      ageRange: userData.ageRange || "",
+    },
+  });
 
   //update profile mutation
   const [updateProfile, { isLoading }] = useUpdateProfileMutation();
@@ -353,38 +111,13 @@ const EditMyProfileDetails = ({
       )
     ) {
       const reader = new FileReader();
+      console.log("type", type);
       reader.onloadend = () => {
-        setCropImageSrc(reader.result as string);
-        setOriginalImageFile(file);
-        setCropType(type);
-        setIsCropModalOpen(true);
       };
       reader.readAsDataURL(file);
     } else {
       toast.error("Please upload a valid SVG, PNG, JPG, or GIF image.");
     }
-  };
-
-  const handleCropComplete = (croppedImage: Blob) => {
-    const croppedFile = new File(
-      [croppedImage],
-      originalImageFile?.name || `${cropType}_image.jpg`,
-      {
-        type: "image/jpeg",
-      }
-    );
-
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      if (cropType === "profile") {
-        setProfileImagePreview(reader.result as string);
-        setProfileImageFile(croppedFile);
-      } else {
-        setCoverImagePreview(reader.result as string);
-        setCoverImageFile(croppedFile);
-      }
-    };
-    reader.readAsDataURL(croppedFile);
   };
 
   const handleUpdateProfileImage = async () => {
@@ -422,13 +155,10 @@ const EditMyProfileDetails = ({
   const handleEditImage = (type: "profile" | "cover") => {
     const imageSrc =
       type === "profile" ? profileImagePreview : coverImagePreview;
-    if (imageSrc) {
-      setCropImageSrc(imageSrc);
-      setCropType(type);
-      setIsCropModalOpen(true);
-    }
+      console.log("imageSrc", imageSrc);
   };
 
+  console.log("Eerrors", errors);
   return (
     <>
       <section className="w-full grid grid-cols-1 md:grid-cols-3 gap-4 mt-8">
@@ -438,11 +168,7 @@ const EditMyProfileDetails = ({
               Personal Information
             </h1>
           </div>
-          <CustomForm
-            onSubmit={handleEditProfileInformation}
-            defaultValues={userData}
-            resolver={zodResolver(editProfileValidationSchema)}
-          >
+          <form onSubmit={handleSubmit(handleEditProfileInformation)}>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <CustomInput
                 type="text"
@@ -450,6 +176,8 @@ const EditMyProfileDetails = ({
                 name="firstName"
                 placeholder="Enter your first name"
                 label="First Name"
+                register={register("firstName")}
+                error={errors.firstName}
               />
               <CustomInput
                 type="text"
@@ -457,12 +185,16 @@ const EditMyProfileDetails = ({
                 name="lastName"
                 placeholder="Enter your last name"
                 label="Last Name"
+                register={register("lastName")}
+                error={errors.lastName}
               />
               <CustomInput
                 type="text"
                 name="nickname"
                 placeholder="Enter your nick name"
                 label="Nick Name"
+                register={register("nickname")}
+                error={errors.nickname}
               />
               <CustomInput
                 type="text"
@@ -470,6 +202,8 @@ const EditMyProfileDetails = ({
                 required
                 placeholder="Enter your username"
                 label="Username"
+                register={register("username")}
+                error={errors.username}
               />
               <CustomInput
                 type="text"
@@ -477,6 +211,8 @@ const EditMyProfileDetails = ({
                 name="address"
                 placeholder="Enter your address"
                 label="Address"
+                register={register("address")}
+                error={errors.address}
               />
               <CustomInput
                 type="text"
@@ -484,6 +220,8 @@ const EditMyProfileDetails = ({
                 name="phoneNumber"
                 placeholder="Enter your phone number"
                 label="Phone Number"
+                register={register("phoneNumber")}
+                error={errors.phoneNumber}
               />
               <CustomInput
                 type="text"
@@ -491,6 +229,8 @@ const EditMyProfileDetails = ({
                 required
                 placeholder="Enter your country"
                 label="Country"
+                register={register("country")}
+                error={errors.country}
               />
               <CustomInput
                 type="text"
@@ -498,6 +238,8 @@ const EditMyProfileDetails = ({
                 required
                 placeholder="Enter your city"
                 label="City"
+                register={register("city")}
+                error={errors.city}
               />
               <CustomInput
                 type="text"
@@ -505,6 +247,8 @@ const EditMyProfileDetails = ({
                 name="state"
                 placeholder="Enter your state"
                 label="State"
+                register={register("state")}
+                error={errors.state}
               />
               <CustomSelectField
                 items={[
@@ -529,6 +273,9 @@ const EditMyProfileDetails = ({
                 label="Relationship Status"
                 size="md"
                 placeholder="What is your marital status"
+                register={register("maritalStatus")}
+                defaultValue={userData?.maritalStatus}
+                error={errors.maritalStatus}
               />
               <CustomSelectField
                 items={[
@@ -542,6 +289,9 @@ const EditMyProfileDetails = ({
                 size="md"
                 required
                 placeholder="How did you know about us"
+                register={register("referredAs")}
+                defaultValue={userData?.referredAs}
+                error={errors.referredAs}
               />
               <CustomSelectField
                 items={[
@@ -558,6 +308,9 @@ const EditMyProfileDetails = ({
                 size="md"
                 required
                 placeholder="Select your age range"
+                defaultValue={userData?.ageRange}
+                register={register("ageRange")}
+                error={errors.ageRange}
               />
               <CustomInput
                 type="text"
@@ -565,6 +318,8 @@ const EditMyProfileDetails = ({
                 required
                 placeholder="Enter your profession"
                 label="Profession"
+                register={register("profession")}
+                error={errors.profession}
               />
             </div>
             <div className="mt-6 flex flex-col md:flex-row gap-4">
@@ -587,7 +342,7 @@ const EditMyProfileDetails = ({
                 Save
               </CustomButton>
             </div>
-          </CustomForm>
+          </form>
         </div>
 
         <div className="w-full col-span-1 space-y-8">
@@ -804,18 +559,6 @@ const EditMyProfileDetails = ({
           </div>
         </div>
       </section>
-
-      {/* Crop Modal */}
-      <CropModal
-        isOpen={isCropModalOpen}
-        onClose={() => setIsCropModalOpen(false)}
-        imageSrc={cropImageSrc}
-        onCropComplete={handleCropComplete}
-        aspectRatio={cropType === "profile" ? 1 : 16 / 9} // Square for profile, 16:9 for cover
-        title={
-          cropType === "profile" ? "Edit Profile Photo" : "Edit Cover Photo"
-        }
-      />
     </>
   );
 };

@@ -2,29 +2,43 @@
 import authImage from "@/asset/auth/auth.jpg";
 import logo from "@/asset/logo/logo.png";
 import CustomButton from "@/components/custom/custom-button";
-import CustomForm from "@/components/custom/custom-form";
 import CustomInput from "@/components/custom/custom-input";
 import { useForgotPasswordMutation } from "@/redux/features/auth/authApi";
 import { TError } from "@/types/error";
-import { forgotPasswordValidationSchema } from "@/validation/auth.validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Mail } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { FieldValues } from "react-hook-form";
+import { FieldValues, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { handleAuthResponse } from "@/utils/tokenManager";
+import { z } from "zod";
+
+// define forgot password zod schema
+const forgotPasswordValidationSchema = z.object({
+  email: z.string().email("Invalid email").nonempty("Email is required"),
+});
+type ForgotPasswordFormType = z.infer<typeof forgotPasswordValidationSchema>;
 const ForgotPassword = () => {
   const router = useRouter();
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<ForgotPasswordFormType>({
+    resolver: zodResolver(forgotPasswordValidationSchema),
+  });
+
   const [forgotPassword, { isLoading }] = useForgotPasswordMutation();
   const handleForgotPassword = async (values: FieldValues) => {
     try {
       const res = await forgotPassword(values).unwrap();
-      
+
       // Handle reset password token
-      handleAuthResponse(res, 'forgot-password');
-      
+      handleAuthResponse(res, "forgot-password");
+
       // Redirect to verify email page
       toast.success(res?.message);
       router.push(`/verify-email?type=forgot-password`);
@@ -49,7 +63,7 @@ const ForgotPassword = () => {
       {/* Semi-transparent color overlay */}
       <div className="absolute top-0 left-0 w-full h-full bg-[#40E0D054]"></div>
       {/* Content that remains sharp */}
-     <div className="w-full max-w-[500px] mx-auto px-8 xl:px-[65px] pt-6 pb-12  bg-[#FFFFFF] z-30 rounded-xl border-2 border-primary shadow-xl shadow-gray-900">
+      <div className="w-full max-w-[500px] mx-auto px-8 xl:px-[65px] pt-6 pb-12  bg-[#FFFFFF] z-30 rounded-xl border-2 border-primary shadow-xl shadow-gray-900">
         <div className="flex flex-col items-center gap-4 justify-center">
           <Image
             src={logo}
@@ -63,9 +77,9 @@ const ForgotPassword = () => {
           </h1>
         </div>
         {/* Form content */}
-        <CustomForm
-          onSubmit={handleForgotPassword}
-          resolver={zodResolver(forgotPasswordValidationSchema)}
+        <form
+          onSubmit={handleSubmit(handleForgotPassword)}
+          className="flex flex-col gap-4"
         >
           <div className="space-y-3 md:space-y-6 mt-8">
             <CustomInput
@@ -77,6 +91,8 @@ const ForgotPassword = () => {
               size="lg"
               fullWidth
               placeholder="Enter your email"
+              register={register("email")}
+              error={errors.email}
             />
             <CustomButton loading={isLoading} fullWidth className="py-4">
               Send OTP
@@ -93,7 +109,7 @@ const ForgotPassword = () => {
               </Link>
             </div>
           </div>
-        </CustomForm>
+        </form>
       </div>
     </section>
   );

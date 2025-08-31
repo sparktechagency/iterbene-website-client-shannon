@@ -2,32 +2,68 @@
 import authImage from "@/asset/auth/auth.jpg";
 import logo from "@/asset/logo/logo.png";
 import CustomButton from "@/components/custom/custom-button";
-import CustomForm from "@/components/custom/custom-form";
 import CustomInput from "@/components/custom/custom-input";
 import { useResetPasswordMutation } from "@/redux/features/auth/authApi";
 import { TError } from "@/types/error";
-import {  clearAllTokens } from "@/utils/tokenManager";
-import { resetPasswordValidationSchema } from "@/validation/auth.validation";
+import { clearAllTokens } from "@/utils/tokenManager";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Lock } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { FieldValues } from "react-hook-form";
+import { FieldValues, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
+import { z } from "zod";
+
+// define reset password zod schema
+const resetPasswordValidationSchema = z
+  .object({
+    newPassword: z
+      .string({
+        required_error: "Password is required",
+      })
+      .min(8, { message: "Password must be at least 8 characters long" }),
+
+    confirmPassword: z
+      .string({
+        required_error: "Confirm Password is required",
+      })
+      .min(8, {
+        message: "Confirm Password must be at least 8 characters long",
+      }),
+  })
+  .refine((data) => data.newPassword === data.confirmPassword, {
+    message: "Passwords do not match",
+    path: ["confirmPassword"], 
+  });
+
+  // define type for reset password form values
+  type ResetPasswordFormValues = z.infer<typeof resetPasswordValidationSchema>;
+
 const ResetPassword = () => {
   const router = useRouter();
   const [resetPassword, { isLoading }] = useResetPasswordMutation();
+
+   const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<ResetPasswordFormValues>({
+    resolver: zodResolver(resetPasswordValidationSchema),
+  });
+
   const handleResetPassword = async (values: FieldValues) => {
     try {
       const res = await resetPassword({
         password: values?.newPassword,
       }).unwrap();
-      
+
       // Clear all tokens after successful password reset
       clearAllTokens();
-      
-      toast.success(res?.message || "Password reset successful! Please login again.");
+
+      toast.success(
+        res?.message || "Password reset successful! Please login again."
+      );
       router.push("/auth");
     } catch (error) {
       const err = error as TError;
@@ -64,9 +100,8 @@ const ResetPassword = () => {
           </h1>
         </div>
         {/* Form content */}
-        <CustomForm
-          onSubmit={handleResetPassword}
-          resolver={zodResolver(resetPasswordValidationSchema)}
+        <form
+          onSubmit={handleSubmit(handleResetPassword)}
         >
           <div className="space-y-3 md:space-y-6 mt-8">
             <CustomInput
@@ -78,6 +113,8 @@ const ResetPassword = () => {
               placeholder="Enter new password"
               variant="outline"
               type="password"
+              register={register("newPassword")}
+              error={errors.newPassword}
             />
             <CustomInput
               name="confirmPassword"
@@ -88,6 +125,8 @@ const ResetPassword = () => {
               placeholder="Enter confirm password"
               variant="outline"
               type="password"
+              register={register("confirmPassword")}
+              error={errors.confirmPassword}
             />
             <CustomButton loading={isLoading} fullWidth className="py-4">
               Reset
@@ -104,7 +143,7 @@ const ResetPassword = () => {
               </Link>
             </div>
           </div>
-        </CustomForm>
+        </form>
       </div>
     </section>
   );
