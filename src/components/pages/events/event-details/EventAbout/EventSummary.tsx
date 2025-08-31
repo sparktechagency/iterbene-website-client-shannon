@@ -10,7 +10,7 @@ const EventSummary = ({
   eventDetailsData: IEventDetails;
 }) => {
   return (
-    <div className="w-full col-span-full md:col-span-7 bg-white p-8 rounded-xl">
+    <div className="w-full col-span-full md:col-span-7 bg-white p-6 md:p-8 rounded-xl">
       <div className="w-full space-y-5">
         <div className="flex items-center gap-4">
           <BsPeople className="text-gray-900" size={24} />
