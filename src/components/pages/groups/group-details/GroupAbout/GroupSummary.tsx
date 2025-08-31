@@ -2,7 +2,6 @@ import { IGroupDetails } from "@/types/group.types";
 import { getFullName } from "@/utils/nameUtils";
 import { LucideUserRound } from "lucide-react";
 import { BsPeople } from "react-icons/bs";
-import { HiOutlineLocationMarker } from "react-icons/hi";
 
 const GroupSummary = ({
   groupDetailsData,
@@ -25,12 +24,6 @@ const GroupSummary = ({
             <span className="font-semibold text-lg ">
               {getFullName(groupDetailsData?.creatorId)}
             </span>
-          </h1>
-        </div>
-        <div className="flex items-center gap-4">
-          <HiOutlineLocationMarker className="text-gray-900" size={24} />
-          <h1 className="text-base font-medium">
-            {groupDetailsData?.locationName}
           </h1>
         </div>
       </div>

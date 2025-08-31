@@ -9,20 +9,10 @@ const GroupDetailsTab = ({
 }: {
   groupDetailsData: IGroupDetails
 }) => {
-  const [activeTab, setActiveTab] = useState("about");
+  const [activeTab, setActiveTab] = useState("discussion");
   return (
     <section className="w-full py-8 ">
       <div className="w-full flex items-center gap-5  ">
-        <button
-          onClick={() => setActiveTab("about")}
-          className={`px-8 py-2  rounded-xl ${
-            activeTab === "about"
-              ? "text-primary bg-[#E9F8F9] border border-primary"
-              : "text-black "
-          } text-[16px] font-semibold cursor-pointer`}
-        >
-          About
-        </button>
         <button
           onClick={() => setActiveTab("discussion")}
           className={`px-8 py-2  rounded-xl ${

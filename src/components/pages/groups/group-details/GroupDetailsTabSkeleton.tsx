@@ -1,6 +1,5 @@
 import Skeleton from "@/components/custom/custom-skeleton";
 import { GroupSummarySkeleton } from "./GroupAbout/GroupSummarySkeleton";
-import { GroupLocationMapSkeleton } from "./GroupAbout/GroupLocationMapSkeleton";
 import { GroupAuthorDetailsSkeleton } from "./GroupAbout/GroupAuthorDetailsSkeleton";
 import { GroupParticipantsListSkeleton } from "./GroupAbout/GroupParticipantsListSkeleton";
 
@@ -15,8 +14,7 @@ export const GroupDetailsTabSkeleton = () => {
 
       {/* Tab content area */}
       <div className="w-full grid grid-cols-1 md:grid-cols-12 gap-4 mt-5">
-        <GroupSummarySkeleton />
-        <GroupLocationMapSkeleton />
+        <GroupSummarySkeleton /> 
         <GroupAuthorDetailsSkeleton />
         <GroupParticipantsListSkeleton />
       </div>

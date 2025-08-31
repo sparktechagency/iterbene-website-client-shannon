@@ -49,7 +49,6 @@ const CreateGroup: React.FC = () => {
     handleSubmit,
     formState: { errors },
     setValue,
-    getValues,
   } = useForm<GroupFormData>({
     resolver: zodResolver(groupSchema),
     defaultValues: {
@@ -145,26 +144,13 @@ const CreateGroup: React.FC = () => {
     }
   };
 
-  const isCreateGroupButtonDisabled = () => {
-    if (isLoading) return true;
-    if (!groupFile ) return true;
-
-    const requiredFields = ["groupName", "description"] as const;
-    const hasEmptyFields = requiredFields.some((field) => {
-      const value = getValues(field);
-      return !value || value.trim() === "";
-    });
-
-    return hasEmptyFields || Object.keys(errors).length > 0;
-  };
-
   return (
     <div>
       {user && (
         <section className="w-full mb-8">
           <button
             onClick={openModal}
-            className="w-full bg-gradient-to-r from-orange-50 to-red-50 text-orange-600 flex justify-center items-center gap-3 font-bold px-6 py-4 rounded-2xl border-2 border-orange-200 hover:border-orange-300 transition-all duration-300 shadow-lg hover:shadow-xl"
+            className="w-full bg-[#FEEFE8] text-secondary flex justify-center items-center gap-2 font-semibold px-5 py-3.5 rounded-xl border border-secondary transition cursor-pointer"
           >
             <BsStars size={24} />
             <span>Create New Group</span>
@@ -351,7 +337,6 @@ const CreateGroup: React.FC = () => {
                     loading={isLoading}
                     type="submit"
                     fullWidth
-                    disabled={isCreateGroupButtonDisabled()}
                     className="px-5 py-3.5"
                   >
                     <span>Create Group</span>

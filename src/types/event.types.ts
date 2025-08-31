@@ -18,7 +18,7 @@ export interface IEventDetails {
   _id: string;
   eventName: string;
   eventImage: string;
-  eventCost: number;
+  eventCost?: number;
   creatorId: {
     _id: string;
     firstName?: string;
@@ -36,10 +36,7 @@ export interface IEventDetails {
     longitude: number;
   };
   locationName: string;
-  duration: {
-    days: number;
-    nights: number;
-  };
+  duration: number;
   privacy: "public" | "private";
   pendingInterestedUsers: {
     _id: string;

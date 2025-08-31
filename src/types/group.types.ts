@@ -53,11 +53,6 @@ export interface IGroupDetails {
     description: string;
     createdAt: Date;
   };
-  location: {
-    latitude: number;
-    longitude: number;
-  };
-  locationName: string;
   members: IGroupMember[];
   coLeaders: ICoLeader[];
   pendingMembers: IGroupMember[];
