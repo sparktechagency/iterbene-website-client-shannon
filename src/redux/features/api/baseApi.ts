@@ -1,4 +1,3 @@
-import { getApiToken, getToken, TokenType, setToken } from "@/utils/tokenManager";
 import {
   createApi,
   fetchBaseQuery,
@@ -6,22 +5,39 @@ import {
   BaseQueryFn,
 } from "@reduxjs/toolkit/query/react";
 
-// Define a base query that accesses the token from encrypted cookies
+// Helper function to decrypt cookie value
+const decryptCookie = (encryptedValue: string): string => {
+  try {
+    const CryptoJS = require('crypto-js');
+    const ENCRYPTION_KEY = process.env.NEXT_PUBLIC_ENCRYPTION_KEY || 'your-secret-key-change-in-production';
+    const bytes = CryptoJS.AES.decrypt(encryptedValue, ENCRYPTION_KEY);
+    return bytes.toString(CryptoJS.enc.Utf8);
+  } catch {
+    return '';
+  }
+};
+
+// Helper function to get access token from cookies
+const getAccessTokenFromCookies = (): string | null => {
+  if (typeof document === 'undefined') return null;
+  
+  const cookies = document.cookie.split(';');
+  for (const cookie of cookies) {
+    const [name, value] = cookie.trim().split('=');
+    if (name === 'at' && value) { // 'at' is the obfuscated name for ACCESS_TOKEN
+      const decryptedValue = decryptCookie(value);
+      return decryptedValue || null;
+    }
+  }
+  return null;
+};
+
+// Define a base query that gets token from cookies
 const baseQuery = fetchBaseQuery({
   baseUrl: process.env.NEXT_PUBLIC_BASE_URL,
-  prepareHeaders: (headers, { endpoint }) => {
-    // Get appropriate token based on endpoint
-    let token: string | null = null;
-    
-    // For auth endpoints, use specific tokens
-    if (endpoint === 'verifyEmail') {
-      token = getToken(TokenType.EMAIL_VERIFICATION_TOKEN);
-    } else if (endpoint === 'resetPassword') {
-      token = getToken(TokenType.RESET_PASSWORD_TOKEN);
-    } else {
-      // For all other endpoints, use access token
-      token = getApiToken();
-    }
+  prepareHeaders: (headers) => {
+    // Get access token from cookies
+    const token = getAccessTokenFromCookies();
     
     if (token) {
       headers.set("Authorization", `Bearer ${token}`);
@@ -38,49 +54,15 @@ const baseQueryWithRefreshToken: BaseQueryFn<
 > = async (args, api, extraOptions) => {
   const result = await baseQuery(args, api, extraOptions);
 
+  // For now, just return the result. 
+  // Refresh token logic can be implemented later if needed
   if (result?.error?.status === 401) {
-    const refreshToken = getToken(TokenType.REFRESH_TOKEN);
-    if (refreshToken) {
-      try {
-        const refreshResult = await fetch(
-          `${process.env.NEXT_PUBLIC_BASE_URL}/auth/refresh-token`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              "Authorization": `Bearer ${refreshToken}`
-            },
-          }
-        );
-        const res = await refreshResult.json();
-        if (res.code === 200 && res?.data?.attributes?.tokens) {
-          // Store new tokens
-          setToken(TokenType.ACCESS_TOKEN, res.data.attributes.tokens.accessToken, 120);
-          setToken(TokenType.REFRESH_TOKEN, res.data.attributes.tokens.refreshToken, 8760);
-          
-          // Retry the original request with the new access token
-          const retryResult = await baseQuery(args, api, extraOptions);
-          return retryResult;
-        } else {
-          // Token refresh failed, perform complete logout
-          import("@/utils/logoutManager").then(({ performLogout }) => {
-            performLogout(null, "/login");
-          });
-        }
-      } catch (error) {
-        console.error("Error refreshing token:", error);
-        // Token refresh error, perform complete logout
-        import("@/utils/logoutManager").then(({ performLogout }) => {
-          performLogout(null, "/login");
-        });
-      }
-    } else {
-      // No refresh token, perform complete logout
-      import("@/utils/logoutManager").then(({ performLogout }) => {
-        performLogout(null, "/login");
-      });
-    }
+    // Clear cookies on 401 error
+    document.cookie = 'at=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+    document.cookie = 'rt=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+    // Redirect to login can be handled by the component
   }
+  
   return result;
 };
 

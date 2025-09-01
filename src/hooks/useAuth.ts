@@ -1,50 +1,43 @@
+"use client";
 import { useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useCookies, COOKIE_NAMES } from '@/contexts/CookieContext';
-import { clearAllTokens, isAuthenticated as checkTokenAuth } from '@/utils/tokenManager';
 
 export const useAuth = () => {
   const router = useRouter();
-  const { removeCookie } = useCookies();
+  const { removeCookie, getCookie } = useCookies();
 
   const logout = useCallback(() => {
     try {
-      // Clear all encrypted auth tokens
-      clearAllTokens();
+      // Clear access and refresh token cookies
+      removeCookie(COOKIE_NAMES.ACCESS_TOKEN);
+      removeCookie(COOKIE_NAMES.REFRESH_TOKEN);
       
       // Clear localStorage
-      localStorage.removeItem('user');
+      localStorage.clear();
       
       // Clear sessionStorage
       sessionStorage.clear();
       
-      // Clear custom encrypted cookies
-      removeCookie(COOKIE_NAMES.ITER_BENE_VERIFIED);
-      removeCookie(COOKIE_NAMES.PROFILE_COMPLETED);
-      removeCookie(COOKIE_NAMES.IS_FIRST_TIME_USER);
-      removeCookie(COOKIE_NAMES.LOCATION_PERMISSION_DENIED);
-      removeCookie(COOKIE_NAMES.LOCATION_PERMISSION_GRANTED);
-      removeCookie(COOKIE_NAMES.USER_LAST_LOCATION);
+      // Clear other cookies
+      removeCookie(COOKIE_NAMES.REGISTER_VERIFY_MAIL);
+      removeCookie(COOKIE_NAMES.FORGOT_PASSWORD_MAIL);
+      removeCookie(COOKIE_NAMES.VERIFY_EMAIL_TYPE);
       
-      // Navigate to auth page before reload to prevent flash
-      router.push('/auth');
-      
-      // Small delay to ensure navigation starts before reload
-      setTimeout(() => {
-        window.location.reload();
-      }, 100);
+      // Navigate to login page
+      router.push('/login');
       
     } catch (error) {
       console.error('Logout error:', error);
-      // Fallback: force reload anyway
-      window.location.href = '/auth';
+      // Fallback: force reload
+      window.location.href = '/login';
     }
   }, [router, removeCookie]);
 
   const isAuthenticated = useCallback(() => {
     if (typeof window === 'undefined') return false;
-    return checkTokenAuth();
-  }, []);
+    return !!getCookie(COOKIE_NAMES.ACCESS_TOKEN);
+  }, [getCookie]);
 
   return {
     logout,

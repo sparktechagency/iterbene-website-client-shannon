@@ -4,10 +4,10 @@ import CryptoJS from 'crypto-js';
 // Encryption key - should match the one in tokenManager.ts
 const ENCRYPTION_KEY = process.env.NEXT_PUBLIC_ENCRYPTION_KEY || 'your-secret-key-change-in-production';
 
-// Cookie names for encrypted tokens
+// Cookie names for encrypted tokens  
 const ENCRYPTED_COOKIE_NAMES = {
-  ACCESS_TOKEN: 'iat',   // Encrypted access token
-  REFRESH_TOKEN: 'irt'   // Encrypted refresh token
+  ACCESS_TOKEN: 'at',   // Encrypted access token
+  REFRESH_TOKEN: 'rt'   // Encrypted refresh token
 };
 
 // Decrypt function
@@ -15,7 +15,7 @@ function decrypt(encryptedText: string): string {
   try {
     const bytes = CryptoJS.AES.decrypt(encryptedText, ENCRYPTION_KEY);
     return bytes.toString(CryptoJS.enc.Utf8);
-  } catch (error) {
+  } catch {
     return '';
   }
 }

@@ -14,8 +14,8 @@ import { TError } from "@/types/error";
 import { toast } from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import { useCookies, COOKIE_NAMES } from "@/contexts/CookieContext";
-import { handleAuthResponse } from "@/utils/tokenManager";
 import { z } from "zod";
+import { useState } from "react";
 
 // define register zod validation schema
 const registerValidationSchema = z.object({
@@ -29,24 +29,24 @@ const registerValidationSchema = z.object({
 type RegisterFormData = z.infer<typeof registerValidationSchema>;
 const Register = () => {
   const [userRegistation, { isLoading }] = useRegisterMutation();
+  const [termsAccepted, setTermsAccepted] = useState<boolean>(false);
   const router = useRouter();
-  const { setBooleanCookie } = useCookies();
-   const {
+  const { setBooleanCookie, setCookie } = useCookies();
+  const {
     register,
     handleSubmit,
-    formState: { errors }
+    formState: { errors },
   } = useForm<RegisterFormData>({
-    resolver: zodResolver(registerValidationSchema)
+    resolver: zodResolver(registerValidationSchema),
   });
-
-
 
   const handleRegister = async (values: FieldValues) => {
     try {
       const res = await userRegistation(values).unwrap();
 
-      // Handle tokens using secure token manager
-      handleAuthResponse(res, "register");
+      // Set registerVerifyMail cookie with email for simple token management
+      setCookie(COOKIE_NAMES.REGISTER_VERIFY_MAIL, values.email);
+      setCookie(COOKIE_NAMES.VERIFY_EMAIL_TYPE, "register");
 
       // Mark user as first-time user for profile completion modal
       setBooleanCookie(COOKIE_NAMES.IS_FIRST_TIME_USER, true);
@@ -60,7 +60,7 @@ const Register = () => {
     }
   };
   return (
-    <section className="w-full h-screen flex items-center justify-center relative p-5">
+    <section className="w-full h-full min-h-screen flex items-center justify-center relative p-5">
       {/* Background with blur effect */}
       <div
         style={{
@@ -87,17 +87,15 @@ const Register = () => {
           <h1 className="text-2xl md:text-3xl  font-semibold">Register</h1>
         </div>
         {/* Form content */}
-        <form
-          onSubmit={handleSubmit(handleRegister)}
-        >
-          <div className="space-y-3 md:space-y-6 mt-8">
+        <form onSubmit={handleSubmit(handleRegister)}>
+          <div className="w-full flex flex-col gap-3 mt-5">
             <CustomInput
               name="firstName"
               label="First Name"
               type="text"
-              variant="outline"
+              variant="default"
               size="lg"
-              icon={<UserRound size={24} className="text-secondary" />}
+              icon={<UserRound size={23} className="text-secondary" />}
               fullWidth
               placeholder="Enter your first name"
               register={register("firstName")}
@@ -107,9 +105,9 @@ const Register = () => {
               name="lastName"
               label="Last Name"
               type="text"
-              variant="outline"
+              variant="default"
               size="lg"
-              icon={<UserRound size={24} className="text-secondary" />}
+              icon={<UserRound size={23} className="text-secondary" />}
               fullWidth
               placeholder="Enter your last name"
               register={register("lastName")}
@@ -119,8 +117,8 @@ const Register = () => {
               name="email"
               label="Email"
               type="email"
-              variant="outline"
-              icon={<Mail size={24} className="text-secondary" />}
+              variant="default"
+              icon={<Mail size={23} className="text-secondary" />}
               size="lg"
               fullWidth
               placeholder="Enter your email"
@@ -130,10 +128,10 @@ const Register = () => {
             <CustomInput
               name="password"
               label="Password"
-              variant="outline"
+              variant="default"
               type="password"
               size="lg"
-              icon={<Lock size={24} className="text-secondary" />}
+              icon={<Lock size={23} className="text-secondary -mt-1" />}
               fullWidth
               placeholder="Enter your password"
               register={register("password")}
@@ -144,6 +142,8 @@ const Register = () => {
                 <div className="flex items-center">
                   <Checkbox
                     id="remember"
+                    checked={termsAccepted}
+                    onChange={(e) => setTermsAccepted(e.target.checked)}
                     className="border-primary cursor-pointer "
                   />
                   <label

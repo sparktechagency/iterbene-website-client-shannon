@@ -12,46 +12,52 @@ import logo from "@/asset/logo/logo.png";
 import useUser from "@/hooks/useUser";
 import { useCookies, COOKIE_NAMES } from "@/contexts/CookieContext";
 import CustomInput from "../custom/custom-input";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 interface FirstTimeUserModalProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
-// Define Zod schema type for form validation
-type FirstTimeUserFormData = {
-  firstName: string;
-  lastName: string;
-  phoneNumber: string;
-  referredAs: string;
-  ageRange: string;
-  profession: string;
-  maritalStatus: string;
-};
+// Define Zod schema for form validation
+const firstTimeValidationSchema = z.object({
+  firstName: z.string().min(1, "First name is required"),
+  lastName: z.string().min(1, "Last name is required"),
+  phoneNumber: z.string().min(1, "Phone number is required"),
+  referredAs: z.string().min(1, "Referred as is required"),
+  ageRange: z.string().min(1, "Age range is required"),
+  profession: z.string().min(1, "Profession is required"),
+  maritalStatus: z.string().min(1, "Marital status is required"),
+});
+
+type FirstTimeUserFormData = z.infer<typeof firstTimeValidationSchema>;
 
 const FirstTimeUserModal = ({ isOpen, onClose }: FirstTimeUserModalProps) => {
-  // state
+  // State
   const [isClient, setIsClient] = useState(false);
   const userData = useUser();
 
-   const {
+  
+  // Initialize useForm with zodResolver
+  const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm<FirstTimeUserFormData>({
+    resolver: zodResolver(firstTimeValidationSchema),
     defaultValues: {
       firstName: userData?.firstName || "",
-    lastName: userData?.lastName || "",
-    phoneNumber: userData?.phoneNumber || "",
-    referredAs: userData?.referredAs || "",
-    ageRange: userData?.ageRange || "",
-    profession: userData?.profession || "",
-    maritalStatus: userData?.maritalStatus || "",
+      lastName: userData?.lastName || "",
+      phoneNumber: userData?.phoneNumber || "",
+      referredAs: userData?.referredAs || "",
+      ageRange: userData?.ageRange || "",
+      profession: userData?.profession || "",
+      maritalStatus: userData?.maritalStatus || "",
     },
   });
 
-
-  // hooks
+  // Hooks
   const [updateProfile, { isLoading }] = useUpdateProfileMutation();
   const { setBooleanCookie, removeCookie } = useCookies();
 
@@ -63,10 +69,7 @@ const FirstTimeUserModal = ({ isOpen, onClose }: FirstTimeUserModalProps) => {
     try {
       const res = await updateProfile(values).unwrap();
       toast.success(res?.message || "Profile completed successfully!");
-
-      // Mark user as having completed profile
       setBooleanCookie(COOKIE_NAMES.PROFILE_COMPLETED, true);
-      // Remove first-time user flag
       removeCookie(COOKIE_NAMES.IS_FIRST_TIME_USER);
       onClose();
     } catch (error) {
@@ -76,9 +79,7 @@ const FirstTimeUserModal = ({ isOpen, onClose }: FirstTimeUserModalProps) => {
   };
 
   const handleSkip = () => {
-    // Mark user as having completed profile
     setBooleanCookie(COOKIE_NAMES.PROFILE_COMPLETED, true);
-    // Remove first-time user flag
     removeCookie(COOKIE_NAMES.IS_FIRST_TIME_USER);
     onClose();
   };
@@ -88,13 +89,13 @@ const FirstTimeUserModal = ({ isOpen, onClose }: FirstTimeUserModalProps) => {
     if (isOpen) {
       const originalBodyOverflow = document.body.style.overflow;
       document.body.style.overflow = "hidden";
-
       return () => {
         document.body.style.overflow = originalBodyOverflow;
       };
     }
   }, [isOpen]);
 
+  // Render nothing if not client-side, modal is not open, or userData is missing
   if (!isClient || !isOpen || !userData) return null;
 
   return (
@@ -108,7 +109,7 @@ const FirstTimeUserModal = ({ isOpen, onClose }: FirstTimeUserModalProps) => {
           transition={{ duration: 0.3 }}
         >
           <motion.div
-            className="bg-white rounded-xl shadow-2xl w-full max-w-2xl  max-h-[90vh] overflow-y-auto relative"
+            className="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto relative"
             initial={{ scale: 0.9, opacity: 0, y: 20 }}
             animate={{ scale: 1, opacity: 1, y: 0 }}
             exit={{ scale: 0.9, opacity: 0, y: 20 }}
@@ -149,16 +150,14 @@ const FirstTimeUserModal = ({ isOpen, onClose }: FirstTimeUserModalProps) => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2, duration: 0.3 }}
               >
-                <form
-                 onSubmit={handleSubmit(handleProfileCompletion)}
-                >
+                <form onSubmit={handleSubmit(handleProfileCompletion)}>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <CustomInput
                       type="text"
                       required
                       name="firstName"
                       placeholder="Enter your first name"
-                      label="FirstName Name"
+                      label="First Name"
                       register={register("firstName")}
                       error={errors.firstName}
                     />
@@ -171,7 +170,6 @@ const FirstTimeUserModal = ({ isOpen, onClose }: FirstTimeUserModalProps) => {
                       register={register("lastName")}
                       error={errors.lastName}
                     />
-
                     <CustomInput
                       type="text"
                       required
@@ -181,65 +179,31 @@ const FirstTimeUserModal = ({ isOpen, onClose }: FirstTimeUserModalProps) => {
                       register={register("phoneNumber")}
                       error={errors.phoneNumber}
                     />
-
                     <CustomSelectField
                       items={[
-                        {
-                          label: "He/Him",
-                          value: "He/Him",
-                        },
-                        {
-                          label: "She/Her",
-                          value: "She/Her",
-                        },
-                        {
-                          label: "They/Them",
-                          value: "They/Them",
-                        },
-                        {
-                          label: "Undisclosed",
-                          value: "Undisclosed",
-                        },
+                        { label: "He/Him", value: "He/Him" },
+                        { label: "She/Her", value: "She/Her" },
+                        { label: "They/Them", value: "They/Them" },
+                        { label: "Undisclosed", value: "Undisclosed" },
                       ]}
                       name="referredAs"
                       label="Referred As"
                       size="md"
                       required
-                      placeholder="How did you know about us"
+                      placeholder="Select how you are referred"
                       defaultValue={userData?.referredAs}
                       register={register("referredAs")}
                       error={errors.referredAs}
                     />
                     <CustomSelectField
                       items={[
-                        {
-                          label: "13-17",
-                          value: "13-17",
-                        },
-                        {
-                          label: "18-24",
-                          value: "18-24",
-                        },
-                        {
-                          label: "25-34",
-                          value: "25-34",
-                        },
-                        {
-                          label: "35-44",
-                          value: "35-44",
-                        },
-                        {
-                          label: "45-54",
-                          value: "45-54",
-                        },
-                        {
-                          label: "55-64",
-                          value: "55-64",
-                        },
-                        {
-                          label: "65+",
-                          value: "65+",
-                        },
+                        { label: "13-17", value: "13-17" },
+                        { label: "18-24", value: "18-24" },
+                        { label: "25-34", value: "25-34" },
+                        { label: "35-44", value: "35-44" },
+                        { label: "45-54", value: "45-54" },
+                        { label: "55-64", value: "55-64" },
+                        { label: "65+", value: "65+" },
                       ]}
                       name="ageRange"
                       label="Age Range"
@@ -271,7 +235,7 @@ const FirstTimeUserModal = ({ isOpen, onClose }: FirstTimeUserModalProps) => {
                       name="maritalStatus"
                       label="Relationship Status"
                       size="md"
-                      placeholder="What is your marital status"
+                      placeholder="Select your marital status"
                       defaultValue={userData?.maritalStatus}
                       register={register("maritalStatus")}
                       error={errors.maritalStatus}

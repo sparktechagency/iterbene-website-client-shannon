@@ -18,7 +18,7 @@ import {
 const AuthModal = () => {
   const dispatch = useAppDispatch();
   const isModalOpen = useAppSelector(
-    (state: RootState) => state.auth.showAuthModal
+    (state: RootState) => state.authModal.showAuthModal
   );
   const isAuthenticated = useUser();
   const [isClient, setIsClient] = useState<boolean>(false);

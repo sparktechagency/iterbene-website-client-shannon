@@ -5,7 +5,7 @@ import CustomButton from "@/components/custom/custom-button";
 import CustomInput from "@/components/custom/custom-input";
 import { useLoginMutation } from "@/redux/features/auth/authApi";
 import { TError } from "@/types/error";
-import { handleAuthResponse } from "@/utils/tokenManager";
+import { useCookies, COOKIE_NAMES } from "@/contexts/CookieContext";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Checkbox } from "antd";
 import { Lock, Mail } from "lucide-react";
@@ -32,6 +32,7 @@ const Login = () => {
   const redirectUrl = searchParams.get("redirect_url");
   const [login, { isLoading }] = useLoginMutation();
   const router = useRouter();
+  const { setCookie } = useCookies();
 
    const {
     register,
@@ -52,7 +53,6 @@ const Login = () => {
   const handleLogin = async (values: FieldValues) => {
     try {
       const res = await login(values).unwrap();
-
       if (
         res?.data?.attributes?.user?.role === "Admin" ||
         res?.data?.attributes?.user?.role === "Super_Admin"
@@ -77,14 +77,19 @@ const Login = () => {
         res?.message == "Please verify your email."
       ) {
         toast.success(res?.message);
-        // Handle email verification token
-        handleAuthResponse(res, "login-not-verified");
         router.push("/verify-email");
         return;
       }
+      
+      // Set accessToken and refreshToken in cookies
+      if (res?.data?.attributes?.tokens?.accessToken) {
+        setCookie(COOKIE_NAMES.ACCESS_TOKEN, res.data.attributes.tokens.accessToken, 1); // 1 day
+      }
+      if (res?.data?.attributes?.tokens?.refreshToken) {
+        setCookie(COOKIE_NAMES.REFRESH_TOKEN, res.data.attributes.tokens.refreshToken, 30); // 30 days
+      }
+      
       toast.success(res.message || "Login successful!");
-      // Handle successful login tokens
-      handleAuthResponse(res, "login-success");
 
       if (redirectUrl) {
         router.push(redirectUrl);
@@ -140,8 +145,8 @@ const Login = () => {
               name="email"
               label="Email"
               type="email"
-              variant="outline"
-              icon={<Mail size={24} className="text-secondary" />}
+              variant="default"
+              icon={<Mail size={23} className="text-secondary -mt-1" />}
               size="lg"
               fullWidth
               placeholder="Enter your email"
@@ -151,10 +156,10 @@ const Login = () => {
             <CustomInput
               name="password"
               label="Password"
-              variant="outline"
+              variant="default"
               type="password"
               size="lg"
-              icon={<Lock size={24} className="text-secondary" />}
+              icon={<Lock size={23} className="text-secondary -mt-1" />}
               fullWidth
               placeholder="Enter your password"
               register={register("password")}

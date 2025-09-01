@@ -13,7 +13,11 @@ export const COOKIE_NAMES = {
   LOCATION_PERMISSION_GRANTED: "lpg", // locationPermissionGranted -> lpg  
   PROFILE_COMPLETED: "pc",             // profileCompleted -> pc
   IS_FIRST_TIME_USER: "iftu",          // isFirstTimeUser -> iftu
-  USER_LAST_LOCATION: "ull"            // userLastLocation -> ull
+  REGISTER_VERIFY_MAIL: "rvm",         // registerVerifyMail -> rvm
+  FORGOT_PASSWORD_MAIL: "fpm",         // forgotPasswordMail -> fpm
+  VERIFY_EMAIL_TYPE: "vet",            // verifyEmailType -> vet
+  ACCESS_TOKEN: "at",                  // accessToken -> at
+  REFRESH_TOKEN: "rt",                 // refreshToken -> rt
 } as const;
 
 // Encrypt function
@@ -26,6 +30,7 @@ const decrypt = (encryptedText: string): string => {
   try {
     const bytes = CryptoJS.AES.decrypt(encryptedText, ENCRYPTION_KEY);
     return bytes.toString(CryptoJS.enc.Utf8);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (error) {
     return '';
   }

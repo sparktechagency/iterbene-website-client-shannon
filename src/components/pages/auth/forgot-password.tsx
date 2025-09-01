@@ -12,7 +12,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FieldValues, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
-import { handleAuthResponse } from "@/utils/tokenManager";
+import { useCookies, COOKIE_NAMES } from "@/contexts/CookieContext";
 import { z } from "zod";
 
 // define forgot password zod schema
@@ -22,6 +22,7 @@ const forgotPasswordValidationSchema = z.object({
 type ForgotPasswordFormType = z.infer<typeof forgotPasswordValidationSchema>;
 const ForgotPassword = () => {
   const router = useRouter();
+  const { setCookie } = useCookies();
 
   const {
     register,
@@ -36,12 +37,13 @@ const ForgotPassword = () => {
     try {
       const res = await forgotPassword(values).unwrap();
 
-      // Handle reset password token
-      handleAuthResponse(res, "forgot-password");
+      // Set forgotPasswordMail cookie with email for simple token management
+      setCookie(COOKIE_NAMES.FORGOT_PASSWORD_MAIL, values.email);
+      setCookie(COOKIE_NAMES.VERIFY_EMAIL_TYPE, "forgot-password");
 
       // Redirect to verify email page
       toast.success(res?.message);
-      router.push(`/verify-email?type=forgot-password`);
+      router.push(`/verify-email`);
     } catch (error) {
       const err = error as TError;
       toast.error(err?.data?.message || "Something went wrong!");
@@ -86,8 +88,8 @@ const ForgotPassword = () => {
               name="email"
               label="Email"
               type="email"
-              variant="outline"
-              icon={<Mail size={24} className="text-secondary" />}
+              variant="default"
+              icon={<Mail size={23} className="text-secondary -mt-0.5" />}
               size="lg"
               fullWidth
               placeholder="Enter your email"

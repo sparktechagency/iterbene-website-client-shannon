@@ -5,7 +5,6 @@ import CustomButton from "@/components/custom/custom-button";
 import CustomInput from "@/components/custom/custom-input";
 import { useResetPasswordMutation } from "@/redux/features/auth/authApi";
 import { TError } from "@/types/error";
-import { clearAllTokens } from "@/utils/tokenManager";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Lock } from "lucide-react";
 import Image from "next/image";
@@ -58,13 +57,10 @@ const ResetPassword = () => {
         password: values?.newPassword,
       }).unwrap();
 
-      // Clear all tokens after successful password reset
-      clearAllTokens();
-
       toast.success(
         res?.message || "Password reset successful! Please login again."
       );
-      router.push("/auth");
+      router.push("/login");
     } catch (error) {
       const err = error as TError;
       toast.error(err?.data?.message || "Something went wrong!");
@@ -109,9 +105,9 @@ const ResetPassword = () => {
               label="New Password"
               fullWidth
               size="lg"
-              icon={<Lock size={24} className="text-secondary" />}
+              icon={<Lock size={23} className="text-secondary" />}
               placeholder="Enter new password"
-              variant="outline"
+              variant="default"
               type="password"
               register={register("newPassword")}
               error={errors.newPassword}
@@ -121,9 +117,9 @@ const ResetPassword = () => {
               label="Confirm Password"
               fullWidth
               size="lg"
-              icon={<Lock size={24} className="text-secondary" />}
+              icon={<Lock size={23} className="text-secondary" />}
               placeholder="Enter confirm password"
-              variant="outline"
+               variant="default"
               type="password"
               register={register("confirmPassword")}
               error={errors.confirmPassword}

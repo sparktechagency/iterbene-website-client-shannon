@@ -46,15 +46,15 @@ const CustomInput = ({
 
   // Size classes
   const inputSizeClass = {
-    sm: "py-1.5 px-3 text-sm",
-    md: "py-2.5 px-3 text-base",
-    lg: "py-3 px-4 text-lg",
+    sm: "py-2 pl-2  pr-3 text-sm",
+    md: "py-2.5 pl-2  pr-3 text-base",
+    lg: "py-2.5 pl-2  pr-3 text-lg",
   }[size];
 
   const textareaSizeClass = {
-    sm: "py-2 px-3 text-sm min-h-[80px]",
-    md: "py-2.5 px-3 text-base min-h-[100px]",
-    lg: "py-3 px-4 text-lg min-h-[120px]",
+    sm: "py-2 pl-2  pr-3 text-sm min-h-[80px]",
+    md: "py-2.5 pl-2  pr-3 text-base min-h-[100px]",
+    lg: "py-2.5 pl-2  pr-3 text-lg min-h-[120px]",
   }[size];
 
   // Determine input type for password toggle
@@ -63,7 +63,7 @@ const CustomInput = ({
   // Base styles for input container
   const containerClasses = `
     ${fullWidth ? "w-full" : "w-auto"}
-    flex items-start relative
+    flex justify-between items-center relative
     ${
       variant === "outline"
         ? "bg-transparent border-b border-primary rounded-none"
@@ -95,7 +95,7 @@ const CustomInput = ({
         {icon && (
           <div
             className={`flex-shrink-0 ${
-              isTextarea ? "pt-3 pl-3" : "pl-3 self-center"
+              isTextarea ? "self-center pl-3" : "self-center pl-3"
             }`}
           >
             {icon}
@@ -149,7 +149,7 @@ const CustomInput = ({
           <button
             type="button"
             onClick={togglePassword}
-            className="flex-shrink-0 p-2 text-gray-500 hover:text-gray-700 self-center"
+            className="flex-shrink-0 p-2 cursor-pointer text-gray-500 hover:text-gray-700 self-center"
             tabIndex={-1}
           >
             {showPassword ? <EyeIcon size={20} /> : <EyeOff size={20} />}

@@ -9,13 +9,6 @@ import UserVerificationWrapper from "@/components/common/UserVerificationWrapper
 import AuthModalWrapper from "@/components/common/AuthModalWrapper";
 import { BrowserExtensionSafe } from "@/utils/hydrationUtils";
 
-// Load auth test utilities in development
-if (process.env.NODE_ENV === 'development') {
-  import("@/utils/authTestUtils").catch(() => {
-    // Ignore if file doesn't exist or fails to load
-  });
-}
-
 const inter = Source_Sans_3({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
@@ -46,7 +39,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={inter?.className}>
+      <body className={inter?.className} suppressHydrationWarning>
         <BrowserExtensionSafe>
           <AntdRegistry>
             <ConfigProvider

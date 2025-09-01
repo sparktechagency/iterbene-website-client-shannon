@@ -4,7 +4,8 @@ import logo from "@/asset/logo/logo.png";
 import Image from "next/image";
 import { useState, useEffect } from "react";
 import CustomButton from "@/components/custom/custom-button";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
+import { useCookies, COOKIE_NAMES } from "@/contexts/CookieContext";
 import OTPInput from "react-otp-input";
 import {
   useResendOtpMutation,
@@ -12,12 +13,10 @@ import {
 } from "@/redux/features/auth/authApi";
 import { TError } from "@/types/error";
 import toast from "react-hot-toast";
-import { handleAuthResponse } from "@/utils/tokenManager";
 
 const VerifyEmail = () => {
-  const searchParams = useSearchParams();
-  const type = searchParams.get("type");
   const router = useRouter();
+  const { getCookie, removeCookie, setCookie } = useCookies();
   const [oneTimeCode, setOneTimeCode] = useState<string>("");
   const [countdown, setCountdown] = useState<number>(60); // 1 minute = 60 seconds
   const [canResend, setCanResend] = useState<boolean>(false);
@@ -49,12 +48,23 @@ const VerifyEmail = () => {
   const handleVerifyEmail = async () => {
     try {
       const res = await verifyEmail({ otp: oneTimeCode }).unwrap();
-      
-      // Handle successful verification tokens
-      handleAuthResponse(res, 'verify-otp');
-      
+      const type = getCookie(COOKIE_NAMES.VERIFY_EMAIL_TYPE);
+
+      // Set tokens in cookies for login success
+      if (res?.data?.attributes?.tokens?.accessToken) {
+        setCookie(COOKIE_NAMES.ACCESS_TOKEN, res.data.attributes.tokens.accessToken, 1); // 1 day
+      }
+      if (res?.data?.attributes?.tokens?.refreshToken) {
+        setCookie(COOKIE_NAMES.REFRESH_TOKEN, res.data.attributes.tokens.refreshToken, 30); // 30 days
+      }
+
+      // Clear verification cookies
+      removeCookie(COOKIE_NAMES.REGISTER_VERIFY_MAIL);
+      // removeCookie(COOKIE_NAMES.FORGOT_PASSWORD_MAIL);
+      removeCookie(COOKIE_NAMES.VERIFY_EMAIL_TYPE);
+
       toast.success(res?.message);
-      if (type == "forgot-password") {
+      if (type === "forgot-password") {
         router.push(`/reset-password`);
       } else {
         router.push(`/`);
