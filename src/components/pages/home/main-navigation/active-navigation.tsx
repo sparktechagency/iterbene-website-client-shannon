@@ -16,7 +16,7 @@ const ActiveNavigation = ({ navLink }: { navLink: ActiveNavigationProps }) => {
       className={`flex items-center gap-4 ${isActive ? "bg-[#C4F5F0]" : "hover:bg-[#C4F5F0]"}  px-4 py-3 rounded-xl cursor-pointer transition-all duration-200`}
     >
       {navLink.icon}
-      <span className="font-medium">{navLink.name}</span>
+      <span className="text-sm md:text-base font-semibold text-gray-800">{navLink.name}</span>
     </Link>
   );
 };

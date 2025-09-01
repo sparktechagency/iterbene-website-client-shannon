@@ -82,7 +82,16 @@ const RequestedConnections: React.FC = () => {
       </div>
     );
   } else if (allConnectionRequests?.length === 0) {
-    content = null; // Don't render anything if no requests are found
+    content = (
+      <div className="w-full text-center">
+        <h1 className="text-base md:text-lg font-semibold text-gray-700">
+          No Request Connection found
+        </h1>
+        <p className="text-xs md:text-sm text-gray-600">
+          You don&apos;t have any request connection
+        </p>
+      </div>
+    ); // Don't render anything if no requests are found
   } else if (allConnectionRequests?.length > 0) {
     content = (
       <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
@@ -97,17 +106,12 @@ const RequestedConnections: React.FC = () => {
     );
   }
 
-  // Only render the section if there are requests or loading
-  if (!isLoading && !isLoadingMore && allConnectionRequests?.length === 0) {
-    return null;
-  }
-
   return (
     <section className="w-full border-b border-gray-400 pb-8">
       {/* Header Section */}
       <div className="w-full flex items-center justify-between mb-6 px-2">
         <div className="flex items-center gap-4">
-          <h1 className="text-xl md:text-2xl font-semibold text-gray-800">
+          <h1 className="text-lg md:text-xl font-semibold text-gray-800">
             Requests Connection
           </h1>
           {requestCount > 0 && (

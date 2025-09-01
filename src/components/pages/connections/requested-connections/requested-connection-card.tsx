@@ -51,36 +51,38 @@ const RequestedConnectionCard = ({
   };
 
   return (
-    <div className="w-full bg-white rounded-2xl p-4 flex flex-col items-center">
+    <div className="w-full h-fit bg-white rounded-2xl p-4 flex flex-row md:flex-col gap-4 items-center">
       {/* Profile Image */}
-      <Link className="w-full" href={`/${request?.sentBy?.username}`}>
+      <Link className="flex-shrink-0" href={`/${request?.sentBy?.username}`}>
         <Image
           src={request?.sentBy?.profileImage}
           alt={request?.sentBy?.username}
-          width={248}
-          height={248}
-          className="w-full h-56 md:h-60 lg:h-[248px] object-cover rounded-2xl mb-4"
+          width={224}
+          height={224}
+          className="size-16 md:w-full md:h-56 object-cover rounded-full md:rounded-2xl"
         />
       </Link>
-      {/* Name */}
-      <h2 className="text-base font-semibold text-gray-800 mb-4">
-        {request?.sentBy?.firstName} {request?.sentBy?.lastName}
-      </h2>
+      <div className="w-full">
+        {/* Name */}
+        <h2 className="text-lg font-semibold text-gray-800 mb-3 text-left">
+          {request?.sentBy?.firstName} {request?.sentBy?.lastName}
+        </h2>
 
-      {/* Buttons */}
-      <div className="flex flex-col gap-4 w-full">
-        <button
-          onClick={handleAcceptConnection}
-          className="bg-secondary text-white px-5 py-3 rounded-xl cursor-pointer"
-        >
-          Accept
-        </button>
-        <button
-          onClick={handleDeclineConnection}
-          className="border border-[#9EA1B3] text-gray-900 px-5 py-3 rounded-xl hover:bg-gray-100 transition cursor-pointer"
-        >
-          Decline
-        </button>
+        {/* Buttons */}
+        <div className="flex flex-row md:flex-col gap-4">
+          <button
+            onClick={handleAcceptConnection}
+            className="w-full bg-secondary text-white px-4 py-2.5 text-sm md:text-base rounded-xl cursor-pointer"
+          >
+            Accept
+          </button>
+          <button
+            onClick={handleDeclineConnection}
+            className="w-full border border-[#9EA1B3] text-gray-900 px-4 py-2.5 text-sm md:text-base rounded-xl hover:bg-gray-100 transition cursor-pointer"
+          >
+            Decline
+          </button>
+        </div>
       </div>
     </div>
   );

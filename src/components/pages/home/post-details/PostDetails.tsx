@@ -49,10 +49,10 @@ const PostDetails = ({ isOpen, onClose, post }: PostDetailsProps) => {
   const [addOrRemoveReaction] = useAddOrRemoveReactionMutation();
 
   const reactionIcons: { [key: string]: JSX.Element } = {
-    heart: <h1 className="text-2xl">❤️</h1>,
-    suitcase: <h1 className="text-2xl">🧳</h1>,
-    not_interested: <h1 className="text-2xl">🚫</h1>, // Fixed: camelCase to match enum
-    smile: <h1 className="text-2xl">🙂</h1>,
+    heart: <h1 className="text-2xl emoji-font">❤️</h1>,
+    suitcase: <h1 className="text-2xl emoji-font">🧳</h1>,
+    not_interested: <h1 className="text-2xl emoji-font">🚫</h1>,
+    smile: <h1 className="text-2xl emoji-font">🙂</h1>,
   };
 
   // Reaction colors
@@ -228,7 +228,7 @@ const PostDetails = ({ isOpen, onClose, post }: PostDetailsProps) => {
                     </>
                   ) : (
                     <div className="flex items-center gap-1">
-                      <h1 className="text-2xl">❤️</h1>
+                      <h1 className="text-2xl emoji-font">❤️</h1>
                       <span className="font-semibold text-gray-500">Heart</span>
                     </div>
                   )}

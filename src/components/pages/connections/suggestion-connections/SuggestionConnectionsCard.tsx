@@ -13,9 +13,9 @@ interface SuggestionConnectionsCardProps {
   onConnectionAction?: (connectionId: string) => void; // New prop for callback
 }
 
-const SuggestionConnectionsCard = ({ 
-  connection, 
-  onConnectionAction 
+const SuggestionConnectionsCard = ({
+  connection,
+  onConnectionAction,
 }: SuggestionConnectionsCardProps) => {
   const [addConnection] = useAddConnectionMutation();
   const [removeConnection] = useRemoveSuggestionConnectionMutation();
@@ -25,7 +25,7 @@ const SuggestionConnectionsCard = ({
       const payload = { receivedBy: connection?._id };
       await addConnection(payload).unwrap();
       toast.success("Connection sent successfully!");
-      
+
       // Optimistically remove from UI
       if (onConnectionAction) {
         onConnectionAction(connection._id);
@@ -40,7 +40,7 @@ const SuggestionConnectionsCard = ({
     try {
       await removeConnection(connection?._id).unwrap();
       toast.success("Connection removed successfully!");
-      
+
       // Optimistically remove from UI
       if (onConnectionAction) {
         onConnectionAction(connection._id);
@@ -52,35 +52,37 @@ const SuggestionConnectionsCard = ({
   };
 
   return (
-    <div className="w-full h-fit bg-white rounded-2xl p-4 flex flex-col items-center">
+    <div className="w-full h-fit bg-white rounded-2xl p-4 flex flex-row md:flex-col gap-4 items-center">
       {/* Profile Image */}
-      <Link className="w-full" href={`/${connection?.username}`}>
+      <Link className="flex-shrink-0" href={`/${connection?.username}`}>
         <Image
           src={connection?.profileImage}
           alt={connection?.username}
-          width={248}
-          height={248}
-          className="w-full h-56 md:h-60 lg:h-[248px] object-cover rounded-2xl mb-4"
+          width={224}
+          height={224}
+          className="size-16 md:w-full md:h-56 object-cover rounded-full md:rounded-2xl"
         />
       </Link>
-      {/* Name */}
-      <h2 className="text-lg font-semibold text-gray-800 mb-4">
-        {connection?.firstName} {connection?.lastName}
-      </h2>
-      {/* Buttons */}
-      <div className="flex flex-col gap-4 w-full">
-        <button
-          onClick={handleAddConnection}
-          className="bg-[#FEEFE8] text-secondary px-5 py-3 rounded-xl border border-secondary transition cursor-pointer"
-        >
-          Add Connection
-        </button>
-        <button
-          onClick={handleRemoveConnection}
-          className="border border-[#9EA1B3] text-gray-900 px-5 py-3 rounded-xl hover:bg-gray-100 transition cursor-pointer"
-        >
-          Remove
-        </button>
+      <div className="w-full">
+        {/* Name */}
+        <h2 className="text-lg font-semibold text-gray-800 mb-2 text-left">
+          {connection?.firstName} {connection?.lastName}
+        </h2>
+        {/* Buttons */}
+        <div className="w-full flex flex-row md:flex-col gap-4">
+          <button
+            onClick={handleAddConnection}
+            className="bg-[#FEEFE8] text-secondary px-3.5 py-2.5 text-sm md:text-base rounded-xl border border-secondary transition cursor-pointer"
+          >
+            Add Connection
+          </button>
+          <button
+            onClick={handleRemoveConnection}
+            className="border border-[#9EA1B3] text-gray-900 px-6 py-2.5 text-sm md:text-base rounded-xl hover:bg-gray-100 transition cursor-pointer"
+          >
+            Remove
+          </button>
+        </div>
       </div>
     </div>
   );

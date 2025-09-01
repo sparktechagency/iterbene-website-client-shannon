@@ -184,10 +184,10 @@ const PostCard = ({ post, setAllPosts }: PostCardProps) => {
   );
 
   const reactionIcons: { [key: string]: JSX.Element } = {
-    heart: <h1 className="text-[22px]">❤️</h1>,
-    suitcase: <h1 className="text-[22px]">🧳</h1>,
-    not_interested: <h1 className="text-[22px]">🚫</h1>, // Fixed: camelCase to match enum
-    smile: <h1 className="text-[22px]">🙂</h1>,
+    heart: <h1 className="text-[22px] emoji-font">❤️</h1>,
+    suitcase: <h1 className="text-[22px] emoji-font">🧳</h1>,
+    not_interested: <h1 className="text-[22px] emoji-font">🚫</h1>,
+    smile: <h1 className="text-[22px] emoji-font">🙂</h1>,
   };
 
   // Reaction colors
@@ -472,7 +472,7 @@ const PostCard = ({ post, setAllPosts }: PostCardProps) => {
               ) : (
                 <div className="flex items-center gap-1">
                   <h1
-                    className="text-[22px]"
+                    className="text-[22px] emoji-font"
                     style={{
                       filter: "grayscale(100%)"
                     }}

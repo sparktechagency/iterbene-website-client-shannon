@@ -76,10 +76,19 @@ const SuggestionConnections: React.FC = () => {
       </div>
     );
   } else if (allConnections?.length === 0) {
-    content = null; // Don't render anything if no connections are found
+    content = (
+      <div className="w-full text-center">
+        <h1 className="text-base md:text-lg font-semibold text-gray-700">
+          No Suggestion Connection found
+        </h1>
+        <p className="text-xs md:text-sm text-gray-600">
+          You don&apos;t have any suggestion connection
+        </p>
+      </div>
+    );
   } else if (allConnections.length > 0) {
     content = (
-      <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+      <div className="w-full grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-4">
         {allConnections?.map((connection: IConnection) => (
           <SuggestionConnectionsCard
             key={connection?._id}
@@ -91,17 +100,11 @@ const SuggestionConnections: React.FC = () => {
     );
   }
 
-  // Only render the section if there are connections or loading
-  if (!isLoading && !isLoadingMore && allConnections?.length === 0) {
-    return null;
-  }
-
-  
   return (
     <section className="w-full">
       {/* Header Section */}
       <div className="w-full flex items-center justify-between mb-6 px-2">
-        <h1 className="text-xl md:text-2xl font-semibold text-gray-800">
+        <h1 className="text-lg md:text-xl font-semibold text-gray-800">
           People You Might Like
         </h1>
         {showViewMoreButton && (

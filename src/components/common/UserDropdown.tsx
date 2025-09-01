@@ -110,7 +110,7 @@ const UserDropdown: React.FC<DropdownProps> = ({
                     <LucideCalendarCheck className="w-5 h-5 text-gray-600" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-gray-900 text-sm font-medium">
+                    <p className="text-gray-700 text-base font-semibold">
                       Timeline
                     </p>
                     <p className="text-xs text-gray-500 mt-0.5">
@@ -128,7 +128,7 @@ const UserDropdown: React.FC<DropdownProps> = ({
                     <IoChatboxEllipsesOutline className="w-5 h-5 text-gray-600" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-gray-900 text-sm font-medium">
+                    <p className="text-gray-700 text-base font-semibold">
                       Messages
                     </p>
                     <p className="text-xs text-gray-500 mt-0.5">
@@ -146,7 +146,7 @@ const UserDropdown: React.FC<DropdownProps> = ({
                     <HiOutlineUserGroup className="w-5 h-5 text-gray-600" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-gray-900 text-sm font-medium">Groups</p>
+                    <p className="text-gray-700 text-base font-semibold">Groups</p>
                     <p className="text-xs text-gray-500 mt-0.5">
                       Join communities
                     </p>
@@ -162,7 +162,7 @@ const UserDropdown: React.FC<DropdownProps> = ({
                     <FiMapPin className="w-5 h-5 text-gray-600" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-gray-900 text-sm font-medium">Maps</p>
+                    <p className="text-gray-700 text-base font-semibold">Maps</p>
                     <p className="text-xs text-gray-500 mt-0.5">
                       Explore locations
                     </p>
@@ -178,7 +178,7 @@ const UserDropdown: React.FC<DropdownProps> = ({
                     <FaRegCalendarAlt className="w-5 h-5 text-gray-600" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-gray-900 text-sm font-medium">Events</p>
+                    <p className="text-gray-700 text-base font-semibold">Events</p>
                     <p className="text-xs text-gray-500 mt-0.5">
                       Discover events
                     </p>
@@ -194,7 +194,7 @@ const UserDropdown: React.FC<DropdownProps> = ({
                     <MdAlternateEmail className="w-5 h-5 text-gray-600" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-gray-900 text-sm font-medium">
+                    <p className="text-gray-700 text-base font-semibold">
                       Invitations
                     </p>
                     <p className="text-xs text-gray-500 mt-0.5">
@@ -209,7 +209,7 @@ const UserDropdown: React.FC<DropdownProps> = ({
                       <IoSettingsOutline className="w-5 h-5 text-gray-600" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-gray-900 text-sm font-medium">
+                      <p className="text-gray-700 text-base font-semibold">
                         Settings
                       </p>
                       <p className="text-xs text-gray-500 mt-0.5">
@@ -228,7 +228,7 @@ const UserDropdown: React.FC<DropdownProps> = ({
                     <BadgeInfo className="w-5 h-5 text-gray-600" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-gray-900 text-sm font-medium">About</p>
+                    <p className="text-gray-700 text-base font-semibold">About</p>
                     <p className="text-xs text-gray-500 mt-0.5">
                       Learn more about us
                     </p>
@@ -244,7 +244,7 @@ const UserDropdown: React.FC<DropdownProps> = ({
                     <ShieldAlert className="w-5 h-5 text-gray-600" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-gray-900 text-sm font-medium">
+                    <p className="text-gray-700 text-base font-semibold">
                       Terms and conditions
                     </p>
                     <p className="text-xs text-gray-500 mt-0.5">
@@ -263,7 +263,7 @@ const UserDropdown: React.FC<DropdownProps> = ({
                     <BookKey className="w-5 h-5 text-gray-600" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-gray-900 text-sm font-medium">
+                    <p className="text-gray-700 text-base font-semibold">
                       Privacy policy
                     </p>
                     <p className="text-xs text-gray-500 mt-0.5">

@@ -247,7 +247,7 @@ const CustomEmojiPicker = memo(
                     className="relative aspect-square cursor-pointer flex items-center justify-center text-2xl  rounded-2xl transition-all duration-200 hover:scale-125 active:scale-95 "
                     title={emoji.name}
                   >
-                    <span className="filter hover:drop-shadow-sm transition-all duration-200">
+                    <span className="filter hover:drop-shadow-sm transition-all duration-200 emoji-font">
                       {emoji.character}
                     </span>
                     
@@ -261,7 +261,7 @@ const CustomEmojiPicker = memo(
                   animate={{ opacity: 1, y: 0 }}
                   className="text-center py-12"
                 >
-                  <div className="text-6xl mb-4">🔍</div>
+                  <div className="text-6xl mb-4 emoji-font">🔍</div>
                   <p className="text-gray-500 font-medium">
                     No emojis found for &ldquo;{searchQuery}&rdquo;
                   </p>
@@ -298,7 +298,7 @@ const CustomEmojiPicker = memo(
                           onClick={() => handleEmojiClick(emoji)}
                           className="aspect-square cursor-pointer flex items-center justify-center text-2xl  rounded-2xl transition-all duration-200 hover:scale-125 active:scale-95"
                         >
-                          <span className="filter hover:drop-shadow-sm transition-all duration-200">
+                          <span className="filter hover:drop-shadow-sm transition-all duration-200 emoji-font">
                             {emoji}
                           </span>
                         </motion.button>
@@ -347,7 +347,7 @@ const CustomEmojiPicker = memo(
                         className="relative aspect-square cursor-pointer flex items-center justify-center text-2xl  rounded-2xl transition-all duration-200 hover:scale-125 active:scale-95"
                         title={emoji.name}
                       >
-                        <span className="filter hover:drop-shadow-sm transition-all duration-200">
+                        <span className="filter hover:drop-shadow-sm transition-all duration-200 emoji-font">
                           {emoji.character}
                         </span>
                         
