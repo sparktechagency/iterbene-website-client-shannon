@@ -1,7 +1,6 @@
 import "./globals.css";
 import type { Metadata, Viewport } from "next";
-import {PT_Sans } from "next/font/google";
-// import { Arimo, Epilogue, Open_Sans, PT_Sans, Roboto_Mono, Source_Sans_3 } from "next/font/google";
+import { Source_Sans_3 } from "next/font/google";
 import { ConfigProvider } from "antd";
 import { AntdRegistry } from "@ant-design/nextjs-registry";
 import { Toaster } from "react-hot-toast";
@@ -10,10 +9,10 @@ import UserVerificationWrapper from "@/components/common/UserVerificationWrapper
 import AuthModalWrapper from "@/components/common/AuthModalWrapper";
 import { BrowserExtensionSafe } from "@/utils/hydrationUtils";
 
-const inter = PT_Sans({
+const inter = Source_Sans_3({
   subsets: ["latin"],
-  weight: ["400", "700"],
-  display:"swap",
+  weight: ["400", "500", "600", "700"],
+  display: 'swap', // Use font-display: swap for better performance
   preload: true,
 });
 
@@ -40,7 +39,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={inter?.className} suppressHydrationWarning>
+      <body className={inter?.className}>
         <BrowserExtensionSafe>
           <AntdRegistry>
             <ConfigProvider

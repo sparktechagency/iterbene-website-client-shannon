@@ -194,7 +194,7 @@ const PostCard = ({ post, setAllPosts }: PostCardProps) => {
   const reactionColors: { [key: string]: string } = {
     heart: "text-red-500",
     suitcase: "text-blue-500",
-    not_interested: "text-orange-500",
+    not_interested: "text-rose-500",
     smile: "text-yellow-500",
   };
 

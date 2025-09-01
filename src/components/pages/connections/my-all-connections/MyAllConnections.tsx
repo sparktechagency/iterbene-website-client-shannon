@@ -1,16 +1,16 @@
 "use client";
-import { useGetSuggestionsConnectionsQuery } from "@/redux/features/connections/connectionsApi";
+import { useGetMyConnectionsQuery } from "@/redux/features/connections/connectionsApi";
 import { IConnection } from "@/types/connection.types";
 import React, { useEffect, useState } from "react";
-import SuggestionConnectionsCard from "./SuggestionConnectionsCard";
-import SuggestionConnectionsCardSkeleton from "./SuggestionConnectionsCardSkeleton";
+import SuggestionConnectionsCardSkeleton from "../suggestion-connections/SuggestionConnectionsCardSkeleton";
+import MyAllConnectionCard from "./MyAllConnectionCard";
 
-const SuggestionConnections: React.FC = () => {
+const MyAllConnections: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [isLoadingMore, setIsLoadingMore] = useState<boolean>(false);
   const [allConnections, setAllConnections] = useState<IConnection[]>([]);
 
-  const { data: responseData, isLoading } = useGetSuggestionsConnectionsQuery(
+  const { data: responseData, isLoading } = useGetMyConnectionsQuery(
     [
       {
         key: "page",
@@ -26,19 +26,19 @@ const SuggestionConnections: React.FC = () => {
     }
   );
 
-  const suggestionsConnections = responseData?.data?.attributes?.results;
+  const myAllConnections = responseData?.data?.attributes?.results;
   const totalPages = responseData?.data?.attributes?.totalPages;
 
   useEffect(() => {
-    if (suggestionsConnections && suggestionsConnections.length > 0) {
+    if (myAllConnections && myAllConnections.length > 0) {
       if (currentPage === 1) {
         // First page - replace all connections
-        setAllConnections(suggestionsConnections);
+        setAllConnections(myAllConnections);
       } else {
         // Additional pages - append only new unique connections
         setAllConnections((prev) => {
           const existingIds = new Set(prev.map((conn) => conn._id));
-          const newConnections = suggestionsConnections.filter(
+          const newConnections = myAllConnections.filter(
             (conn: IConnection) => !existingIds.has(conn._id)
           );
           return [...prev, ...newConnections];
@@ -46,7 +46,7 @@ const SuggestionConnections: React.FC = () => {
       }
       setIsLoadingMore(false);
     }
-  }, [suggestionsConnections, currentPage]);
+  }, [myAllConnections, currentPage]);
 
   const handleViewMore = () => {
     if (currentPage < totalPages) {
@@ -54,12 +54,12 @@ const SuggestionConnections: React.FC = () => {
       setCurrentPage((prev) => prev + 1);
     }
   };
+
   const handleConnectionAction = (connectionId: string) => {
     setAllConnections((prev) =>
       prev.filter((conn) => conn._id !== connectionId)
     );
   };
-
   const hasMoreData = currentPage < totalPages;
   const showViewMoreButton =
     !isLoading && hasMoreData && allConnections?.length > 0;
@@ -77,10 +77,10 @@ const SuggestionConnections: React.FC = () => {
     content = (
       <div className="w-full text-center">
         <h1 className="text-base md:text-lg font-semibold text-gray-700">
-          No Suggestion Connection found
+          No Connections found
         </h1>
         <p className="text-xs md:text-sm text-gray-600">
-          You don&apos;t have any suggestion connection
+          You don&apos;t have any active connections
         </p>
       </div>
     );
@@ -88,22 +88,18 @@ const SuggestionConnections: React.FC = () => {
     content = (
       <div className="w-full grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-4">
         {allConnections?.map((connection: IConnection) => (
-          <SuggestionConnectionsCard
-            key={connection?._id}
-            connection={connection}
-            onConnectionAction={handleConnectionAction}
-          />
+          <MyAllConnectionCard key={connection?._id} connection={connection} handleConnectionAction={handleConnectionAction} />
         ))}
       </div>
     );
   }
 
   return (
-    <section className="w-full">
+    <section className="w-full border-b border-gray-400 pb-8">
       {/* Header Section */}
       <div className="w-full flex items-center justify-between mb-6 px-2">
         <h1 className="text-lg md:text-xl font-semibold text-gray-800">
-          People You Might Like
+          My All Connections
         </h1>
         {showViewMoreButton && (
           <button
@@ -122,4 +118,4 @@ const SuggestionConnections: React.FC = () => {
   );
 };
 
-export default SuggestionConnections;
+export default MyAllConnections;

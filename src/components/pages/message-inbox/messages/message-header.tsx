@@ -1,6 +1,5 @@
 "use client";
 import { useGetSingleByUserIdQuery } from "@/redux/features/users/userApi";
-import { getFullName } from "@/utils/nameUtils";
 import { ChevronLeft } from "lucide-react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
@@ -31,7 +30,7 @@ const MessageHeader = () => {
         )}
         <Link href={`/${receiverInfo?.username}`}>
           <h1 className="text-lg md:text-xl cursor-pointer  font-semibold text-gray-800">
-            {getFullName(receiverInfo)}
+           {receiverInfo?.firstName} {receiverInfo?.lastName}
           </h1>
         </Link>
       </div>
