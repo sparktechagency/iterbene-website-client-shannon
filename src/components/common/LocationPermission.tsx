@@ -7,11 +7,7 @@ import { IoMdClose } from "react-icons/io";
 import toast from "react-hot-toast";
 import { useSetLatestLocationMutation } from "@/redux/features/profile/profileApi";
 import useUser from "@/hooks/useUser";
-import {
-  useCookies,
-  COOKIE_NAMES,
-  migrateFromLocalStorage,
-} from "@/contexts/CookieContext";
+import { getBooleanCookie, setBooleanCookie, COOKIE_NAMES } from "@/utils/cookies";
 import { TError } from "@/types/error";
 
 interface ILocationData {
@@ -33,7 +29,7 @@ const LocationPermission = () => {
 
   const [setLatestLocation] = useSetLatestLocationMutation();
   const user = useUser();
-  const { getBooleanCookie, setBooleanCookie } = useCookies();
+  // Using direct imports
 
   // Use ref to track if component is still mounted
   const isMountedRef = useRef(true);
@@ -238,7 +234,7 @@ const LocationPermission = () => {
     if (typeof window !== "undefined") {
       // Migrate from localStorage to cookies
       try {
-        migrateFromLocalStorage();
+        // Migration no longer needed with direct cookie utils
       } catch (error) {
         console.error("Error migrating from localStorage:", error);
       }

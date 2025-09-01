@@ -1,22 +1,18 @@
 "use client";
+import { COOKIE_NAMES, getBooleanCookie, removeCookie, setBooleanCookie } from "@/utils/cookies";
+import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import useUser from "./useUser";
-import { usePathname } from "next/navigation";
-import { useCookies, COOKIE_NAMES, migrateFromLocalStorage } from "@/contexts/CookieContext";
 
 const useFirstTimeUser = () => {
   const [showFirstTimeModal, setShowFirstTimeModal] = useState(false);
   const [isClient, setIsClient] = useState(false);
   const userData = useUser();
   const pathname = usePathname();
-  const { getBooleanCookie, setBooleanCookie, removeCookie } = useCookies();
+  // Using direct imports
 
   useEffect(() => {
     setIsClient(true);
-    if (typeof window !== "undefined") {
-      // Migrate from localStorage to cookies
-      migrateFromLocalStorage();
-    }
   }, []);
 
   useEffect(() => {
@@ -29,7 +25,7 @@ const useFirstTimeUser = () => {
       pathname.startsWith("/register") ||
       pathname.startsWith("/forgot-password") ||
       pathname.startsWith("/reset-password") ||
-      pathname.startsWith("/verify-email");
+      pathname.startsWith("/verify-otp");
 
     if (isAuthPage || !isFeedOrHomePage) return;
 
@@ -62,7 +58,7 @@ const useFirstTimeUser = () => {
       setBooleanCookie(COOKIE_NAMES.PROFILE_COMPLETED, true);
       removeCookie(COOKIE_NAMES.IS_FIRST_TIME_USER);
     }
-  }, [isClient, userData, pathname, getBooleanCookie, setBooleanCookie, removeCookie]);
+  }, [isClient, userData, pathname]);
 
   const closeModal = () => {
     setShowFirstTimeModal(false);

@@ -5,40 +5,14 @@ import {
   BaseQueryFn,
 } from "@reduxjs/toolkit/query/react";
 
-// Helper function to decrypt cookie value
-const decryptCookie = (encryptedValue: string): string => {
-  try {
-    const CryptoJS = require('crypto-js');
-    const ENCRYPTION_KEY = process.env.NEXT_PUBLIC_ENCRYPTION_KEY || 'your-secret-key-change-in-production';
-    const bytes = CryptoJS.AES.decrypt(encryptedValue, ENCRYPTION_KEY);
-    return bytes.toString(CryptoJS.enc.Utf8);
-  } catch {
-    return '';
-  }
-};
-
-// Helper function to get access token from cookies
-const getAccessTokenFromCookies = (): string | null => {
-  if (typeof document === 'undefined') return null;
-  
-  const cookies = document.cookie.split(';');
-  for (const cookie of cookies) {
-    const [name, value] = cookie.trim().split('=');
-    if (name === 'at' && value) { // 'at' is the obfuscated name for ACCESS_TOKEN
-      const decryptedValue = decryptCookie(value);
-      return decryptedValue || null;
-    }
-  }
-  return null;
-};
+import { getCookie, COOKIE_NAMES } from "@/utils/cookies";
 
 // Define a base query that gets token from cookies
 const baseQuery = fetchBaseQuery({
   baseUrl: process.env.NEXT_PUBLIC_BASE_URL,
   prepareHeaders: (headers) => {
     // Get access token from cookies
-    const token = getAccessTokenFromCookies();
-    
+    const token = getCookie(COOKIE_NAMES.ACCESS_TOKEN);
     if (token) {
       headers.set("Authorization", `Bearer ${token}`);
     }

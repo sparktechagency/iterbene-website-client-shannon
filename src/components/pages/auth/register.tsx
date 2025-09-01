@@ -4,18 +4,18 @@ import logo from "@/asset/logo/logo.png";
 import CustomButton from "@/components/custom/custom-button";
 import CustomInput from "@/components/custom/custom-input";
 import { useRegisterMutation } from "@/redux/features/auth/authApi";
+import { TError } from "@/types/error";
+import { COOKIE_NAMES, setBooleanCookie, setCookie } from "@/utils/cookies";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Checkbox } from "antd";
 import { Lock, Mail, UserRound } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { FieldValues, useForm } from "react-hook-form";
-import { TError } from "@/types/error";
-import { toast } from "react-hot-toast";
 import { useRouter } from "next/navigation";
-import { useCookies, COOKIE_NAMES } from "@/contexts/CookieContext";
-import { z } from "zod";
 import { useState } from "react";
+import { FieldValues, useForm } from "react-hook-form";
+import { toast } from "react-hot-toast";
+import { z } from "zod";
 
 // define register zod validation schema
 const registerValidationSchema = z.object({
@@ -31,7 +31,7 @@ const Register = () => {
   const [userRegistation, { isLoading }] = useRegisterMutation();
   const [termsAccepted, setTermsAccepted] = useState<boolean>(false);
   const router = useRouter();
-  const { setBooleanCookie, setCookie } = useCookies();
+  // No need to destructure, using direct imports
   const {
     register,
     handleSubmit,
@@ -45,14 +45,14 @@ const Register = () => {
       const res = await userRegistation(values).unwrap();
 
       // Set registerVerifyMail cookie with email for simple token management
-      setCookie(COOKIE_NAMES.REGISTER_VERIFY_MAIL, values.email);
-      setCookie(COOKIE_NAMES.VERIFY_EMAIL_TYPE, "register");
+      setCookie(COOKIE_NAMES.VERIFY_OTP_MAIL, values.email);
+      setCookie(COOKIE_NAMES.VERIFY_OTP_TYPE, "register");
 
       // Mark user as first-time user for profile completion modal
       setBooleanCookie(COOKIE_NAMES.IS_FIRST_TIME_USER, true);
 
       // Redirect to verify email page
-      router.push("/verify-email");
+      router.push("/verify-otp");
       toast.success(res?.message);
     } catch (error) {
       const err = error as TError;

@@ -1,69 +1,55 @@
 "use client";
-import {
-  useGetALLMessageNotificationsQuery,
-  useViewAllNotificationsMutation,
-} from "@/redux/features/notifications/notificationsApi";
-import { TError } from "@/types/error";
-import { AnimatePresence, motion } from "framer-motion";
-import Image from "next/image";
-import { useEffect, useRef, useState } from "react";
-import toast from "react-hot-toast";
-import Skeleton from "../custom/custom-skeleton";
-import { useRouter } from "next/navigation";
+import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
+import { useGetALLMessageNotificationsQuery } from "@/redux/features/notifications/notificationsApi";
+import { INotification } from "@/types/notification.types";
 import formatTimeAgo from "@/utils/formatTimeAgo";
-import { IoMdNotificationsOutline } from "react-icons/io";
-
-interface Notification {
-  _id: string;
-  title: string;
-  message: string;
-  senderId: string;
-  receiverId: string;
-  role: string;
-  image?: string;
-  type: string;
-  linkId?: string;
-  viewStatus: boolean;
-  createdAt: string;
-  updatedAt: string;
-}
+import { AnimatePresence, motion } from "framer-motion";
+import { Check, MessageCircle, RefreshCw } from "lucide-react";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
+import Skeleton from "../custom/custom-skeleton";
 
 interface DropdownProps {
   isOpen: boolean;
-  setUnviewMessageCount: React.Dispatch<React.SetStateAction<number>>;
+  setIsMessagesOpen: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 const MessagesDropdown: React.FC<DropdownProps> = ({
   isOpen,
-  setUnviewMessageCount,
+  setIsMessagesOpen
 }) => {
-  const [allNotifications, setAllNotifications] = useState<Notification[]>([]);
+  const [allNotifications, setAllNotifications] = useState<INotification[]>([]);
+  const [hasMore, setHasMore] = useState(true);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
-  // Notification data fetch
+  // Fetch notification data
   const {
     data: responseData,
     isLoading,
+    isFetching,
     refetch,
   } = useGetALLMessageNotificationsQuery(
     [
       { key: "page", value: currentPage },
-      { key: "limit", value: "10" },
+      { key: "limit", value: "8" },
     ],
     { refetchOnMountOrArgChange: true, skip: !isOpen }
   );
-  // Mark all as read mutation
-  const [viewAllNotifications] = useViewAllNotificationsMutation();
 
+
+  // Reset state when dropdown opens
   useEffect(() => {
     if (isOpen) {
+      setCurrentPage(1);
+      setAllNotifications([]);
       refetch();
     }
   }, [isOpen, refetch]);
 
-  // Update notifications when data arrives
+  // Update notifications when new data arrives
   useEffect(() => {
     if (responseData?.data?.attributes?.results) {
       if (currentPage === 1) {
@@ -72,14 +58,14 @@ const MessagesDropdown: React.FC<DropdownProps> = ({
         const existingIds = new Set(allNotifications.map((n) => n._id));
         const uniqueNewNotifications =
           responseData.data.attributes.results.filter(
-            (n: Notification) => !existingIds.has(n._id)
+            (n: INotification) => !existingIds.has(n._id)
           );
         setAllNotifications((prev) => [...prev, ...uniqueNewNotifications]);
       }
     }
   }, [responseData, currentPage, allNotifications]);
 
-  // Handle click inside dropdown
+  // Handle click inside dropdown to prevent closing
   useEffect(() => {
     const handleClickInside = (event: MouseEvent) => event.stopPropagation();
     const dropdownElement = dropdownRef.current;
@@ -94,36 +80,28 @@ const MessagesDropdown: React.FC<DropdownProps> = ({
   }, []);
 
   // Handle notification click
-  const handleNotificationClick = (notification: Notification) => {
+  const handleNotificationClick = (notification: INotification) => {
     if (notification.type === "message") {
       router.push(`/messages/${notification?.senderId}`);
+      setIsMessagesOpen(false);
     }
   };
 
-  // Mark all as read
-  const handleMarkAllAsRead = async () => {
-    try {
-      const type = "message";
-      await viewAllNotifications(type).unwrap();
-      setUnviewMessageCount(0);
-      toast.success("All notifications marked as read!");
-    } catch (error) {
-      const err = error as TError;
-      toast.error(err?.data?.message || "Something went wrong!");
-    }
-  };
+  // Update hasMore state
+  useEffect(() => {
+    const totalPages = responseData?.data?.attributes?.totalPages || 0;
+    setHasMore(currentPage < totalPages);
+  }, [currentPage, responseData]);
 
-  // Load next page
-  const handlePageChange = () => {
-    if (
-      responseData?.data?.attributes?.totalPages &&
-      currentPage < responseData.data.attributes.totalPages
-    ) {
-      setCurrentPage((prev) => prev + 1);
-    }
-  };
-
-  const unviewNotificationCount = responseData?.data?.attributes?.count || 0;
+  // Infinite scroll hook
+  const { lastElementRef } = useInfiniteScroll({
+    isLoading,
+    isFetching,
+    hasMore,
+    onLoadMore: () => setCurrentPage((prev) => prev + 1),
+    threshold: 0.1,
+    rootMargin: "50px",
+  });
 
   return (
     <AnimatePresence>
@@ -134,118 +112,183 @@ const MessagesDropdown: React.FC<DropdownProps> = ({
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 10 }}
           transition={{ duration: 0.2 }}
-          className="absolute top-16 right-0 bg-white rounded-xl shadow-lg p-6 w-[min(662px,90vw)] z-50"
+          className="absolute top-16 right-0 bg-white rounded-xl shadow-lg border border-gray-200 w-[min(420px,90vw)] z-50 max-h-[80vh] overflow-hidden"
           role="menu"
-          aria-label="Notifications dropdown"
+          aria-label="Messages dropdown"
         >
-          <div className="flex justify-between items-center mb-5">
-            <h3 className="font-semibold text-lg">Messages</h3>
-            {unviewNotificationCount > 0 && (
-              <button
-                onClick={handleMarkAllAsRead}
-                className="text-primary cursor-pointer"
-                aria-label="Mark all as read"
-              >
-                Mark all as read
-              </button>
-            )}
-          </div>
-
-          <div className="space-y-3 min-h-48 max-h-[400px] scrollbar-hide overflow-y-auto">
-            {isLoading ? (
-              Array(3)
-                .fill(null)
-                .map((_, index) => (
-                  <div
-                    key={index}
-                    className="animate-pulse px-4 py-3 rounded-xl flex items-center gap-4"
-                  >
-                    <Skeleton
-                      width="56px"
-                      height="56px"
-                      className="rounded-full"
-                    />
-                    <div className="flex-1 space-y-2">
-                      <Skeleton
-                        width="70%"
-                        height="0.8rem"
-                        className="rounded"
-                      />
-                      <Skeleton
-                        width="50%"
-                        height="0.4rem"
-                        className="rounded"
-                      />
-                    </div>
-                  </div>
-                ))
-            ) : allNotifications.length > 0 ? (
-              allNotifications?.map((notification) => (
-                <div
-                  key={notification?._id}
-                  onClick={() => handleNotificationClick(notification)}
-                  className={`text-gray-800 hover:bg-[#ECFCFA] px-4 py-3 rounded-xl flex items-center gap-4 cursor-pointer transition-colors ${
-                    !notification.viewStatus ? "bg-[#ECFCFA]" : ""
-                  }`}
-                  role="button"
-                  tabIndex={0}
-                  onKeyPress={(e) =>
-                    e.key === "Enter" && handleNotificationClick(notification)
-                  }
-                >
-                  {notification?.image ? (
-                    <Image
-                      src={notification?.image}
-                      width={40}
-                      height={40}
-                      className="size-[40px] rounded-full flex-shrink-0 object-cover"
-                      alt="user"
-                    />
-                  ) : (
-                    <div className="size-[40px] rounded-full bg-gray-300 flex items-center justify-center">
-                      🔔
-                    </div>
-                  )}
-                  <div className="flex-1 min-w-0">
-                    <p
-                      className={`truncate ${
-                        !notification?.viewStatus
-                          ? "font-semibold"
-                          : "font-medium"
-                      }`}
-                    >
-                      {notification.title}
-                    </p>
-                    <p className="text-sm text-gray-500">
-                      {formatTimeAgo(notification?.createdAt)}
-                    </p>
-                  </div>
-                  {!notification?.viewStatus && (
-                    <span className="w-3 h-3 bg-primary rounded-full block" />
-                  )}
+          {/* Header */}
+          <div className="bg-gray-50 px-4 py-3 border-b border-gray-200">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <MessageCircle className="w-5 h-5 text-primary" />
+                <div>
+                  <h3 className="font-semibold text-lg text-gray-900">
+                    Messages
+                  </h3>
                 </div>
-              ))
-            ) : (
-              <div className="flex flex-col items-center justify-center py-8 text-gray-500">
-                <IoMdNotificationsOutline className="w-8 h-8" />
-                <p className="text-sm">No messages yet</p>
               </div>
-            )}
-          </div>
-
-          {allNotifications.length >= 10 &&
-            responseData?.data?.attributes?.totalPages &&
-            currentPage < responseData.data.attributes.totalPages && (
-              <div className="mt-3 border-t border-[#E2E8F0] pt-5 flex justify-center items-center">
+              <div className="flex items-center gap-2">
                 <button
-                  onClick={handlePageChange}
-                  className="text-primary text-sm cursor-pointer hover:underline"
-                  aria-label="View more notifications"
+                  onClick={() => refetch()}
+                  className="p-2 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors"
+                  title="Refresh"
                 >
-                  View all messages
+                  <RefreshCw className="w-4 h-4" />
                 </button>
               </div>
+            </div>
+          </div>
+
+          {/* Content */}
+          <div className="max-h-[400px] overflow-y-auto">
+            {isLoading ? (
+              <div className="p-4">
+                {Array(4)
+                  .fill(null)
+                  .map((_, index) => (
+                    <div
+                      key={index}
+                      className="animate-pulse flex items-center gap-3 py-3 border-b border-gray-100 last:border-b-0"
+                    >
+                      <Skeleton
+                        width="40px"
+                        height="40px"
+                        className="rounded-full flex-shrink-0"
+                      />
+                      <div className="flex-1 space-y-2">
+                        <Skeleton
+                          width="70%"
+                          height="0.875rem"
+                          className="rounded"
+                        />
+                        <Skeleton
+                          width="50%"
+                          height="0.75rem"
+                          className="rounded"
+                        />
+                      </div>
+                      <Skeleton
+                        width="12px"
+                        height="12px"
+                        className="rounded-full"
+                      />
+                    </div>
+                  ))}
+              </div>
+            ) : allNotifications.length > 0 ? (
+              <div className="divide-y divide-gray-100">
+                {allNotifications?.map((notification, index) => (
+                  <div
+                    key={notification?._id}
+                    ref={
+                      index === allNotifications.length - 1
+                        ? lastElementRef
+                        : null
+                    }
+                    onClick={() => handleNotificationClick(notification)}
+                    className={`px-4 py-3 hover:bg-gray-50 cursor-pointer transition-colors flex items-start gap-3 ${
+                      !notification.viewStatus
+                        ? "bg-primary/5 border-l-4 border-l-primary"
+                        : ""
+                    }`}
+                    role="button"
+                    tabIndex={0}
+                    onKeyPress={(e) =>
+                      e.key === "Enter" && handleNotificationClick(notification)
+                    }
+                  >
+                    {/* Avatar */}
+                    <div className="flex-shrink-0">
+                      {notification?.image ? (
+                        <Image
+                          src={notification?.image}
+                          width={40}
+                          height={40}
+                          className="w-10 h-10 rounded-full object-cover"
+                          alt="Message avatar"
+                        />
+                      ) : (
+                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary/20 to-primary/40 flex items-center justify-center text-lg">
+                          ✉️
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Content */}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="flex-1 min-w-0">
+                          <p
+                            className={`text-gray-900 text-sm leading-relaxed line-clamp-2 ${
+                              !notification.viewStatus
+                                ? "font-semibold"
+                                : "font-medium"
+                            }`}
+                          >
+                            {notification.title}
+                          </p>
+                          {notification.message && (
+                            <p className="text-gray-600 text-xs mt-1 line-clamp-1">
+                              {notification.message}
+                            </p>
+                          )}
+                          <div className="flex items-center gap-2 mt-1">
+                            <span className="text-xs text-gray-500">
+                              {formatTimeAgo(notification.createdAt)}
+                            </span>
+                            <span className="text-xs text-primary bg-primary/10 px-2 py-0.5 rounded-full">
+                              message
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Read status */}
+                        <div className="flex-shrink-0">
+                          {!notification.viewStatus ? (
+                            <div className="w-2 h-2 bg-primary rounded-full" />
+                          ) : (
+                            <Check className="w-3 h-3 text-green-500" />
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="flex flex-col items-center justify-center py-12 text-gray-500">
+                <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-3">
+                  <MessageCircle className="w-8 h-8" />
+                </div>
+                <h4 className="font-medium text-gray-900 mb-1">
+                  No message notifications
+                </h4>
+                <p className="text-sm text-center max-w-xs">
+                  When you receive new messages, notifications will appear here.
+                </p>
+              </div>
             )}
+
+            {/* Loading more indicator */}
+            {isFetching && !isLoading && (
+              <div className="flex justify-center py-4 border-t border-gray-100">
+                <div className="flex items-center gap-2 text-gray-500">
+                  <RefreshCw className="w-4 h-4 animate-spin" />
+                  <span className="text-sm">Loading more...</span>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* View All Button */}
+          <div className="border-t border-gray-200 p-3">
+            <button
+              onClick={() => router.push("/messages")}
+              className="w-full bg-primary text-white cursor-pointer text-sm font-medium py-2.5 rounded-lg hover:bg-primary/90 transition-colors"
+            >
+              View all messages
+            </button>
+          </div>
         </motion.div>
       )}
     </AnimatePresence>

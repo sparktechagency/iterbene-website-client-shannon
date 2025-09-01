@@ -1,11 +1,11 @@
 "use client";
 import { useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { useCookies, COOKIE_NAMES } from '@/contexts/CookieContext';
+import { removeCookie, getCookie, COOKIE_NAMES } from '@/utils/cookies';
 
 export const useAuth = () => {
   const router = useRouter();
-  const { removeCookie, getCookie } = useCookies();
+  // Using direct imports
 
   const logout = useCallback(() => {
     try {
@@ -32,7 +32,7 @@ export const useAuth = () => {
       // Fallback: force reload
       window.location.href = '/login';
     }
-  }, [router, removeCookie]);
+  }, [router]);
 
   const isAuthenticated = useCallback(() => {
     if (typeof window === 'undefined') return false;

@@ -5,7 +5,7 @@ import CustomButton from "@/components/custom/custom-button";
 import CustomInput from "@/components/custom/custom-input";
 import { useLoginMutation } from "@/redux/features/auth/authApi";
 import { TError } from "@/types/error";
-import { useCookies, COOKIE_NAMES } from "@/contexts/CookieContext";
+import { COOKIE_NAMES, setBooleanCookie, setCookie } from "@/utils/cookies";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Checkbox } from "antd";
 import { Lock, Mail } from "lucide-react";
@@ -15,8 +15,8 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { FieldValues, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
-import LoginLockModal from "./LoginLockModal";
 import { z } from "zod";
+import LoginLockModal from "./LoginLockModal";
 
 // define login zod validation schema
 const loginValidationSchema = z.object({
@@ -32,16 +32,14 @@ const Login = () => {
   const redirectUrl = searchParams.get("redirect_url");
   const [login, { isLoading }] = useLoginMutation();
   const router = useRouter();
-  const { setCookie } = useCookies();
 
-   const {
+  const {
     register,
     handleSubmit,
-    formState: { errors }
+    formState: { errors },
   } = useForm<LoginFormData>({
-    resolver: zodResolver(loginValidationSchema)
+    resolver: zodResolver(loginValidationSchema),
   });
-
 
   // State for lock modal
   const [isLockModalVisible, setIsLockModalVisible] = useState(false);
@@ -76,19 +74,32 @@ const Login = () => {
         res?.message == "Email is not verified. Please verify your email." ||
         res?.message == "Please verify your email."
       ) {
+        // Set registerVerifyMail cookie with email for simple token management
+        setCookie(COOKIE_NAMES.REGISTER_VERIFY_MAIL, values.email);
+        setCookie(COOKIE_NAMES.VERIFY_EMAIL_TYPE, "register");
+        
+        // Mark user as first-time user for profile completion modal
+        setBooleanCookie(COOKIE_NAMES.IS_FIRST_TIME_USER, true);
         toast.success(res?.message);
-        router.push("/verify-email");
+        router.push("/verify-otp");
         return;
       }
-      
+
       // Set accessToken and refreshToken in cookies
       if (res?.data?.attributes?.tokens?.accessToken) {
-        setCookie(COOKIE_NAMES.ACCESS_TOKEN, res.data.attributes.tokens.accessToken, 1); // 1 day
+        setCookie(
+          COOKIE_NAMES.ACCESS_TOKEN,
+          res.data.attributes.tokens.accessToken,
+          1
+        ); // 1 day
       }
       if (res?.data?.attributes?.tokens?.refreshToken) {
-        setCookie(COOKIE_NAMES.REFRESH_TOKEN, res.data.attributes.tokens.refreshToken, 30); // 30 days
+        setCookie(
+          COOKIE_NAMES.REFRESH_TOKEN,
+          res.data.attributes.tokens.refreshToken,
+          30
+        ); // 30 days
       }
-      
       toast.success(res.message || "Login successful!");
 
       if (redirectUrl) {
@@ -137,9 +148,7 @@ const Login = () => {
         </div>
 
         {/* Form content */}
-        <form
-          onSubmit={handleSubmit(handleLogin)}
-        >
+        <form onSubmit={handleSubmit(handleLogin)}>
           <div className="space-y-3 md:space-y-6 mt-8">
             <CustomInput
               name="email"

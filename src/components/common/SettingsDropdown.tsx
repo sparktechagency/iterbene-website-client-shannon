@@ -35,7 +35,7 @@ const SettingsDropdown: React.FC<DropdownProps> = ({ isOpen }) => {
           animate={{ opacity: 1, x: 0 }}
           exit={{ opacity: 0, x: -10 }}
           transition={{ duration: 0.2 }}
-          className="rounded-xl p-3.5 mt-2 w-[228px] z-50 shadow-lg bg-gray-50 "
+          className="rounded-xl p-3.5 mt-2 w-[228px] z-50 shadow-lg bg-gray-50  absolute -left-56 top-12"
         >
           <div className="space-y-3">
             <Link

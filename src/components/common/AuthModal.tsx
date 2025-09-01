@@ -9,11 +9,7 @@ import Image from "next/image";
 import { X } from "lucide-react";
 import logo from "@/asset/logo/logo.png";
 import { useRouter } from "next/navigation";
-import {
-  useCookies,
-  COOKIE_NAMES,
-  migrateFromLocalStorage,
-} from "@/contexts/CookieContext";
+import { getBooleanCookie, COOKIE_NAMES } from "@/utils/cookies";
 
 const AuthModal = () => {
   const dispatch = useAppDispatch();
@@ -23,7 +19,7 @@ const AuthModal = () => {
   const isAuthenticated = useUser();
   const [isClient, setIsClient] = useState<boolean>(false);
   const router = useRouter();
-  const { getBooleanCookie } = useCookies();
+  // Using direct imports
 
   // Get verification status reactively from cookies
   const isVerified = getBooleanCookie(COOKIE_NAMES.ITER_BENE_VERIFIED);
@@ -32,8 +28,6 @@ const AuthModal = () => {
   useEffect(() => {
     setIsClient(true);
     if (typeof window !== "undefined") {
-      // Migrate from localStorage to cookies
-      migrateFromLocalStorage();
       // Reset modal state on app initialization to avoid hydration issues
       dispatch(closeAuthModal());
     }

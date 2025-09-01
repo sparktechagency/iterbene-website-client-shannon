@@ -5,6 +5,7 @@ import CustomButton from "@/components/custom/custom-button";
 import CustomInput from "@/components/custom/custom-input";
 import { useForgotPasswordMutation } from "@/redux/features/auth/authApi";
 import { TError } from "@/types/error";
+import { COOKIE_NAMES, setCookie } from "@/utils/cookies";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Mail } from "lucide-react";
 import Image from "next/image";
@@ -12,7 +13,6 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FieldValues, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
-import { useCookies, COOKIE_NAMES } from "@/contexts/CookieContext";
 import { z } from "zod";
 
 // define forgot password zod schema
@@ -22,7 +22,7 @@ const forgotPasswordValidationSchema = z.object({
 type ForgotPasswordFormType = z.infer<typeof forgotPasswordValidationSchema>;
 const ForgotPassword = () => {
   const router = useRouter();
-  const { setCookie } = useCookies();
+  // Using direct import
 
   const {
     register,
@@ -43,7 +43,7 @@ const ForgotPassword = () => {
 
       // Redirect to verify email page
       toast.success(res?.message);
-      router.push(`/verify-email`);
+      router.push(`/verify-otp`);
     } catch (error) {
       const err = error as TError;
       toast.error(err?.data?.message || "Something went wrong!");

@@ -4,18 +4,14 @@ import logo from "@/asset/logo/logo2.png";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import {
-  useCookies,
-  COOKIE_NAMES,
-  migrateFromLocalStorage,
-} from "@/contexts/CookieContext";
+import { getBooleanCookie, setBooleanCookie, COOKIE_NAMES } from "@/utils/cookies";
 import Link from "next/link";
 
 const UserVerification = () => {
   const [isClient, setIsClient] = useState<boolean>(false);
   const [step, setStep] = useState<number>(1);
   const [errorMessage, setErrorMessage] = useState<string>("");
-  const { getBooleanCookie, setBooleanCookie } = useCookies();
+  // Using direct imports
 
   // Get verification status reactively from cookies
   const userVerified = getBooleanCookie(COOKIE_NAMES.ITER_BENE_VERIFIED);
@@ -24,8 +20,6 @@ const UserVerification = () => {
   useEffect(() => {
     if (typeof window !== "undefined") {
       setIsClient(true);
-      // Migrate from localStorage to cookies
-      migrateFromLocalStorage();
     }
   }, []);
 

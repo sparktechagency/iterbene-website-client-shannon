@@ -1,17 +1,16 @@
 import { IUser } from "@/types/user.types";
-import { LucideCalendarCheck } from "lucide-react";
+import { LucideCalendarCheck, User } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { BiLogOut } from "react-icons/bi";
-import { FaRegCalendarAlt, FaRegUserCircle } from "react-icons/fa";
+import { FaRegCalendarAlt } from "react-icons/fa";
 import { FiMapPin } from "react-icons/fi";
 import { HiOutlineUserGroup } from "react-icons/hi";
 import { IoChatboxEllipsesOutline, IoSettingsOutline } from "react-icons/io5";
 import { MdAlternateEmail } from "react-icons/md";
 import { AnimatePresence, motion } from "framer-motion";
-import SettingsDropdown from "./SettingsDropdown";
 interface DropdownProps {
   user?: IUser;
   isOpen: boolean;
@@ -19,7 +18,6 @@ interface DropdownProps {
 const UserDropdown: React.FC<DropdownProps> = ({ user, isOpen }) => {
   const router = useRouter();
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const [isSettingsOpen, setIsSettingsOpen] = useState<boolean>(false);
 
   useEffect(() => {
     const handleClickInside = (event: MouseEvent) => {
@@ -38,115 +36,190 @@ const UserDropdown: React.FC<DropdownProps> = ({ user, isOpen }) => {
     };
   }, []);
 
-  const toggleSettings = () => {
-    setIsSettingsOpen((prev) => !prev);
-  };
-
   const handleLogout = async () => {
     router.push("/login");
   };
 
   return (
-    <AnimatePresence>
-      {isOpen && (
-        <motion.div
-          ref={dropdownRef}
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: 10 }}
-          transition={{ duration: 0.2 }}
-          className="absolute  top-16 right-0 bg-white rounded-xl shadow-md p-6 w-[min(430px,90vw)] z-50"
-        >
-          <Link href={`/${user?.username}`}>
-            <div className="flex items-center gap-3 mb-4 bg-[#ECFCFA] p-4 rounded-xl">
-              {user?.profileImage && (
-                <Image
-                  src={user?.profileImage}
-                  width={40}
-                  height={40}
-                  className="size-13 rounded-full flex-shrink-0"
-                  alt="user"
-                />
-              )}
-              <div className="flex-1 min-w-0">
-                <p className="font-medium truncate">{`${user?.firstName} ${user?.lastName}`}</p>
-                <p className="text-sm text-gray-500 truncate">
-                  @{user?.username}
-                </p>
+    <>
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            ref={dropdownRef}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 10 }}
+            transition={{ duration: 0.2 }}
+            className="absolute top-16 right-0 bg-white rounded-xl shadow-lg border border-gray-200 w-[min(420px,90vw)] z-50 max-h-[80vh] overflow-hidden"
+            role="menu"
+            aria-label="User menu dropdown"
+          >
+            {/* User Profile Section */}
+            <Link href={`/${user?.username}`}>
+              <div className="px-4 py-3 bg-primary/5 border-b border-gray-100 hover:bg-primary/10 transition-colors cursor-pointer">
+                <div className="flex items-center gap-3">
+                  {user?.profileImage ? (
+                    <Image
+                      src={user?.profileImage}
+                      width={40}
+                      height={40}
+                      className="w-10 h-10 rounded-full object-cover"
+                      alt="Profile"
+                    />
+                  ) : (
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary/20 to-primary/40 flex items-center justify-center">
+                      <User className="w-5 h-5 text-primary" />
+                    </div>
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <p className="font-semibold text-gray-900 truncate">
+                      {`${user?.firstName} ${user?.lastName}`}
+                    </p>
+                    <p className="text-sm text-gray-500 truncate">
+                      View your profile
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </Link>
+
+            {/* Content */}
+            <div className="max-h-[400px] overflow-y-auto">
+              <div className="divide-y divide-gray-100">
+                <Link
+                  href={`/${user?.username}/timeline`}
+                  className="px-4 py-3 hover:bg-gray-50 cursor-pointer transition-colors flex items-start gap-3"
+                >
+                  <div className="flex-shrink-0 pt-1">
+                    <LucideCalendarCheck className="w-5 h-5 text-gray-600" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-gray-900 text-sm font-medium">
+                      Timeline
+                    </p>
+                    <p className="text-xs text-gray-500 mt-0.5">
+                      View your timeline
+                    </p>
+                  </div>
+                </Link>
+
+                <Link
+                  href="/messages"
+                  className="px-4 py-3 hover:bg-gray-50 cursor-pointer transition-colors flex items-start gap-3"
+                >
+                  <div className="flex-shrink-0 pt-1">
+                    <IoChatboxEllipsesOutline className="w-5 h-5 text-gray-600" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-gray-900 text-sm font-medium">
+                      Messages
+                    </p>
+                    <p className="text-xs text-gray-500 mt-0.5">
+                      Chat with friends
+                    </p>
+                  </div>
+                </Link>
+
+                <Link
+                  href="/groups"
+                  className="px-4 py-3 hover:bg-gray-50 cursor-pointer transition-colors flex items-start gap-3"
+                >
+                  <div className="flex-shrink-0 pt-1">
+                    <HiOutlineUserGroup className="w-5 h-5 text-gray-600" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-gray-900 text-sm font-medium">Groups</p>
+                    <p className="text-xs text-gray-500 mt-0.5">
+                      Join communities
+                    </p>
+                  </div>
+                </Link>
+
+                <Link
+                  href={`/${user?.username}/maps`}
+                  className="px-4 py-3 hover:bg-gray-50 cursor-pointer transition-colors flex items-start gap-3"
+                >
+                  <div className="flex-shrink-0 pt-1">
+                    <FiMapPin className="w-5 h-5 text-gray-600" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-gray-900 text-sm font-medium">Maps</p>
+                    <p className="text-xs text-gray-500 mt-0.5">
+                      Explore locations
+                    </p>
+                  </div>
+                </Link>
+
+                <Link
+                  href="/events"
+                  className="px-4 py-3 hover:bg-gray-50 cursor-pointer transition-colors flex items-start gap-3"
+                >
+                  <div className="flex-shrink-0 pt-1">
+                    <FaRegCalendarAlt className="w-5 h-5 text-gray-600" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-gray-900 text-sm font-medium">Events</p>
+                    <p className="text-xs text-gray-500 mt-0.5">
+                      Discover events
+                    </p>
+                  </div>
+                </Link>
+
+                <Link
+                  href={`/${user?.username}/invitations`}
+                  className="px-4 py-3 hover:bg-gray-50 cursor-pointer transition-colors flex items-start gap-3"
+                >
+                  <div className="flex-shrink-0 pt-1">
+                    <MdAlternateEmail className="w-5 h-5 text-gray-600" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-gray-900 text-sm font-medium">
+                      Invitations
+                    </p>
+                    <p className="text-xs text-gray-500 mt-0.5">
+                      Manage invites
+                    </p>
+                  </div>
+                </Link>
+
+                <div className="relative">
+                  <button
+                    className="w-full px-4 py-3 hover:bg-gray-50 cursor-pointer transition-colors flex items-start gap-3 text-left"
+                  >
+                    <div className="flex-shrink-0 pt-1">
+                      <IoSettingsOutline className="w-5 h-5 text-gray-600" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-gray-900 text-sm font-medium">
+                        Settings
+                      </p>
+                      <p className="text-xs text-gray-500 mt-0.5">
+                        Account preferences
+                      </p>
+                    </div>
+                  </button>
+                </div>
+
+                <button
+                  onClick={handleLogout}
+                  className="w-full px-4 py-3 hover:bg-red-50 cursor-pointer transition-colors flex items-start gap-3 text-left text-red-500"
+                >
+                  <div className="flex-shrink-0 pt-1">
+                    <BiLogOut className="w-5 h-5" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium">Logout</p>
+                    <p className="text-xs text-red-400 mt-0.5">
+                      Sign out of your account
+                    </p>
+                  </div>
+                </button>
               </div>
             </div>
-          </Link>
-          <div className="space-y-3 min-h-48 max-h-[400px] overflow-y-auto ">
-            <Link
-              href={`/${user?.username}`}
-              className="text-gray-800 hover:bg-[#ECFCFA] px-4 py-3 rounded-xl flex items-center gap-4"
-            >
-              <FaRegUserCircle size={24} />
-              <span>My Profile</span>
-            </Link>
-            <Link
-              href={`/${user?.username}/timeline`}
-              className="text-gray-800 hover:bg-[#ECFCFA] px-4 py-3 rounded-xl flex items-center gap-4"
-            >
-              <LucideCalendarCheck size={24} />
-              <span>Timeline</span>
-            </Link>
-            <Link
-              href="/messages"
-              className="text-gray-800 hover:bg-[#ECFCFA] px-4 py-3 rounded-xl flex items-center gap-4"
-            >
-              <IoChatboxEllipsesOutline size={24} />
-              <span>Messages</span>
-            </Link>
-            <Link
-              href="/groups"
-              className="text-gray-800 hover:bg-[#ECFCFA] px-4 py-3 rounded-xl flex items-center gap-4"
-            >
-              <HiOutlineUserGroup size={24} />
-              <span>Groups</span>
-            </Link>
-            <Link
-              href={`/${user?.username}/maps`}
-              className="text-gray-800 hover:bg-[#ECFCFA] px-4 py-3 rounded-xl flex items-center gap-4 "
-            >
-              <FiMapPin size={24} />
-              <span>Maps</span>
-            </Link>
-            <Link
-              href="/events"
-              className="text-gray-800 hover:bg-[#ECFCFA] px-4 py-3 rounded-xl flex items-center gap-4"
-            >
-              <FaRegCalendarAlt size={24} />
-              <span>Events</span>
-            </Link>
-            <Link
-              href={`/${user?.username}/invitations`}
-              className="text-gray-800 hover:bg-[#ECFCFA] px-4 py-3 rounded-xl flex items-center gap-4"
-            >
-              <MdAlternateEmail size={24} />
-              <span>Invitations</span>
-            </Link>
-            <div className="relative">
-              <button
-                onMouseEnter={toggleSettings}
-                className="text-gray-800 hover:bg-[#ECFCFA] px-4 py-3 rounded-xl flex items-center gap-4 w-full text-left cursor-pointer"
-              >
-                <IoSettingsOutline size={24} />
-                <span>Settings</span>
-              </button>
-              <SettingsDropdown isOpen={isSettingsOpen} />
-            </div>
-            <button
-              onClick={handleLogout}
-              className="w-full cursor-pointer flex items-center px-4 py-3 gap-4 text-red-500 hover:bg-gray-100 rounded-xl"
-            >
-              <BiLogOut size={24} />
-              <span>Logout</span>
-            </button>
-          </div>
-        </motion.div>
-      )}
-    </AnimatePresence>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </>
   );
 };
 

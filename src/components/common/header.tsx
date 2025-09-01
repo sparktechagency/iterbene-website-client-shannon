@@ -1,18 +1,31 @@
 "use client";
 
 import logo from "@/asset/logo/logo2.png";
+import useUser from "@/hooks/useUser";
+import { useSocket } from "@/lib/socket";
+import {
+  useGetUnviewedMessageNotificationsCountQuery,
+  useGetUnviewedNotificationsCountQuery,
+  useViewAllMessageNotificationsMutation,
+  useViewAllNotificationsMutation,
+} from "@/redux/features/notifications/notificationsApi";
+import { useGetSearchHashtagAndUsersQuery } from "@/redux/features/search/searchApi";
+import { IHashtag, ISearchResult } from "@/types/search.types";
+import { IUser } from "@/types/user.types";
 import { AnimatePresence, motion } from "framer-motion";
 import {
-  LucideCalendarCheck,
-  Search,
-  Menu,
-  X,
-  Newspaper,
   Images,
+  LucideCalendarCheck,
+  Menu,
+  Newspaper,
+  Search,
+  X,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useRouter } from "next/navigation";
+import { useCallback, useEffect, useRef, useState } from "react";
+import toast from "react-hot-toast";
 import { BiLogOut } from "react-icons/bi";
 import { BsChatSquareDots } from "react-icons/bs";
 import { FaRegCalendarAlt, FaRegUserCircle } from "react-icons/fa";
@@ -22,24 +35,11 @@ import { IoMdNotificationsOutline } from "react-icons/io";
 import { IoChatboxEllipsesOutline } from "react-icons/io5";
 import { MdAlternateEmail } from "react-icons/md";
 import CustomButton from "../custom/custom-button";
-import useUser from "@/hooks/useUser";
-import { IUser } from "@/types/user.types";
-import { useRouter } from "next/navigation";
-import EnhancedMessagesDropdown from "./EnhancedMessagesDropdown";
-import EnhancedNotificationsDropdown from "./EnhancedNotificationsDropdown";
-import UserDropdown from "./UserDropdown";
-import { useSocket } from "@/lib/socket";
-import { IHashtag, ISearchResult } from "@/types/search.types";
-import SearchDropdown from "./SearchDropdown";
-import { useGetSearchHashtagAndUsersQuery } from "@/redux/features/search/searchApi";
 import LocationPermission from "./LocationPermission";
-import {
-  useGetUnviewedMessageNotificationsCountQuery,
-  useGetUnviewedNotificationsCountQuery,
-  useViewAllMessageNotificationsMutation,
-  useViewAllNotificationsMutation,
-} from "@/redux/features/notifications/notificationsApi";
-import toast from "react-hot-toast";
+import MessagesDropdown from "./MessagesDropdown";
+import NotificationsDropdown from "./NotificationsDropdown";
+import SearchDropdown from "./SearchDropdown";
+import UserDropdown from "./UserDropdown";
 
 // Mobile Menu Component
 const MobileMenu: React.FC<{
@@ -360,12 +360,19 @@ const Header: React.FC = () => {
   // Close other dropdowns when one opens
   const toggleMessages = async () => {
     try {
-      await viewAllMessageNotifications(undefined).unwrap();
-      // Mark all messages as read
-      setUnviewMessageCount(0);
-      setIsMessagesOpen((prev) => !prev);
+      // Close other dropdowns first
       setIsNotificationsOpen(false);
       setIsUserOpen(false);
+      
+      // Toggle messages dropdown
+      const newIsOpen = !isMessagesOpen;
+      setIsMessagesOpen(newIsOpen);
+      
+      // If opening the dropdown, mark all messages as viewed and reset count
+      if (newIsOpen) {
+        await viewAllMessageNotifications(undefined).unwrap();
+        setUnviewMessageCount(0);
+      }
     } catch (error) {
       const err = error as Error;
       toast.error(err?.message || "Something went wrong!");
@@ -374,12 +381,19 @@ const Header: React.FC = () => {
 
   const toggleNotifications = async () => {
     try {
-      await viewAllNotifications(undefined).unwrap();
-      // Mark all notifications as read
-      setUnviewNotificationCount(0);
-      setIsNotificationsOpen((prev) => !prev);
+      // Close other dropdowns first
       setIsMessagesOpen(false);
       setIsUserOpen(false);
+      
+      // Toggle notifications dropdown
+      const newIsOpen = !isNotificationsOpen;
+      setIsNotificationsOpen(newIsOpen);
+      
+      // If opening the dropdown, mark all notifications as viewed and reset count
+      if (newIsOpen) {
+        await viewAllNotifications(undefined).unwrap();
+        setUnviewNotificationCount(0);
+      }
     } catch (error) {
       const err = error as Error;
       toast.error(err?.message || "Something went wrong!");
@@ -387,10 +401,12 @@ const Header: React.FC = () => {
   };
 
   const toggleUser = () => {
-    setIsUserOpen((prev) => !prev);
+    console.log("Clicked");
+    setIsUserOpen(true);
     setIsMessagesOpen(false);
     setIsNotificationsOpen(false);
   };
+
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen((prev) => !prev);
@@ -461,6 +477,9 @@ const Header: React.FC = () => {
     },
     [router]
   );
+
+
+  console.log("isUserOpen", isUserOpen);
   return (
     <nav className="w-full bg-[#F0FAF9] h-[72px] md:h-[88px] lg:h-[112px] fixed top-0 left-0 z-40">
       <div className="w-full container mx-auto flex justify-between items-center h-full px-4 md:px-5">
@@ -533,7 +552,7 @@ const Header: React.FC = () => {
                       </div>
                     )}
                   </motion.button>
-                  <EnhancedMessagesDropdown
+                  <MessagesDropdown
                     isOpen={isMessagesOpen}
                     setIsMessagesOpen={setIsMessagesOpen}
                   />
@@ -551,20 +570,24 @@ const Header: React.FC = () => {
                       </div>
                     )}
                   </motion.button>
-                  <EnhancedNotificationsDropdown
+                  <NotificationsDropdown
                     isOpen={isNotificationsOpen}
                     setIsNotificationsOpen={setIsNotificationsOpen}
                   />
                 </div>
 
-                <div ref={userRef} className="relative">
+                <div 
+                  ref={userRef} 
+                  onClick={toggleUser}
+                  className="relative"
+                >
                   <motion.div>
                     <Image
                       src={user?.profileImage || "/path/to/default-avatar.png"}
                       width={56}
                       height={56}
                       onClick={toggleUser}
-                      className="size-12 lg:size-14 ring ring-[#40E0D0] rounded-full cursor-pointer transition-all object-cover"
+                      className="size-12 lg:size-14 ring ring-[#40E0D0] rounded-full cursor-pointer transition-all object-cover hover:ring-2 hover:ring-primary"
                       alt="userImage"
                     />
                   </motion.div>

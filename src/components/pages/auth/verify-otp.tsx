@@ -1,22 +1,27 @@
 "use client";
 import authImage from "@/asset/auth/auth.jpg";
 import logo from "@/asset/logo/logo.png";
-import Image from "next/image";
-import { useState, useEffect } from "react";
 import CustomButton from "@/components/custom/custom-button";
-import { useRouter } from "next/navigation";
-import { useCookies, COOKIE_NAMES } from "@/contexts/CookieContext";
-import OTPInput from "react-otp-input";
 import {
   useResendOtpMutation,
   useVerifyEmailMutation,
 } from "@/redux/features/auth/authApi";
 import { TError } from "@/types/error";
+import {
+  COOKIE_NAMES,
+  getCookie,
+  removeCookie,
+  setCookie,
+} from "@/utils/cookies";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
+import OTPInput from "react-otp-input";
 
-const VerifyEmail = () => {
+const VerifyOtp = () => {
   const router = useRouter();
-  const { getCookie, removeCookie, setCookie } = useCookies();
+  // Using direct imports
   const [oneTimeCode, setOneTimeCode] = useState<string>("");
   const [countdown, setCountdown] = useState<number>(60); // 1 minute = 60 seconds
   const [canResend, setCanResend] = useState<boolean>(false);
@@ -48,25 +53,30 @@ const VerifyEmail = () => {
   const handleVerifyEmail = async () => {
     try {
       const res = await verifyEmail({ otp: oneTimeCode }).unwrap();
-      const type = getCookie(COOKIE_NAMES.VERIFY_EMAIL_TYPE);
+      const type = getCookie(COOKIE_NAMES.VERIFY_OTP_TYPE);
 
       // Set tokens in cookies for login success
       if (res?.data?.attributes?.tokens?.accessToken) {
-        setCookie(COOKIE_NAMES.ACCESS_TOKEN, res.data.attributes.tokens.accessToken, 1); // 1 day
+        setCookie(
+          COOKIE_NAMES.ACCESS_TOKEN,
+          res.data.attributes.tokens.accessToken,
+          1
+        ); // 1 day
       }
       if (res?.data?.attributes?.tokens?.refreshToken) {
-        setCookie(COOKIE_NAMES.REFRESH_TOKEN, res.data.attributes.tokens.refreshToken, 30); // 30 days
+        setCookie(
+          COOKIE_NAMES.REFRESH_TOKEN,
+          res.data.attributes.tokens.refreshToken,
+          30
+        ); // 30 days
       }
-
-      // Clear verification cookies
-      removeCookie(COOKIE_NAMES.REGISTER_VERIFY_MAIL);
-      // removeCookie(COOKIE_NAMES.FORGOT_PASSWORD_MAIL);
-      removeCookie(COOKIE_NAMES.VERIFY_EMAIL_TYPE);
-
       toast.success(res?.message);
       if (type === "forgot-password") {
         router.push(`/reset-password`);
       } else {
+        // Clear verification cookies
+        removeCookie(COOKIE_NAMES.VERIFY_OTP_MAIL);
+        removeCookie(COOKIE_NAMES.VERIFY_OTP_TYPE);
         router.push(`/`);
       }
     } catch (error) {
@@ -203,4 +213,4 @@ const VerifyEmail = () => {
   );
 };
 
-export default VerifyEmail;
+export default VerifyOtp;

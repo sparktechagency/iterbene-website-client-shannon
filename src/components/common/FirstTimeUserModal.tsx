@@ -10,7 +10,7 @@ import { X } from "lucide-react";
 import Image from "next/image";
 import logo from "@/asset/logo/logo.png";
 import useUser from "@/hooks/useUser";
-import { useCookies, COOKIE_NAMES } from "@/contexts/CookieContext";
+import { setBooleanCookie, removeCookie, COOKIE_NAMES } from "@/utils/cookies";
 import CustomInput from "../custom/custom-input";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -59,7 +59,7 @@ const FirstTimeUserModal = ({ isOpen, onClose }: FirstTimeUserModalProps) => {
 
   // Hooks
   const [updateProfile, { isLoading }] = useUpdateProfileMutation();
-  const { setBooleanCookie, removeCookie } = useCookies();
+  // Using direct imports
 
   useEffect(() => {
     setIsClient(true);

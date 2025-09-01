@@ -1,13 +1,13 @@
-import { NextRequest, NextResponse } from "next/server";
 import CryptoJS from 'crypto-js';
+import { NextRequest, NextResponse } from "next/server";
 
-// Encryption key - should match the one in tokenManager.ts
+// Encryption key
 const ENCRYPTION_KEY = process.env.NEXT_PUBLIC_ENCRYPTION_KEY || 'your-secret-key-change-in-production';
 
-// Cookie names for encrypted tokens  
-const ENCRYPTED_COOKIE_NAMES = {
-  ACCESS_TOKEN: 'at',   // Encrypted access token
-  REFRESH_TOKEN: 'rt'   // Encrypted refresh token
+// Cookie names - must match utils/cookies.ts
+const COOKIE_NAMES = {
+  ACCESS_TOKEN: 'at',   // accessToken -> at
+  REFRESH_TOKEN: 'rt'   // refreshToken -> rt
 };
 
 // Decrypt function
@@ -22,8 +22,8 @@ function decrypt(encryptedText: string): string {
 
 // Helper function to check for authentication
 function isAuthenticated(request: NextRequest): boolean {
-  const encryptedAccessToken = request.cookies.get(ENCRYPTED_COOKIE_NAMES.ACCESS_TOKEN)?.value;
-  const encryptedRefreshToken = request.cookies.get(ENCRYPTED_COOKIE_NAMES.REFRESH_TOKEN)?.value;
+  const encryptedAccessToken = request.cookies.get(COOKIE_NAMES.ACCESS_TOKEN)?.value;
+  const encryptedRefreshToken = request.cookies.get(COOKIE_NAMES.REFRESH_TOKEN)?.value;
   
   if (!encryptedAccessToken && !encryptedRefreshToken) {
     return false;
@@ -73,6 +73,6 @@ export const config = {
      * - about-us, privacy-policy, terms-and-conditions (public pages)
      * - feed, search, journeys, photos, watch-videos (public pages)
      */
-    "/((?!api|_next/static|_next/image|favicon.ico|auth|login|register|forgot-password|reset-password|verify-email|about-us|privacy-policy|terms-and-conditions|feed|search|journeys|photos|watch-videos).*)",
+    "/((?!api|_next/static|_next/image|favicon.ico|auth|login|register|forgot-password|reset-password|verify-otp|about-us|privacy-policy|terms-and-conditions|feed|search|journeys|photos|watch-videos).*)",
   ],
 };

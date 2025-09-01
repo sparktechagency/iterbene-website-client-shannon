@@ -1,15 +1,15 @@
-import VerifyEmail from "@/components/pages/auth/verify-email";
+import VerifyOtp from "@/components/pages/auth/verify-otp";
 import { Loader2 } from "lucide-react";
 import { Metadata } from "next";
 import { Suspense } from "react";
 
 export const metadata: Metadata = {
-  title: "Verify Email - Iter Bene",
+  title: "Verify otp - Iter Bene",
   description:
-    "Please verify your email address to complete the registration process and start exploring Iter Bene.",
+    "Please verify your OTP  code to complete the registration process and start exploring Iter Bene.",
 };
 
-const VerifyEmailPage = () => {
+const VerifyOtpPage = () => {
   return (
     <Suspense
       fallback={
@@ -18,9 +18,9 @@ const VerifyEmailPage = () => {
         </div>
       }
     >
-      <VerifyEmail />
+      <VerifyOtp />
     </Suspense>
   );
 };
 
-export default VerifyEmailPage;
+export default VerifyOtpPage;
