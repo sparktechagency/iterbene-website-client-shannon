@@ -311,7 +311,6 @@ const PostCommentInput = ({
               <CustomEmojiPicker
                 onEmojiSelect={handleEmojiSelect}
                 onClose={() => setShowEmojiPicker(false)}
-                position="top"
               />
             </div>
           )}

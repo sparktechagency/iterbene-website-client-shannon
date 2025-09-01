@@ -99,9 +99,9 @@ export interface IPost {
 }
 
 export enum ReactionType {
-  LOVE = "love",
-  LUGGAGE = "luggage",
-  BAN = "ban",
+  HEART = "heart",
+  SUITCASE = "suitcase",
+  NOT_INTERESTED = "not_interested",
   SMILE = "smile",
 }
 

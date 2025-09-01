@@ -1,25 +1,23 @@
 import CustomModal from "@/components/custom/custom-modal";
+import useUser from "@/hooks/useUser";
+import { useAddOrRemoveReactionMutation } from "@/redux/features/post/postApi";
+import { TError } from "@/types/error";
 import {
   IPost,
   IReaction,
   ISortedReaction,
   ReactionType,
 } from "@/types/post.types";
-import React, { JSX, useState } from "react";
-import PostDetailsContentRender from "./PostDetailsContentRender";
-import { FaBan, FaCalendarCheck, FaHeart, FaRegHeart } from "react-icons/fa";
-import { MdOutlineLuggage } from "react-icons/md";
-import { FaFaceSmile } from "react-icons/fa6";
-import { useAddOrRemoveReactionMutation } from "@/redux/features/post/postApi";
-import useUser from "@/hooks/useUser";
-import { TError } from "@/types/error";
-import toast from "react-hot-toast";
+import formatPostReactionNumber from "@/utils/formatPostReactionNumber";
 import { Tooltip } from "antd";
 import { AnimatePresence, motion } from "framer-motion";
-import PostDetailsHeader from "./PostDetailsHeader";
+import { JSX, useEffect, useRef, useState } from "react";
+import toast from "react-hot-toast";
+import { FaCalendarCheck } from "react-icons/fa";
 import PostCommentInput from "../posts/post.comment.input";
 import PostCommentSection from "../posts/post.comment.section";
-import formatPostReactionNumber from "@/utils/formatPostReactionNumber";
+import PostDetailsContentRender from "./PostDetailsContentRender";
+import PostDetailsHeader from "./PostDetailsHeader";
 
 interface PostDetailsProps {
   isOpen: boolean;
@@ -30,7 +28,15 @@ const PostDetails = ({ isOpen, onClose, post }: PostDetailsProps) => {
   const user = useUser();
   const currentUserId = user?._id;
   const [showReactions, setShowReactions] = useState<boolean>(false);
-  const userReaction = post?.reactions?.find(
+  
+  // Reaction timing refs for better control
+  const showReactionTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const hideReactionTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  // Ensure reactions array is initialized
+  const reactions = post?.reactions || [];
+  
+  // Find the user's reaction, if any
+  const userReaction = reactions.find(
     (reaction: IReaction) => reaction?.userId?._id === currentUserId
   );
 
@@ -42,26 +48,101 @@ const PostDetails = ({ isOpen, onClose, post }: PostDetailsProps) => {
   // Add or remove reactions
   const [addOrRemoveReaction] = useAddOrRemoveReactionMutation();
 
-  // Reaction icon mapping
   const reactionIcons: { [key: string]: JSX.Element } = {
-    love: <FaHeart size={23} className="text-red-500" />,
-    luggage: <MdOutlineLuggage size={25} className="text-blue-500 -mt-0.5" />,
-    ban: <FaBan size={23} className="text-orange-500" />,
-    smile: <FaFaceSmile size={23} className="text-yellow-500" />,
+    heart: <h1 className="text-2xl">❤️</h1>,
+    suitcase: <h1 className="text-2xl">🧳</h1>,
+    not_interested: <h1 className="text-2xl">🚫</h1>, // Fixed: camelCase to match enum
+    smile: <h1 className="text-2xl">🙂</h1>,
   };
 
   // Reaction colors
   const reactionColors: { [key: string]: string } = {
-    love: "text-red-500 ",
-    luggage: "text-blue-500",
-    ban: "text-orange-500",
+    heart: "text-red-500",
+    suitcase: "text-blue-500",
+    not_interested: "text-orange-500",
     smile: "text-yellow-500",
   };
+  // Facebook-like timing functions
+  const handleShowReactions = () => {
+    if (hideReactionTimeoutRef.current) {
+      clearTimeout(hideReactionTimeoutRef.current);
+      hideReactionTimeoutRef.current = null;
+    }
+    showReactionTimeoutRef.current = setTimeout(() => {
+      setShowReactions(true);
+    }, 500);
+  };
+
+  const handleHideReactions = () => {
+    if (showReactionTimeoutRef.current) {
+      clearTimeout(showReactionTimeoutRef.current);
+      showReactionTimeoutRef.current = null;
+    }
+    hideReactionTimeoutRef.current = setTimeout(() => {
+      setShowReactions(false);
+    }, 1500);
+  };
+
+  const cancelHideReactions = () => {
+    if (hideReactionTimeoutRef.current) {
+      clearTimeout(hideReactionTimeoutRef.current);
+      hideReactionTimeoutRef.current = null;
+    }
+  };
+
+  useEffect(() => {
+    return () => {
+      if (showReactionTimeoutRef.current) {
+        clearTimeout(showReactionTimeoutRef.current);
+      }
+      if (hideReactionTimeoutRef.current) {
+        clearTimeout(hideReactionTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  // Handle heart button click - should not show reactions
+  const handleHeartButtonClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    // Clear any pending timeouts to prevent reactions from showing
+    if (showReactionTimeoutRef.current) {
+      clearTimeout(showReactionTimeoutRef.current);
+      showReactionTimeoutRef.current = null;
+    }
+    if (hideReactionTimeoutRef.current) {
+      clearTimeout(hideReactionTimeoutRef.current);
+      hideReactionTimeoutRef.current = null;
+    }
+    
+    // Directly handle heart reaction
+    if (userReaction) {
+      handleReaction(userReaction.reactionType);
+    } else {
+      handleReaction("heart");
+    }
+  };
+
   const handleReaction = async (reactionType: string) => {
+    if (!user) {
+      return;
+    }
+
+    setShowReactions(false);
+    
+    // Clear any pending timeouts
+    if (showReactionTimeoutRef.current) {
+      clearTimeout(showReactionTimeoutRef.current);
+      showReactionTimeoutRef.current = null;
+    }
+    if (hideReactionTimeoutRef.current) {
+      clearTimeout(hideReactionTimeoutRef.current);
+      hideReactionTimeoutRef.current = null;
+    }
+
     try {
       await addOrRemoveReaction({ postId: post?._id, reactionType }).unwrap();
-
-      setShowReactions(false);
     } catch (error) {
       const err = error as TError;
       toast.error(err?.data?.message || "Something went wrong!");
@@ -74,7 +155,7 @@ const PostDetails = ({ isOpen, onClose, post }: PostDetailsProps) => {
       onClose={onClose}
       header={null}
       maxHeight="max-h-[80vh] md:max-h-[90vh]"
-         className="w-full p-2"
+      className="w-full p-2"
     >
       <section className="w-full grid grid-cols-1 md:grid-cols-12 gap-5">
         <div className="w-full h-full  col-span-full md:col-span-8">
@@ -101,8 +182,7 @@ const PostDetails = ({ isOpen, onClose, post }: PostDetailsProps) => {
               <div className="relative mb-2 mt-2">
                 <div className="w-fit flex items-center gap-1 cursor-pointer">
                   <div className="flex -space-x-1 cursor-pointer ">
-                    {/* Show up to 3 reaction types */}
-                    {nonZeroReactions?.slice(0, 3).map((reaction) => (
+                    {nonZeroReactions?.map((reaction) => (
                       <div key={reaction.type}>
                         <span className={`${reactionColors[reaction.type]}`}>
                           {reactionIcons[reaction.type]}
@@ -120,16 +200,14 @@ const PostDetails = ({ isOpen, onClose, post }: PostDetailsProps) => {
             <div className="flex gap-7 items-center border-y border-[#DDDDDD] py-3">
               <div
                 className="relative flex items-center"
-                onMouseEnter={() => setShowReactions(true)}
-                onMouseLeave={() => setShowReactions(false)}
+                onMouseEnter={handleShowReactions}
+                onMouseLeave={handleHideReactions}
               >
                 <button
-                  className="flex gap-2 items-center cursor-pointer ml-1"
-                  onClick={() =>
-                    userReaction
-                      ? handleReaction(userReaction?.reactionType)
-                      : handleReaction("love")
-                  }
+                  className="flex gap-2 items-center cursor-pointer ml-1 transition-all duration-200"
+                  onClick={handleHeartButtonClick}
+                  onFocus={handleShowReactions}
+                  onBlur={handleHideReactions}
                 >
                   {userReaction ? (
                     <>
@@ -145,24 +223,26 @@ const PostDetails = ({ isOpen, onClose, post }: PostDetailsProps) => {
                           reactionColors[userReaction.reactionType]
                         }`}
                       >
-                        <span> {userReaction.reactionType}</span>
+                        <span>{userReaction?.reactionType === 'not_interested' ? 'Not Interested' : userReaction?.reactionType}</span>
                       </span>
                     </>
                   ) : (
                     <div className="flex items-center gap-1">
-                      <FaRegHeart size={23} className=" text-gray-500" />
-                      <span className="font-semibold text-gray-500">Love</span>
+                      <h1 className="text-2xl">❤️</h1>
+                      <span className="font-semibold text-gray-500">Heart</span>
                     </div>
                   )}
                 </button>
                 <AnimatePresence>
                   {showReactions && (
                     <motion.div
-                      initial={{ opacity: 0, y: 0 }}
-                      animate={{ opacity: 1, y: -9 }}
-                      exit={{ opacity: 0, y: 0 }}
-                      transition={{ duration: 0.2 }}
-                      className="absolute -top-12 -left-2 bg-white border border-gray-50 rounded-full shadow-lg px-3 py-2 flex space-x-3 z-10"
+                      initial={{ opacity: 0, y: 10, scale: 0.8 }}
+                      animate={{ opacity: 1, y: -9, scale: 1 }}
+                      exit={{ opacity: 0, y: 10, scale: 0.8 }}
+                      transition={{ duration: 0.15, ease: "easeOut" }}
+                      className="absolute -top-12 -left-2 bg-white border border-gray-100 rounded-full shadow-xl px-3 py-2 flex space-x-2 z-50"
+                      onMouseEnter={cancelHideReactions}
+                      onMouseLeave={handleHideReactions}
                     >
                       {Object.keys(ReactionType).map((reactionKey) => {
                         const reaction =

@@ -172,7 +172,7 @@ const NotificationsPage = () => {
             <div className="flex items-center gap-2">
               <button
                 onClick={() => refetchNotifications()}
-                className="p-2 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors"
+                className="p-2 rounded-lg cursor-pointer text-gray-600 hover:bg-gray-100 transition-colors"
                 title="Refresh"
               >
                 <RefreshCw className="w-5 h-5" />

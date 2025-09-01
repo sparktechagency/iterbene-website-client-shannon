@@ -231,7 +231,6 @@ const ReplyInput = ({
               <CustomEmojiPicker
                 onEmojiSelect={handleEmojiSelect}
                 onClose={() => setShowEmojiPicker(false)}
-                position="top"
               />
             </div>
           )}
@@ -355,7 +354,7 @@ const CommentItem = ({
 
           <div className="w-full md:w-fit flex items-center space-x-4 mt-2 ml-1 text-gray-500 relative text-xs">
             <button
-              onClick={() => onReaction(post?._id, comment?._id, "love")}
+              onClick={() => onReaction(post?._id, comment?._id, "heart")}
               className={`hover:text-rose-500 transition-colors flex items-center space-x-1 cursor-pointer ${
                 isReactionAdded ? "text-rose-500" : "text-gray-500"
               }`}
@@ -562,7 +561,8 @@ const PostCommentSection = ({
                       mentions: [
                         {
                           _id: replyToUserId,
-                          fullName: "", // Placeholder; server should populate
+                          firstName: "",
+                          lastName: "",
                           username:
                             replyText.split("@")[1]?.split(" ")[0] || "",
                           profileImage: "",

@@ -23,7 +23,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
   return (
     <section className="w-full h-screen flex flex-col">
       <Header />
-      <section className="w-full container mx-auto pt-[80px] md:pt-[100px] px-3 lg:pt-[125px] flex-1 overflow-hidden">
+      <section className="w-full container mx-auto pt-[80px] md:pt-[100px] px-5 lg:pt-[120px] flex-1 overflow-hidden">
         <div className="w-full h-full p-0 md:p-6 flex gap-6 bg-white rounded-xl">
           <div
             className={`w-full md:w-[35%] lg:w-[30%] h-full transition-transform duration-300 ease-in-out ${receiverId ? "hidden md:block" : "block"}`}>

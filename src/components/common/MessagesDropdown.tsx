@@ -12,12 +12,12 @@ import Skeleton from "../custom/custom-skeleton";
 
 interface DropdownProps {
   isOpen: boolean;
-  setIsMessagesOpen: React.Dispatch<React.SetStateAction<boolean>>
+  setIsMessagesOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const MessagesDropdown: React.FC<DropdownProps> = ({
   isOpen,
-  setIsMessagesOpen
+  setIsMessagesOpen,
 }) => {
   const [allNotifications, setAllNotifications] = useState<INotification[]>([]);
   const [hasMore, setHasMore] = useState(true);
@@ -39,6 +39,7 @@ const MessagesDropdown: React.FC<DropdownProps> = ({
     { refetchOnMountOrArgChange: true, skip: !isOpen }
   );
 
+  const messageNotificationData = responseData?.data?.attributes?.results;
 
   // Reset state when dropdown opens
   useEffect(() => {
@@ -51,19 +52,18 @@ const MessagesDropdown: React.FC<DropdownProps> = ({
 
   // Update notifications when new data arrives
   useEffect(() => {
-    if (responseData?.data?.attributes?.results) {
+    if (messageNotificationData?.length > 0) {
       if (currentPage === 1) {
-        setAllNotifications(responseData.data.attributes.results);
+        setAllNotifications(messageNotificationData);
       } else {
         const existingIds = new Set(allNotifications.map((n) => n._id));
-        const uniqueNewNotifications =
-          responseData.data.attributes.results.filter(
-            (n: INotification) => !existingIds.has(n._id)
-          );
+        const uniqueNewNotifications = messageNotificationData?.filter(
+          (n: INotification) => !existingIds.has(n._id)
+        );
         setAllNotifications((prev) => [...prev, ...uniqueNewNotifications]);
       }
     }
-  }, [responseData, currentPage, allNotifications]);
+  }, [messageNotificationData, currentPage, allNotifications]);
 
   // Handle click inside dropdown to prevent closing
   useEffect(() => {
@@ -130,7 +130,7 @@ const MessagesDropdown: React.FC<DropdownProps> = ({
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => refetch()}
-                  className="p-2 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors"
+                  className="p-2 rounded-lg cursor-pointer text-gray-600 hover:bg-gray-100 transition-colors"
                   title="Refresh"
                 >
                   <RefreshCw className="w-4 h-4" />
@@ -281,14 +281,16 @@ const MessagesDropdown: React.FC<DropdownProps> = ({
           </div>
 
           {/* View All Button */}
-          <div className="border-t border-gray-200 p-3">
-            <button
-              onClick={() => router.push("/messages")}
-              className="w-full bg-primary text-white cursor-pointer text-sm font-medium py-2.5 rounded-lg hover:bg-primary/90 transition-colors"
-            >
-              View all messages
-            </button>
-          </div>
+          {messageNotificationData?.length > 0 && (
+            <div className="border-t border-gray-200 p-3">
+              <button
+                onClick={() => router.push("/messages")}
+                className="w-full bg-primary text-white cursor-pointer text-sm font-medium py-2.5 rounded-lg hover:bg-primary/90 transition-colors"
+              >
+                View all messages
+              </button>
+            </div>
+          )}
         </motion.div>
       )}
     </AnimatePresence>

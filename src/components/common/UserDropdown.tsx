@@ -1,5 +1,11 @@
 import { IUser } from "@/types/user.types";
-import { LucideCalendarCheck, User } from "lucide-react";
+import {
+  BadgeInfo,
+  BookKey,
+  LucideCalendarCheck,
+  ShieldAlert,
+  User,
+} from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -14,8 +20,13 @@ import { AnimatePresence, motion } from "framer-motion";
 interface DropdownProps {
   user?: IUser;
   isOpen: boolean;
+  setIsUserOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
-const UserDropdown: React.FC<DropdownProps> = ({ user, isOpen }) => {
+const UserDropdown: React.FC<DropdownProps> = ({
+  user,
+  isOpen,
+  setIsUserOpen,
+}) => {
   const router = useRouter();
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -38,6 +49,7 @@ const UserDropdown: React.FC<DropdownProps> = ({ user, isOpen }) => {
 
   const handleLogout = async () => {
     router.push("/login");
+    setIsUserOpen(false);
   };
 
   return (
@@ -55,7 +67,10 @@ const UserDropdown: React.FC<DropdownProps> = ({ user, isOpen }) => {
             aria-label="User menu dropdown"
           >
             {/* User Profile Section */}
-            <Link href={`/${user?.username}`}>
+            <Link
+              href={`/${user?.username}`}
+              onClick={() => setIsUserOpen(false)}
+            >
               <div className="px-4 py-3 bg-primary/5 border-b border-gray-100 hover:bg-primary/10 transition-colors cursor-pointer">
                 <div className="flex items-center gap-3">
                   {user?.profileImage ? (
@@ -88,6 +103,7 @@ const UserDropdown: React.FC<DropdownProps> = ({ user, isOpen }) => {
               <div className="divide-y divide-gray-100">
                 <Link
                   href={`/${user?.username}/timeline`}
+                  onClick={() => setIsUserOpen(false)}
                   className="px-4 py-3 hover:bg-gray-50 cursor-pointer transition-colors flex items-start gap-3"
                 >
                   <div className="flex-shrink-0 pt-1">
@@ -105,6 +121,7 @@ const UserDropdown: React.FC<DropdownProps> = ({ user, isOpen }) => {
 
                 <Link
                   href="/messages"
+                  onClick={() => setIsUserOpen(false)}
                   className="px-4 py-3 hover:bg-gray-50 cursor-pointer transition-colors flex items-start gap-3"
                 >
                   <div className="flex-shrink-0 pt-1">
@@ -122,6 +139,7 @@ const UserDropdown: React.FC<DropdownProps> = ({ user, isOpen }) => {
 
                 <Link
                   href="/groups"
+                  onClick={() => setIsUserOpen(false)}
                   className="px-4 py-3 hover:bg-gray-50 cursor-pointer transition-colors flex items-start gap-3"
                 >
                   <div className="flex-shrink-0 pt-1">
@@ -137,6 +155,7 @@ const UserDropdown: React.FC<DropdownProps> = ({ user, isOpen }) => {
 
                 <Link
                   href={`/${user?.username}/maps`}
+                  onClick={() => setIsUserOpen(false)}
                   className="px-4 py-3 hover:bg-gray-50 cursor-pointer transition-colors flex items-start gap-3"
                 >
                   <div className="flex-shrink-0 pt-1">
@@ -152,6 +171,7 @@ const UserDropdown: React.FC<DropdownProps> = ({ user, isOpen }) => {
 
                 <Link
                   href="/events"
+                  onClick={() => setIsUserOpen(false)}
                   className="px-4 py-3 hover:bg-gray-50 cursor-pointer transition-colors flex items-start gap-3"
                 >
                   <div className="flex-shrink-0 pt-1">
@@ -167,6 +187,7 @@ const UserDropdown: React.FC<DropdownProps> = ({ user, isOpen }) => {
 
                 <Link
                   href={`/${user?.username}/invitations`}
+                  onClick={() => setIsUserOpen(false)}
                   className="px-4 py-3 hover:bg-gray-50 cursor-pointer transition-colors flex items-start gap-3"
                 >
                   <div className="flex-shrink-0 pt-1">
@@ -183,9 +204,7 @@ const UserDropdown: React.FC<DropdownProps> = ({ user, isOpen }) => {
                 </Link>
 
                 <div className="relative">
-                  <button
-                    className="w-full px-4 py-3 hover:bg-gray-50 cursor-pointer transition-colors flex items-start gap-3 text-left"
-                  >
+                  <button className="w-full px-4 py-3 hover:bg-gray-50 cursor-pointer transition-colors flex items-start gap-3 text-left">
                     <div className="flex-shrink-0 pt-1">
                       <IoSettingsOutline className="w-5 h-5 text-gray-600" />
                     </div>
@@ -199,6 +218,61 @@ const UserDropdown: React.FC<DropdownProps> = ({ user, isOpen }) => {
                     </div>
                   </button>
                 </div>
+                {/* about us */}
+                <Link
+                  href="/about-us"
+                  onClick={() => setIsUserOpen(false)}
+                  className="px-4 py-3 hover:bg-gray-50 cursor-pointer transition-colors flex items-start gap-3"
+                >
+                  <div className="flex-shrink-0 pt-1">
+                    <BadgeInfo className="w-5 h-5 text-gray-600" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-gray-900 text-sm font-medium">About</p>
+                    <p className="text-xs text-gray-500 mt-0.5">
+                      Learn more about us
+                    </p>
+                  </div>
+                </Link>
+                {/* Terms and conditions */}
+                <Link
+                  href="/terms-and-conditions"
+                  onClick={() => setIsUserOpen(false)}
+                  className="px-4 py-3 hover:bg-gray-50 cursor-pointer transition-colors flex items-start gap-3"
+                >
+                  <div className="flex-shrink-0 pt-1">
+                    <ShieldAlert className="w-5 h-5 text-gray-600" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-gray-900 text-sm font-medium">
+                      Terms and conditions
+                    </p>
+                    <p className="text-xs text-gray-500 mt-0.5">
+                      Read our terms and conditions
+                    </p>
+                  </div>
+                </Link>
+
+                {/* Privacy policy */}
+                <Link
+                  href="/privacy-policy"
+                  onClick={() => setIsUserOpen(false)}
+                  className="px-4 py-3 hover:bg-gray-50 cursor-pointer transition-colors flex items-start gap-3"
+                >
+                  <div className="flex-shrink-0 pt-1">
+                    <BookKey className="w-5 h-5 text-gray-600" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-gray-900 text-sm font-medium">
+                      Privacy policy
+                    </p>
+                    <p className="text-xs text-gray-500 mt-0.5">
+                      Read our privacy policy
+                    </p>
+                  </div>
+                </Link>
+
+                {/* Logout */}
 
                 <button
                   onClick={handleLogout}

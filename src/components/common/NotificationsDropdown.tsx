@@ -1,21 +1,19 @@
 "use client";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
-import {
-  useGetAllNotificationsQuery
-} from "@/redux/features/notifications/notificationsApi";
+import { useGetAllNotificationsQuery } from "@/redux/features/notifications/notificationsApi";
 import { INotification } from "@/types/notification.types";
 import formatTimeAgo from "@/utils/formatTimeAgo";
 import { AnimatePresence, motion } from "framer-motion";
 import { Bell, Check, RefreshCw } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { IoMdNotificationsOutline } from "react-icons/io";
 import Skeleton from "../custom/custom-skeleton";
 
 interface DropdownProps {
   isOpen: boolean;
-  setIsNotificationsOpen: React.Dispatch<React.SetStateAction<boolean>>
+  setIsNotificationsOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 // Get notification icon based on type
@@ -42,7 +40,7 @@ const getNotificationIcon = (type: string) => {
 
 const NotificationsDropdown: React.FC<DropdownProps> = ({
   isOpen,
-  setIsNotificationsOpen
+  setIsNotificationsOpen,
 }) => {
   const [allNotifications, setAllNotifications] = useState<INotification[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -64,11 +62,7 @@ const NotificationsDropdown: React.FC<DropdownProps> = ({
     { refetchOnMountOrArgChange: true, skip: !isOpen }
   );
 
-  // Memoize unviewNotificationCount
-  const unviewNotificationCount = useMemo(
-    () => responseData?.data?.attributes?.count || 0,
-    [responseData]
-  );
+  const notificationData = responseData?.data?.attributes?.results;
 
   // Refetch notifications when dropdown opens
   useEffect(() => {
@@ -81,21 +75,20 @@ const NotificationsDropdown: React.FC<DropdownProps> = ({
 
   // Update notifications when data arrives
   useEffect(() => {
-    if (responseData?.data?.attributes?.results) {
+    if (notificationData?.length > 0) {
       if (currentPage === 1) {
-        setAllNotifications(responseData.data.attributes.results);
+        setAllNotifications(notificationData);
       } else {
         setAllNotifications((prev) => {
           const existingIds = new Set(prev.map((n) => n._id));
-          const uniqueNewNotifications =
-            responseData.data.attributes.results.filter(
-              (n: INotification) => !existingIds.has(n._id)
-            );
+          const uniqueNewNotifications = notificationData?.filter(
+            (n: INotification) => !existingIds.has(n._id)
+          );
           return [...prev, ...uniqueNewNotifications];
         });
       }
     }
-  }, [responseData, currentPage]);
+  }, [notificationData, currentPage]);
 
   // Handle click inside dropdown
   useEffect(() => {
@@ -130,7 +123,6 @@ const NotificationsDropdown: React.FC<DropdownProps> = ({
       router.push(`/feed/${notification?.linkId}`);
     }
   };
-
 
   // Handle View All Notifications - Fixed navigation issue
   const handleViewAllNotifications = async () => {
@@ -180,18 +172,13 @@ const NotificationsDropdown: React.FC<DropdownProps> = ({
                   <h3 className="font-semibold text-lg text-gray-900">
                     Notifications
                   </h3>
-                  {unviewNotificationCount > 0 && (
-                    <p className="text-sm text-gray-500">
-                      {unviewNotificationCount} unread
-                    </p>
-                  )}
                 </div>
               </div>
 
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => refetchNotifications()}
-                  className="p-2 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors"
+                  className="p-2 rounded-lg cursor-pointer text-gray-600 hover:bg-gray-100 transition-colors"
                   title="Refresh"
                 >
                   <RefreshCw className="w-4 h-4" />
@@ -338,21 +325,16 @@ const NotificationsDropdown: React.FC<DropdownProps> = ({
           </div>
 
           {/* View All Button - Fixed */}
-          <div className="border-t border-gray-200 p-3">
-            <button
-              onClick={handleViewAllNotifications}
-              className="w-full bg-primary cursor-pointer text-white text-sm font-medium py-2.5 rounded-lg hover:bg-primary/90 transition-colors flex items-center justify-center gap-2"
-            >
-              <span>View all notifications</span>
-              <motion.div
-                initial={{ x: 0 }}
-                whileHover={{ x: 2 }}
-                transition={{ type: "spring", stiffness: 400, damping: 30 }}
+          {notificationData?.length > 0 && (
+            <div className="border-t border-gray-200 p-3">
+              <button
+                onClick={handleViewAllNotifications}
+                className="w-full bg-primary cursor-pointer text-white text-sm font-medium py-2.5 rounded-lg hover:bg-primary/90 transition-colors flex items-center justify-center gap-2"
               >
-                →
-              </motion.div>
-            </button>
-          </div>
+                <span>View all notifications</span>
+              </button>
+            </div>
+          )}
         </motion.div>
       )}
     </AnimatePresence>

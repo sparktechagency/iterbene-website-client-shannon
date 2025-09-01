@@ -109,7 +109,7 @@ const CustomEmojiPicker = memo(
       const baseClasses = `
         relative bg-white/95 backdrop-blur-xl border border-gray-200/50 rounded-3xl 
         shadow-2xl shadow-purple-500/10 overflow-hidden scrollbar-hide   ${className}`;
-      return `${baseClasses} w-96 h-[420px] overflow-y-auto max-w-[calc(100vw-2rem)]`;
+      return `${baseClasses} w-96 h-[350px] md:h-[420px] overflow-y-auto max-w-[calc(100vw-2rem)]`;
     };
 
     // Loading state with beautiful spinner

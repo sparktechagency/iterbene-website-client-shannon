@@ -196,11 +196,11 @@ const PostHeader = ({ post, onEditClick, setAllPosts }: PostHeaderProps) => {
               </>
             )}
             {post?.privacy === "public" ? (
-              <HiGlobe size={23} className="text-primary" />
+              <HiGlobe size={23} className="size-[19px] md:size-[20px] text-primary" />
             ) : post?.privacy === "friends" ? (
-              <HiUsers size={23} className="text-primary" />
+              <HiUsers size={23} className="size-[19px] md:size-[20px]  text-primary" />
             ) : (
-              <HiLockClosed size={23} className="text-primary" />
+              <HiLockClosed size={23} className="size-[19px] md:size-[20px] ] text-primary" />
             )}
           </div>
         </div>

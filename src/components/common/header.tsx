@@ -591,7 +591,7 @@ const Header: React.FC = () => {
                       alt="userImage"
                     />
                   </motion.div>
-                  <UserDropdown user={user} isOpen={isUserOpen} />
+                  <UserDropdown user={user} isOpen={isUserOpen} setIsUserOpen = {setIsUserOpen} />
                 </div>
               </div>
 
