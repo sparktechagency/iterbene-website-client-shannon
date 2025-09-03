@@ -21,30 +21,17 @@ const ImageCropModal: React.FC<ImageCropModalProps> = ({
   imageSrc,
   onCropComplete,
   cropShape = "rect",
-  aspect,
+  aspect = 12 / 6,
   title,
-  isUploading,
+  isUploading
 }) => {
-  const [crop, setCrop] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
-  const [zoom, setZoom] = useState<number>(1);
-  const [croppedAreaPixels, setCroppedAreaPixels] = useState<null | {
-    x: number;
-    y: number;
-    width: number;
-    height: number;
-  }>(null);
+  const [crop, setCrop] = useState({ x: 0, y: 0 });
+  const [zoom, setZoom] = useState(1);
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState<null | { x: number; y: number; width: number; height: number }>(null);
 
-  const onCropCompleteInternal = useCallback(
-    (croppedAreaPixels: {
-      x: number;
-      y: number;
-      width: number;
-      height: number;
-    }) => {
-      setCroppedAreaPixels(croppedAreaPixels);
-    },
-    []
-  );
+  const onCropCompleteInternal = useCallback(( croppedAreaPixels: { x: number; y: number; width: number; height: number }) => {
+    setCroppedAreaPixels(croppedAreaPixels);
+  }, []);
 
   const handleSave = async () => {
     if (croppedAreaPixels) {
@@ -65,32 +52,27 @@ const ImageCropModal: React.FC<ImageCropModalProps> = ({
     <CustomModal
       isOpen={isOpen}
       onClose={handleCancel}
-      // Full width এর জন্য maxWidth remove করুন অথবা বড় করুন
-      maxWidth="max-w-5xl" // অথবা "max-w-full" বা "max-w-screen-xl"
+      maxWidth="max-w-3xl"
       header={
-        <div className="flex items-center justify-between px-4 sm:px-6 py-3 border-b border-gray-200 rounded-t-xl">
+        <div className="flex items-center justify-between px-6 py-3 border-b border-gray-200 rounded-t-xl">
           <div>
-            <h2 className="text-lg sm:text-xl font-bold text-gray-800">
-              {title}
-            </h2>
-            <p className="text-xs sm:text-sm text-gray-600 mt-1">
-              Adjust your image to look perfect
-            </p>
+            <h2 className="text-xl font-bold text-gray-800">{title}</h2>
+            <p className="text-sm text-gray-600 mt-1">Adjust your image to look perfect</p>
           </div>
           <button
-            className="text-gray-600 border-gray-400 cursor-pointer size-8 sm:size-10 bg-[#EEFDFB] hover:bg-[#D1FAE5] rounded-full border flex justify-center items-center transition-colors"
+            className="text-gray-600 border-gray-400 cursor-pointer size-10 bg-[#EEFDFB] hover:bg-[#D1FAE5] rounded-full border flex justify-center items-center transition-colors"
             onClick={handleCancel}
             disabled={isUploading}
           >
-            <IoMdClose size={16} className="sm:w-[18px] sm:h-[18px]" />
+            <IoMdClose size={18} />
           </button>
         </div>
       }
       className="w-full p-0"
     >
-      <div className="p-4 sm:p-6">
-        {/* Cropper Container - Responsive height */}
-        <div className="relative w-full h-[250px] sm:h-[350px] rounded-lg overflow-hidden mb-4 sm:mb-6">
+      <div className="p-6">
+        {/* Cropper Container */}
+        <div className="relative h-[300px]  rounded-lg overflow-hidden mb-6">
           <Cropper
             image={imageSrc}
             crop={crop}
@@ -103,27 +85,23 @@ const ImageCropModal: React.FC<ImageCropModalProps> = ({
             onCropComplete={onCropCompleteInternal}
             style={{
               containerStyle: {
-                background: "#f9fafb",
-                borderRadius: "8px",
-                width: "100%",
-                height: "100%",
+                background: '#f9fafb',
+                borderRadius: '8px',
               },
               cropAreaStyle: {
-                border: "2px solid #40e0d0",
-                boxShadow: "0 0 0 9999em rgba(0, 0, 0, 0.5)",
+                border: '2px solid #40e0d0',
+                boxShadow: '0 0 0 9999em rgba(0, 0, 0, 0.5)',
               },
               mediaStyle: {
-                transform: "none",
-              },
+                transform: 'none',
+              }
             }}
           />
         </div>
 
         {/* Zoom Control */}
-        <div className="mb-4 sm:mb-6">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Zoom
-          </label>
+        <div className="mb-6">
+          <label className="block text-sm font-medium text-gray-700 mb-2">Zoom</label>
           <div className="relative">
             <input
               type="range"
@@ -134,46 +112,29 @@ const ImageCropModal: React.FC<ImageCropModalProps> = ({
               onChange={(e) => setZoom(parseFloat(e.target.value))}
               className="w-full h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-50"
               style={{
-                background: `linear-gradient(to right, #40e0d0 0%, #40e0d0 ${
-                  ((zoom - 1) / 2) * 100
-                }%, #e5e7eb ${((zoom - 1) / 2) * 100}%, #e5e7eb 100%)`,
+                background: `linear-gradient(to right, #40e0d0 0%, #40e0d0 ${((zoom - 1) / 2) * 100}%, #e5e7eb ${((zoom - 1) / 2) * 100}%, #e5e7eb 100%)`
               }}
             />
             <style jsx>{`
               input[type="range"]::-webkit-slider-thumb {
                 appearance: none;
-                width: 16px;
-                height: 16px;
+                width: 20px;
+                height: 20px;
                 border-radius: 50%;
                 background: #40e0d0;
                 cursor: pointer;
                 border: 2px solid white;
                 box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
               }
-
-              @media (min-width: 640px) {
-                input[type="range"]::-webkit-slider-thumb {
-                  width: 20px;
-                  height: 20px;
-                }
-              }
-
               input[type="range"]::-moz-range-thumb {
-                width: 16px;
-                height: 16px;
+                width: 20px;
+                height: 20px;
                 border-radius: 50%;
                 background: #40e0d0;
                 cursor: pointer;
                 border: 2px solid white;
                 box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
                 border: none;
-              }
-
-              @media (min-width: 640px) {
-                input[type="range"]::-moz-range-thumb {
-                  width: 20px;
-                  height: 20px;
-                }
               }
             `}</style>
           </div>
@@ -184,10 +145,10 @@ const ImageCropModal: React.FC<ImageCropModalProps> = ({
         </div>
 
         {/* Action Buttons */}
-        <div className="flex flex-col sm:flex-row justify-end gap-2 sm:gap-3 pt-4 border-t border-gray-200">
+        <div className="flex justify-end gap-3 pt-4 border-t border-gray-200">
           <button
             onClick={handleCancel}
-            className="w-full sm:w-auto px-4 sm:px-6 py-2.5 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-xl font-medium transition-colors disabled:opacity-50 order-2 sm:order-1"
+            className="px-6 py-2.5 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-xl font-medium transition-colors disabled:opacity-50"
             disabled={isUploading}
           >
             Cancel
@@ -195,7 +156,7 @@ const ImageCropModal: React.FC<ImageCropModalProps> = ({
           <button
             onClick={handleSave}
             disabled={isUploading || !croppedAreaPixels}
-            className="w-full sm:w-auto px-4 sm:px-6 py-2.5 bg-primary hover:bg-secondary text-white rounded-xl font-medium transition-colors flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed order-1 sm:order-2"
+            className="px-6 py-2.5 bg-primary hover:bg-secondary text-white rounded-xl font-medium transition-colors flex items-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
           >
             {isUploading ? (
               <>
@@ -203,7 +164,7 @@ const ImageCropModal: React.FC<ImageCropModalProps> = ({
                 Uploading...
               </>
             ) : (
-              "Save Image"
+              'Save Image'
             )}
           </button>
         </div>
