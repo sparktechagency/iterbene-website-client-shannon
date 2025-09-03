@@ -11,9 +11,10 @@ interface ImageCropModalProps {
   imageSrc: string;
   onCropComplete: (croppedImage: File) => void;
   cropShape?: "rect" | "round";
-  aspect?: number;
+  aspect?: number; // Allow dynamic aspect ratio
   title: string;
   isUploading: boolean;
+  isProfile?: boolean; // New prop to differentiate profile vs cover
 }
 
 const ImageCropModal: React.FC<ImageCropModalProps> = ({
@@ -22,9 +23,10 @@ const ImageCropModal: React.FC<ImageCropModalProps> = ({
   imageSrc,
   onCropComplete,
   cropShape = "rect",
-  aspect = 12 / 6,
+  aspect = 1, // Default to 1:1, will be overridden by props
   title,
   isUploading,
+  isProfile = false, // Default to false (cover), true for profile
 }) => {
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
@@ -42,6 +44,9 @@ const ImageCropModal: React.FC<ImageCropModalProps> = ({
       setImageSize({ width: img.width, height: img.height });
     };
   }, [imageSrc]);
+
+  // Set dynamic aspect ratio based on isProfile
+  const effectiveAspect = isProfile ? 1 : aspect || 4 / 1; // 1:1 for profile, 4:1 for cover (LinkedIn-like)
 
   const onCropCompleteInternal = useCallback(
     (_croppedArea: Area, croppedAreaPixels: Area) => {
@@ -74,12 +79,13 @@ const ImageCropModal: React.FC<ImageCropModalProps> = ({
 
   // Initialize crop position based on image size and aspect ratio
   useEffect(() => {
-    if (imageSize && aspect) {
-      const initialX = (imageSize.width - imageSize.height * aspect) / 2;
+    if (imageSize && effectiveAspect) {
+      const initialX =
+        (imageSize.width - imageSize.height * effectiveAspect) / 2;
       const initialY = 0;
       setCrop({ x: initialX > 0 ? initialX : 0, y: initialY });
     }
-  }, [imageSize, aspect]);
+  }, [imageSize, effectiveAspect]);
 
   return (
     <CustomModal
@@ -111,7 +117,7 @@ const ImageCropModal: React.FC<ImageCropModalProps> = ({
             image={imageSrc}
             crop={crop}
             zoom={zoom}
-            aspect={aspect}
+            aspect={effectiveAspect}
             cropShape={cropShape}
             showGrid={cropShape === "rect"}
             onCropChange={setCrop}
@@ -127,7 +133,9 @@ const ImageCropModal: React.FC<ImageCropModalProps> = ({
                 boxShadow: "0 0 0 9999em rgba(0, 0, 0, 0.5)",
               },
               mediaStyle: {
-                transform: "none",
+                objectFit: "cover", // Ensure the image fills the crop area
+                width: "100%",
+                height: "300px",
               },
             }}
           />

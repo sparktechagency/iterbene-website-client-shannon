@@ -4,7 +4,10 @@ import { CameraIcon } from "lucide-react";
 import Image from "next/image";
 import React, { useState, useRef } from "react";
 import ImageCropModal from "@/components/custom/ImageCropModal";
-import { useUpdateProfileImageMutation, useUpdateCoverImageMutation } from "@/redux/features/profile/profileApi";
+import {
+  useUpdateProfileImageMutation,
+  useUpdateCoverImageMutation,
+} from "@/redux/features/profile/profileApi";
 import toast from "react-hot-toast";
 
 const MyProfileHeader = ({ userData }: { userData: IUser }) => {
@@ -24,7 +27,10 @@ const MyProfileHeader = ({ userData }: { userData: IUser }) => {
     inputRef.current?.click();
   };
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>, type: "cover" | "profile") => {
+  const handleFileChange = (
+    event: React.ChangeEvent<HTMLInputElement>,
+    type: "cover" | "profile"
+  ) => {
     const file = event.target.files?.[0];
     if (file) {
       const reader = new FileReader();
@@ -56,7 +62,12 @@ const MyProfileHeader = ({ userData }: { userData: IUser }) => {
     } catch (error: unknown) {
       console.error("Error uploading cover image:", error);
       const errorMessage =
-        error && typeof error === "object" && "data" in error && error.data && typeof error.data === "object" && "message" in error.data
+        error &&
+        typeof error === "object" &&
+        "data" in error &&
+        error.data &&
+        typeof error.data === "object" &&
+        "message" in error.data
           ? String(error.data.message)
           : "Failed to update cover photo. Please try again.";
       toast.error(errorMessage);
@@ -77,7 +88,12 @@ const MyProfileHeader = ({ userData }: { userData: IUser }) => {
       setProfileImageSrc(null);
     } catch (error: unknown) {
       const errorMessage =
-        error && typeof error === "object" && "data" in error && error.data && typeof error.data === "object" && "message" in error.data
+        error &&
+        typeof error === "object" &&
+        "data" in error &&
+        error.data &&
+        typeof error.data === "object" &&
+        "message" in error.data
           ? String(error.data.message)
           : "Failed to update profile photo. Please try again.";
       toast.error(errorMessage);
@@ -112,7 +128,6 @@ const MyProfileHeader = ({ userData }: { userData: IUser }) => {
         className="hidden"
         onChange={(e) => handleFileChange(e, "profile")}
       />
-
       <div className="w-full bg-white rounded-2xl relative mt-[72px] md:mt-[88px] lg:mt-[112px]">
         {/* Background Image with Camera Icon */}
         <div className="relative group w-full">
@@ -148,7 +163,7 @@ const MyProfileHeader = ({ userData }: { userData: IUser }) => {
         <div className="relative group inline-block">
           <div className="relative lg:absolute left-8 -mt-[80px] lg:-mt-[100px] mx-auto">
             <div className="relative size-[140px] md:size-[174px] lg:size-[174px] border-4 border-white rounded-full overflow-hidden shadow-lg">
-              {userData?.profileImage? (
+              {userData?.profileImage ? (
                 <Image
                   src={userData?.profileImage}
                   alt="Profile photo"
@@ -190,16 +205,16 @@ const MyProfileHeader = ({ userData }: { userData: IUser }) => {
           </div>
         </div>
       </div>
-
       <ImageCropModal
         isOpen={showCoverCrop}
         onClose={() => handleCropCancel("cover")}
         imageSrc={coverImageSrc || ""}
         onCropComplete={handleCoverCropComplete}
         cropShape="rect"
-        aspect={8000 / 3000} // Adjusted aspect ratio to match typical cover photo dimensions
+        aspect={3 / 1} // Explicitly set for cover
         title="Crop Cover Photo"
         isUploading={isUploading}
+        isProfile={false} // Indicate this is a cover image
       />
       <ImageCropModal
         isOpen={showProfileCrop}
@@ -207,9 +222,10 @@ const MyProfileHeader = ({ userData }: { userData: IUser }) => {
         imageSrc={profileImageSrc || ""}
         onCropComplete={handleProfileCropComplete}
         cropShape="round"
-        aspect={1}
+        aspect={1} // Explicitly set for profile
         title="Crop Profile Photo"
         isUploading={isUploading}
+        isProfile={true} // Indicate this is a profile image
       />
     </>
   );
