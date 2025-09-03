@@ -1,8 +1,9 @@
 "use client";
 import CustomModal from "@/components/custom/custom-modal";
 import { IoMdClose } from "react-icons/io";
-import Cropper from "react-easy-crop";
-import { useState, useCallback } from "react";
+import Cropper, { Area } from "react-easy-crop";
+import { useState, useCallback, useEffect } from "react";
+import getCroppedImg from "@/utils/cropUtils";
 
 interface ImageCropModalProps {
   isOpen: boolean;
@@ -23,23 +24,46 @@ const ImageCropModal: React.FC<ImageCropModalProps> = ({
   cropShape = "rect",
   aspect = 12 / 6,
   title,
-  isUploading
+  isUploading,
 }) => {
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
-  const [croppedAreaPixels, setCroppedAreaPixels] = useState<null | { x: number; y: number; width: number; height: number }>(null);
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null);
+  const [imageSize, setImageSize] = useState<{
+    width: number;
+    height: number;
+  } | null>(null);
 
-  const onCropCompleteInternal = useCallback(( croppedAreaPixels: { x: number; y: number; width: number; height: number }) => {
-    setCroppedAreaPixels(croppedAreaPixels);
-  }, []);
+  // Load image size to adjust initial crop position
+  useEffect(() => {
+    const img = new Image();
+    img.src = imageSrc;
+    img.onload = () => {
+      setImageSize({ width: img.width, height: img.height });
+    };
+  }, [imageSrc]);
 
-  const handleSave = async () => {
-    if (croppedAreaPixels) {
-      const { getCroppedImg } = await import("@/utils/cropUtils");
-      const croppedImage = await getCroppedImg(imageSrc, croppedAreaPixels);
+  const onCropCompleteInternal = useCallback(
+    (_croppedArea: Area, croppedAreaPixels: Area) => {
+      setCroppedAreaPixels(croppedAreaPixels);
+    },
+    []
+  );
+
+  const handleSave = useCallback(async () => {
+    if (!croppedAreaPixels || !imageSize) return;
+    try {
+      const croppedImage = await getCroppedImg(imageSrc, {
+        x: croppedAreaPixels.x,
+        y: croppedAreaPixels.y,
+        width: croppedAreaPixels.width,
+        height: croppedAreaPixels.height,
+      });
       onCropComplete(croppedImage);
+    } catch (e) {
+      console.error("Error cropping image:", e);
     }
-  };
+  }, [croppedAreaPixels, imageSrc, onCropComplete, imageSize]);
 
   const handleCancel = () => {
     setCrop({ x: 0, y: 0 });
@@ -47,6 +71,15 @@ const ImageCropModal: React.FC<ImageCropModalProps> = ({
     setCroppedAreaPixels(null);
     onClose();
   };
+
+  // Initialize crop position based on image size and aspect ratio
+  useEffect(() => {
+    if (imageSize && aspect) {
+      const initialX = (imageSize.width - imageSize.height * aspect) / 2;
+      const initialY = 0;
+      setCrop({ x: initialX > 0 ? initialX : 0, y: initialY });
+    }
+  }, [imageSize, aspect]);
 
   return (
     <CustomModal
@@ -57,7 +90,9 @@ const ImageCropModal: React.FC<ImageCropModalProps> = ({
         <div className="flex items-center justify-between px-6 py-3 border-b border-gray-200 rounded-t-xl">
           <div>
             <h2 className="text-xl font-bold text-gray-800">{title}</h2>
-            <p className="text-sm text-gray-600 mt-1">Adjust your image to look perfect</p>
+            <p className="text-sm text-gray-600 mt-1">
+              Adjust your image to look perfect
+            </p>
           </div>
           <button
             className="text-gray-600 border-gray-400 cursor-pointer size-10 bg-[#EEFDFB] hover:bg-[#D1FAE5] rounded-full border flex justify-center items-center transition-colors"
@@ -71,8 +106,7 @@ const ImageCropModal: React.FC<ImageCropModalProps> = ({
       className="w-full p-0"
     >
       <div className="p-6">
-        {/* Cropper Container */}
-        <div className="relative h-[300px]  rounded-lg overflow-hidden mb-6">
+        <div className="relative h-[300px] rounded-lg overflow-hidden mb-6">
           <Cropper
             image={imageSrc}
             crop={crop}
@@ -85,23 +119,24 @@ const ImageCropModal: React.FC<ImageCropModalProps> = ({
             onCropComplete={onCropCompleteInternal}
             style={{
               containerStyle: {
-                background: '#f9fafb',
-                borderRadius: '8px',
+                background: "#f9fafb",
+                borderRadius: "8px",
               },
               cropAreaStyle: {
-                border: '2px solid #40e0d0',
-                boxShadow: '0 0 0 9999em rgba(0, 0, 0, 0.5)',
+                border: "2px solid #40e0d0",
+                boxShadow: "0 0 0 9999em rgba(0, 0, 0, 0.5)",
               },
               mediaStyle: {
-                transform: 'none',
-              }
+                transform: "none",
+              },
             }}
           />
         </div>
 
-        {/* Zoom Control */}
         <div className="mb-6">
-          <label className="block text-sm font-medium text-gray-700 mb-2">Zoom</label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Zoom
+          </label>
           <div className="relative">
             <input
               type="range"
@@ -112,7 +147,9 @@ const ImageCropModal: React.FC<ImageCropModalProps> = ({
               onChange={(e) => setZoom(parseFloat(e.target.value))}
               className="w-full h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-50"
               style={{
-                background: `linear-gradient(to right, #40e0d0 0%, #40e0d0 ${((zoom - 1) / 2) * 100}%, #e5e7eb ${((zoom - 1) / 2) * 100}%, #e5e7eb 100%)`
+                background: `linear-gradient(to right, #40e0d0 0%, #40e0d0 ${
+                  ((zoom - 1) / 2) * 100
+                }%, #e5e7eb ${((zoom - 1) / 2) * 100}%, #e5e7eb 100%)`,
               }}
             />
             <style jsx>{`
@@ -144,7 +181,6 @@ const ImageCropModal: React.FC<ImageCropModalProps> = ({
           </div>
         </div>
 
-        {/* Action Buttons */}
         <div className="flex justify-end gap-3 pt-4 border-t border-gray-200">
           <button
             onClick={handleCancel}
@@ -164,7 +200,7 @@ const ImageCropModal: React.FC<ImageCropModalProps> = ({
                 Uploading...
               </>
             ) : (
-              'Save Image'
+              "Save Image"
             )}
           </button>
         </div>
