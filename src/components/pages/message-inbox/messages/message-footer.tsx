@@ -36,6 +36,7 @@ const MessageFooter = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const imageInputRef = useRef<HTMLInputElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const textareaRef2 = useRef<HTMLTextAreaElement>(null);
   const attachmentScrollRef = useRef<HTMLDivElement>(null);
   const emojiPickerRef = useRef<HTMLDivElement>(null);
 
@@ -50,11 +51,14 @@ const MessageFooter = () => {
       ),
     [selectedFiles]
   );
-  
+
   // Check if user is typing (has message or files)
   const isTyping = message.trim().length > 0 || selectedFiles.length > 0;
 
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    if (message === "") {
+      textareaRef2.current?.focus();
+    }
     setMessage(e.target.value);
   };
 
@@ -69,15 +73,13 @@ const MessageFooter = () => {
     }
   }, [message]);
 
-  // Auto focus textarea when switching to typing mode
+  // Auto focus textareaRef when switching to typing mode
   useEffect(() => {
     if (isTyping && textareaRef.current && !hasOnlyNonMediaAttachments) {
-      // Small delay to ensure layout transition is complete
       const timer = setTimeout(() => {
         const textarea = textareaRef.current;
         if (textarea) {
           textarea.focus();
-          // Set cursor position to the end of existing text
           const textLength = textarea.value.length;
           textarea.setSelectionRange(textLength, textLength);
         }
@@ -86,6 +88,21 @@ const MessageFooter = () => {
       return () => clearTimeout(timer);
     }
   }, [isTyping, hasOnlyNonMediaAttachments]);
+
+  // Auto focus textareaRef2 in default mode or after sending message
+  useEffect(() => {
+    if (!isTyping && textareaRef2.current) {
+      const timer = setTimeout(() => {
+        textareaRef2.current?.focus();
+        const textLength = textareaRef2.current ? textareaRef2.current.value.length : 0;
+        if (textareaRef2.current) {
+          textareaRef2.current.setSelectionRange(textLength, textLength);
+        }
+      }, 150);
+
+      return () => clearTimeout(timer);
+    }
+  }, [isTyping, message]);
 
   // Close emoji picker when clicking outside
   useEffect(() => {
@@ -111,7 +128,6 @@ const MessageFooter = () => {
   const handleEmojiSelect = (emoji: string) => {
     setMessage(message + emoji);
     if (textareaRef.current) {
-      // Focus and set cursor position after emoji
       const newMessage = message + emoji;
       textareaRef.current.focus();
       textareaRef.current.setSelectionRange(
@@ -138,16 +154,6 @@ const MessageFooter = () => {
           newFile.preview = event.target?.result as string;
           newFile.type = "image";
           setSelectedFiles((prev) => [...prev, newFile]);
-          // Auto focus textarea after file is added
-          setTimeout(() => {
-            const textarea = textareaRef.current;
-            if (textarea && !hasOnlyNonMediaAttachments) {
-              textarea.focus();
-              // Set cursor position to the end of existing text
-              const textLength = textarea.value.length;
-              textarea.setSelectionRange(textLength, textLength);
-            }
-          }, 200);
         };
         reader.readAsDataURL(file);
       } else if (file.type.startsWith("video/")) {
@@ -167,16 +173,6 @@ const MessageFooter = () => {
           newFile.type = "video";
           newFile.duration = video.duration;
           setSelectedFiles((prev) => [...prev, newFile]);
-          // Auto focus textarea after file is added
-          setTimeout(() => {
-            const textarea = textareaRef.current;
-            if (textarea && !hasOnlyNonMediaAttachments) {
-              textarea.focus();
-              // Set cursor position to the end of existing text
-              const textLength = textarea.value.length;
-              textarea.setSelectionRange(textLength, textLength);
-            }
-          }, 200);
           URL.revokeObjectURL(videoUrl);
         };
       }
@@ -192,6 +188,14 @@ const MessageFooter = () => {
     if (imageInputRef.current) {
       imageInputRef.current.value = "";
     }
+    setTimeout(() => {
+      const textarea = textareaRef.current;
+      if (textarea && !hasOnlyNonMediaAttachments) {
+        textarea.focus();
+        const textLength = textarea.value.length;
+        textarea.setSelectionRange(textLength, textLength);
+      }
+    }, 200);
   };
 
   // Handle file selection (for attachment button)
@@ -250,6 +254,14 @@ const MessageFooter = () => {
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
+    setTimeout(() => {
+      const textarea = textareaRef.current;
+      if (textarea && !hasOnlyNonMediaAttachments) {
+        textarea.focus();
+        const textLength = textarea.value.length;
+        textarea.setSelectionRange(textLength, textLength);
+      }
+    }, 200);
   };
 
   // Remove selected file
@@ -312,9 +324,6 @@ const MessageFooter = () => {
       setMessage("");
       setSelectedFiles([]);
       setShowEmojiPicker(false);
-      if (textareaRef.current) {
-        textareaRef.current.style.height = "auto";
-      }
     } catch (error) {
       const err = error as TError;
       toast.error(err?.data?.message || "Something went wrong!");
@@ -342,7 +351,6 @@ const MessageFooter = () => {
             {selectedFiles?.map((selectedFile) => (
               <div key={selectedFile.id} className="relative flex-shrink-0">
                 {selectedFile.type === "image" && selectedFile.preview ? (
-                  // Image preview - Instagram style with rounded corners
                   <div className="relative group">
                     <div className="relative overflow-hidden rounded-xl bg-gray-100">
                       <Image
@@ -352,18 +360,16 @@ const MessageFooter = () => {
                         height={80}
                         className="w-16 h-16 sm:w-20 sm:h-20 object-cover transition-transform group-hover:scale-105"
                       />
-                      {/* Gradient overlay on hover */}
                       <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors rounded-xl"></div>
                     </div>
                     <button
                       onClick={() => removeFile(selectedFile.id)}
-                      className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-red-600 transition-all transform hover:scale-110 shadow-lg"
+                      className="absolute -top-1.5 -right-1.5 w-5 h h-5 bg-red-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-red-600 transition-all transform hover:scale-110 shadow-lg"
                     >
                       <X size={12} />
                     </button>
                   </div>
                 ) : selectedFile.type === "video" && selectedFile.preview ? (
-                  // Video preview - Instagram style
                   <div className="relative group">
                     <div className="relative overflow-hidden rounded-xl bg-gray-100">
                       <Image
@@ -371,9 +377,8 @@ const MessageFooter = () => {
                         alt="Video thumbnail"
                         width={90}
                         height={80}
-                        className="w-20 h-16 sm:w-24 sm:h-20 object-cover transition-transform group-hover:scale-105"
+                        className="w-20 h-16	sm:w-24 sm:h-20 object-cover transition-transform group-hover:scale-105"
                       />
-                      {/* Play button overlay */}
                       <div className="absolute inset-0 flex items-center justify-center bg-black/20 rounded-xl group-hover:bg-black/30 transition-colors">
                         <div className="bg-white/95 backdrop-blur-sm rounded-full p-2 shadow-lg">
                           <Play
@@ -383,7 +388,6 @@ const MessageFooter = () => {
                           />
                         </div>
                       </div>
-                      {/* Duration badge */}
                       {selectedFile.duration && (
                         <div className="absolute bottom-1.5 right-1.5 bg-black/80 text-white text-xs px-1.5 py-0.5 rounded-md backdrop-blur-sm">
                           {formatDuration(selectedFile.duration)}
@@ -398,7 +402,6 @@ const MessageFooter = () => {
                     </button>
                   </div>
                 ) : selectedFile.type === "pdf" ? (
-                  // PDF preview - Modern card style
                   <div className="relative bg-white rounded-2xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow w-60 sm:w-72">
                     <div className="p-3 sm:p-4">
                       <div className="flex items-start gap-3">
@@ -455,7 +458,6 @@ const MessageFooter = () => {
                     </button>
                   </div>
                 ) : (
-                  // Regular file preview - Modern card style
                   <div className="relative bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow w-40 sm:w-48">
                     <div className="p-3">
                       <div className="flex items-center gap-2.5">
@@ -597,7 +599,7 @@ const MessageFooter = () => {
               </div>
             </div>
           ) : (
-            /* Default Mode - Original single row layout */
+            /* clonal /* Default Mode - Original single row layout */
             <div className="flex items-end space-x-2">
               {/* Attachment button */}
               <button
@@ -631,7 +633,7 @@ const MessageFooter = () => {
 
               {/* Textarea */}
               <textarea
-                ref={textareaRef}
+                ref={textareaRef2}
                 placeholder="Message"
                 value={hasOnlyNonMediaAttachments ? "" : message}
                 onChange={hasOnlyNonMediaAttachments ? () => {} : handleChange}
@@ -644,7 +646,6 @@ const MessageFooter = () => {
                 }`}
                 style={{
                   minHeight: "32px",
-                  maxHeight: window.innerWidth < 768 ? "100px" : "120px",
                 }}
                 disabled={isLoading || hasOnlyNonMediaAttachments}
                 readOnly={hasOnlyNonMediaAttachments}
@@ -686,5 +687,4 @@ const MessageFooter = () => {
     </div>
   );
 };
-
 export default MessageFooter;

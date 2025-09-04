@@ -6,7 +6,17 @@ import "yet-another-react-lightbox/styles.css";
 import Link from "next/link";
 import pdf from "@/asset/message/pdf.png";
 import { IUser } from "@/types/user.types";
-import { Eye, Download, FileText, X, Play, Pause, Volume2, VolumeX, Maximize2 } from "lucide-react";
+import {
+  Eye,
+  Download,
+  FileText,
+  X,
+  Play,
+  Pause,
+  Volume2,
+  VolumeX,
+  Maximize2,
+} from "lucide-react";
 import { getFullName } from "@/utils/nameUtils";
 
 interface MessageItemProps {
@@ -24,14 +34,19 @@ interface PDFModalProps {
   fileName: string;
 }
 
-const PDFModal: React.FC<PDFModalProps> = ({ isOpen, onClose, pdfUrl, fileName }) => {
+const PDFModal: React.FC<PDFModalProps> = ({
+  isOpen,
+  onClose,
+  pdfUrl,
+  fileName,
+}) => {
   if (!isOpen) return null;
 
   const handleDownload = () => {
-    const link = document.createElement('a');
+    const link = document.createElement("a");
     link.href = pdfUrl;
     link.download = fileName;
-    link.target = '_blank';
+    link.target = "_blank";
     link.click();
   };
 
@@ -45,7 +60,9 @@ const PDFModal: React.FC<PDFModalProps> = ({ isOpen, onClose, pdfUrl, fileName }
               <FileText size={20} className="text-red-600" />
             </div>
             <div>
-              <h3 className="font-semibold text-gray-900 truncate">{fileName}</h3>
+              <h3 className="font-semibold text-gray-900 truncate">
+                {fileName}
+              </h3>
               <p className="text-sm text-gray-500">PDF Document</p>
             </div>
           </div>
@@ -65,7 +82,7 @@ const PDFModal: React.FC<PDFModalProps> = ({ isOpen, onClose, pdfUrl, fileName }
             </button>
           </div>
         </div>
-        
+
         {/* PDF Viewer */}
         <div className="flex-1 p-4">
           <iframe
@@ -86,81 +103,88 @@ const MessageItem: React.FC<MessageItemProps> = ({
   onOpenLightbox,
 }) => {
   const [pdfModalOpen, setPdfModalOpen] = useState(false);
-  const [selectedPdfUrl, setSelectedPdfUrl] = useState('');
-  const [selectedFileName, setSelectedFileName] = useState('');
-  const [videoStates, setVideoStates] = useState<Record<string, {
-    isPlaying: boolean;
-    isMuted: boolean;
-    showControls: boolean;
-  }>>({});
-  
+  const [selectedPdfUrl, setSelectedPdfUrl] = useState("");
+  const [selectedFileName, setSelectedFileName] = useState("");
+  const [videoStates, setVideoStates] = useState<
+    Record<
+      string,
+      {
+        isPlaying: boolean;
+        isMuted: boolean;
+        showControls: boolean;
+      }
+    >
+  >({});
+
   const fileUrls = message?.content?.fileUrls || [];
-  
+
   // Video control functions
   const togglePlay = (videoId: string, videoElement: HTMLVideoElement) => {
     if (videoStates[videoId]?.isPlaying) {
       videoElement.pause();
     } else {
       // Pause all other videos first
-      Object.keys(videoStates).forEach(id => {
+      Object.keys(videoStates).forEach((id) => {
         if (id !== videoId && videoStates[id]?.isPlaying) {
-          const otherVideo = document.getElementById(`video-${id}`) as HTMLVideoElement;
+          const otherVideo = document.getElementById(
+            `video-${id}`
+          ) as HTMLVideoElement;
           if (otherVideo) otherVideo.pause();
         }
       });
       videoElement.play();
     }
   };
-  
+
   const toggleMute = (videoId: string, videoElement: HTMLVideoElement) => {
     videoElement.muted = !videoElement.muted;
-    setVideoStates(prev => ({
+    setVideoStates((prev) => ({
       ...prev,
       [videoId]: {
         ...prev[videoId],
-        isMuted: videoElement.muted
-      }
+        isMuted: videoElement.muted,
+      },
     }));
   };
-  
+
   const handleVideoPlay = (videoId: string) => {
-    setVideoStates(prev => ({
+    setVideoStates((prev) => ({
       ...prev,
-      [videoId]: { ...prev[videoId], isPlaying: true }
+      [videoId]: { ...prev[videoId], isPlaying: true },
     }));
   };
-  
+
   const handleVideoPause = (videoId: string) => {
-    setVideoStates(prev => ({
+    setVideoStates((prev) => ({
       ...prev,
-      [videoId]: { ...prev[videoId], isPlaying: false }
+      [videoId]: { ...prev[videoId], isPlaying: false },
     }));
   };
-  
+
   const showVideoControls = (videoId: string) => {
-    setVideoStates(prev => ({
+    setVideoStates((prev) => ({
       ...prev,
-      [videoId]: { ...prev[videoId], showControls: true }
+      [videoId]: { ...prev[videoId], showControls: true },
     }));
   };
-  
+
   const hideVideoControls = (videoId: string) => {
-    setVideoStates(prev => ({
+    setVideoStates((prev) => ({
       ...prev,
-      [videoId]: { ...prev[videoId], showControls: false }
+      [videoId]: { ...prev[videoId], showControls: false },
     }));
   };
-  
+
   // Initialize video state
   const initVideoState = (videoId: string) => {
     if (!videoStates[videoId]) {
-      setVideoStates(prev => ({
+      setVideoStates((prev) => ({
         ...prev,
         [videoId]: {
           isPlaying: false,
           isMuted: true,
-          showControls: false
-        }
+          showControls: false,
+        },
       }));
     }
   };
@@ -168,7 +192,7 @@ const MessageItem: React.FC<MessageItemProps> = ({
   // Limit displayed images to 2
   const displayedImages = fileUrls.slice(0, 2);
   const extraImagesCount = fileUrls.length - displayedImages.length;
-  
+
   const openPdfModal = (pdfUrl: string, fileName: string) => {
     setSelectedPdfUrl(pdfUrl);
     setSelectedFileName(fileName);
@@ -177,8 +201,8 @@ const MessageItem: React.FC<MessageItemProps> = ({
 
   const closePdfModal = () => {
     setPdfModalOpen(false);
-    setSelectedPdfUrl('');
-    setSelectedFileName('');
+    setSelectedPdfUrl("");
+    setSelectedFileName("");
   };
 
   console.log("MessageItem:", message);
@@ -220,19 +244,31 @@ const MessageItem: React.FC<MessageItemProps> = ({
               {moment(message.createdAt).format("h:mm A")}
             </span>
             {fileUrls.length > 0 && (
-              <div className={`grid gap-1 max-w-[300px] sm:max-w-[400px] ${
-                fileUrls.length === 1 ? 'grid-cols-1' :
-                fileUrls.length === 2 ? 'grid-cols-2' : 'grid-cols-2'
-              }`}>
+              <div
+                className={`grid gap-1 max-w-[300px] sm:max-w-[400px] ${
+                  fileUrls.length === 1
+                    ? "grid-cols-1"
+                    : fileUrls.length === 2
+                    ? "grid-cols-2"
+                    : "grid-cols-2"
+                }`}
+              >
                 {displayedImages.map((url, index) => {
                   // Check if it's a video URL (basic check)
-                  const isVideo = url.includes('.mp4') || url.includes('.webm') || url.includes('.mov');
+                  const isVideo =
+                    url.includes(".mp4") ||
+                    url.includes(".webm") ||
+                    url.includes(".mov");
                   const mediaId = `mixed-${message._id}-${index}`;
-                  
+
                   if (isVideo) {
                     initVideoState(mediaId);
-                    const currentVideoState = videoStates[mediaId] || { isPlaying: false, isMuted: true, showControls: false };
-                    
+                    const currentVideoState = videoStates[mediaId] || {
+                      isPlaying: false,
+                      isMuted: true,
+                      showControls: false,
+                    };
+
                     return (
                       <div
                         key={index}
@@ -255,13 +291,16 @@ const MessageItem: React.FC<MessageItemProps> = ({
                         >
                           <source src={url} type="video/mp4" />
                         </video>
-                        
-                        {(!currentVideoState.isPlaying || currentVideoState.showControls) && (
+
+                        {(!currentVideoState.isPlaying ||
+                          currentVideoState.showControls) && (
                           <div className="absolute inset-0 flex items-center justify-center bg-black/20">
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
-                                const video = document.getElementById(`video-${mediaId}`) as HTMLVideoElement;
+                                const video = document.getElementById(
+                                  `video-${mediaId}`
+                                ) as HTMLVideoElement;
                                 if (video) togglePlay(mediaId, video);
                               }}
                               className="bg-black/60 hover:bg-black/80 text-white rounded-full p-2"
@@ -269,7 +308,11 @@ const MessageItem: React.FC<MessageItemProps> = ({
                               {currentVideoState.isPlaying ? (
                                 <Pause size={16} fill="white" />
                               ) : (
-                                <Play size={16} fill="white" className="ml-0.5" />
+                                <Play
+                                  size={16}
+                                  fill="white"
+                                  className="ml-0.5"
+                                />
                               )}
                             </button>
                           </div>
@@ -355,17 +398,26 @@ const MessageItem: React.FC<MessageItemProps> = ({
             >
               {moment(message.createdAt).format("h:mm A")}
             </span>
-            <div className={`grid gap-1 max-w-[300px] sm:max-w-[400px] ${
-              fileUrls.length === 1 ? 'grid-cols-1' :
-              fileUrls.length === 2 ? 'grid-cols-2' :
-              fileUrls.length === 3 ? 'grid-cols-2' : 'grid-cols-2'
-            }`}>
+            <div
+              className={`grid gap-1 max-w-[300px] sm:max-w-[400px] ${
+                fileUrls.length === 1
+                  ? "grid-cols-1"
+                  : fileUrls.length === 2
+                  ? "grid-cols-2"
+                  : fileUrls.length === 3
+                  ? "grid-cols-2"
+                  : "grid-cols-2"
+              }`}
+            >
               {displayedImages.map((url, index) => (
                 <div
                   key={index}
                   className={`relative cursor-pointer overflow-hidden rounded-lg ${
-                    fileUrls.length === 1 ? 'col-span-1' :
-                    fileUrls.length === 3 && index === 0 ? 'col-span-2' : 'col-span-1'
+                    fileUrls.length === 1
+                      ? "col-span-1"
+                      : fileUrls.length === 3 && index === 0
+                      ? "col-span-2"
+                      : "col-span-1"
                   }`}
                   onClick={() => onOpenLightbox(fileUrls, index)}
                 >
@@ -375,8 +427,9 @@ const MessageItem: React.FC<MessageItemProps> = ({
                     width={fileUrls.length === 1 ? 300 : 150}
                     height={fileUrls.length === 1 ? 300 : 150}
                     className={`object-cover hover:scale-105 transition-transform duration-200 ${
-                      fileUrls.length === 1 ? 'w-full h-auto max-h-[400px]' :
-                      'w-full h-[150px]'
+                      fileUrls.length === 1
+                        ? "w-full h-auto max-h-[400px]"
+                        : "w-full h-[150px]"
                     }`}
                   />
                   {index === 1 && extraImagesCount > 0 && (
@@ -424,8 +477,12 @@ const MessageItem: React.FC<MessageItemProps> = ({
             {fileUrls.map((videoUrl, index) => {
               const videoId = `${message._id}-${index}`;
               initVideoState(videoId);
-              const currentVideoState = videoStates[videoId] || { isPlaying: false, isMuted: true, showControls: false };
-              
+              const currentVideoState = videoStates[videoId] || {
+                isPlaying: false,
+                isMuted: true,
+                showControls: false,
+              };
+
               return (
                 <div
                   key={index}
@@ -449,14 +506,17 @@ const MessageItem: React.FC<MessageItemProps> = ({
                     <source src={videoUrl} type="video/mp4" />
                     Your browser does not support the video element.
                   </video>
-                  
+
                   {/* Play/Pause Button Overlay */}
-                  {(!currentVideoState.isPlaying || currentVideoState.showControls) && (
+                  {(!currentVideoState.isPlaying ||
+                    currentVideoState.showControls) && (
                     <div className="absolute inset-0 flex items-center justify-center bg-black/20 transition-opacity">
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
-                          const video = document.getElementById(`video-${videoId}`) as HTMLVideoElement;
+                          const video = document.getElementById(
+                            `video-${videoId}`
+                          ) as HTMLVideoElement;
                           if (video) togglePlay(videoId, video);
                         }}
                         className="bg-black/60 hover:bg-black/80 text-white rounded-full p-3 transition-all hover:scale-110"
@@ -469,17 +529,23 @@ const MessageItem: React.FC<MessageItemProps> = ({
                       </button>
                     </div>
                   )}
-                  
+
                   {/* Video Controls Overlay */}
-                  <div className={`absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-3 transition-opacity duration-200 ${
-                    currentVideoState.showControls ? "opacity-100" : "opacity-0"
-                  }`}>
+                  <div
+                    className={`absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-3 transition-opacity duration-200 ${
+                      currentVideoState.showControls
+                        ? "opacity-100"
+                        : "opacity-0"
+                    }`}
+                  >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-2">
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
-                            const video = document.getElementById(`video-${videoId}`) as HTMLVideoElement;
+                            const video = document.getElementById(
+                              `video-${videoId}`
+                            ) as HTMLVideoElement;
                             if (video) toggleMute(videoId, video);
                           }}
                           className="text-white hover:text-blue-400 transition-colors"
@@ -494,7 +560,9 @@ const MessageItem: React.FC<MessageItemProps> = ({
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
-                          const video = document.getElementById(`video-${videoId}`) as HTMLVideoElement;
+                          const video = document.getElementById(
+                            `video-${videoId}`
+                          ) as HTMLVideoElement;
                           if (video && video.requestFullscreen) {
                             video.requestFullscreen();
                           }
@@ -505,7 +573,7 @@ const MessageItem: React.FC<MessageItemProps> = ({
                       </button>
                     </div>
                   </div>
-                  
+
                   {/* Loading/Buffering Indicator */}
                   <div className="absolute top-2 right-2">
                     <div className="bg-black/50 text-white text-xs px-2 py-1 rounded">
@@ -535,8 +603,8 @@ const MessageItem: React.FC<MessageItemProps> = ({
               const fileName = decodeURIComponent(
                 fileUrl.split("/").pop()?.split("?")[0] || `file-${index}`
               );
-              const isPdf = fileName.toLowerCase().endsWith('.pdf');
-              
+              const isPdf = fileName.toLowerCase().endsWith(".pdf");
+
               return (
                 <div
                   key={index}
@@ -560,7 +628,7 @@ const MessageItem: React.FC<MessageItemProps> = ({
                           </p>
                         </div>
                       </div>
-                      
+
                       <div className="flex items-center space-x-2 pt-2 border-t border-gray-100">
                         <button
                           onClick={() => openPdfModal(fileUrl, fileName)}
@@ -571,10 +639,10 @@ const MessageItem: React.FC<MessageItemProps> = ({
                         </button>
                         <button
                           onClick={() => {
-                            const link = document.createElement('a');
+                            const link = document.createElement("a");
                             link.href = fileUrl;
                             link.download = fileName;
-                            link.target = '_blank';
+                            link.target = "_blank";
                             link.click();
                           }}
                           className="flex-1 flex items-center justify-center space-x-2 py-2 px-3 bg-gray-50 text-gray-600 rounded-lg hover:bg-gray-100 transition-colors text-sm font-medium"
@@ -586,9 +654,11 @@ const MessageItem: React.FC<MessageItemProps> = ({
                     </div>
                   ) : (
                     // Regular file display
-                    <div className={`flex items-center gap-2 ${
-                      isMyMessage ? "flex-row-reverse" : "flex-row"
-                    }`}>
+                    <div
+                      className={`flex items-center gap-2 ${
+                        isMyMessage ? "flex-row-reverse" : "flex-row"
+                      }`}
+                    >
                       <Image src={pdf} width={32} height={32} alt="file" />
                       <Link
                         href={fileUrl}
@@ -630,13 +700,20 @@ const MessageItem: React.FC<MessageItemProps> = ({
             <div>
               {message?.storyMedia?.mediaType === "image" ? (
                 message?.storyMedia?.mediaUrl ? (
-                  <Image
-                    src={message?.storyMedia?.mediaUrl || ""}
-                    alt={`Story Image`}
-                    width={150}
-                    height={150}
-                    className="w-[120px] h-[120px] object-cover rounded-lg"
-                  />
+                  <>
+                    <Image
+                      src={message?.storyMedia?.mediaUrl || ""}
+                      alt={`Story Image`}
+                      width={150}
+                      height={150}
+                      className="w-[120px] h-[120px] object-cover rounded-lg"
+                    />
+                    {message?.content?.text && !isMyMessage && (
+                      <h1 className="max-w-fit p-3 rounded-xl bg-[#ECFCFA] text-[#1A1A1A]">
+                        {message?.content?.text}
+                      </h1>
+                    )}
+                  </>
                 ) : (
                   <div className="w-[120px] h-[120px] bg-slate-100 flex items-center justify-center rounded-lg">
                     <h1 className="text-xs text-gray-700 text-center">
@@ -646,13 +723,20 @@ const MessageItem: React.FC<MessageItemProps> = ({
                 )
               ) : message?.storyMedia?.mediaType === "mixed" ? (
                 message?.storyMedia?.mediaUrl ? (
-                  <Image
-                    src={message?.storyMedia?.mediaUrl || ""}
-                    alt={`Story Image`}
-                    width={150}
-                    height={150}
-                    className="w-[120px] h-[120px] object-cover rounded-lg"
-                  />
+                  <div className="flex flex-col gap-2">
+                    <Image
+                      src={message?.storyMedia?.mediaUrl || ""}
+                      alt={`Story Image`}
+                      width={150}
+                      height={150}
+                      className="w-[120px] h-[120px] object-cover rounded-lg"
+                    />
+                    {message?.content?.text && !isMyMessage && (
+                      <h1 className="max-w-fit p-3 rounded-xl bg-[#ECFCFA] text-[#1A1A1A]">
+                        {message?.content?.text}
+                      </h1>
+                    )}
+                  </div>
                 ) : (
                   <div className="w-[120px] h-[120px] bg-slate-100 flex items-center justify-center rounded-lg">
                     <h1 className="text-xs text-gray-700 text-center">
@@ -675,7 +759,7 @@ const MessageItem: React.FC<MessageItemProps> = ({
           </div>
         )}
       </div>
-      
+
       {/* PDF Modal */}
       <PDFModal
         isOpen={pdfModalOpen}
