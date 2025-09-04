@@ -10,10 +10,12 @@ import { IUser } from "@/types/user.types";
 import Image from "next/image"; // For rendering images in React components
 import { FieldValues, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
-import { useState, ChangeEvent } from "react";
-import { BsUpload } from "react-icons/bs";
+import { useState, ChangeEvent, useRef, DragEvent } from "react";
+import ImageCropModal from "@/components/custom/ImageCropModal";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { TError } from "@/types/error";
+import { HiOutlinePhotograph } from "react-icons/hi";
 
 interface IEditMyProfileDetailsProps {
   userData: IUser;
@@ -51,8 +53,22 @@ const EditMyProfileDetails = ({
   const [coverImagePreview, setCoverImagePreview] = useState<string | null>(
     null
   );
-  const [profileImageFile, setProfileImageFile] = useState<File | null>(null);
-  const [coverImageFile, setCoverImageFile] = useState<File | null>(null);
+  // Image crop modal states
+  const [showCoverCrop, setShowCoverCrop] = useState(false);
+  const [showProfileCrop, setShowProfileCrop] = useState(false);
+  const [coverImageSrc, setCoverImageSrc] = useState<string | null>(null);
+  const [profileImageSrc, setProfileImageSrc] = useState<string | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
+
+  // Drag and drop states
+  const [isDragging, setIsDragging] = useState({
+    profile: false,
+    cover: false,
+  });
+
+  // File input refs
+  const profileInputRef = useRef<HTMLInputElement>(null);
+  const coverInputRef = useRef<HTMLInputElement>(null);
 
   const {
     register,
@@ -81,12 +97,10 @@ const EditMyProfileDetails = ({
   const [updateProfile, { isLoading }] = useUpdateProfileMutation();
 
   //update profile image mutation
-  const [updateProfileImage, { isLoading: isUpdatingProfileImage }] =
-    useUpdateProfileImageMutation();
+  const [updateProfileImage] = useUpdateProfileImageMutation();
 
   //update cover image mutation
-  const [updateCoverImage, { isLoading: isUpdatingCoverImage }] =
-    useUpdateCoverImageMutation();
+  const [updateCoverImage] = useUpdateCoverImageMutation();
 
   const handleEditProfileInformation = async (values: FieldValues) => {
     try {
@@ -104,59 +118,126 @@ const EditMyProfileDetails = ({
     type: "profile" | "cover"
   ) => {
     const file = e.target.files?.[0];
+    if (file) {
+      handleFileSelection(file, type);
+    }
+    // Reset input value
+    e.target.value = "";
+  };
+
+  const handleFileSelection = (file: File, type: "profile" | "cover") => {
     if (
       file &&
-      ["image/svg+xml", "image/png", "image/jpeg", "image/gif"].includes(
-        file.type
-      )
+      [
+        "image/svg+xml",
+        "image/png",
+        "image/jpeg",
+        "image/gif",
+        "image/webp",
+      ].includes(file.type)
     ) {
       const reader = new FileReader();
-      console.log("type", type);
-      reader.onloadend = () => {
+      reader.onload = () => {
+        const imageSrc = reader.result as string;
+        if (type === "cover") {
+          setCoverImageSrc(imageSrc);
+          setShowCoverCrop(true);
+        } else {
+          setProfileImageSrc(imageSrc);
+          setShowProfileCrop(true);
+        }
       };
       reader.readAsDataURL(file);
     } else {
-      toast.error("Please upload a valid SVG, PNG, JPG, or GIF image.");
+      toast.error("Please upload a valid SVG, PNG, JPG, WEBP, or GIF image.");
     }
   };
 
-  const handleUpdateProfileImage = async () => {
-    if (profileImageFile) {
-      const formData = new FormData();
-      formData.append("profileImage", profileImageFile);
-      try {
-        const res = await updateProfileImage(formData).unwrap();
-        toast.success(res?.message);
-        setProfileImagePreview(null);
-        setProfileImageFile(null);
-      } catch (error) {
-        const err = error as Error;
-        toast.error(err?.message || "Something went wrong!");
-      }
+  // Drag and drop handlers
+  const handleDragOver = (
+    e: DragEvent<HTMLDivElement>,
+    type: "profile" | "cover"
+  ) => {
+    e.preventDefault();
+    setIsDragging((prev) => ({ ...prev, [type]: true }));
+  };
+
+  const handleDragLeave = (
+    e: DragEvent<HTMLDivElement>,
+    type: "profile" | "cover"
+  ) => {
+    e.preventDefault();
+    setIsDragging((prev) => ({ ...prev, [type]: false }));
+  };
+
+  const handleDrop = (
+    e: DragEvent<HTMLDivElement>,
+    type: "profile" | "cover"
+  ) => {
+    e.preventDefault();
+    setIsDragging((prev) => ({ ...prev, [type]: false }));
+
+    const files = Array.from(e.dataTransfer.files);
+    if (files.length > 0) {
+      handleFileSelection(files[0], type);
     }
   };
 
-  const handleUpdateCoverImage = async () => {
-    if (coverImageFile) {
+  // Image crop handlers
+  const handleCoverCropComplete = async (croppedImage: File) => {
+    try {
+      setIsUploading(true);
       const formData = new FormData();
-      formData.append("coverImage", coverImageFile);
-      try {
-        const res = await updateCoverImage(formData).unwrap();
-        toast.success(res?.message);
-        setCoverImagePreview(null);
-        setCoverImageFile(null);
-      } catch (error) {
-        const err = error as Error;
-        toast.error(err?.message || "Something went wrong!");
-      }
+      formData.append("coverImage", croppedImage);
+
+      const res = await updateCoverImage(formData).unwrap();
+      toast.success(res?.message || "Cover photo updated successfully!");
+      setShowCoverCrop(false);
+      setCoverImageSrc(null);
+      setCoverImagePreview(null);
+    } catch (error) {
+      const err = error as TError;
+      toast.error(err?.data?.message || "Something went wrong!");
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const handleProfileCropComplete = async (croppedImage: File) => {
+    try {
+      setIsUploading(true);
+      const formData = new FormData();
+      formData.append("profileImage", croppedImage);
+
+      const res = await updateProfileImage(formData).unwrap();
+      toast.success(res?.message || "Profile photo updated successfully!");
+      setShowProfileCrop(false);
+      setProfileImageSrc(null);
+      setProfileImagePreview(null);
+    } catch (error) {
+      const err = error as TError;
+      toast.error(err?.data?.message || "Something went wrong!");
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const handleCropCancel = (type: "cover" | "profile") => {
+    if (type === "cover") {
+      setShowCoverCrop(false);
+      setCoverImageSrc(null);
+    } else {
+      setShowProfileCrop(false);
+      setProfileImageSrc(null);
     }
   };
 
   const handleEditImage = (type: "profile" | "cover") => {
     const imageSrc =
       type === "profile" ? profileImagePreview : coverImagePreview;
-      console.log("imageSrc", imageSrc);
+    console.log("imageSrc", imageSrc);
   };
+
 
   console.log("Eerrors", errors);
   return (
@@ -361,7 +442,12 @@ const EditMyProfileDetails = ({
               />
               <h1 className="text-base md:text-lg">Edit Your Profile Photo</h1>
             </div>
-            <div className="w-full border-2 p-6 border-dashed border-gray-400 rounded text-center relative">
+            <div
+              className={`w-full h-52 rounded-2xl relative flex items-center justify-center border-2 border-dashed transition-all duration-300 border-gray-300 hover:border-orange-300 hover:bg-orange-25`}
+              onDragOver={(e) => handleDragOver(e, "profile")}
+              onDragLeave={(e) => handleDragLeave(e, "profile")}
+              onDrop={(e) => handleDrop(e, "profile")}
+            >
               {profileImagePreview ? (
                 <div className="relative">
                   <Image
@@ -412,42 +498,45 @@ const EditMyProfileDetails = ({
                   </div>
                 </div>
               ) : (
-                <label className="cursor-pointer">
-                  <BsUpload size={28} className="text-secondary mx-auto" />
-                  <p className="text-gray-600 mt-2 font-medium">
-                    <span className="text-primary">Click to upload</span> or
-                    drag and drop SVG, PNG, JPG or GIF
+                <label className="cursor-pointer flex flex-col items-center justify-center h-full text-center">
+                  <div
+                    className={`p-5 rounded-full mb-4 transition-colors duration-300 ${
+                      isDragging.profile ? "bg-orange-200" : "bg-gray-100"
+                    }`}
+                  >
+                    <HiOutlinePhotograph
+                      size={30}
+                      className={`transition-colors duration-300 ${
+                        isDragging.profile ? "text-orange-600" : "text-gray-500"
+                      }`}
+                    />
+                  </div>
+                  <h3
+                    className={`text-lg font-semibold mb-2 transition-colors duration-300 ${
+                      isDragging.profile ? "text-orange-700" : "text-gray-700"
+                    }`}
+                  >
+                    {isDragging.profile
+                      ? "Drop your amazing photo here!"
+                      : "Add Your Profile Photo"}
+                  </h3>
+                  <p className="text-gray-600 max-w-sm text-sm">
+                    <span className="text-orange-600 font-semibold">
+                      Click to browse
+                    </span>{" "}
+                    or drag and drop
                     <br />
-                    (max, 1640 x 856px)
+                    High-quality images work best (JPG, PNG, GIF)
                   </p>
                   <input
+                    ref={profileInputRef}
                     type="file"
-                    accept="image/svg+xml,image/png,image/jpeg,image/gif"
+                    accept="image/*"
                     className="hidden"
                     onChange={(e) => handleImageUpload(e, "profile")}
                   />
                 </label>
               )}
-            </div>
-            <div className="mt-4 flex justify-end gap-4">
-              <CustomButton
-                variant="outline"
-                className="px-6 py-2"
-                onClick={() => {
-                  setProfileImagePreview(null);
-                  setProfileImageFile(null);
-                }}
-              >
-                Cancel
-              </CustomButton>
-              <CustomButton
-                variant="default"
-                className="px-6 py-2 bg-orange-500 text-white"
-                onClick={handleUpdateProfileImage}
-                loading={isUpdatingProfileImage}
-              >
-                Save
-              </CustomButton>
             </div>
           </div>
 
@@ -455,7 +544,7 @@ const EditMyProfileDetails = ({
           <div className="border border-[#E2E8F0] shadow p-4">
             <div className="border-b border-[#E2E8F0] pb-4 mb-4">
               <h1 className="text-base md:text-xl font-semibold">
-                Edit Your Cover Photo
+                Your Cover Photo
               </h1>
             </div>
             <div className="flex items-center gap-4 mb-4">
@@ -468,7 +557,12 @@ const EditMyProfileDetails = ({
               />
               <h1 className="text-base md:text-lg">Edit Your Cover Photo</h1>
             </div>
-            <div className="w-full border-2 p-6 border-dashed border-gray-400 rounded text-center relative">
+            <div
+              className={`w-full h-52 rounded-2xl relative flex items-center justify-center border-2 border-dashed transition-all duration-300 border-gray-300 hover:border-orange-300 hover:bg-orange-25`}
+              onDragOver={(e) => handleDragOver(e, "cover")}
+              onDragLeave={(e) => handleDragLeave(e, "cover")}
+              onDrop={(e) => handleDrop(e, "cover")}
+            >
               {coverImagePreview ? (
                 <div className="relative">
                   <Image
@@ -519,46 +613,73 @@ const EditMyProfileDetails = ({
                   </div>
                 </div>
               ) : (
-                <label className="cursor-pointer">
-                  <BsUpload size={28} className="text-secondary mx-auto" />
-                  <p className="text-gray-600 mt-2 font-medium">
-                    <span className="text-primary">Click to upload</span> or
-                    drag and drop SVG, PNG, JPG or GIF
+                <label className="cursor-pointer flex flex-col items-center justify-center h-full text-center">
+                  <div
+                    className={`p-5 rounded-full mb-4 transition-colors duration-300 ${
+                      isDragging.profile ? "bg-orange-200" : "bg-gray-100"
+                    }`}
+                  >
+                    <HiOutlinePhotograph
+                      size={30}
+                      className={`transition-colors duration-300 ${
+                        isDragging.profile ? "text-orange-600" : "text-gray-500"
+                      }`}
+                    />
+                  </div>
+                  <h3
+                    className={`text-lg font-semibold mb-2 transition-colors duration-300 ${
+                      isDragging.profile ? "text-orange-700" : "text-gray-700"
+                    }`}
+                  >
+                    {isDragging.profile
+                      ? "Drop your amazing photo here!"
+                      : "Add Your Cover Photo"}
+                  </h3>
+                  <p className="text-gray-600 max-w-sm text-sm">
+                    <span className="text-orange-600 font-semibold">
+                      Click to browse
+                    </span>{" "}
+                    or drag and drop
                     <br />
-                    (max, 1640 x 856px)
+                    High-quality images work best (JPG, PNG, GIF)
                   </p>
                   <input
+                    ref={coverInputRef}
                     type="file"
-                    accept="image/svg+xml,image/png,image/jpeg,image/gif"
+                    accept="image/*"
                     className="hidden"
                     onChange={(e) => handleImageUpload(e, "cover")}
                   />
                 </label>
               )}
             </div>
-            <div className="mt-4 flex justify-end gap-4">
-              <CustomButton
-                variant="outline"
-                className="px-6 py-2"
-                onClick={() => {
-                  setCoverImagePreview(null);
-                  setCoverImageFile(null);
-                }}
-              >
-                Cancel
-              </CustomButton>
-              <CustomButton
-                variant="default"
-                onClick={handleUpdateCoverImage}
-                loading={isUpdatingCoverImage}
-                className="px-6 py-2 bg-orange-500 text-white"
-              >
-                Save
-              </CustomButton>
-            </div>
           </div>
         </div>
       </section>
+
+      {/* Image Crop Modals */}
+      <ImageCropModal
+        isOpen={showCoverCrop}
+        onClose={() => handleCropCancel("cover")}
+        imageSrc={coverImageSrc || ""}
+        onCropComplete={handleCoverCropComplete}
+        cropShape="rect"
+        aspect={3 / 1}
+        title="Crop Cover Photo"
+        isUploading={isUploading}
+        isProfile={false}
+      />
+      <ImageCropModal
+        isOpen={showProfileCrop}
+        onClose={() => handleCropCancel("profile")}
+        imageSrc={profileImageSrc || ""}
+        onCropComplete={handleProfileCropComplete}
+        cropShape="round"
+        aspect={1}
+        title="Crop Profile Photo"
+        isUploading={isUploading}
+        isProfile={true}
+      />
     </>
   );
 };
