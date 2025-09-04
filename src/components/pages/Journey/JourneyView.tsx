@@ -59,16 +59,17 @@ const JourneyView = () => {
 
   // State management
   const [currentStory, setCurrentStory] = useState<IStory | null>(null);
-  const [currentMediaIndex, setCurrentMediaIndex] = useState(0);
+  const [currentMediaIndex, setCurrentMediaIndex] = useState<number>(0);
   const [allStories, setAllStories] = useState<IStory[]>([]);
-  const [currentStoryIndex, setCurrentStoryIndex] = useState(0);
-  const [isPaused, setIsPaused] = useState(false);
-  const [isMuted, setIsMuted] = useState(false);
-  const [progress, setProgress] = useState(0);
+  const [currentStoryIndex, setCurrentStoryIndex] = useState<number>(0);
+  const [isPaused, setIsPaused] = useState<boolean>(false);
+  const [isTypingReply, setIsTypingReply] = useState<boolean>(false);
+  const [isMuted, setIsMuted] = useState<boolean>(false);
+  const [progress, setProgress] = useState<number>(0);
   const [replyText, setReplyText] = useState("");
-  const [showMenu, setShowMenu] = useState(false);
-  const [showViewers, setShowViewers] = useState(false);
-  const [hasViewedCurrent, setHasViewedCurrent] = useState(false);
+  const [showMenu, setShowMenu] = useState<boolean>(false);
+  const [showViewers, setShowViewers] = useState<boolean>(false);
+  const [hasViewedCurrent, setHasViewedCurrent] = useState<boolean>(false);
 
   // New state for tracking reactions per media
   const [mediaReactions, setMediaReactions] = useState<{
@@ -219,7 +220,8 @@ const JourneyView = () => {
 
   // Handle progress based on pause state
   useEffect(() => {
-    if (!isPaused && currentStory) {
+    // Pause progress if user is paused OR typing a reply
+    if (!isPaused && !isTypingReply && currentStory) {
       startProgress();
     } else {
       pauseProgress();
@@ -231,6 +233,7 @@ const JourneyView = () => {
   }, [
     currentMediaIndex,
     isPaused,
+    isTypingReply,
     currentStory,
     startProgress,
     pauseProgress,
@@ -244,6 +247,14 @@ const JourneyView = () => {
       });
     }
   }, [currentMediaIndex]);
+
+  const handleReplyFocus = () => {
+    setIsTypingReply(true);
+  };
+
+  const handleReplyBlur = () => {
+    setIsTypingReply(false);
+  };
 
   const handlePrev = () => {
     if (currentMediaIndex > 0) {
@@ -397,7 +408,6 @@ const JourneyView = () => {
     isLiked: false,
     reactions: [],
   };
-
   return (
     <div className="fixed inset-0 bg-black z-50 flex items-center justify-center">
       <div className="relative w-full max-w-md h-full bg-black overflow-hidden">
@@ -588,6 +598,8 @@ const JourneyView = () => {
                   value={replyText}
                   onChange={(e) => setReplyText(e.target.value)}
                   onKeyPress={(e) => e.key === "Enter" && handleReply()}
+                  onFocus={handleReplyFocus}
+                  onBlur={handleReplyBlur}
                   className="flex-1 bg-transparent text-white text-sm outline-none"
                 />
               </div>
