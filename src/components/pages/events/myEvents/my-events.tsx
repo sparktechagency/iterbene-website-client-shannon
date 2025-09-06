@@ -2,8 +2,8 @@
 import { useGetMyEventsQuery } from "@/redux/features/event/eventApi";
 import { IEvent } from "@/types/event.types";
 import React, { useEffect, useState } from "react";
-import MyEventCard from "./my-event-card";
 import MyGroupCardSkeleton from "../../groups/my-groups/MyGroupCardSkeleton";
+import MyEventCard from "./my-event-card";
 
 const MyEvents: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -57,18 +57,15 @@ const MyEvents: React.FC = () => {
   const showViewMoreButton =
     !isLoading && hasMoreData && eventsData?.length > 0;
 
-    
-    // optimistic update ui
+  // optimistic update ui
   const handleOptimisticUiUpdate = (eventId: string) => {
-    setAllMyEvents((prev) =>
-      prev.filter((event) => event._id !== eventId)
-    );
+    setAllMyEvents((prev) => prev.filter((event) => event._id !== eventId));
   };
 
   let content = null;
   if (isLoading || isLoadingMore) {
     content = (
-      <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+      <div className="w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-4">
         {Array.from({ length: 3 }).map((_, index) => (
           <MyGroupCardSkeleton key={`skeleton-${index}`} />
         ))}
@@ -78,14 +75,17 @@ const MyEvents: React.FC = () => {
     content = <p className="text-center">No events found</p>;
   } else if (allMyEvents?.length > 0) {
     content = (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-4">
         {allMyEvents?.map((event: IEvent) => (
-          <MyEventCard key={event?._id} event={event} handleOptimisticUiUpdate={handleOptimisticUiUpdate} />
+          <MyEventCard
+            key={event?._id}
+            event={event}
+            handleOptimisticUiUpdate={handleOptimisticUiUpdate}
+          />
         ))}
       </div>
     );
   }
-
 
   // If no data and not loading, return null to hide the component
   if (!isLoading && !isLoadingMore && allMyEvents?.length === 0) {

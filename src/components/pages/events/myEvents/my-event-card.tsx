@@ -7,7 +7,7 @@ import Link from "next/link";
 import { useState } from "react";
 import toast from "react-hot-toast";
 import { PiUserBold } from "react-icons/pi";
-import { Eye, Trash2, Calendar } from "lucide-react";
+import { Eye, Trash2 } from "lucide-react";
 
 interface UpcomingEventCardProps {
   event: IEvent;
@@ -61,13 +61,6 @@ const MyEventCard = ({
               {event?.interestCount}
             </span>
           </div>
-
-          {/* Creator Badge */}
-          <div className="absolute top-3 left-3 bg-primary text-white rounded-full px-3 py-1.5 flex items-center gap-1.5">
-            <Calendar size={12} />
-            <span className="text-xs font-medium">Creator</span>
-          </div>
-
           {/* Creator Profile */}
           <div className="absolute bottom-14 left-4">
             <Image

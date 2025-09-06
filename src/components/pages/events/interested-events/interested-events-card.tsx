@@ -1,4 +1,3 @@
-import CustomButton from "@/components/custom/custom-button";
 import { useNotInterestEventMutation } from "@/redux/features/event/eventApi";
 import { TError } from "@/types/error";
 import { IEvent } from "@/types/event.types";
@@ -6,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import toast from "react-hot-toast";
 import { PiUserBold } from "react-icons/pi";
-import { Eye, Heart, Users } from "lucide-react";
+import { Eye, Heart } from "lucide-react";
 
 interface UpcomingEventCardProps {
   event: IEvent;
@@ -46,7 +45,7 @@ const InterestedEventCard = ({
           className="w-full h-full object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
-        
+
         {/* Interest Count Badge */}
         <div className="absolute top-3 right-3 bg-white rounded-full px-3 py-1.5 flex items-center gap-1.5">
           <PiUserBold size={14} className="text-secondary" />
@@ -54,13 +53,6 @@ const InterestedEventCard = ({
             {event?.interestCount}
           </span>
         </div>
-
-        {/* Interested Badge */}
-        <div className="absolute top-3 left-3 bg-secondary text-white rounded-full px-3 py-1.5 flex items-center gap-1.5">
-          <Heart size={12} />
-          <span className="text-xs font-medium">Interested</span>
-        </div>
-
         {/* Creator Profile */}
         <div className="absolute bottom-14 left-4">
           <Image
@@ -70,13 +62,15 @@ const InterestedEventCard = ({
             height={40}
             className="w-10 h-10 rounded-full object-cover border-2 border-white"
           />
+          <div>
+            <h3 className="text-lg font-bold text-white truncate mb-1">
+              {event?.eventName}
+            </h3>
+          </div>
         </div>
 
         {/* Event Name Overlay */}
         <div className="absolute bottom-0 left-0 right-0 p-4">
-          <h3 className="text-lg font-bold text-white truncate mb-1">
-            {event?.eventName}
-          </h3>
           <p className="text-white/80 text-sm line-clamp-2">
             {event?.eventDescription || "No description available"}
           </p>
@@ -91,7 +85,7 @@ const InterestedEventCard = ({
             View Event
           </button>
         </Link>
-        
+
         <button
           onClick={handleNotInterest}
           disabled={isNotInterestLoading}

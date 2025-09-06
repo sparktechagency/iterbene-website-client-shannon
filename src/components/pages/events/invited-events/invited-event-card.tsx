@@ -1,4 +1,3 @@
-import CustomButton from "@/components/custom/custom-button";
 import {
   useAcceptEventInviteMutation,
   useDeclineEventInviteMutation,
@@ -8,7 +7,7 @@ import { IEventInvitation } from "@/types/event.types";
 import Image from "next/image";
 import toast from "react-hot-toast";
 import { PiUserBold } from "react-icons/pi";
-import { Mail, Check, X } from "lucide-react";
+import {  Check, X } from "lucide-react";
 
 interface UpcomingEventCardProps {
   event: IEventInvitation;
@@ -75,13 +74,6 @@ const InvitedEventCard = ({
             {event?.eventId?.interestCount}
           </span>
         </div>
-
-        {/* Invited Badge */}
-        <div className="absolute top-3 left-3 bg-primary text-white rounded-full px-3 py-1.5 flex items-center gap-1.5">
-          <Mail size={12} />
-          <span className="text-xs font-medium">Invited</span>
-        </div>
-
         {/* Creator Profile */}
         <div className="absolute bottom-14 left-4">
           <Image
