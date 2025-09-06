@@ -190,7 +190,7 @@ const CustomSelectField = ({
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -10, scale: 0.95 }}
               transition={{ duration: 0.15 }}
-              className="absolute top-full mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto z-[9999]"
+              className="absolute top-full mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg h-auto max-h-48 overflow-y-auto z-[9999]"
             >
               {items.length === 0 ? (
                 <div className="px-4 py-3 text-gray-500 text-sm">
@@ -202,7 +202,7 @@ const CustomSelectField = ({
                     key={item.value}
                     onClick={() => handleSelect(item)}
                     className={`
-                      px-4 py-3 cursor-pointer transition-colors
+                      px-4 py-2 cursor-pointer transition-colors
                       hover:bg-orange-50 border-b border-gray-100 last:border-b-0
                       ${
                         selectedValue === item.value

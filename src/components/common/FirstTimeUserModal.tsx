@@ -14,6 +14,7 @@ import { setBooleanCookie, removeCookie, COOKIE_NAMES } from "@/utils/cookies";
 import CustomInput from "../custom/custom-input";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useRouter } from "next/navigation";
 
 interface FirstTimeUserModalProps {
   isOpen: boolean;
@@ -22,13 +23,49 @@ interface FirstTimeUserModalProps {
 
 // Define Zod schema for form validation
 const firstTimeValidationSchema = z.object({
-  firstName: z.string().min(1, "First name is required"),
-  lastName: z.string().min(1, "Last name is required"),
-  phoneNumber: z.string().min(1, "Phone number is required"),
-  referredAs: z.string().min(1, "Referred as is required"),
-  ageRange: z.string().min(1, "Age range is required"),
-  profession: z.string().min(1, "Profession is required"),
-  maritalStatus: z.string().min(1, "Marital status is required"),
+  firstName: z.string({}).min(1, "First name is required"),
+  lastName: z
+    .string({
+      required_error: "Last name is required",
+      invalid_type_error: "Last name is required",
+    })
+    .min(1, "Last name is required"),
+  username: z
+    .string({
+      required_error: "Username is required",
+      invalid_type_error: "Username is required",
+    })
+    .min(1, "Username is required"),
+  phoneNumber: z
+    .string({
+      required_error: "Phone number is required",
+      invalid_type_error: "Phone number is required",
+    })
+    .min(1, "Phone number is required"),
+  referredAs: z
+    .string({
+      required_error: "Referred as is required",
+      invalid_type_error: "Referred as is required",
+    })
+    .min(1, "Referred as is required"),
+  ageRange: z
+    .string({
+      required_error: "Age range is required",
+      invalid_type_error: "Age range is required",
+    })
+    .min(1, "Age range is required"),
+  profession: z
+    .string({
+      required_error: "Profession is required",
+      invalid_type_error: "Profession is required",
+    })
+    .min(1, "Profession is required"),
+  gender: z
+    .string({
+      required_error: "Gender is required",
+      invalid_type_error: "Gender is required",
+    })
+    .min(1, "Gender is required"),
 });
 
 type FirstTimeUserFormData = z.infer<typeof firstTimeValidationSchema>;
@@ -37,24 +74,28 @@ const FirstTimeUserModal = ({ isOpen, onClose }: FirstTimeUserModalProps) => {
   // State
   const [isClient, setIsClient] = useState(false);
   const userData = useUser();
+  const [defaultValues, setDefaultValues] = useState<FirstTimeUserFormData>({
+    firstName: userData?.firstName || "",
+    lastName: userData?.lastName || "",
+    username: userData?.username || "",
+    phoneNumber: userData?.phoneNumber || "",
+    referredAs: userData?.referredAs || "",
+    ageRange: userData?.ageRange || "",
+    profession: userData?.profession || "",
+    gender: userData?.gender || "",
+  });
 
-  
+  const router = useRouter();
+
   // Initialize useForm with zodResolver
   const {
     register,
     handleSubmit,
     formState: { errors },
+    reset,
   } = useForm<FirstTimeUserFormData>({
     resolver: zodResolver(firstTimeValidationSchema),
-    defaultValues: {
-      firstName: userData?.firstName || "",
-      lastName: userData?.lastName || "",
-      phoneNumber: userData?.phoneNumber || "",
-      referredAs: userData?.referredAs || "",
-      ageRange: userData?.ageRange || "",
-      profession: userData?.profession || "",
-      maritalStatus: userData?.maritalStatus || "",
-    },
+    defaultValues,
   });
 
   // Hooks
@@ -72,6 +113,7 @@ const FirstTimeUserModal = ({ isOpen, onClose }: FirstTimeUserModalProps) => {
       setBooleanCookie(COOKIE_NAMES.PROFILE_COMPLETED, true);
       removeCookie(COOKIE_NAMES.IS_FIRST_TIME_USER);
       onClose();
+      router.push("/");
     } catch (error) {
       const err = error as Error;
       toast.error(err?.message || "Something went wrong!");
@@ -83,6 +125,23 @@ const FirstTimeUserModal = ({ isOpen, onClose }: FirstTimeUserModalProps) => {
     removeCookie(COOKIE_NAMES.IS_FIRST_TIME_USER);
     onClose();
   };
+
+  useEffect(() => {
+    if (userData) {
+      const newDefaultValues = {
+        firstName: userData?.firstName || "",
+        lastName: userData?.lastName || "",
+        username: userData?.username || "",
+        phoneNumber: userData?.phoneNumber || "",
+        referredAs: userData?.referredAs || "",
+        ageRange: userData?.ageRange || "",
+        profession: userData?.profession || "",
+        gender: userData?.gender || "",
+      };
+      setDefaultValues(newDefaultValues);
+      reset(newDefaultValues);
+    }
+  }, [userData, reset]);
 
   // Handle body overflow when modal is open
   useEffect(() => {
@@ -172,6 +231,16 @@ const FirstTimeUserModal = ({ isOpen, onClose }: FirstTimeUserModalProps) => {
                     />
                     <CustomInput
                       type="text"
+                      name="username"
+                      placeholder="Enter your username"
+                      label="Username"
+                      register={register("username")}
+                      error={errors.username}
+                      required
+                    />
+
+                    <CustomInput
+                      type="text"
                       required
                       name="phoneNumber"
                       placeholder="Enter your phone number"
@@ -225,20 +294,18 @@ const FirstTimeUserModal = ({ isOpen, onClose }: FirstTimeUserModalProps) => {
                     />
                     <CustomSelectField
                       items={[
-                        { label: "Single", value: "Single" },
-                        { label: "Married", value: "Married" },
-                        { label: "Divorced", value: "Divorced" },
-                        { label: "Separated", value: "Separated" },
-                        { label: "Widowed", value: "Widowed" },
+                        { label: "Male", value: "Male" },
+                        { label: "Female", value: "Female" },
+                        { label: "Custom", value: "Custom" },
                       ]}
-                      required
-                      name="maritalStatus"
-                      label="Relationship Status"
+                      name="gender"
+                      label="Gender"
                       size="md"
-                      placeholder="Select your marital status"
-                      defaultValue={userData?.maritalStatus}
-                      register={register("maritalStatus")}
-                      error={errors.maritalStatus}
+                      required
+                      placeholder="Select your gender"
+                      defaultValue={userData?.gender}
+                      register={register("gender")}
+                      error={errors.gender}
                     />
                   </div>
                   <div className="mt-6 flex flex-col md:flex-row gap-4">

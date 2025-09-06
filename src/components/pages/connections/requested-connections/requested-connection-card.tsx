@@ -51,7 +51,7 @@ const RequestedConnectionCard = ({
   };
 
   return (
-    <div className="w-full h-fit bg-white rounded-2xl p-4 flex flex-row md:flex-col gap-4 items-center">
+    <div className="w-full h-fit bg-white rounded-2xl p-4 flex flex-row md:flex-col gap-3 items-center">
       {/* Profile Image */}
       <Link className="flex-shrink-0" href={`/${request?.sentBy?.username}`}>
         <Image
@@ -64,7 +64,7 @@ const RequestedConnectionCard = ({
       </Link>
       <div className="w-full">
         {/* Name */}
-        <h2 className="text-lg font-semibold text-gray-800 mb-3 text-left">
+        <h2 className="text-sm md:text-base font-semibold text-gray-800 mb-3 text-left">
           {request?.sentBy?.firstName} {request?.sentBy?.lastName}
         </h2>
 
@@ -72,13 +72,13 @@ const RequestedConnectionCard = ({
         <div className="flex flex-row md:flex-col gap-4">
           <button
             onClick={handleAcceptConnection}
-            className="w-full bg-secondary text-white px-4 py-2.5 text-sm md:text-base rounded-xl cursor-pointer"
+            className="w-full bg-secondary text-white px-4 py-2 text-sm md:text-base rounded-xl cursor-pointer"
           >
             Accept
           </button>
           <button
             onClick={handleDeclineConnection}
-            className="w-full border border-[#9EA1B3] text-gray-900 px-4 py-2.5 text-sm md:text-base rounded-xl hover:bg-gray-100 transition cursor-pointer"
+            className="w-full border border-[#9EA1B3] text-gray-900 px-4 py-2 text-sm md:text-base rounded-xl hover:bg-gray-100 transition cursor-pointer"
           >
             Decline
           </button>
