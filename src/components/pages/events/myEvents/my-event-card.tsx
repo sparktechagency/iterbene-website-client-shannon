@@ -1,4 +1,3 @@
-import CustomButton from "@/components/custom/custom-button";
 import ConfirmationPopup from "@/components/custom/custom-popup";
 import { useRemoveEventMutation } from "@/redux/features/event/eventApi";
 import { TError } from "@/types/error";
@@ -8,6 +7,7 @@ import Link from "next/link";
 import { useState } from "react";
 import toast from "react-hot-toast";
 import { PiUserBold } from "react-icons/pi";
+import { Eye, Trash2, Calendar } from "lucide-react";
 
 interface UpcomingEventCardProps {
   event: IEvent;
@@ -41,55 +41,72 @@ const MyEventCard = ({
     setIsRemoveModalOpen(false);
   };
   return (
-    <div className="w-full bg-white rounded-2xl  p-4 flex flex-col items-center">
-      {/* Group Image */}
-      <div className="w-full h-56 md:h-60 lg:h-[248px] bg-gray-200 rounded-xl mb-4 relative">
-        <Image
-          src={event?.eventImage}
-          alt={event?.eventName}
-          width={248}
-          height={248}
-          className="w-full h-56 md:h-60 lg:h-[248px] object-cover rounded-2xl mb-4"
-        />
-        <div className="absolute px-4 py-5 rounded-xl top-0 left-0 right-0 bottom-0 bg-gray-950/20">
-          <div className="w-full h-full flex flex-col justify-between">
-            <div className="flex  justify-between items-center">
-              <Image
-                src={event?.creatorId?.profileImage}
-                alt={`${event?.creatorId?.firstName} ${event?.creatorId?.lastName} 's profile`}
-                width={60}
-                height={60}
-                className="size-[60px] rounded-full object-cover mr-3 "
-              />
-              <div className="bg-white rounded-full px-4 py-2 flex items-center gap-1">
-                <PiUserBold size={24} className="text-secondary" />
-                <span className="text-sm font-semibold text-gray-800">
-                  {event?.interestCount}
-                </span>
-              </div>
-            </div>
-            <h2 className="text-xl md:text-2xl font-bold text-white">
+    <>
+      <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+        {/* Event Image */}
+        <div className="relative w-full h-48 sm:h-52 md:h-56 overflow-hidden">
+          <Image
+            src={event?.eventImage}
+            alt={event?.eventName}
+            width={400}
+            height={300}
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
+
+          {/* Interest Count Badge */}
+          <div className="absolute top-3 right-3 bg-white rounded-full px-3 py-1.5 flex items-center gap-1.5">
+            <PiUserBold size={14} className="text-secondary" />
+            <span className="text-xs font-semibold text-gray-800">
+              {event?.interestCount}
+            </span>
+          </div>
+
+          {/* Creator Badge */}
+          <div className="absolute top-3 left-3 bg-primary text-white rounded-full px-3 py-1.5 flex items-center gap-1.5">
+            <Calendar size={12} />
+            <span className="text-xs font-medium">Creator</span>
+          </div>
+
+          {/* Creator Profile */}
+          <div className="absolute bottom-14 left-4">
+            <Image
+              src={event?.creatorId?.profileImage}
+              alt={`${event?.creatorId?.firstName} ${event?.creatorId?.lastName}`}
+              width={40}
+              height={40}
+              className="w-10 h-10 rounded-full object-cover border-2 border-white"
+            />
+          </div>
+
+          {/* Event Name Overlay */}
+          <div className="absolute bottom-0 left-0 right-0 p-4">
+            <h3 className="text-lg font-bold text-white truncate mb-1">
               {event?.eventName}
-            </h2>
+            </h3>
+            <p className="text-white/80 text-sm line-clamp-2">
+              {event?.eventDescription || "No description available"}
+            </p>
           </div>
         </div>
-      </div>
-      {/* Buttons */}
-      <div className="flex flex-col gap-4 w-full">
-        <Link href={`/events/${event?._id}`}>
-          <CustomButton variant="default" fullWidth className="px-5 py-3">
-            View
-          </CustomButton>
-        </Link>
 
-        <CustomButton
-          onClick={openRemoveModal}
-          variant="outline"
-          fullWidth
-          className="px-5 py-3"
-        >
-          Remove
-        </CustomButton>
+        {/* Action Buttons */}
+        <div className="p-4 space-y-3">
+          <Link href={`/events/${event?._id}`} className="w-full block">
+            <button className="w-full bg-secondary text-white font-medium py-2.5 px-4 rounded-lg hover:bg-secondary/90 transition-colors flex items-center justify-center gap-2">
+              <Eye size={16} />
+              View Event
+            </button>
+          </Link>
+
+          <button
+            onClick={openRemoveModal}
+            className="w-full border border-gray-300 text-gray-700 hover:bg-gray-50 font-medium py-2.5 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
+          >
+            <Trash2 size={16} />
+            Remove Event
+          </button>
+        </div>
       </div>
       <ConfirmationPopup
         isOpen={isRemoveModalOpen}
@@ -102,7 +119,7 @@ const MyEventCard = ({
         cancelText="Cancel"
         isLoading={isRemoving}
       />
-    </div>
+    </>
   );
 };
 

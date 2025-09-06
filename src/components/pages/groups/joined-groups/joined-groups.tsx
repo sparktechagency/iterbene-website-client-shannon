@@ -58,9 +58,7 @@ const JoinedGroups: React.FC = () => {
     !isLoading && hasMoreData && groupsData?.length > 0;
 
   const handleOptimisticUpdateUi = (groupId: string) => {
-    setAllJoinedGroups((prev) =>
-      prev.filter((group) => group._id !== groupId)
-    );
+    setAllJoinedGroups((prev) => prev.filter((group) => group._id !== groupId));
   };
 
   // If no data and not loading, return null to hide the component
@@ -71,7 +69,7 @@ const JoinedGroups: React.FC = () => {
   let content = null;
   if (isLoading || isLoadingMore) {
     content = (
-      <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+      <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         {Array.from({ length: 3 }).map((_, index) => (
           <MyGroupCardSkeleton key={`skeleton-${index}`} />
         ))}
@@ -81,9 +79,13 @@ const JoinedGroups: React.FC = () => {
     content = <p className="text-center">No joined groups found</p>;
   } else if (allJoinedGroups?.length > 0) {
     content = (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         {allJoinedGroups?.map((group: IGroup) => (
-          <JoinedGroupCard key={group?._id} group={group} handleOptimisticUpdateUi={handleOptimisticUpdateUi} />
+          <JoinedGroupCard
+            key={group?._id}
+            group={group}
+            handleOptimisticUpdateUi={handleOptimisticUpdateUi}
+          />
         ))}
       </div>
     );

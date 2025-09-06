@@ -4,6 +4,8 @@ import { IGroup } from "@/types/group.types";
 import Image from "next/image";
 import toast from "react-hot-toast";
 import { PiUserBold } from "react-icons/pi";
+import { UserPlus } from "lucide-react";
+import { useRouter } from "next/navigation";
 const SuggestionGroupCard = ({
   group,
   handleOptimisticUpdateUi,
@@ -12,6 +14,7 @@ const SuggestionGroupCard = ({
   handleOptimisticUpdateUi?: (groupId: string) => void;
 }) => {
   const [joinGroup, { isLoading }] = useJoinGroupMutation();
+  const router = useRouter();
   const handleJoinGroup = async () => {
     try {
       const payload = { groupId: group?._id };
@@ -20,49 +23,63 @@ const SuggestionGroupCard = ({
         handleOptimisticUpdateUi(group?._id);
       }
       toast.success("Successfully joined the group!");
+      router.push(`/groups/${group?._id}`);
     } catch (error) {
       const err = error as TError;
       toast.error(err?.data?.message || "Something went wrong!");
     }
   };
   return (
-    <>
-      <div className="w-full bg-white rounded-2xl  p-4 flex flex-col items-center">
-        {/* Group Image */}
-        <div className="w-full h-56 md:h-60 lg:h-[248px]  bg-gray-200 rounded-xl mb-4 relative">
-          <Image
-            src={group?.groupImage}
-            alt={group?.name}
-            width={248}
-            height={248}
-            className="w-full h-56 md:h-60 lg:h-[248px] object-cover rounded-2xl mb-4"
-          />
-          <div className="absolute top-0 left-0 right-0 bottom-0 bg-gray-950/20 rounded-xl"></div>
-          {/* Member Count Overlay */}
-          <div className="absolute top-5 right-5 bg-white rounded-full px-4 py-2 flex items-center gap-1">
-            <PiUserBold size={20} className="text-secondary" />
-            <span className="text-sm font-semibold text-gray-800">
-              {group?.participantCount}
-            </span>
-          </div>
-          {/* Group Name */}
-          <h2 className="text-xl md:text-2xl font-bold text-white absolute bottom-4 left-2">
-            {group?.name}
-          </h2>
-        </div>
+    <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+      {/* Group Image */}
+      <div className="relative w-full h-48 sm:h-52 md:h-56 overflow-hidden">
+        <Image
+          src={group?.groupImage}
+          alt={group?.name}
+          width={400}
+          height={300}
+          className="w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
 
-        {/* Buttons */}
-        <div className="flex flex-col gap-5 w-full">
-          <button
-            onClick={handleJoinGroup}
-            disabled={isLoading}
-            className="w-full border border-[#9EA1B3] text-gray-900 px-5 py-3   rounded-xl cursor-pointer"
-          >
-            {isLoading ? "Joining..." : "Join Group"}
-          </button>
+        {/* Member Count Badge */}
+        <div className="absolute top-3 right-3 bg-white rounded-full px-3 py-1.5 flex items-center gap-1.5">
+          <PiUserBold size={14} className="text-secondary" />
+          <span className="text-xs font-semibold text-gray-800">
+            {group?.participantCount}
+          </span>
+        </div>
+        {/* Group Name Overlay */}
+        <div className="absolute bottom-0 left-0 right-0 p-4">
+          <h3 className="text-lg font-bold text-white truncate mb-1">
+            {group?.name}
+          </h3>
+          <p className="text-white/80 text-sm line-clamp-2">
+            {group?.description ||
+              "Discover new communities that match your interests"}
+          </p>
         </div>
       </div>
-    </>
+
+      {/* Action Button */}
+      <div className="p-4">
+        <button
+          onClick={handleJoinGroup}
+          disabled={isLoading}
+          className="w-full cursor-pointer bg-secondary hover:bg-secondary/90 disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium py-2.5 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
+        >
+          <UserPlus size={16} />
+          {isLoading ? (
+            <>
+              <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
+              Joining...
+            </>
+          ) : (
+            "Join Group"
+          )}
+        </button>
+      </div>
+    </div>
   );
 };
 

@@ -19,19 +19,21 @@ export interface IGroup {
   name: string;
   groupImage: string;
   privacy: string;
+  description: string;
   participantCount: number;
   createdAt: string;
   updatedAt: string;
 }
 export interface IGroupInvite {
   _id: string;
-  from:string;
-  to:string;
+  from: string;
+  to: string;
   groupId: {
     _id: string;
     name: string;
     groupImage: string;
     privacy: string;
+    description: string;
     participantCount: number;
     createdAt: string;
     updatedAt: string;

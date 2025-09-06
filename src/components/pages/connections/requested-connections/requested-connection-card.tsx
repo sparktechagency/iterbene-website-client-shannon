@@ -7,6 +7,7 @@ import { TError } from "@/types/error";
 import Image from "next/image";
 import Link from "next/link";
 import toast from "react-hot-toast";
+import { UserPlus, UserX } from "lucide-react";
 
 interface RequestedConnectionCardProps {
   request: IConnectionRequest;
@@ -51,38 +52,47 @@ const RequestedConnectionCard = ({
   };
 
   return (
-    <div className="w-full h-fit bg-white rounded-2xl p-4 flex flex-row md:flex-col gap-3 items-center">
+    <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
       {/* Profile Image */}
-      <Link className="flex-shrink-0" href={`/${request?.sentBy?.username}`}>
-        <Image
-          src={request?.sentBy?.profileImage}
-          alt={request?.sentBy?.username}
-          width={208}
-          height={208}
-          className="size-16 md:w-full md:h-52 object-cover rounded-full md:rounded-2xl"
-        />
-      </Link>
-      <div className="w-full">
-        {/* Name */}
-        <h2 className="text-lg font-semibold text-gray-800 mb-3 text-left">
-          {request?.sentBy?.firstName} {request?.sentBy?.lastName}
-        </h2>
-
-        {/* Buttons */}
-        <div className="flex flex-row md:flex-col gap-4">
-          <button
-            onClick={handleAcceptConnection}
-            className="w-full bg-secondary text-white px-4 py-2 text-sm md:text-base rounded-xl cursor-pointer"
-          >
-            Accept
-          </button>
-          <button
-            onClick={handleDeclineConnection}
-            className="w-full border border-[#9EA1B3] text-gray-900 px-4 py-2 text-sm md:text-base rounded-xl hover:bg-gray-100 transition cursor-pointer"
-          >
-            Decline
-          </button>
+      <div className="relative w-full h-48 sm:h-52 md:h-56 overflow-hidden">
+        <Link href={`/${request?.sentBy?.username}`}>
+          <Image
+            src={request?.sentBy?.profileImage}
+            alt={request?.sentBy?.username}
+            width={400}
+            height={300}
+            className="w-full h-full object-cover cursor-pointer"
+          />
+        </Link>
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
+        {/* User Name Overlay */}
+        <div className="absolute bottom-0 left-0 right-0 p-4">
+          <h3 className="text-lg font-bold text-white truncate">
+            {request?.sentBy?.firstName} {request?.sentBy?.lastName}
+          </h3>
+          <p className="text-white/80 text-sm">
+            @{request?.sentBy?.username}
+          </p>
         </div>
+      </div>
+
+      {/* Action Buttons */}
+      <div className="p-4 space-y-3">
+        <button
+          onClick={handleAcceptConnection}
+          className="w-full bg-secondary text-white font-medium py-2.5 px-4 rounded-lg hover:bg-secondary/90 transition-colors flex items-center justify-center gap-2"
+        >
+          <UserPlus size={16} />
+          Accept
+        </button>
+        
+        <button
+          onClick={handleDeclineConnection}
+          className="w-full border border-gray-300 text-gray-700 hover:bg-gray-50 font-medium py-2.5 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
+        >
+          <UserX size={16} />
+          Decline
+        </button>
       </div>
     </div>
   );

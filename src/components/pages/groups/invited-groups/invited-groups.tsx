@@ -53,12 +53,11 @@ const InvitedGroups: React.FC = () => {
     }
   };
 
-    const handleOptimisticUpdateUi = (invitedId: string) => {
+  const handleOptimisticUpdateUi = (invitedId: string) => {
     setAllInvitedGroups((prev) =>
       prev.filter((invited) => invited._id !== invitedId)
     );
   };
-
 
   const hasMoreData = currentPage < totalPages;
   const showViewMoreButton =
@@ -72,7 +71,7 @@ const InvitedGroups: React.FC = () => {
   let content = null;
   if (isLoading || isLoadingMore) {
     content = (
-      <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+      <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         {Array.from({ length: 3 }).map((_, index) => (
           <MyGroupCardSkeleton key={`skeleton-${index}`} />
         ))}
@@ -82,9 +81,13 @@ const InvitedGroups: React.FC = () => {
     content = <p className="text-center">No invited groups found</p>;
   } else if (allInvitedGroups?.length > 0) {
     content = (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         {allInvitedGroups?.map((group: IGroupInvite) => (
-          <InvitedGroupCard key={group?._id} group={group} handleOptimisticUpdateUi={handleOptimisticUpdateUi} />
+          <InvitedGroupCard
+            key={group?._id}
+            group={group}
+            handleOptimisticUpdateUi={handleOptimisticUpdateUi}
+          />
         ))}
       </div>
     );

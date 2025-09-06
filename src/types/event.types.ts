@@ -9,6 +9,7 @@ export interface IEvent {
     username: string;
     profileImage: string;
   };
+  eventDescription: string;
   interestCount: number;
   startDate: string;
   endDate: string;
@@ -71,9 +72,10 @@ export interface IEventInvitation {
       username: string;
       profileImage: string;
     };
+    eventDescription: string;
     duration: {
-    days: number;
-    nights: number;
+      days: number;
+      nights: number;
     };
     privacy: string;
     interestCount: number;

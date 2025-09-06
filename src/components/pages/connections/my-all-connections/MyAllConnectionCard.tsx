@@ -7,6 +7,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import toast from "react-hot-toast";
+import { UserMinus, Shield } from "lucide-react";
 
 interface MyAllConnectionCardCardProps {
   connection: IConnection;
@@ -52,62 +53,73 @@ const MyAllConnectionCard = ({
   };
 
   return (
-    <div className="w-full h-fit bg-white rounded-2xl p-4 flex flex-row md:flex-col gap-3 items-center">
+    <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
       {/* Profile Image */}
-      <Link className="flex-shrink-0" href={`/${connection?.username}`}>
-        <Image
-          src={connection?.profileImage}
-          alt={connection?.username}
-          width={208}
-          height={208}
-          className="size-16 md:w-full md:h-52 object-cover rounded-full md:rounded-2xl"
-        />
-      </Link>
-      <div className="w-full">
-        {/* Name */}
-        <h2 className="text-base md:text-lg font-semibold text-gray-800 mb-2 text-left">
-          {connection?.firstName} {connection?.lastName}
-        </h2>
-        {/* Buttons */}
-        <div className="w-full flex flex-row md:flex-col gap-4">
-          <button
-            onClick={() => setRemoveConnectionPopup(true)}
-            className="bg-[#FEEFE8] text-secondary px-3.5 py-2 text-sm md:text-base rounded-xl border border-secondary transition cursor-pointer"
-          >
-            Remove Connection
-          </button>
-          <button
-            onClick={() => setBlockUserPopup(true)}
-            className="border border-[#9EA1B3] text-gray-900 px-6 py-2 text-sm md:text-base rounded-xl hover:bg-gray-100 transition cursor-pointer"
-          >
-            Block
-          </button>
+      <div className="relative w-full h-48 sm:h-52 md:h-56 overflow-hidden">
+        <Link href={`/${connection?.username}`}>
+          <Image
+            src={connection?.profileImage}
+            alt={connection?.username}
+            width={400}
+            height={300}
+            className="w-full h-full object-cover cursor-pointer"
+          />
+        </Link>
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
+        {/* User Name Overlay */}
+        <div className="absolute bottom-0 left-0 right-0 p-4">
+          <h3 className="text-lg font-bold text-white truncate">
+            {connection?.firstName} {connection?.lastName}
+          </h3>
+          <p className="text-white/80 text-sm">
+            @{connection?.username}
+          </p>
         </div>
-        {/* Remove connection popup */}
-        <ConfirmationPopup
-          isOpen={isRemoveConnectionPopup}
-          onClose={() => setRemoveConnectionPopup(false)}
-          onConfirm={handleConfirmRemoveConnection}
-          type="delete"
-          title="Remove Connection"
-          message="Are you sure you want to remove connection? This action cannot be undone."
-          confirmText="Remove"
-          cancelText="Cancel"
-          isLoading={isRemovingConnection}
-        />
-        {/* Block popup */}
-        <ConfirmationPopup
-          isOpen={isBlockUserPopup}
-          onClose={() => setBlockUserPopup(false)}
-          onConfirm={handleConfirmBlockUser}
-          type="delete"
-          title="Block User"
-          message="Are you sure you want to block this user? This action cannot be undone."
-          confirmText="Yes"
-          cancelText="No"
-          isLoading={isBlockingUser}
-        />
       </div>
+
+      {/* Action Buttons */}
+      <div className="p-4 space-y-3">
+        <button
+          onClick={() => setRemoveConnectionPopup(true)}
+          className="w-full bg-secondary text-white font-medium py-2.5 px-4 rounded-lg hover:bg-secondary/90 transition-colors flex items-center justify-center gap-2"
+        >
+          <UserMinus size={16} />
+          Remove Connection
+        </button>
+        
+        <button
+          onClick={() => setBlockUserPopup(true)}
+          className="w-full border border-gray-300 text-gray-700 hover:bg-gray-50 font-medium py-2.5 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
+        >
+          <Shield size={16} />
+          Block User
+        </button>
+      </div>
+
+      {/* Remove connection popup */}
+      <ConfirmationPopup
+        isOpen={isRemoveConnectionPopup}
+        onClose={() => setRemoveConnectionPopup(false)}
+        onConfirm={handleConfirmRemoveConnection}
+        type="delete"
+        title="Remove Connection"
+        message="Are you sure you want to remove connection? This action cannot be undone."
+        confirmText="Remove"
+        cancelText="Cancel"
+        isLoading={isRemovingConnection}
+      />
+      {/* Block popup */}
+      <ConfirmationPopup
+        isOpen={isBlockUserPopup}
+        onClose={() => setBlockUserPopup(false)}
+        onConfirm={handleConfirmBlockUser}
+        type="delete"
+        title="Block User"
+        message="Are you sure you want to block this user? This action cannot be undone."
+        confirmText="Yes"
+        cancelText="No"
+        isLoading={isBlockingUser}
+      />
     </div>
   );
 };
