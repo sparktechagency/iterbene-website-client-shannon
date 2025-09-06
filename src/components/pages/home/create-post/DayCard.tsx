@@ -17,8 +17,13 @@ const DayCard = ({ control }: DayCardProps) => {
     name: "days",
   });
 
-  const { setValue, watch } = useFormContext();
-  
+  const {
+    setValue,
+    watch,
+    register,
+    formState: { errors },
+  } = useFormContext();
+
   // Watch all days to get current values
   const watchedDays = watch("days");
 
@@ -48,7 +53,10 @@ const DayCard = ({ control }: DayCardProps) => {
   }
 
   // Handle location select for specific day
-  const handleLocationSelect = (location: LocationDetails, dayIndex: number) => {
+  const handleLocationSelect = (
+    location: LocationDetails,
+    dayIndex: number
+  ) => {
     setValue(`days.${dayIndex}.locationName`, location.name);
     setValue(`days.${dayIndex}.location`, {
       latitude: location.latitude,
@@ -60,6 +68,7 @@ const DayCard = ({ control }: DayCardProps) => {
   const handleLocationInputChange = (value: string, dayIndex: number) => {
     setValue(`days.${dayIndex}.locationName`, value);
   };
+
   return (
     <div>
       <div className="flex justify-between items-center mb-2">
@@ -92,8 +101,12 @@ const DayCard = ({ control }: DayCardProps) => {
               required
               value={watchedDays?.[dayIndex]?.locationName || ""}
               showSelectedInfo={false}
-              onLocationSelect={(location) => handleLocationSelect(location, dayIndex)}
-              onInputChange={(value) => handleLocationInputChange(value, dayIndex)}
+              onLocationSelect={(location) =>
+                handleLocationSelect(location, dayIndex)
+              }
+              onInputChange={(value) =>
+                handleLocationInputChange(value, dayIndex)
+              }
               placeholder="Where are you exploring? (e.g., Rome, Italy)"
             />
           </div>
@@ -104,6 +117,8 @@ const DayCard = ({ control }: DayCardProps) => {
               placeholder="Any notes for this day? (e.g., Pack sunscreen)"
               fullWidth
               size="md"
+              register={register(`days.${dayIndex}.comment`)}
+              error={errors?.days?.[dayIndex]?.comment}
             />
             <CustomInput
               name={`days.${dayIndex}.weather`}
@@ -111,6 +126,8 @@ const DayCard = ({ control }: DayCardProps) => {
               placeholder="Expected weather? (e.g., Sunny, 25°C)"
               fullWidth
               size="md"
+              register={register(`days.${dayIndex}.weather` as const)}
+              error={errors?.days?.[dayIndex]?.weather}
             />
           </div>
           <div className="my-3">

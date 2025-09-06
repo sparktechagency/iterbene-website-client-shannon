@@ -223,7 +223,7 @@ const LocationPermission = () => {
         setIsRequesting(false);
       }
     }
-  }, [user, isRequesting, setLatestLocation, setBooleanCookie]);
+  }, [user, isRequesting, setLatestLocation]);
   // Initialize previous location data (removed cookie dependency)
   useEffect(() => {}, []);
 
@@ -259,7 +259,7 @@ const LocationPermission = () => {
       isMountedRef.current = false;
       setMounted(false);
     };
-  }, [user, getBooleanCookie]);
+  }, [user]);
 
   // Handle modal open/close effects
   useEffect(() => {
@@ -288,7 +288,7 @@ const LocationPermission = () => {
     setPermissionStatus("denied");
     setBooleanCookie(COOKIE_NAMES.LOCATION_PERMISSION_DENIED, true);
     setIsOpen(false);
-  }, [isRequesting, setBooleanCookie]);
+  }, [isRequesting]);
 
   const handleModalClick = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();

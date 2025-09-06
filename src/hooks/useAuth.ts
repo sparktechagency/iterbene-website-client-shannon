@@ -37,7 +37,7 @@ export const useAuth = () => {
   const isAuthenticated = useCallback(() => {
     if (typeof window === 'undefined') return false;
     return !!getCookie(COOKIE_NAMES.ACCESS_TOKEN);
-  }, [getCookie]);
+  }, []);
 
   return {
     logout,

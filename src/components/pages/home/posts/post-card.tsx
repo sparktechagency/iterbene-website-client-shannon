@@ -101,7 +101,6 @@ const PostCard = ({ post, setAllPosts }: PostCardProps) => {
     setEditCommentText(commentText);
   };
 
-  // Facebook-like timing functions
   const handleShowReactions = () => {
     // Clear any pending hide timeout
     if (hideReactionTimeoutRef.current) {
@@ -322,6 +321,8 @@ const PostCard = ({ post, setAllPosts }: PostCardProps) => {
       />
 
       <div className="text-gray-700 mb-4 whitespace-pre-wrap break-words">
+
+        {/* Render text with highlighted hashtags */}
         {post?.content?.split('\n').map((line, lineIndex) => (
           <React.Fragment key={lineIndex}>
             {line.split(/(\s+)/).map((word, wordIndex) => {

@@ -155,9 +155,6 @@ const ReplyInput = ({
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 5 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: 5 }}
       className={`mt-3 ${level > 0 ? getNestedMargin(1) : ""} relative`}
     >
       {level > 0 && (
@@ -315,10 +312,6 @@ const CommentItem = ({
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: 10 }}
-      transition={{ duration: 0.3 }}
       className={`mb-3 ${level > 0 ? getNestedMargin(1) : ""} relative`}
     >
       {showConnectionLine && (
@@ -686,6 +679,8 @@ const PostCommentSection = ({
 
   const handleDeleteComment = async (commentId: string) => {
     try {
+      const payload = { commentId, postId: post?._id };
+      await deleteComment(payload).unwrap();
       // Optimistic update: Remove comment
       if (setAllPosts) {
         setAllPosts((prevPosts: IPost[]) =>
@@ -700,8 +695,6 @@ const PostCommentSection = ({
           })
         );
       }
-      const payload = { commentId, postId: post?._id };
-      await deleteComment(payload).unwrap();
     } catch (error) {
       const err = error as TError;
       toast.error(err?.data?.message || "Something went wrong!");

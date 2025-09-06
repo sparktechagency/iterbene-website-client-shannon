@@ -238,7 +238,7 @@ const PostCommentInput = ({
         <div
           className={`w-full relative flex ${
             newComment ? "flex-col items-end" : "flex-row justify-between"
-          } bg-gray-100 rounded-xl text-base`}
+          } bg-red-100 rounded-xl text-base`}
         >
           {newComment === "" ? (
             <input
@@ -250,7 +250,7 @@ const PostCommentInput = ({
               value={newComment}
               onChange={(e) => setNewComment(e.target.value)}
               onKeyDown={handleKeyDown}
-              className="w-full px-4 py-3.5 bg-transparent text-gray-800 placeholder-gray-500 focus:outline-none rounded-full"
+              className="w-full px-4 py-3.5 bg-green-100 text-gray-800 placeholder-gray-500 focus:outline-none rounded-full"
             />
           ) : (
             <textarea

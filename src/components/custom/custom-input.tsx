@@ -149,7 +149,7 @@ const CustomInput = ({
           <button
             type="button"
             onClick={togglePassword}
-            className="flex-shrink-0 p-2 cursor-pointer text-gray-500 hover:text-gray-700 self-center"
+            className="flex-shrink-0 p-2 absolute right-0 cursor-pointer text-gray-500 hover:text-gray-700 self-center"
             tabIndex={-1}
           >
             {showPassword ? <EyeIcon size={20} /> : <EyeOff size={20} />}

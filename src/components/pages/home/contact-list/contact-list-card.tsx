@@ -67,7 +67,7 @@ const ContactListCard: React.FC<ContactListCardProps> = ({ contact }) => {
           )}
           <div>
             {/* full name */}
-            <h2 className="text-sm md:text-base ">{getFullName(receiverDetails)}</h2>
+            <h2 className="text-sm md:text-base ">{getFullName(receiverDetails?? {})}</h2>
             {/* last message */}
             <p className="text-[14px] text-gray-600">
               {renderMessageContent()}

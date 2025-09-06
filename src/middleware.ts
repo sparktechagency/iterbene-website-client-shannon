@@ -51,7 +51,7 @@ function isAuthenticated(request: NextRequest): boolean {
 export function middleware(request: NextRequest) {
   if (!isAuthenticated(request)) {
     // If not authenticated, redirect to the auth page
-    const authUrl = new URL("/auth", request.url);
+    const authUrl = new URL("/login", request.url);
     authUrl.searchParams.set("redirect_url", request.nextUrl.pathname); // Save the original path
     return NextResponse.redirect(authUrl);
   }
@@ -73,6 +73,6 @@ export const config = {
      * - about-us, privacy-policy, terms-and-conditions (public pages)
      * - feed, search, journeys, photos, watch-videos (public pages)
      */
-    "/((?!api|_next/static|_next/image|favicon.ico|auth|login|register|forgot-password|reset-password|verify-otp|about-us|privacy-policy|terms-and-conditions|feed|search|journeys|photos|watch-videos).*)",
+    "/((?!api|_next/static|_next/image|favicon.ico|login|register|forgot-password|reset-password|verify-otp|about-us|privacy-policy|terms-and-conditions|feed|search|journeys|photos|watch-videos).*)",
   ],
 };

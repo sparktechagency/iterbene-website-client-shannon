@@ -2,7 +2,7 @@
 import { Button } from "antd";
 import { DeleteOutlined, PlusCircleOutlined } from "@ant-design/icons";
 import CustomInput from "@/components/custom/custom-input";
-import { Control, useFieldArray } from "react-hook-form";
+import { Control, useFieldArray, useFormContext } from "react-hook-form";
 import CustomRating from "@/components/custom/CustomRating";
 
 interface ActivityCardProps {
@@ -10,11 +10,16 @@ interface ActivityCardProps {
   dayIndex: number;
 }
 
-export default function ActivityCard({ control, dayIndex }: ActivityCardProps) {
+const ActivityCard = ({ control, dayIndex }: ActivityCardProps) => {
   const { fields, append, remove } = useFieldArray({
     control,
     name: `days.${dayIndex}.activities`,
   });
+
+  const {
+    register,
+    formState: { errors },
+  } = useFormContext();
 
   const addActivity = () => {
     append({
@@ -23,7 +28,7 @@ export default function ActivityCard({ control, dayIndex }: ActivityCardProps) {
       link: "",
       duration: "",
       cost: 0,
-      rating: 0, 
+      rating: 0,
     });
   };
 
@@ -62,6 +67,15 @@ export default function ActivityCard({ control, dayIndex }: ActivityCardProps) {
               fullWidth
               placeholder="When does this start? (e.g., 9:00 AM)"
               required
+              register={register(
+                `days.${dayIndex}.activities.${activityIndex}.time`,
+                {
+                  required: "Time is required",
+                }
+              )}
+              error={
+                errors?.days?.[dayIndex]?.activities?.[activityIndex]?.time
+              }
             />
             <CustomInput
               name={`days.${dayIndex}.activities.${activityIndex}.duration`}
@@ -71,6 +85,15 @@ export default function ActivityCard({ control, dayIndex }: ActivityCardProps) {
               fullWidth
               placeholder="How long will it take? (e.g., 2 hours)"
               required
+              register={register(
+                `days.${dayIndex}.activities.${activityIndex}.duration`,
+                {
+                  required: "Duration is required",
+                }
+              )}
+              error={
+                errors?.days?.[dayIndex]?.activities?.[activityIndex]?.duration
+              }
             />
             <CustomInput
               name={`days.${dayIndex}.activities.${activityIndex}.link`}
@@ -79,6 +102,12 @@ export default function ActivityCard({ control, dayIndex }: ActivityCardProps) {
               size="md"
               fullWidth
               placeholder="Add a hotel/booking link (optional)"
+              register={register(
+                `days.${dayIndex}.activities.${activityIndex}.link`
+              )}
+              error={
+                errors?.days?.[dayIndex]?.activities?.[activityIndex]?.link
+              }
             />
             <CustomInput
               name={`days.${dayIndex}.activities.${activityIndex}.cost`}
@@ -87,6 +116,12 @@ export default function ActivityCard({ control, dayIndex }: ActivityCardProps) {
               size="md"
               fullWidth
               placeholder="How much will it cost? (e.g., 50)"
+              register={register(
+                `days.${dayIndex}.activities.${activityIndex}.cost`
+              )}
+              error={
+                errors?.days?.[dayIndex]?.activities?.[activityIndex]?.cost
+              }
             />
           </div>
           <CustomInput
@@ -94,8 +129,17 @@ export default function ActivityCard({ control, dayIndex }: ActivityCardProps) {
             label="Description"
             isTextarea
             fullWidth
-            placeholder="What’s the plan? (e.g., Visit the Colosseum)"
+            placeholder="What's the plan? (e.g., Visit the Colosseum)"
             required
+            register={register(
+              `days.${dayIndex}.activities.${activityIndex}.description` as const,
+              {
+                required: "Description is required",
+              }
+            )}
+            error={
+              errors?.days?.[dayIndex]?.activities?.[activityIndex]?.description
+            }
           />
           <div className="mt-3">
             <CustomRating
@@ -108,4 +152,6 @@ export default function ActivityCard({ control, dayIndex }: ActivityCardProps) {
       ))}
     </div>
   );
-}
+};
+
+export default ActivityCard;

@@ -82,6 +82,10 @@ export const removeCookie = (name: string): void => {
 
 // Set boolean cookie
 export const setBooleanCookie = (name: string, value: boolean, days: number = 30): void => {
+  console.log("NAME", name);
+  console.log("VALUE", value);
+  console.log("DAYS", days);
+  
   setCookie(name, value.toString(), days);
 };
 

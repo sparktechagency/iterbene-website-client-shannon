@@ -92,6 +92,7 @@ const UserVerification = () => {
 
   const handleAgeVerify = () => {
     setErrorMessage("");
+    console.log("Clicked");
     setBooleanCookie(COOKIE_NAMES.ITER_BENE_VERIFIED, true);
     // setIsVisible will be automatically updated by the reactive cookie change
   };
@@ -208,7 +209,7 @@ const UserVerification = () => {
         )}
 
         <motion.div className="mt-6">
-          <p className="text-xs text-gray-500 flex gap-1 justify-center">
+          <p className="text-xs text-gray-500 flex flex-wrap gap-1 justify-center">
             By continuing, you agree to our {" "}
             <Link
               href="/terms-and-conditions"

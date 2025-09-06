@@ -106,15 +106,14 @@ const PostHeader = ({ post, onEditClick, setAllPosts }: PostHeaderProps) => {
   };
 
   const handleConfirmDelete = async () => {
-    // Optimistic update: Remove post from UI immediately
-    if (setAllPosts) {
-      setAllPosts((prevPosts: IPost[]) =>
-        prevPosts.filter((p) => p._id !== post._id)
-      );
-      toast.success("Post deleted successfully!");
-    }
     try {
       await deletePost(post._id).unwrap();
+      toast.success("Post deleted successfully!");
+      if (setAllPosts) {
+        setAllPosts((prevPosts: IPost[]) =>
+          prevPosts.filter((p) => p._id !== post._id)
+        );
+      }
       setIsDeletePopupOpen(false);
     } catch (error) {
       const err = error as TError;
@@ -196,11 +195,20 @@ const PostHeader = ({ post, onEditClick, setAllPosts }: PostHeaderProps) => {
               </>
             )}
             {post?.privacy === "public" ? (
-              <HiGlobe size={23} className="size-[19px] md:size-[20px] text-primary" />
+              <HiGlobe
+                size={23}
+                className="size-[19px] md:size-[20px] text-primary"
+              />
             ) : post?.privacy === "friends" ? (
-              <HiUsers size={23} className="size-[19px] md:size-[20px]  text-primary" />
+              <HiUsers
+                size={23}
+                className="size-[19px] md:size-[20px]  text-primary"
+              />
             ) : (
-              <HiLockClosed size={23} className="size-[19px] md:size-[20px] ] text-primary" />
+              <HiLockClosed
+                size={23}
+                className="size-[19px] md:size-[20px] ] text-primary"
+              />
             )}
           </div>
         </div>
