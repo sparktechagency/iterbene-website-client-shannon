@@ -31,10 +31,11 @@ const authApi = baseApi.injectEndpoints({
       }),
     }),
     resendOtp: builder.mutation({
-      query: () => {
+      query: (email) => {
         return {
           url: "/auth/resend-otp",
           method: "POST",
+          body: { email },
         };
       },
     }),

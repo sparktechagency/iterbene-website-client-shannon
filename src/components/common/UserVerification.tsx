@@ -94,7 +94,7 @@ const UserVerification = () => {
     setErrorMessage("");
     console.log("Clicked");
     setBooleanCookie(COOKIE_NAMES.ITER_BENE_VERIFIED, true);
-    // setIsVisible will be automatically updated by the reactive cookie change
+    setIsVisible(false);
   };
 
   const handleLocationReject = () => {

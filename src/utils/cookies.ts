@@ -44,7 +44,11 @@ export const setCookie = (name: string, value: string, days: number = 30): void 
     const expiryDate = new Date();
     expiryDate.setDate(expiryDate.getDate() + days);
     
-    document.cookie = `${name}=${encryptedValue}; expires=${expiryDate.toUTCString()}; path=/; secure; samesite=strict`;
+    // Only use secure flag in production (HTTPS)
+    const isSecure = typeof window !== 'undefined' && window.location.protocol === 'https:';
+    const secureFlag = isSecure ? '; secure' : '';
+    
+    document.cookie = `${name}=${encryptedValue}; expires=${expiryDate.toUTCString()}; path=/${secureFlag}; samesite=strict`;
   } catch (error) {
     console.error('Error setting cookie:', error);
   }

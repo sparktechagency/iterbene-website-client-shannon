@@ -25,6 +25,8 @@ const VerifyOtp = () => {
   const [oneTimeCode, setOneTimeCode] = useState<string>("");
   const [countdown, setCountdown] = useState<number>(60); // 1 minute = 60 seconds
   const [canResend, setCanResend] = useState<boolean>(false);
+  const type = getCookie(COOKIE_NAMES.VERIFY_OTP_TYPE);
+  const email = getCookie(COOKIE_NAMES.VERIFY_OTP_MAIL);
 
   // verify email api
   const [verifyEmail, { isLoading }] = useVerifyEmailMutation();
@@ -52,9 +54,7 @@ const VerifyOtp = () => {
   // Handle verify email
   const handleVerifyEmail = async () => {
     try {
-      const res = await verifyEmail({ otp: oneTimeCode }).unwrap();
-      const type = getCookie(COOKIE_NAMES.VERIFY_OTP_TYPE);
-
+      const res = await verifyEmail({ email, otp: oneTimeCode }).unwrap();
       // Set tokens in cookies for login success
       if (res?.data?.attributes?.tokens?.accessToken) {
         setCookie(
@@ -90,7 +90,7 @@ const VerifyOtp = () => {
     if (!canResend) return;
 
     try {
-      await resendOtp(undefined).unwrap();
+      await resendOtp(email).unwrap();
       toast.success("OTP sent successfully!");
       // Reset countdown
       setCountdown(60);
@@ -135,7 +135,9 @@ const VerifyOtp = () => {
             height={128}
             className="ml-2 w-[70px] sm:w-[80px] md:w-[90px] lg:w-[100px] h-auto"
           />
-          <h1 className="text-xl sm:text-2xl md:text-3xl font-semibold">Verify OTP</h1>
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-semibold">
+            Verify OTP
+          </h1>
         </div>
         <div className="w-full space-y-8">
           {/* OTP Instructions */}
@@ -154,7 +156,9 @@ const VerifyOtp = () => {
                 value={oneTimeCode}
                 onChange={handleOtpChange}
                 numInputs={6}
-                renderInput={(props) => <input {...props} className="otp-input-responsive" />}
+                renderInput={(props) => (
+                  <input {...props} className="otp-input-responsive" />
+                )}
                 containerStyle="flex justify-center gap-1 sm:gap-2"
               />
             </div>
