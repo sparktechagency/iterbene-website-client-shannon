@@ -10,8 +10,11 @@ export const COOKIE_NAMES = {
   LOCATION_PERMISSION_GRANTED: "lpg", // locationPermissionGranted -> lpg  
   PROFILE_COMPLETED: "pc",             // profileCompleted -> pc
   IS_FIRST_TIME_USER: "iftu",          // isFirstTimeUser -> iftu
-  VERIFY_OTP_MAIL: "vom",         // registerVerifyMail -> rvm
-  VERIFY_OTP_TYPE: "vet",            // verifyEmailType -> vet
+  VERIFY_OTP_MAIL: "vom",              // verifyOtpMail -> vom
+  VERIFY_OTP_TYPE: "vot",              // verifyOtpType -> vot
+  REGISTER_VERIFY_MAIL: "rvm",         // registerVerifyMail -> rvm
+  VERIFY_EMAIL_TYPE: "vet",            // verifyEmailType -> vet
+  FORGOT_PASSWORD_MAIL: "fpm",         // forgotPasswordMail -> fpm
   ACCESS_TOKEN: "at",                  // accessToken -> at
   REFRESH_TOKEN: "rt",                 // refreshToken -> rt
 } as const;

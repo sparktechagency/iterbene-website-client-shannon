@@ -131,7 +131,7 @@ const MyProfileHeader = ({ userData }: { userData: IUser }) => {
       <div className="w-full bg-white rounded-2xl relative mt-[72px] md:mt-[88px] lg:mt-[112px]">
         {/* Background Image with Camera Icon */}
         <div className="relative group w-full">
-          <div className="relative w-full h-[200px] sm:h-[280px] md:h-[360px] overflow-hidden rounded-t-2xl">
+          <div className="relative w-full h-[160px] sm:h-[220px] md:h-[280px] lg:h-[360px] overflow-hidden rounded-t-2xl">
             {userData?.coverImage ? (
               <Image
                 src={userData?.coverImage || ""}
@@ -162,7 +162,7 @@ const MyProfileHeader = ({ userData }: { userData: IUser }) => {
         {/* Profile Image with Camera Icon */}
         <div className="relative group inline-block">
           <div className="relative lg:absolute left-8 -mt-[80px] lg:-mt-[100px] mx-auto">
-            <div className="relative size-[140px] md:size-[174px] lg:size-[174px] border-4 border-white rounded-full overflow-hidden shadow-lg">
+            <div className="relative size-[100px] sm:size-[120px] md:size-[140px] lg:size-[174px] border-4 border-white rounded-full overflow-hidden shadow-lg">
               {userData?.profileImage ? (
                 <Image
                   src={userData?.profileImage}
@@ -170,10 +170,10 @@ const MyProfileHeader = ({ userData }: { userData: IUser }) => {
                   fill
                   className="object-cover"
                   priority
-                  sizes="(max-width: 768px) 140px, (max-width: 1024px) 174px, 174px"
+                  sizes="(max-width: 640px) 100px, (max-width: 768px) 120px, (max-width: 1024px) 140px, 174px"
                 />
               ) : (
-                <div className="size-[140px] md:size-[174px] lg:size-[174px] bg-gradient-to-br from-primary to-secondary rounded-full border-4 border-white flex-shrink-0 shadow-lg flex items-center justify-center">
+                <div className="size-[100px] sm:size-[120px] md:size-[140px] lg:size-[174px] bg-gradient-to-br from-primary to-secondary rounded-full border-4 border-white flex-shrink-0 shadow-lg flex items-center justify-center">
                   <div className="text-white text-center">
                     <CameraIcon className="w-8 h-8 mx-auto mb-1" />
                   </div>
@@ -192,7 +192,7 @@ const MyProfileHeader = ({ userData }: { userData: IUser }) => {
         </div>
 
         {/* Profile Section */}
-        <div className="w-full flex flex-col md:flex-row justify-between items-center gap-4 md:gap-8 lg:pl-[240px] p-7 md:p-10">
+        <div className="w-full flex flex-col md:flex-row justify-between items-center gap-4 md:gap-8 lg:pl-[200px] xl:pl-[240px] p-4 sm:p-6 md:p-8 lg:p-10">
           <div className="space-y-1">
             <h1 className="text-center md:text-left text-lg sm:text-xl md:text-2xl font-bold text-gray-800">
               {getFullName(userData)}

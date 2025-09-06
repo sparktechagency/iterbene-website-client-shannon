@@ -7,7 +7,7 @@ import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 import { Navigation, Pagination } from "swiper/modules";
-import useWindowSize from "@/hooks/useWindowSize";
+import { useResponsive } from "@/hooks/useResponsive";
 import Lightbox from "yet-another-react-lightbox";
 import "yet-another-react-lightbox/styles.css";
 import { useState } from "react";
@@ -19,8 +19,8 @@ interface PostContentRenderProps {
 
 const PostContentRender = ({ data, isVisible }: PostContentRenderProps) => {
   const mediaCount = data?.length;
-  const { width } = useWindowSize();
-  const isMobile = width < 768;
+  const { isMobile, isTablet} = useResponsive();
+  const isMobileOrTablet = isMobile || isTablet;
 
   const [open, setOpen] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -59,7 +59,7 @@ const PostContentRender = ({ data, isVisible }: PostContentRenderProps) => {
             <VideoCard
               url={media?.mediaUrl}
               isVisible={isVisible}
-              className="w-full h-[100px] md:h-[400px]"
+              className={`w-full ${isMobile ? 'h-[200px]' : isTablet ? 'h-[300px]' : 'h-[400px]'}`}
             />
           )}
         </div>
@@ -77,7 +77,7 @@ const PostContentRender = ({ data, isVisible }: PostContentRenderProps) => {
                   alt="Post media"
                   width={400}
                   height={400}
-                  className="w-full h-[100px] md:h-[350px] object-cover rounded-xl cursor-pointer"
+                  className={`w-full ${isMobile ? 'h-[180px]' : isTablet ? 'h-[280px]' : 'h-[350px]'} object-cover rounded-xl cursor-pointer`}
                   onClick={() => handleImageClick(media)}
                   priority={index === 0}
                 />
@@ -104,7 +104,7 @@ const PostContentRender = ({ data, isVisible }: PostContentRenderProps) => {
                 alt="Post media"
                 width={400}
                 height={350}
-                className="w-full h-[100px] md:h-[350px] object-cover rounded-xl cursor-pointer"
+                className={`w-full ${isMobile ? 'h-[180px]' : isTablet ? 'h-[280px]' : 'h-[350px]'} object-cover rounded-xl cursor-pointer`}
                 onClick={() => handleImageClick(data[0])}
                 priority
               />
@@ -192,7 +192,7 @@ const PostContentRender = ({ data, isVisible }: PostContentRenderProps) => {
               <VideoCard
                 url={data[1]?.mediaUrl}
                 isVisible={isVisible}
-                className="w-full h-[100px] md:h-[400px]"
+                className={`w-full ${isMobile ? 'h-[200px]' : isTablet ? 'h-[300px]' : 'h-[400px]'}`}
               />
             )}
           </div>
@@ -210,7 +210,7 @@ const PostContentRender = ({ data, isVisible }: PostContentRenderProps) => {
               <VideoCard
                 url={data[2]?.mediaUrl}
                 isVisible={isVisible}
-                className="w-full h-[100px] md:h-[400px]"
+                className={`w-full ${isMobile ? 'h-[200px]' : isTablet ? 'h-[300px]' : 'h-[400px]'}`}
               />
             )}
           </div>
@@ -228,7 +228,7 @@ const PostContentRender = ({ data, isVisible }: PostContentRenderProps) => {
               <VideoCard
                 url={data[3]?.mediaUrl}
                 isVisible={isVisible}
-                className="w-full h-[100px] md:h-[400px]"
+                className={`w-full ${isMobile ? 'h-[200px]' : isTablet ? 'h-[300px]' : 'h-[400px]'}`}
               />
             )}
           </div>
@@ -254,7 +254,7 @@ const PostContentRender = ({ data, isVisible }: PostContentRenderProps) => {
               <VideoCard
                 url={data[0]?.mediaUrl}
                 isVisible={isVisible}
-                className="w-full h-[100px] md:h-[400px]"
+                className={`w-full ${isMobile ? 'h-[200px]' : isTablet ? 'h-[300px]' : 'h-[400px]'}`}
               />
             )}
           </div>
@@ -286,7 +286,7 @@ const PostContentRender = ({ data, isVisible }: PostContentRenderProps) => {
               <VideoCard
                 url={data[2]?.mediaUrl}
                 isVisible={isVisible}
-                className="w-full h-[100px] md:h-[400px]"
+                className={`w-full ${isMobile ? 'h-[200px]' : isTablet ? 'h-[300px]' : 'h-[400px]'}`}
               />
             )}
           </div>
@@ -306,7 +306,7 @@ const PostContentRender = ({ data, isVisible }: PostContentRenderProps) => {
               <VideoCard
                 url={data[3]?.mediaUrl}
                 isVisible={isVisible}
-                className="w-full h-[100px] md:h-[400px]"
+                className={`w-full ${isMobile ? 'h-[200px]' : isTablet ? 'h-[300px]' : 'h-[400px]'}`}
               />
             )}
             <div className="absolute top-0 left-0 w-full h-full bg-black/30 rounded-xl cursor-pointer">
@@ -323,7 +323,7 @@ const PostContentRender = ({ data, isVisible }: PostContentRenderProps) => {
 
   return (
     <>
-      {isMobile ? (
+      {isMobileOrTablet ? (
         <Swiper
           modules={[Navigation, Pagination]}
           spaceBetween={10}

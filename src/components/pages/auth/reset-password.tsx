@@ -67,7 +67,7 @@ const ResetPassword = () => {
     }
   };
   return (
-    <section className="w-full h-screen flex items-center justify-center relative p-5">
+    <section className="w-full min-h-screen flex items-center justify-center relative p-3 sm:p-5">
       {/* Background with blur effect */}
       <div
         style={{
@@ -82,16 +82,16 @@ const ResetPassword = () => {
       {/* Semi-transparent color overlay */}
       <div className="absolute top-0 left-0 w-full h-full bg-[#40E0D054]"></div>
       {/* Content that remains sharp */}
-      <div className="w-full max-w-[500px] mx-auto px-8 xl:px-[65px] pt-6 pb-12  bg-[#FFFFFF] z-30 rounded-xl border-2 border-primary shadow-xl shadow-gray-900">
+      <div className="w-full max-w-[500px] mx-auto px-4 sm:px-6 md:px-8 xl:px-[65px] pt-4 sm:pt-6 pb-8 sm:pb-12 bg-[#FFFFFF] z-30 rounded-xl border-2 border-primary shadow-xl shadow-gray-900">
         <div className="flex flex-col items-center gap-4 justify-center">
           <Image
             src={logo}
             alt="logo"
             width={128}
             height={128}
-            className="ml-2 w-[90px] md:w-[100px] md:h-[90px] "
+            className="ml-2 w-[70px] sm:w-[80px] md:w-[90px] lg:w-[100px] h-auto"
           />
-          <h1 className="text-2xl md:text-3xl  font-semibold">
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-semibold">
             Reset Password
           </h1>
         </div>

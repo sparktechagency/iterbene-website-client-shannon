@@ -34,13 +34,13 @@ const UserTimelineContentRender = ({
                   alt={`Timeline media ${index + 1}`}
                   width={400}
                   height={350}
-                  className="w-full h-[300px] md:h-[350px]  object-cover cursor-pointer rounded-xl"
+                  className="w-full h-[200px] sm:h-[250px] md:h-[300px] lg:h-[350px] object-cover cursor-pointer rounded-xl"
                   priority={index === 0} // Optimize loading for the first image
                 />
               ) : (
                 <VideoCard
                   url={media.mediaUrl}
-                  className="w-full h-[300px] md:h-[350px]"
+                  className="w-full h-[200px] sm:h-[250px] md:h-[300px] lg:h-[350px]"
                   isVisible={false}
                 />
               )}

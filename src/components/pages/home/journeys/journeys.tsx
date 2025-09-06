@@ -87,7 +87,7 @@ const Journeys = () => {
                   src="https://iter-bene.s3.eu-north-1.amazonaws.com/basic/story.webp"
                   alt="Add Journey"
                   fill
-                  className="object-cover w-full h-full rounded-xl group-hover:scale-105 transition-transform duration-300"
+                  className="object-cover w-full h-full rounded-xl  transition-transform duration-300"
                 />
                 <div className="absolute p-4 rounded-xl top-0 left-0 right-0 bottom-0 bg-black/40 flex flex-col justify-end">
                   <div className="flex flex-col items-center gap-3">

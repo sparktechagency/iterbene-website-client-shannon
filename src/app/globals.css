@@ -57,7 +57,7 @@ body.modal-open {
   --color-primary: #40e0d0; /* turquoise */
   --color-secondary: #ff6347; /* Tomato - Placeholder, please replace with actual hex if different */
 }
-/* OTP Input Styles (unchanged) */
+/* OTP Input Styles */
 .otp-input {
   @apply border border-[#E2E8F0];
 }
@@ -68,6 +68,36 @@ body.modal-open {
 
 .otp-input:valid {
   @apply border-primary;
+}
+
+/* Responsive OTP Input Styles */
+.otp-input-responsive {
+  width: 100% !important;
+  max-width: 2.5rem !important;
+  height: 2.5rem !important;
+  border-radius: 5px !important;
+  font-size: 1.2rem !important;
+  font-weight: bold !important;
+  text-align: center !important;
+  outline: none !important;
+  border: 1px solid #F95F19 !important;
+  transition: border-color 0.3s ease !important;
+}
+
+@media (min-width: 640px) {
+  .otp-input-responsive {
+    max-width: 4rem !important;
+    height: 3rem !important;
+    font-size: 1.5rem !important;
+  }
+}
+
+@media (min-width: 768px) {
+  .otp-input-responsive {
+    max-width: 7rem !important;
+    height: 4rem !important;
+    font-size: 2rem !important;
+  }
 }
 
 /* Custom Scrollbar */

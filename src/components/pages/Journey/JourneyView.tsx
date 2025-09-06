@@ -409,10 +409,10 @@ const JourneyView = () => {
     reactions: [],
   };
   return (
-    <div className="fixed inset-0 bg-black z-50 flex items-center justify-center">
-      <div className="relative w-full max-w-md h-full bg-black overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+      <div className="relative w-full max-w-md h-full bg-amber-600 overflow-hidden">
         {/* Progress bars */}
-        <div className="absolute top-2 left-2 right-2 z-30 flex gap-1">
+        <div className="absolute top-2 bg-amber-700 left-2 right-2 z-30 flex gap-1">
           {currentStory.mediaIds?.map((_, index) => (
             <div
               key={index}
@@ -434,7 +434,7 @@ const JourneyView = () => {
         </div>
 
         {/* Header */}
-        <div className="absolute top-6 left-2 right-2 z-30 flex items-center justify-between pt-4">
+        <div className="absolute top-6 left-2 right-2 z-30 flex items-center justify-between pt-4 bg-amber-600">
           <div className="flex items-center gap-3">
             <Image
               src={currentStory?.userId?.profileImage || "/default-avatar.png"}
@@ -456,7 +456,7 @@ const JourneyView = () => {
             {isVideo && (
               <button
                 onClick={() => setIsMuted(!isMuted)}
-                className="p-1 rounded-full bg-black/20"
+                className="p-1 rounded-full "
               >
                 {isMuted ? (
                   <VolumeX className="w-5 h-5 text-white" />
@@ -498,7 +498,7 @@ const JourneyView = () => {
             )} */}
             <button
               onClick={() => router.push(`/`)}
-              className="p-1 rounded-full bg-black/20 cursor-pointer"
+              className="p-1 rounded-full  cursor-pointer"
             >
               <X className="w-5 h-5 text-white" />
             </button>
@@ -566,7 +566,7 @@ const JourneyView = () => {
         </div>
 
         {/* Bottom section */}
-        <div className="absolute bottom-0 left-0 right-0 z-30 p-4">
+        <div className="absolute bottom-0 left-0 right-0 z-30 p-4 bg-amber-800">
           {isOwnStory ? (
             <div className="flex items-center gap-3">
               <div className="flex-1">
@@ -630,14 +630,14 @@ const JourneyView = () => {
         <div className="hidden md:block">
           <button
             onClick={handlePrev}
-            className="absolute left-4 top-1/2 cursor-pointer transform -translate-y-1/2 z-30 p-2 rounded-full bg-black/20 text-white hover:bg-black/40 transition-colors"
+            className="absolute left-4 top-1/2 cursor-pointer transform -translate-y-1/2 z-30 p-2 rounded-full  text-white transition-colors"
             disabled={currentStoryIndex === 0 && currentMediaIndex === 0}
           >
             <ChevronLeft className="w-6 h-6" />
           </button>
           <button
             onClick={handleNext}
-            className="absolute right-4 cursor-pointer top-1/2 transform -translate-y-1/2 z-30 p-2 rounded-full bg-black/20 text-white hover:bg-black/40 transition-colors"
+            className="absolute right-4 cursor-pointer top-1/2 transform -translate-y-1/2 z-30 p-2 rounded-full  text-white transition-colors"
           >
             <ChevronRight className="w-6 h-6" />
           </button>
@@ -648,7 +648,7 @@ const JourneyView = () => {
       <AnimatePresence>
         {showViewers && isOwnStory && (
           <motion.div
-            className="fixed inset-0 bg-black/80 z-60 flex items-center justify-center p-4"
+            className="fixed inset-0  z-60 flex items-center justify-center p-4"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -674,9 +674,9 @@ const JourneyView = () => {
               </div>
 
               {/* Combined Viewers and Reactions */}
-              <div>
+              <div className="bg-green-300">
                 {currentMedia?.viewedBy?.length > 0 ? (
-                  <div className="space-y-2">
+                  <div className="space-y-2 bg-amber-800">
                     {currentMedia.viewedBy
                       .filter((viewer: IViewer) => viewer?._id !== user?._id)
                       .map((viewer: IViewer) => {

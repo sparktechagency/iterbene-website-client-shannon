@@ -75,8 +75,8 @@ const Login = () => {
         res?.message == "Please verify your email."
       ) {
         // Set registerVerifyMail cookie with email for simple token management
-        setCookie(COOKIE_NAMES.REGISTER_VERIFY_MAIL, values.email);
-        setCookie(COOKIE_NAMES.VERIFY_EMAIL_TYPE, "register");
+        setCookie(COOKIE_NAMES.VERIFY_OTP_MAIL, values.email);
+        setCookie(COOKIE_NAMES.VERIFY_OTP_TYPE, "register");
         
         // Mark user as first-time user for profile completion modal
         setBooleanCookie(COOKIE_NAMES.IS_FIRST_TIME_USER, true);

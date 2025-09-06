@@ -21,7 +21,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { CalendarCheck } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { JSX, useEffect, useRef, useState } from "react";
+import React, { JSX, useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { IoMdClose } from "react-icons/io";
 import PostEditModal from "../create-post/PostEditModal";
@@ -321,25 +321,30 @@ const PostCard = ({ post, setAllPosts }: PostCardProps) => {
         setAllPosts={setAllPosts}
       />
 
-      <p className="text-gray-700 mb-4">
-        {post?.content?.split(/(\s+)/)?.map((word, index) => {
-          const isHashtag = word?.match(/^#\w+/);
-          return (
-            <span key={index}>
-              {isHashtag ? (
-                <Link
-                  href={`/search/hashtag/?q=${word.slice(1)}`}
-                  className="text-blue-600 hover:underline"
-                >
-                  {word}
-                </Link>
-              ) : (
-                word
-              )}
-            </span>
-          );
-        })}
-      </p>
+      <div className="text-gray-700 mb-4 whitespace-pre-wrap break-words">
+        {post?.content?.split('\n').map((line, lineIndex) => (
+          <React.Fragment key={lineIndex}>
+            {line.split(/(\s+)/).map((word, wordIndex) => {
+              const isHashtag = word?.match(/^#\w+/);
+              return (
+                <span key={`${lineIndex}-${wordIndex}`}>
+                  {isHashtag ? (
+                    <Link
+                      href={`/search/hashtag/?q=${word.slice(1)}`}
+                      className="text-blue-600 hover:underline font-medium"
+                    >
+                      {word}
+                    </Link>
+                  ) : (
+                    word
+                  )}
+                </span>
+              );
+            })}
+            {lineIndex < post?.content?.split('\n').length - 1 && <br />}
+          </React.Fragment>
+        ))}
+      </div>
 
       <PostContentRender data={post?.media || []} isVisible={isVisible} />
 

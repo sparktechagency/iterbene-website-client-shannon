@@ -114,24 +114,34 @@ const CreatePost = ({
   // State for textarea focus
   const [isTextareaFocused, setIsTextareaFocused] = useState<boolean>(false);
   
-  // Function to render text with highlighted hashtags
+  // Function to render text with highlighted hashtags and preserved line breaks
   const renderTextWithHashtags = (text: string) => {
     if (!text) return text;
     
-    // Regular expression to match hashtags
-    const hashtagRegex = /(#\w+)/g;
-    const parts = text.split(hashtagRegex);
+    // Split by line breaks first, then handle hashtags
+    const lines = text.split('\n');
     
-    return parts.map((part, index) => {
-      if (part.match(hashtagRegex)) {
-        return (
-          <span key={index} className="text-[#3B82F6]">
-            {part}
-          </span>
-        );
-      }
-      return part;
-    });
+    return lines.map((line, lineIndex) => (
+      <React.Fragment key={lineIndex}>
+        {(() => {
+          // Regular expression to match hashtags
+          const hashtagRegex = /(#\w+)/g;
+          const parts = line.split(hashtagRegex);
+          
+          return parts.map((part, partIndex) => {
+            if (part.match(hashtagRegex)) {
+              return (
+                <span key={partIndex} className="text-[#3B82F6] font-medium">
+                  {part}
+                </span>
+              );
+            }
+            return part;
+          });
+        })()}
+        {lineIndex < lines.length - 1 && <br />}
+      </React.Fragment>
+    ));
   };
 
   // State for itinerary

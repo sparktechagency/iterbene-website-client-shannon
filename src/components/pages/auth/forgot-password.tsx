@@ -38,8 +38,8 @@ const ForgotPassword = () => {
       const res = await forgotPassword(values).unwrap();
 
       // Set forgotPasswordMail cookie with email for simple token management
-      setCookie(COOKIE_NAMES.FORGOT_PASSWORD_MAIL, values.email);
-      setCookie(COOKIE_NAMES.VERIFY_EMAIL_TYPE, "forgot-password");
+      setCookie(COOKIE_NAMES.VERIFY_OTP_MAIL, values.email);
+      setCookie(COOKIE_NAMES.VERIFY_OTP_TYPE, "forgot-password");
 
       // Redirect to verify email page
       toast.success(res?.message);
@@ -50,7 +50,7 @@ const ForgotPassword = () => {
     }
   };
   return (
-    <section className="w-full h-screen flex items-center justify-center relative p-5">
+    <section className="w-full min-h-screen flex items-center justify-center relative p-3 sm:p-5">
       {/* Background with blur effect */}
       <div
         style={{
@@ -65,16 +65,16 @@ const ForgotPassword = () => {
       {/* Semi-transparent color overlay */}
       <div className="absolute top-0 left-0 w-full h-full bg-[#40E0D054]"></div>
       {/* Content that remains sharp */}
-      <div className="w-full max-w-[500px] mx-auto px-8 xl:px-[65px] pt-6 pb-12  bg-[#FFFFFF] z-30 rounded-xl border-2 border-primary shadow-xl shadow-gray-900">
+      <div className="w-full max-w-[500px] mx-auto px-4 sm:px-6 md:px-8 xl:px-[65px] pt-4 sm:pt-6 pb-8 sm:pb-12 bg-[#FFFFFF] z-30 rounded-xl border-2 border-primary shadow-xl shadow-gray-900">
         <div className="flex flex-col items-center gap-4 justify-center">
           <Image
             src={logo}
             alt="logo"
             width={128}
             height={128}
-            className="ml-2 w-[90px] md:w-[100px] md:h-[90px] "
+            className="ml-2 w-[70px] sm:w-[80px] md:w-[90px] lg:w-[100px] h-auto"
           />
-          <h1 className="text-2xl md:text-3xl  font-semibold">
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-semibold">
             Forgot Password
           </h1>
         </div>
@@ -83,7 +83,7 @@ const ForgotPassword = () => {
           onSubmit={handleSubmit(handleForgotPassword)}
           className="flex flex-col gap-4"
         >
-          <div className="space-y-3 md:space-y-6 mt-8">
+          <div className="space-y-3 sm:space-y-4 md:space-y-6 mt-6 sm:mt-8">
             <CustomInput
               name="email"
               label="Email"
