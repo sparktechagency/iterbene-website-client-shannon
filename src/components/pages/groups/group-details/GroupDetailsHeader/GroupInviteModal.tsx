@@ -221,7 +221,7 @@ const GroupInviteModal = ({
                 (member) => member._id === connection._id
               );
               return (
-                <>
+                <div key={connection?._id}>
                   {isAlreadyInvited ? (
                     <div
                       key={connection?._id}
@@ -317,7 +317,7 @@ const GroupInviteModal = ({
                       />
                     </div>
                   )}
-                </>
+                </div>
               );
             })}
 

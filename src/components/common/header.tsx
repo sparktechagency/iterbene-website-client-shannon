@@ -368,8 +368,8 @@ const Header: React.FC = () => {
       const newIsOpen = !isMessagesOpen;
       setIsMessagesOpen(newIsOpen);
       
-      // If opening the dropdown, mark all messages as viewed and reset count
-      if (newIsOpen) {
+      // If opening the dropdown, mark all messages as viewed and reset count immediately
+      if (newIsOpen && unviewMessageCount > 0) {
         await viewAllMessageNotifications(undefined).unwrap();
         setUnviewMessageCount(0);
       }
@@ -389,8 +389,8 @@ const Header: React.FC = () => {
       const newIsOpen = !isNotificationsOpen;
       setIsNotificationsOpen(newIsOpen);
       
-      // If opening the dropdown, mark all notifications as viewed and reset count
-      if (newIsOpen) {
+      // If opening the dropdown, mark all notifications as viewed and reset count immediately
+      if (newIsOpen && unviewNotificationCount > 0) {
         await viewAllNotifications(undefined).unwrap();
         setUnviewNotificationCount(0);
       }
@@ -478,6 +478,8 @@ const Header: React.FC = () => {
     [router]
   );
 
+
+  console.log("isUserOpen", isUserOpen);
   return (
     <nav className="w-full bg-[#F0FAF9] h-[72px] md:h-[88px] lg:h-[112px] fixed top-0 left-0 z-40">
       <div className="w-full container mx-auto flex justify-between items-center h-full px-4 md:px-5">
