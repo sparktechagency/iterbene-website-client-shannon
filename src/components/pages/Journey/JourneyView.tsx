@@ -59,17 +59,16 @@ const JourneyView = () => {
 
   // State management
   const [currentStory, setCurrentStory] = useState<IStory | null>(null);
-  const [currentMediaIndex, setCurrentMediaIndex] = useState<number>(0);
+  const [currentMediaIndex, setCurrentMediaIndex] = useState(0);
   const [allStories, setAllStories] = useState<IStory[]>([]);
-  const [currentStoryIndex, setCurrentStoryIndex] = useState<number>(0);
-  const [isPaused, setIsPaused] = useState<boolean>(false);
-  const [isTypingReply, setIsTypingReply] = useState<boolean>(false);
-  const [isMuted, setIsMuted] = useState<boolean>(false);
-  const [progress, setProgress] = useState<number>(0);
+  const [currentStoryIndex, setCurrentStoryIndex] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
+  const [isMuted, setIsMuted] = useState(false);
+  const [progress, setProgress] = useState(0);
   const [replyText, setReplyText] = useState("");
-  const [showMenu, setShowMenu] = useState<boolean>(false);
-  const [showViewers, setShowViewers] = useState<boolean>(false);
-  const [hasViewedCurrent, setHasViewedCurrent] = useState<boolean>(false);
+  const [showMenu, setShowMenu] = useState(false);
+  const [showViewers, setShowViewers] = useState(false);
+  const [hasViewedCurrent, setHasViewedCurrent] = useState(false);
 
   // New state for tracking reactions per media
   const [mediaReactions, setMediaReactions] = useState<{
@@ -220,8 +219,7 @@ const JourneyView = () => {
 
   // Handle progress based on pause state
   useEffect(() => {
-    // Pause progress if user is paused OR typing a reply
-    if (!isPaused && !isTypingReply && currentStory) {
+    if (!isPaused && currentStory) {
       startProgress();
     } else {
       pauseProgress();
@@ -233,7 +231,6 @@ const JourneyView = () => {
   }, [
     currentMediaIndex,
     isPaused,
-    isTypingReply,
     currentStory,
     startProgress,
     pauseProgress,
@@ -247,14 +244,6 @@ const JourneyView = () => {
       });
     }
   }, [currentMediaIndex]);
-
-  const handleReplyFocus = () => {
-    setIsTypingReply(true);
-  };
-
-  const handleReplyBlur = () => {
-    setIsTypingReply(false);
-  };
 
   const handlePrev = () => {
     if (currentMediaIndex > 0) {
@@ -408,11 +397,12 @@ const JourneyView = () => {
     isLiked: false,
     reactions: [],
   };
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
-      <div className="relative w-full max-w-md h-full bg-amber-600 overflow-hidden">
+    <div className="fixed inset-0 bg-black z-50 flex items-center justify-center">
+      <div className="relative w-full max-w-md h-full bg-black overflow-hidden">
         {/* Progress bars */}
-        <div className="absolute top-2 bg-amber-700 left-2 right-2 z-30 flex gap-1">
+        <div className="absolute top-2 left-2 right-2 z-30 flex gap-1">
           {currentStory.mediaIds?.map((_, index) => (
             <div
               key={index}
@@ -434,7 +424,7 @@ const JourneyView = () => {
         </div>
 
         {/* Header */}
-        <div className="absolute top-6 left-2 right-2 z-30 flex items-center justify-between pt-4 bg-amber-600">
+        <div className="absolute top-6 left-2 right-2 z-30 flex items-center justify-between pt-4">
           <div className="flex items-center gap-3">
             <Image
               src={currentStory?.userId?.profileImage || "/default-avatar.png"}
@@ -456,7 +446,7 @@ const JourneyView = () => {
             {isVideo && (
               <button
                 onClick={() => setIsMuted(!isMuted)}
-                className="p-1 rounded-full "
+                className="p-1 rounded-full bg-black/20"
               >
                 {isMuted ? (
                   <VolumeX className="w-5 h-5 text-white" />
@@ -498,7 +488,7 @@ const JourneyView = () => {
             )} */}
             <button
               onClick={() => router.push(`/`)}
-              className="p-1 rounded-full  cursor-pointer"
+              className="p-1 rounded-full bg-black/20 cursor-pointer"
             >
               <X className="w-5 h-5 text-white" />
             </button>
@@ -532,7 +522,7 @@ const JourneyView = () => {
                 <div
                   className="w-full h-full flex items-center justify-center relative"
                   style={{
-                    backgroundColor: currentMedia.backgroundColor || "#000",
+                    backgroundColor: "#E5E7EB",
                   }}
                 >
                   {currentMedia?.mediaUrl && (
@@ -566,7 +556,7 @@ const JourneyView = () => {
         </div>
 
         {/* Bottom section */}
-        <div className="absolute bottom-0 left-0 right-0 z-30 p-4 bg-amber-800">
+        <div className="absolute bottom-0 left-0 right-0 z-30 p-4">
           {isOwnStory ? (
             <div className="flex items-center gap-3">
               <div className="flex-1">
@@ -598,8 +588,6 @@ const JourneyView = () => {
                   value={replyText}
                   onChange={(e) => setReplyText(e.target.value)}
                   onKeyPress={(e) => e.key === "Enter" && handleReply()}
-                  onFocus={handleReplyFocus}
-                  onBlur={handleReplyBlur}
                   className="flex-1 bg-transparent text-white text-sm outline-none"
                 />
               </div>
@@ -630,14 +618,14 @@ const JourneyView = () => {
         <div className="hidden md:block">
           <button
             onClick={handlePrev}
-            className="absolute left-4 top-1/2 cursor-pointer transform -translate-y-1/2 z-30 p-2 rounded-full  text-white transition-colors"
+            className="absolute left-4 top-1/2 cursor-pointer transform -translate-y-1/2 z-30 p-2 rounded-full bg-black/20 text-white hover:bg-black/40 transition-colors"
             disabled={currentStoryIndex === 0 && currentMediaIndex === 0}
           >
             <ChevronLeft className="w-6 h-6" />
           </button>
           <button
             onClick={handleNext}
-            className="absolute right-4 cursor-pointer top-1/2 transform -translate-y-1/2 z-30 p-2 rounded-full  text-white transition-colors"
+            className="absolute right-4 cursor-pointer top-1/2 transform -translate-y-1/2 z-30 p-2 rounded-full bg-black/20 text-white hover:bg-black/40 transition-colors"
           >
             <ChevronRight className="w-6 h-6" />
           </button>
@@ -648,7 +636,7 @@ const JourneyView = () => {
       <AnimatePresence>
         {showViewers && isOwnStory && (
           <motion.div
-            className="fixed inset-0  z-60 flex items-center justify-center p-4"
+            className="fixed inset-0 bg-black/80 z-60 flex items-center justify-center p-4"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -674,9 +662,9 @@ const JourneyView = () => {
               </div>
 
               {/* Combined Viewers and Reactions */}
-              <div className="bg-green-300">
+              <div>
                 {currentMedia?.viewedBy?.length > 0 ? (
-                  <div className="space-y-2 bg-amber-800">
+                  <div className="space-y-2">
                     {currentMedia.viewedBy
                       .filter((viewer: IViewer) => viewer?._id !== user?._id)
                       .map((viewer: IViewer) => {

@@ -1,16 +1,14 @@
-import { useCallback, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import getImageDominantColor from "./getImageDominantColor";
 import Image from "next/image";
 
 interface SmartImageProps {
-  imgRef: React.RefObject<HTMLImageElement>;
   src: string;
   alt: string;
   className?: string;
 }
 
 const SmartImage = ({
-  imgRef,
   src,
   alt,
   className = ""
@@ -18,6 +16,7 @@ const SmartImage = ({
   const [bgColor, setBgColor] = useState("#f3f4f6");
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
+  const imgRef = useRef<HTMLImageElement>(null);
 
   const handleImageLoad = useCallback(async () => {
     if (imgRef.current) {

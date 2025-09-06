@@ -47,7 +47,7 @@ const CreateJourney: React.FC = () => {
   const [selectedBackground, setSelectedBackground] =
     useState<string>("#3B82F6");
   const [textStyle, setTextStyle] = useState<TextStyleType>("Clean");
-  const [textColor, setTextColor] = useState<string>("#FFFFFF");
+  const [textColor, setTextColor] = useState<string>("#000000");
   const [textSize, setTextSize] = useState<number>(24);
   const [textAlign, setTextAlign] = useState<TextAlignType>("center");
   const [privacy, setPrivacy] = useState<PrivacyType>("public");
@@ -58,7 +58,6 @@ const CreateJourney: React.FC = () => {
     x: 0,
     y: 0,
   });
-  const [isZooming, setIsZooming] = useState<boolean>(false);
   const zoomTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const router = useRouter();
@@ -103,7 +102,52 @@ const CreateJourney: React.FC = () => {
   ];
 
   const textStyles: TextStyleType[] = ["Clean", "Bold", "Typewriter", "Modern"];
-  const textSizes = [16, 20, 24, 28, 32, 36, 40];
+  const textSizes = [
+    {
+      value: 16,
+      label: "16px",
+    },
+    {
+      value: 20,
+      label: "20px",
+    },
+    {
+      value: 22,
+      label: "22px",
+    },
+    {
+      value: 24,
+      label: "24px",
+    },
+    {
+      value: 32,
+      label: "32px",
+    },
+    {
+      value: 36,
+      label: "36px",
+    },
+    {
+      value: 40,
+      label: "40px",
+    },
+    {
+      value: 48,
+      label: "48px",
+    },
+    {
+      value: 56,
+      label: "56px",
+    },
+    {
+      value: 64,
+      label: "64px",
+    },
+    {
+      value: 72,
+      label: "72px",
+    },
+  ];
 
   const handleImageSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -131,7 +175,7 @@ const CreateJourney: React.FC = () => {
     setTextPosition({ x: 0, y: 0 });
     setImagePosition({ x: 0, y: 0 });
     setSelectedBackground("#3B82F6");
-    setTextColor("#FFFFFF");
+    setTextColor("#000000");
     setTextSize(24);
     setTextAlign("center");
     setPrivacy("public");
@@ -241,19 +285,11 @@ const CreateJourney: React.FC = () => {
     event.preventDefault();
     const delta = event.deltaY > 0 ? -0.1 : 0.1;
     setScale((prev) => Math.max(0.5, Math.min(3, prev + delta)));
-    
-    // Show zoom indicator
-    setIsZooming(true);
-    
+
     // Clear existing timeout
     if (zoomTimeoutRef.current) {
       clearTimeout(zoomTimeoutRef.current);
     }
-    
-    // Hide zoom indicator after 1 second
-    zoomTimeoutRef.current = setTimeout(() => {
-      setIsZooming(false);
-    }, 1000);
   };
 
   // Mobile pinch-to-zoom support
@@ -264,15 +300,15 @@ const CreateJourney: React.FC = () => {
     const touch1 = touches[0];
     const touch2 = touches[1];
     return Math.sqrt(
-      Math.pow(touch2.clientX - touch1.clientX, 2) + 
-      Math.pow(touch2.clientY - touch1.clientY, 2)
+      Math.pow(touch2.clientX - touch1.clientX, 2) +
+        Math.pow(touch2.clientY - touch1.clientY, 2)
     );
   };
 
   const handleTouchStart = (event: React.TouchEvent<HTMLDivElement>) => {
     if (event.touches.length === 2) {
       // Two-finger gesture for zoom
-      const distance = getTouchDistance(event.touches);
+      const distance = getTouchDistance(event.touches as unknown as TouchList);
       setLastTouchDistance(distance);
     }
   };
@@ -281,13 +317,13 @@ const CreateJourney: React.FC = () => {
     if (event.touches.length === 2) {
       // Handle pinch-to-zoom
       event.preventDefault();
-      const distance = getTouchDistance(event.touches);
-      
+      const distance = getTouchDistance(event.touches as unknown as TouchList);
+
       if (lastTouchDistance > 0) {
         const scaleChange = (distance - lastTouchDistance) * 0.01;
         setScale((prev) => Math.max(0.5, Math.min(3, prev + scaleChange)));
       }
-      
+
       setLastTouchDistance(distance);
     }
   };
@@ -438,17 +474,19 @@ const CreateJourney: React.FC = () => {
         // Convert preview positions to canvas coordinates
         const scaleFactorX = canvas.width / 384; // 384px is preview width (w-96)
         const scaleFactorY = canvas.height / 500; // 500px is preview height
-        
-        const canvasImageX = (canvas.width - drawWidth) / 2 + (imagePos.x * scaleFactorX);
-        const canvasImageY = (canvas.height - drawHeight) / 2 + (imagePos.y * scaleFactorY);
+
+        const canvasImageX =
+          (canvas.width - drawWidth) / 2 + imagePos.x * scaleFactorX;
+        const canvasImageY =
+          (canvas.height - drawHeight) / 2 + imagePos.y * scaleFactorY;
 
         // Draw image with transformations
         ctx.save();
-        
+
         // Apply rotation around the center of the image
         const imageCenterX = canvasImageX + drawWidth / 2;
         const imageCenterY = canvasImageY + drawHeight / 2;
-        
+
         ctx.translate(imageCenterX, imageCenterY);
         ctx.rotate((rotate * Math.PI) / 180);
         ctx.translate(-imageCenterX, -imageCenterY);
@@ -459,7 +497,7 @@ const CreateJourney: React.FC = () => {
         // Enhanced text overlay rendering
         if (overlayText.trim()) {
           ctx.save();
-          
+
           // Text styling with better shadow
           ctx.fillStyle = textColor;
           ctx.font = `${fontSize * 4}px ${fontFamily}`;
@@ -467,23 +505,23 @@ const CreateJourney: React.FC = () => {
           ctx.textBaseline = "middle";
 
           // Convert text position from preview to canvas coordinates
-          const canvasTextX = canvas.width / 2 + (textPos.x * scaleFactorX);
-          const canvasTextY = canvas.height / 2 + (textPos.y * scaleFactorY);
+          const canvasTextX = canvas.width / 2 + textPos.x * scaleFactorX;
+          const canvasTextY = canvas.height / 2 + textPos.y * scaleFactorY;
 
           // Word wrapping with better line spacing
           const maxWidth = canvas.width * 0.85;
           const words = overlayText.split(" ");
           const lines: string[] = [];
-          
+
           if (words.length === 0) return;
-          
+
           let currentLine = words[0] || "";
 
           for (let i = 1; i < words.length; i++) {
             const word = words[i];
             const testLine = currentLine + " " + word;
             const metrics = ctx.measureText(testLine);
-            
+
             if (metrics.width < maxWidth) {
               currentLine = testLine;
             } else {
@@ -501,10 +539,13 @@ const CreateJourney: React.FC = () => {
           // Draw each line with proper spacing
           lines.forEach((line, index) => {
             const lineY = startY + index * lineHeight;
-            
+
             // Ensure text stays within canvas bounds
-            const clampedY = Math.max(lineHeight, Math.min(canvas.height - lineHeight, lineY));
-            
+            const clampedY = Math.max(
+              lineHeight,
+              Math.min(canvas.height - lineHeight, lineY)
+            );
+
             ctx.fillText(line, canvasTextX, clampedY);
           });
 
@@ -548,16 +589,16 @@ const CreateJourney: React.FC = () => {
     }
   };
 
-  // Handle text drag move  
+  // Handle text drag move
   const handleTextMouseMove = (event: React.MouseEvent<HTMLDivElement>) => {
     if (!isDragging) return;
-    
+
     event.preventDefault();
     event.stopPropagation();
 
-    const storyContainer = event.currentTarget.closest('.story-container');
+    const storyContainer = event.currentTarget.closest(".story-container");
     if (!storyContainer) return;
-    
+
     const rect = storyContainer.getBoundingClientRect();
     const newX = event.clientX - rect.left - rect.width / 2 - dragStart.x;
     const newY = event.clientY - rect.top - rect.height / 2 - dragStart.y;
@@ -776,17 +817,16 @@ const CreateJourney: React.FC = () => {
               <label className="text-sm font-medium mb-2 block">
                 Text Size
               </label>
-              <select
+              <SelectField
+                name="textSize"
+                placeholder="Select text size"
                 value={textSize}
                 onChange={(e) => setTextSize(Number(e.target.value))}
-                className="w-full p-2 border border-gray-300 rounded-lg"
-              >
-                {textSizes.map((size) => (
-                  <option key={size} value={size}>
-                    {size}px
-                  </option>
-                ))}
-              </select>
+                items={textSizes.map((size) => ({
+                  value: size.value.toString(),
+                  label: size.label,
+                }))}
+              />
             </div>
 
             {/* Text Alignment */}
@@ -929,7 +969,6 @@ const CreateJourney: React.FC = () => {
               <h3 className="text-sm font-medium mb-3">Adjust Image</h3>
               <div className="mb-4">
                 <div className="flex items-center gap-2 mb-2">
-                  <span className="text-xs text-gray-600">-</span>
                   <input
                     type="range"
                     min="0.5"
@@ -937,7 +976,7 @@ const CreateJourney: React.FC = () => {
                     step="0.1"
                     value={scale}
                     onChange={handleZoomChange}
-                    className="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
+                    className="flex-1 h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
                     style={{
                       background: `linear-gradient(to right, #3B82F6 0%, #3B82F6 ${
                         ((scale - 0.5) / (3 - 0.5)) * 100
@@ -946,7 +985,6 @@ const CreateJourney: React.FC = () => {
                       }%, #e5e7eb 100%)`,
                     }}
                   />
-                  <span className="text-xs text-gray-600">+</span>
                 </div>
                 <div className="flex items-center justify-between text-xs text-gray-500">
                   <span>{Math.round(scale * 100)}%</span>
@@ -988,7 +1026,7 @@ const CreateJourney: React.FC = () => {
                 value={imageText}
                 onChange={(e) => setImageText(e.target.value)}
                 placeholder="Add text overlay... (drag to position)"
-                className="w-full bg-white border border-gray-300 p-3 rounded-lg resize-none mb-3 outline-none focus:border-secondary focus:ring-2 focus:ring-secondary focus:ring-opacity-20"
+                className="w-full bg-white border border-gray-300 p-3 rounded-lg resize-none mb-3 outline-none focus:border-secondary"
                 rows={3}
                 maxLength={100}
               />
@@ -1018,17 +1056,16 @@ const CreateJourney: React.FC = () => {
                   <label className="text-sm font-medium mb-2 block">
                     Text Size
                   </label>
-                  <select
+                  <SelectField
+                    name="textSize"
+                    placeholder="Select text size"
                     value={textSize}
                     onChange={(e) => setTextSize(Number(e.target.value))}
-                    className="w-full p-2 border border-gray-300 rounded-lg"
-                  >
-                    {textSizes.map((size) => (
-                      <option key={size} value={size}>
-                        {size}px
-                      </option>
-                    ))}
-                  </select>
+                    items={textSizes.map((size) => ({
+                      value: size.value.toString(),
+                      label: size.label,
+                    }))}
+                  />
                 </div>
 
                 {/* Text Color */}
@@ -1074,7 +1111,6 @@ const CreateJourney: React.FC = () => {
               <div className="relative">
                 <div
                   className="story-container w-96 h-[500px] rounded-3xl overflow-hidden relative bg-gray-200  "
-                 
                   onWheel={handleWheelZoom}
                   onMouseMove={(e) => {
                     handleImageMouseMove(e);

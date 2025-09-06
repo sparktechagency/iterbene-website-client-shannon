@@ -133,8 +133,6 @@ const ImageCropModal: React.FC<ImageCropModalProps> = ({
                 boxShadow: "0 0 0 9999em rgba(0, 0, 0, 0.5)",
               },
               mediaStyle: {
-                objectFit: "cover", // Ensure the image fills the crop area
-                width: "100%",
                 height: "300px",
               },
             }}
