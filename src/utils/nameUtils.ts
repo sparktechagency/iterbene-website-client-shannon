@@ -17,9 +17,9 @@ export const joinNames = (firstName?: string, lastName?: string): string => {
 
 export const getFullName = (user: { firstName?: string; lastName?: string; fullName?: string }): string => {
   // If firstName and lastName exist, use them
-  if (user.firstName || user.lastName) {
-    return joinNames(user.firstName, user.lastName);
+  if (user?.firstName || user?.lastName) {
+    return joinNames(user?.firstName, user?.lastName);
   }
   // Fallback to fullName if it exists
-  return user.fullName || '';
+  return user?.fullName || '';
 };

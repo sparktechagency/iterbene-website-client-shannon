@@ -1,39 +1,41 @@
 "use client";
-import PostCard from "@/components/pages/home/posts/post-card";
 import { useGetGroupPostsQuery } from "@/redux/features/post/postApi";
 import { IPost } from "@/types/post.types";
+import { useState, useEffect, useMemo, memo, Suspense } from "react";
+import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import { useParams } from "next/navigation";
-import { useState, useEffect, useMemo, useCallback } from "react";
 import PostCardSkeleton from "@/components/pages/home/posts/PostCardSkeleton";
+import PostCard from "@/components/pages/home/posts/post-card";
 
 const GroupPost = () => {
   const { groupId } = useParams();
-  const [currentPage, setCurrentPage] = useState(1);
+  const [currentPage, setCurrentPage] = useState<number>(1);
   const [allPosts, setAllPosts] = useState<IPost[]>([]);
-  const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
+  const [loading, setLoading] = useState(false);
 
+  // API query parameters
   const {
     data: responseData,
     isLoading,
-    isError,
-    refetch,
+    isFetching,
   } = useGetGroupPostsQuery(
     {
       groupId,
       filters: [
-        { key: "page", value: currentPage },
-        { key: "limit", value: 10 },
+        { key: "page", value: currentPage.toString() },
+        { key: "limit", value: "10" },
       ],
     },
     {
+      skip: !groupId,
       refetchOnMountOrArgChange: true,
       refetchOnFocus: true,
       refetchOnReconnect: true,
-      skip: !groupId,
     }
   );
 
+  // Get current page posts from RTK Query cache
   const currentPagePosts = useMemo(
     () =>
       Array.isArray(responseData?.data?.attributes?.results)
@@ -42,8 +44,10 @@ const GroupPost = () => {
     [responseData]
   );
 
+  // total number of pages
   const totalPages = responseData?.data?.attributes?.totalPages;
 
+  // Merge new posts with existing posts
   useEffect(() => {
     if (currentPagePosts?.length > 0) {
       if (currentPage === 1) {
@@ -60,6 +64,7 @@ const GroupPost = () => {
     }
   }, [currentPagePosts, currentPage]);
 
+  // Update existing posts
   useEffect(() => {
     if (currentPagePosts?.length > 0 && allPosts?.length > 0) {
       setAllPosts((prevPosts) => {
@@ -73,6 +78,7 @@ const GroupPost = () => {
     }
   }, [allPosts?.length, currentPagePosts]);
 
+  // Update loading state
   useEffect(() => {
     if (isLoading) {
       setLoading(true);
@@ -82,74 +88,63 @@ const GroupPost = () => {
     }
   }, [isLoading, currentPage, totalPages]);
 
-  const loadMore = useCallback(() => {
-    if (!loading && hasMore) {
-      setCurrentPage((prev) => prev + 1);
-    }
-  }, [loading, hasMore]);
+  // Use the reusable infinite scroll hook
+  const { lastElementRef } = useInfiniteScroll({
+    isLoading,
+    isFetching,
+    hasMore: hasMore && !loading,
+    onLoadMore: () => setCurrentPage((prev) => prev + 1),
+    threshold: 0.1,
+    rootMargin: "100px",
+  });
 
-  useEffect(() => {
-    if (!hasMore || loading) return;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting) {
-          loadMore();
-        }
-      },
-      { threshold: 0.1 }
-    );
-
-    const sentinel = document.getElementById("sentinel");
-    if (sentinel) observer.observe(sentinel);
-
-    return () => {
-      if (sentinel) observer.unobserve(sentinel);
-    };
-  }, [loadMore, loading, hasMore]);
-
-  if (isLoading && allPosts.length === 0) {
+  // Render
+  if (isLoading && allPosts?.length === 0) {
     return (
-      <div className="space-y-4">
-        <PostCardSkeleton />
-        <PostCardSkeleton />
+      <div className="w-full text-center py-4">
+        {Array.from({ length: 4 }).map((_, index) => (
+          <PostCardSkeleton key={index} />
+        ))}
       </div>
     );
   }
 
-  if (isError) {
+  // Render
+  if (!isLoading && allPosts?.length === 0 && !hasMore) {
     return (
-      <div className="w-full text-center py-4 text-red-500">
-        Failed to load posts. Please try again.
-        <button
-          onClick={() => refetch()}
-          className="ml-2 px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
-        >
-          Retry
-        </button>
-      </div>
+      <section className="w-full text-center py-4">
+        <p className="text-gray-600 text-lg">No posts available</p>
+      </section>
     );
-  }
-
-  if (allPosts.length === 0) {
-    return <div className="w-full text-center py-4">No posts available.</div>;
   }
 
   return (
     <div className="space-y-4">
-      {allPosts?.map((post) => (
-        <PostCard key={post._id} post={post} />
-      ))}
-
-      {loading && (
-        <div className="space-y-4">
-          <PostCardSkeleton />
+      {allPosts?.map((post: IPost, index: number) => {
+        if (index === allPosts?.length - 1) {
+          return (
+            <div key={post?._id} ref={lastElementRef}>
+              <Suspense fallback={<PostCardSkeleton />}>
+                <PostCard post={post} setAllPosts={setAllPosts} />
+              </Suspense>
+            </div>
+          );
+        }
+        return (
+          <Suspense key={post?._id} fallback={<PostCardSkeleton />}>
+            <PostCard post={post} setAllPosts={setAllPosts} />
+          </Suspense>
+        );
+      })}
+      {isFetching && hasMore && (
+        <div className="w-full text-center py-4">
+          {Array.from({ length: 2 }).map((_, index) => (
+            <PostCardSkeleton key={`fetching-${index}`} />
+          ))}
         </div>
       )}
-
-      {hasMore && <div id="sentinel" style={{ height: "1px" }}></div>}
     </div>
   );
 };
 
-export default GroupPost;
+export default memo(GroupPost);
