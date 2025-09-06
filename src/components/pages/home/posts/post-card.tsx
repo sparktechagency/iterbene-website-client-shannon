@@ -239,7 +239,7 @@ const PostCard = ({ post, setAllPosts }: PostCardProps) => {
             if (p._id === post._id) {
               // Ensure reactions array exists
               const currentReactions = p.reactions || [];
-              console.log('Current reactions:', currentReactions);
+              console.log("Current reactions:", currentReactions);
 
               // Check if user already has any reaction on this post
               const existingReaction = currentReactions.find(
@@ -248,8 +248,8 @@ const PostCard = ({ post, setAllPosts }: PostCardProps) => {
               const isSameReaction =
                 existingReaction?.reactionType === reactionType;
 
-              console.log('Existing reaction:', existingReaction);
-              console.log('Is same reaction:', isSameReaction);
+              console.log("Existing reaction:", existingReaction);
+              console.log("Is same reaction:", isSameReaction);
 
               let updatedReactions;
 
@@ -278,7 +278,7 @@ const PostCard = ({ post, setAllPosts }: PostCardProps) => {
                 });
               }
 
-              console.log('Updated reactions:', updatedReactions);
+              console.log("Updated reactions:", updatedReactions);
 
               return {
                 ...p,
@@ -291,7 +291,7 @@ const PostCard = ({ post, setAllPosts }: PostCardProps) => {
         );
       }
     } catch (error) {
-      console.error('API call failed:', error);
+      console.error("API call failed:", error);
       const err = error as TError;
       toast.error(err?.data?.message || "Something went wrong!");
     }
@@ -321,9 +321,8 @@ const PostCard = ({ post, setAllPosts }: PostCardProps) => {
       />
 
       <div className="text-gray-700 mb-4 whitespace-pre-wrap break-words">
-
         {/* Render text with highlighted hashtags */}
-        {post?.content?.split('\n').map((line, lineIndex) => (
+        {post?.content?.split("\n").map((line, lineIndex) => (
           <React.Fragment key={lineIndex}>
             {line.split(/(\s+)/).map((word, wordIndex) => {
               const isHashtag = word?.match(/^#\w+/);
@@ -342,7 +341,7 @@ const PostCard = ({ post, setAllPosts }: PostCardProps) => {
                 </span>
               );
             })}
-            {lineIndex < post?.content?.split('\n').length - 1 && <br />}
+            {lineIndex < post?.content?.split("\n").length - 1 && <br />}
           </React.Fragment>
         ))}
       </div>
@@ -480,12 +479,14 @@ const PostCard = ({ post, setAllPosts }: PostCardProps) => {
                   <h1
                     className="text-[22px] emoji-font"
                     style={{
-                      filter: "grayscale(100%)"
+                      filter: "grayscale(100%)",
                     }}
                   >
                     ❤️
                   </h1>
-                  <span className="text-sm md:text-base font-semibold text-gray-500">Heart</span>
+                  <span className="text-sm md:text-base font-semibold text-gray-500">
+                    Heart
+                  </span>
                 </div>
               )}
             </button>
@@ -521,7 +522,11 @@ const PostCard = ({ post, setAllPosts }: PostCardProps) => {
                         <Tooltip
                           title={
                             reaction?.charAt(0)?.toUpperCase() +
-                            reaction?.slice(1)
+                              reaction?.slice(1) ===
+                            "Not_interested"
+                              ? "Not Interested"
+                              : reaction?.charAt(0)?.toUpperCase() +
+                                reaction?.slice(1)
                           }
                         >
                           {reactionIcons[reaction]}

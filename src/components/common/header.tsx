@@ -478,8 +478,6 @@ const Header: React.FC = () => {
     [router]
   );
 
-
-  console.log("isUserOpen", isUserOpen);
   return (
     <nav className="w-full bg-[#F0FAF9] h-[72px] md:h-[88px] lg:h-[112px] fixed top-0 left-0 z-40">
       <div className="w-full container mx-auto flex justify-between items-center h-full px-4 md:px-5">
