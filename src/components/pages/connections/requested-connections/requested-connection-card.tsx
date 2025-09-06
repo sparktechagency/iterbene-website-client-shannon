@@ -57,14 +57,14 @@ const RequestedConnectionCard = ({
         <Image
           src={request?.sentBy?.profileImage}
           alt={request?.sentBy?.username}
-          width={224}
-          height={224}
-          className="size-16 md:w-full md:h-56 object-cover rounded-full md:rounded-2xl"
+          width={208}
+          height={208}
+          className="size-16 md:w-full md:h-52 object-cover rounded-full md:rounded-2xl"
         />
       </Link>
       <div className="w-full">
         {/* Name */}
-        <h2 className="text-sm md:text-base font-semibold text-gray-800 mb-3 text-left">
+        <h2 className="text-lg font-semibold text-gray-800 mb-3 text-left">
           {request?.sentBy?.firstName} {request?.sentBy?.lastName}
         </h2>
 

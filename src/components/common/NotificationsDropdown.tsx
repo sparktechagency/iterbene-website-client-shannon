@@ -325,7 +325,7 @@ const NotificationsDropdown: React.FC<DropdownProps> = ({
           </div>
 
           {/* View All Button - Fixed */}
-          {notificationData?.length > 0 && (
+          {notificationData?.length > 10 && (
             <div className="border-t border-gray-200 p-3">
               <button
                 onClick={handleViewAllNotifications}

@@ -105,19 +105,23 @@ const SuggestionConnections: React.FC = () => {
         <h1 className="text-lg md:text-xl font-semibold text-gray-800">
           People You Might Like
         </h1>
-        {showViewMoreButton && (
-          <button
-            onClick={handleViewMore}
-            disabled={isLoadingMore}
-            className="text-primary hover:underline cursor-pointer"
-          >
-            Show more
-          </button>
-        )}
       </div>
 
       {/* Content Section */}
       {content}
+
+      {/* View More Button */}
+      {showViewMoreButton && (
+        <div className="w-full flex justify-center my-5">
+          <button
+            onClick={handleViewMore}
+            disabled={isLoadingMore}
+            className="px-5 py-1 bg-secondary text-white rounded-lg  cursor-pointer"
+          >
+            View More
+          </button>
+        </div>
+      )}
     </section>
   );
 };

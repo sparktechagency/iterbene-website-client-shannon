@@ -52,7 +52,7 @@ const MyAllConnectionCard = ({
   };
 
   return (
-    <div className="w-full h-fit bg-white rounded-2xl p-4 flex flex-row md:flex-col gap-4 items-center">
+    <div className="w-full h-fit bg-white rounded-2xl p-4 flex flex-row md:flex-col gap-3 items-center">
       {/* Profile Image */}
       <Link className="flex-shrink-0" href={`/${connection?.username}`}>
         <Image
@@ -60,7 +60,7 @@ const MyAllConnectionCard = ({
           alt={connection?.username}
           width={208}
           height={208}
-          className="w-full md:h-52 object-cover rounded-full md:rounded-2xl"
+          className="size-16 md:w-full md:h-52 object-cover rounded-full md:rounded-2xl"
         />
       </Link>
       <div className="w-full">

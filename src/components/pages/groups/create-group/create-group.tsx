@@ -2,12 +2,11 @@
 import CustomInput from "@/components/custom/custom-input";
 import CustomModal from "@/components/custom/custom-modal";
 import Image from "next/image";
-import React, { useState, DragEvent } from "react";
-import { BsCamera, BsStars } from "react-icons/bs";
+import React, { useState, DragEvent} from "react";
+import { BsCamera } from "react-icons/bs";
 import { HiOutlinePhotograph } from "react-icons/hi";
 import { AnimatePresence } from "framer-motion";
 import useUser from "@/hooks/useUser";
-import { useGetMyConnectionsQuery } from "@/redux/features/connections/connectionsApi";
 import { useCreateGroupMutation } from "@/redux/features/group/groupApi";
 import { TError } from "@/types/error";
 import { useForm } from "react-hook-form";
@@ -16,10 +15,8 @@ import { z } from "zod";
 import toast from "react-hot-toast";
 import { IoClose } from "react-icons/io5";
 import CustomButton from "@/components/custom/custom-button";
-import { Select } from "antd";
-import { IMyConnections } from "@/types/connection.types";
+import { Users } from "lucide-react";
 
-const { Option } = Select;
 
 // Define Zod schema for form validation
 const groupSchema = z.object({
@@ -31,7 +28,6 @@ const groupSchema = z.object({
     .string()
     .min(1, "Description is required")
     .max(395, "Description must be 395 characters or less"),
-  coLeaders: z.array(z.string()).optional(),
 });
 
 type GroupFormData = z.infer<typeof groupSchema>;
@@ -42,7 +38,6 @@ const CreateGroup: React.FC = () => {
   const [groupImage, setGroupImage] = useState<string | null>(null);
   const [groupFile, setGroupFile] = useState<File | null>(null);
   const [isDragOver, setIsDragOver] = useState(false);
-  const [coLeaders, setCoLeaders] = useState<string[]>([]);
 
   const {
     register,
@@ -53,16 +48,15 @@ const CreateGroup: React.FC = () => {
     resolver: zodResolver(groupSchema),
     defaultValues: {
       groupName: "",
-      description: "",
-      coLeaders: [],
+      description: ""
     },
   });
 
-  const { data: responseData } = useGetMyConnectionsQuery({
-    page: 1,
-    limit: 10,
-  });
-  const myConnections = responseData?.data?.attributes?.results;
+  // const { data: responseData } = useGetMyConnectionsQuery({
+  //   page: 1,
+  //   limit: 10,
+  // });
+  // const myConnections = responseData?.data?.attributes?.results;
 
   const [createGroup, { isLoading }] = useCreateGroupMutation();
 
@@ -71,10 +65,8 @@ const CreateGroup: React.FC = () => {
     setIsModalOpen(false);
     setGroupFile(null);
     setGroupImage(null);
-    setCoLeaders([]);
     setValue("groupName", "");
     setValue("description", "");
-    setValue("coLeaders", []);
     setIsDragOver(false);
   };
 
@@ -116,11 +108,38 @@ const CreateGroup: React.FC = () => {
       processImageFile(files[0]);
     }
   };
+  // const filteredConnections =
+  //   myConnections?.filter((connection: IMyConnections) => {
+  //     const isNotSelected = !selectedMembers.some(
+  //       (member) => member._id === connection._id
+  //     );
+  //     const matchesSearch =
+  //       connection.firstName
+  //         .toLowerCase()
+  //         .includes(searchQuery.toLowerCase()) ||
+  //       connection.lastName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+  //       connection.username.toLowerCase().includes(searchQuery.toLowerCase());
+  //     return isNotSelected && matchesSearch;
+  //   }) || [];
 
-  const handleCoLeaderChange = (value: string[]) => {
-    setCoLeaders(value);
-    setValue("coLeaders", value);
-  };
+  // const handleMemberSelect = (member: IMyConnections) => {
+  //   const newSelectedMembers = [...selectedMembers, member];
+  //   setSelectedMembers(newSelectedMembers);
+  //   const memberIds = newSelectedMembers.map((m) => m._id);
+  //   setMembers(memberIds);
+  //   setValue("members", memberIds);
+  //   setSearchQuery("");
+  // };
+
+  // const handleMemberRemove = (memberId: string) => {
+  //   const newSelectedMembers = selectedMembers.filter(
+  //     (member) => member._id !== memberId
+  //   );
+  //   setSelectedMembers(newSelectedMembers);
+  //   const memberIds = newSelectedMembers.map((m) => m._id);
+  //   setMembers(memberIds);
+  //   setValue("members", memberIds);
+  // };
 
   const handleFormSubmit = async (values: GroupFormData) => {
     if (!groupFile) {
@@ -132,9 +151,6 @@ const CreateGroup: React.FC = () => {
       formData.append("name", values.groupName);
       formData.append("description", values.description);
       formData.append("groupImage", groupFile);
-      if (coLeaders.length > 0) {
-        formData.append("coLeaders", JSON.stringify(coLeaders));
-      }
       await createGroup(formData).unwrap();
       toast.success("Group created successfully!");
       closeModal();
@@ -152,7 +168,7 @@ const CreateGroup: React.FC = () => {
             onClick={openModal}
             className="w-full bg-[#FEEFE8] text-secondary flex justify-center items-center gap-2 font-semibold px-5 py-3.5 rounded-xl border border-secondary transition cursor-pointer"
           >
-            <BsStars size={24} />
+            <Users size={24} />
             <span>Create New Group</span>
           </button>
 
@@ -303,35 +319,6 @@ const CreateGroup: React.FC = () => {
                     />
                   </div>
 
-                  {/* Co-Leaders */}
-                  <div className="flex flex-col gap-3">
-                    <div className="flex items-center gap-2">
-                      <h1 className="text-base font-semibold text-gray-900">
-                        Add Co-Leaders
-                      </h1>
-                    </div>
-                    <Select
-                      mode="multiple"
-                      allowClear
-                      value={coLeaders}
-                      onChange={handleCoLeaderChange}
-                      style={{ width: "100%" }}
-                      placeholder="Add co-leaders"
-                      size="large"
-                      className="text-gray-900"
-                    >
-                      {myConnections?.map((connection: IMyConnections) => (
-                        <Option key={connection?._id} value={connection?._id}>
-                          {connection?.firstName} {connection?.lastName}
-                        </Option>
-                      ))}
-                    </Select>
-                    <p className="text-gray-600 text-sm">
-                      Co-leaders can accept or decline once you&apos;ve
-                      published your group.
-                    </p>
-                  </div>
-
                   {/* Submit Button */}
                   <CustomButton
                     loading={isLoading}
@@ -352,3 +339,156 @@ const CreateGroup: React.FC = () => {
 };
 
 export default CreateGroup;
+
+
+{
+  /* 
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <label className="block text-sm font-semibold text-gray-700">
+                        Add Members{" "}
+                        <span className="text-gray-400 font-normal">
+                          (Optional)
+                        </span>
+                      </label>
+                      <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
+                        {selectedMembers.length} selected
+                      </span>
+                    </div>
+                    {selectedMembers.length > 0 && (
+                      <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-4 border border-blue-100">
+                        <div className="flex items-center gap-2 mb-3">
+                          <Users size={16} className="text-blue-600" />
+                          <span className="text-sm font-medium text-blue-800">
+                            Selected Members
+                          </span>
+                        </div>
+                        <div className="flex flex-wrap gap-2">
+                          {selectedMembers.map((member) => (
+                            <div
+                              key={member._id}
+                              className="flex items-center gap-2 bg-white px-3 py-2 rounded-lg border border-blue-200 shadow-sm hover:shadow-md transition-all duration-200"
+                            >
+                              <Image
+                                src={
+                                  member.profileImage || "/default-avatar.png"
+                                }
+                                alt={`${member.firstName} ${member.lastName}`}
+                                width={24}
+                                height={24}
+                                className="size-6 rounded-full object-cover"
+                              />
+                              <span className="text-sm font-medium text-gray-700">
+                                {member.firstName} {member.lastName}
+                              </span>
+                              <button
+                                type="button"
+                                onClick={() => handleMemberRemove(member._id)}
+                                className="text-red-500 hover:text-red-700 hover:bg-red-50 rounded-full p-1 transition-all duration-200"
+                              >
+                                <X size={14} />
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    <div className="relative mb-8" ref={memberSearchRef} >
+                      <button
+                        type="button"
+                        onClick={() => setShowMemberSearch(!showMemberSearch)}
+                        className="w-full flex items-center justify-center gap-3 py-3 px-4 border-2 cursor-pointer border-dashed border-gray-300 rounded-lg hover:border-primary hover:bg-primary/5 transition-all duration-300 group"
+                      >
+                        <UserPlus
+                          size={20}
+                          className="text-gray-500 group-hover:text-primary transition-colors"
+                        />
+                        <span className="text-gray-600 group-hover:text-primary font-medium">
+                          Add Members to Group
+                        </span>
+                      </button>
+
+                      {showMemberSearch && (
+                          <div className="p-4 border-b border-gray-100">
+                            <div className="relative">
+                              <CustomInput
+                                type="text"
+                                label="Search Members"
+                                name="memberSearch"
+                                icon={<Search size={18} />}
+                                placeholder="Search Members"
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                              />
+                            </div>
+                          </div>
+
+                          <div className="max-h-48 overflow-y-auto">
+                            {filteredConnections.length > 0 ? (
+                              filteredConnections.map((connection:IConnection) => (
+                                <button
+                                  key={connection._id}
+                                  type="button"
+                                  onClick={() => handleMemberSelect(connection)}
+                                  className="w-full flex items-center gap-3 p-3 hover:bg-gray-50 transition-colors duration-200 text-left"
+                                >
+                                  <Image
+                                    src={
+                                      connection.profileImage ||
+                                      "/default-avatar.png"
+                                    }
+                                    alt={`${connection.firstName} ${connection.lastName}`}
+                                    width={40}
+                                    height={40}
+                                    className="size-10 rounded-full object-cover"
+                                  />
+                                  <div className="flex-1 min-w-0">
+                                    <p className="text-sm font-medium text-gray-900 truncate">
+                                      {connection.firstName}{" "}
+                                      {connection.lastName}
+                                    </p>
+                                    <p className="text-xs text-gray-500 truncate">
+                                      @{connection.username}
+                                    </p>
+                                  </div>
+                                  <UserPlus
+                                    size={16}
+                                    className="text-primary flex-shrink-0"
+                                  />
+                                </button>
+                              ))
+                            ) : (
+                              <div className="p-6 text-center">
+                                <Users
+                                  size={32}
+                                  className="mx-auto text-gray-300 mb-2"
+                                />
+                                <p className="text-sm text-gray-500">
+                                  {searchQuery
+                                    ? "No connections found matching your search"
+                                    : "No available connections to add"}
+                                </p>
+                              </div>
+                            )}
+                          </div>
+
+                          <div className="p-3 bg-gray-50 border-t border-gray-100">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setShowMemberSearch(false);
+                                setSearchQuery("");
+                              }}
+                              className="w-full py-2 px-4 text-sm text-gray-600 hover:text-gray-800 transition-colors"
+                            >
+                              Close
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+ </div> 
+                  
+                  
+*/
+}

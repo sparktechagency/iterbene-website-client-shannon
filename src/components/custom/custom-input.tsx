@@ -18,7 +18,7 @@ type TInputProps = {
   onChange?: (
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => void;
-  register: UseFormRegisterReturn;
+  register?: UseFormRegisterReturn;
   error?: FieldError;
 };
 
