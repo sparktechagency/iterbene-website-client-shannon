@@ -71,7 +71,7 @@ const CreateEvent: React.FC = () => {
   } = useForm<EventFormData>({
     resolver: zodResolver(eventSchema),
     defaultValues: {
-      eventName: "Rakib",
+      eventName: "",
       description: "",
       startDate: "",
       endDate: "",

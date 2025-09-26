@@ -40,6 +40,8 @@ const MyEventCard = ({
   const closeRemoveModal = () => {
     setIsRemoveModalOpen(false);
   };
+
+  console.log("Event Data:", event);
   return (
     <>
       <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
@@ -52,41 +54,30 @@ const MyEventCard = ({
             height={300}
             className="w-full h-full object-cover"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
-
-          {/* Interest Count Badge */}
-          <div className="absolute top-3 right-3 bg-white rounded-full px-3 py-1.5 flex items-center gap-1.5">
-            <PiUserBold size={14} className="text-secondary" />
-            <span className="text-xs font-semibold text-gray-800">
-              {event?.interestCount}
-            </span>
-          </div>
-          {/* Creator Profile */}
-          <div className="absolute bottom-14 left-4">
-            <Image
-              src={event?.creatorId?.profileImage}
-              alt={`${event?.creatorId?.firstName} ${event?.creatorId?.lastName}`}
-              width={40}
-              height={40}
-              className="w-10 h-10 rounded-full object-cover border-2 border-white"
-            />
-          </div>
-
-          {/* Event Name Overlay */}
-          <div className="absolute bottom-0 left-0 right-0 p-4">
-            <h3 className="text-lg font-bold text-white truncate mb-1">
-              {event?.eventName}
-            </h3>
-            <p className="text-white/80 text-sm line-clamp-2">
-              {event?.eventDescription || "No description available"}
-            </p>
+          <div className="absolute inset-0  flex flex-col justify-between bg-black/40 p-4">
+            <div className="w-full flex justify-end">
+              <div className="bg-white rounded-full px-3 py-1.5 flex items-center gap-1.5">
+                <PiUserBold size={14} className="text-secondary" />
+                <span className="text-xs font-semibold text-gray-800">
+                  {event?.interestCount}
+                </span>
+              </div>
+            </div>
+            <div className="w-full">
+              <h3 className="text-lg font-bold text-white truncate">
+                {event?.eventName}
+              </h3>
+              <p className="text-white/80 text-sm line-clamp-2 truncate">
+                {event?.description || "No description available"}
+              </p>
+            </div>
           </div>
         </div>
 
         {/* Action Buttons */}
         <div className="p-4 space-y-3">
           <Link href={`/events/${event?._id}`} className="w-full block">
-            <button className="w-full bg-secondary text-white font-medium py-2.5 px-4 rounded-lg hover:bg-secondary/90 transition-colors flex items-center justify-center gap-2">
+            <button className="w-full bg-secondary cursor-pointer text-white font-medium py-2.5 px-4 rounded-lg hover:bg-secondary/90 transition-colors flex items-center justify-center gap-2">
               <Eye size={16} />
               View Event
             </button>
@@ -94,7 +85,7 @@ const MyEventCard = ({
 
           <button
             onClick={openRemoveModal}
-            className="w-full border border-gray-300 text-gray-700 hover:bg-gray-50 font-medium py-2.5 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
+            className="w-full border border-gray-300 cursor-pointer text-gray-700 hover:bg-gray-50 font-medium py-2.5 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
           >
             <Trash2 size={16} />
             Remove Event

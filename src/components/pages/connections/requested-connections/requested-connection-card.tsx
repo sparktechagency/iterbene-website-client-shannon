@@ -80,7 +80,7 @@ const RequestedConnectionCard = ({
       <div className="p-4 space-y-3">
         <button
           onClick={handleAcceptConnection}
-          className="w-full bg-secondary text-white font-medium py-2.5 px-4 rounded-lg hover:bg-secondary/90 transition-colors flex items-center justify-center gap-2"
+          className="w-full bg-secondary cursor-pointer text-white font-medium py-2.5 px-4 rounded-lg hover:bg-secondary/90 transition-colors flex items-center justify-center gap-2"
         >
           <UserPlus size={16} />
           Accept
@@ -88,7 +88,7 @@ const RequestedConnectionCard = ({
         
         <button
           onClick={handleDeclineConnection}
-          className="w-full border border-gray-300 text-gray-700 hover:bg-gray-50 font-medium py-2.5 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
+          className="w-full border cursor-pointer border-gray-300 text-gray-700 hover:bg-gray-50 font-medium py-2.5 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
         >
           <UserX size={16} />
           Decline

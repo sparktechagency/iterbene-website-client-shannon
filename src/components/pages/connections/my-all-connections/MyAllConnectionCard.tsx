@@ -71,9 +71,7 @@ const MyAllConnectionCard = ({
           <h3 className="text-lg font-bold text-white truncate">
             {connection?.firstName} {connection?.lastName}
           </h3>
-          <p className="text-white/80 text-sm">
-            @{connection?.username}
-          </p>
+          <p className="text-white/80 text-sm">@{connection?.username}</p>
         </div>
       </div>
 
@@ -81,15 +79,15 @@ const MyAllConnectionCard = ({
       <div className="p-4 space-y-3">
         <button
           onClick={() => setRemoveConnectionPopup(true)}
-          className="w-full bg-secondary text-white font-medium py-2.5 px-4 rounded-lg hover:bg-secondary/90 transition-colors flex items-center justify-center gap-2"
+          className="w-full bg-secondary cursor-pointer text-white font-medium py-2.5 px-4 rounded-lg hover:bg-secondary/90 transition-colors flex items-center justify-center gap-2"
         >
           <UserMinus size={16} />
           Remove Connection
         </button>
-        
+
         <button
           onClick={() => setBlockUserPopup(true)}
-          className="w-full border border-gray-300 text-gray-700 hover:bg-gray-50 font-medium py-2.5 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
+          className="w-full border border-gray-300 cursor-pointer text-gray-700 hover:bg-gray-50 font-medium py-2.5 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
         >
           <Shield size={16} />
           Block User

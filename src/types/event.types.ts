@@ -9,7 +9,7 @@ export interface IEvent {
     username: string;
     profileImage: string;
   };
-  eventDescription: string;
+  description: string;
   interestCount: number;
   startDate: string;
   endDate: string;
