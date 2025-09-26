@@ -64,7 +64,7 @@ const UpcomingEvent = () => {
   return (
     <section className="w-full">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold uppercase">Upcoming</h1>
+        <h1 className="text-xl font-semibold uppercase">Upcoming</h1>
         <div className="size-8 rounded-full bg-primary flex items-center justify-center text-white">
           <span>{allEvents?.length}</span>
         </div>

@@ -72,7 +72,7 @@ export interface IEventInvitation {
       username: string;
       profileImage: string;
     };
-    eventDescription: string;
+    description: string;
     duration: {
       days: number;
       nights: number;

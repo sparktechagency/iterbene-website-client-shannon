@@ -4,7 +4,7 @@ import CustomModal from "@/components/custom/custom-modal";
 import CustomDatePicker from "@/components/custom/CustomDatePicker";
 import Image from "next/image";
 import React, { useState, DragEvent } from "react";
-import { BsCamera, BsStars } from "react-icons/bs";
+import { BsCamera } from "react-icons/bs";
 import { HiOutlinePhotograph } from "react-icons/hi";
 import { AnimatePresence } from "framer-motion";
 import LocationSearchInput from "@/components/custom/LocationSearchInput";
@@ -18,6 +18,7 @@ import { z } from "zod";
 import toast from "react-hot-toast";
 import { IoClose } from "react-icons/io5";
 import CustomButton from "@/components/custom/custom-button";
+import { CalendarHeart } from "lucide-react";
 
 // Define Zod schema for form validation
 const eventSchema = z
@@ -177,7 +178,7 @@ const CreateEvent: React.FC = () => {
             onClick={openModal}
             className="w-full bg-[#FEEFE8] text-secondary flex justify-center items-center gap-2 font-semibold px-5 py-3.5 rounded-xl border border-secondary transition cursor-pointer"
           >
-            <BsStars size={24} />
+            <CalendarHeart size={24} />
             <span>Create New Event</span>
           </button>
           {/* Render the Modal */}

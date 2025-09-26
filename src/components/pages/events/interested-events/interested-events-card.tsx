@@ -44,43 +44,39 @@ const InterestedEventCard = ({
           height={300}
           className="w-full h-full object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
-
-        {/* Interest Count Badge */}
-        <div className="absolute top-3 right-3 bg-white rounded-full px-3 py-1.5 flex items-center gap-1.5">
-          <PiUserBold size={14} className="text-secondary" />
-          <span className="text-xs font-semibold text-gray-800">
-            {event?.interestCount}
-          </span>
-        </div>
-        {/* Creator Profile */}
-        <div className="absolute bottom-14 left-4">
-          <Image
-            src={event?.creatorId?.profileImage}
-            alt={`${event?.creatorId?.firstName} ${event?.creatorId?.lastName}`}
-            width={40}
-            height={40}
-            className="w-10 h-10 rounded-full object-cover border-2 border-white"
-          />
-          <div>
-            <h3 className="text-lg font-bold text-white truncate mb-1">
-              {event?.eventName}
-            </h3>
+        <div className="absolute inset-0  flex flex-col justify-between bg-black/40 p-4">
+          <div className="w-full flex justify-end">
+            <div className="bg-white rounded-full px-3 py-1.5 flex items-center gap-1.5">
+              <PiUserBold size={14} className="text-secondary" />
+              <span className="text-xs font-semibold text-gray-800">
+                {event?.interestCount}
+              </span>
+            </div>
           </div>
-        </div>
-
-        {/* Event Name Overlay */}
-        <div className="absolute bottom-0 left-0 right-0 p-4">
-          <p className="text-white/80 text-sm line-clamp-2">
-            {event?.eventDescription || "No description available"}
-          </p>
+          <div className="w-full">
+            <div className="flex items-center gap-3 mb-1">
+              <Image
+                src={event?.creatorId?.profileImage}
+                alt={`${event?.creatorId?.firstName} ${event?.creatorId?.lastName}`}
+                width={40}
+                height={40}
+                className="w-10 h-10 rounded-full object-cover border-2 border-white mb-1"
+              />
+              <h3 className="text-lg font-bold text-white truncate">
+                {event?.eventName}
+              </h3>
+            </div>
+            <p className="text-white/80 text-sm line-clamp-2 truncate">
+              {event?.description || "No description available"}
+            </p>
+          </div>
         </div>
       </div>
 
       {/* Action Buttons */}
       <div className="p-4 space-y-3">
         <Link href={`/events/${event?._id}`} className="w-full block">
-          <button className="w-full bg-secondary text-white font-medium py-2.5 px-4 rounded-lg hover:bg-secondary/90 transition-colors flex items-center justify-center gap-2">
+          <button className="w-full cursor-pointer bg-secondary text-white font-medium py-2.5 px-4 rounded-lg hover:bg-secondary/90 transition-colors flex items-center justify-center gap-2">
             <Eye size={16} />
             View Event
           </button>
@@ -89,7 +85,7 @@ const InterestedEventCard = ({
         <button
           onClick={handleNotInterest}
           disabled={isNotInterestLoading}
-          className="w-full border border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed font-medium py-2.5 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
+          className="w-full border cursor-pointer border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed font-medium py-2.5 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
         >
           <Heart size={16} />
           {isNotInterestLoading ? "Removing..." : "Not Interested"}

@@ -66,7 +66,7 @@ const InterestedEvents: React.FC = () => {
   let content = null;
   if (isLoading || isLoadingMore) {
     content = (
-       <div className="w-full grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-4">
+       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {Array.from({ length: 3 }).map((_, index) => (
           <MyGroupCardSkeleton key={`skeleton-${index}`} />
         ))}
@@ -76,7 +76,7 @@ const InterestedEvents: React.FC = () => {
     content = null; // Don't render anything if no events are found
   } else if (allInterestedEvents?.length > 0) {
     content = (
-      <div className="w-full grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {allInterestedEvents?.map((event: IEvent) => (
           <InterestedEventCard key={event?._id} event={event} handleOptimisticUiUpdate={handleOptimisticUiUpdate} />
         ))}

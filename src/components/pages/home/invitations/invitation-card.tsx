@@ -1,11 +1,11 @@
-import CustomButton from "@/components/custom/custom-button";
+
 import {
   useAcceptEventInviteMutation,
   useDeclineEventInviteMutation,
 } from "@/redux/features/event/eventApi";
 import { TError } from "@/types/error";
 import { IEventInvitation } from "@/types/event.types";
-import { getFullName } from "@/utils/nameUtils";
+import { Check, X } from "lucide-react";
 import Image from "next/image";
 import toast from "react-hot-toast";
 import { PiUserBold } from "react-icons/pi";
@@ -15,7 +15,10 @@ interface UpcomingEventCardProps {
   handleAcceptInvitation: (invitationId: string) => void;
 }
 
-const InvitationCard = ({ event,handleAcceptInvitation }: UpcomingEventCardProps) => {
+const InvitationCard = ({
+  event,
+  handleAcceptInvitation,
+}: UpcomingEventCardProps) => {
   const [acceptInvitation, { isLoading: isAccepting }] =
     useAcceptEventInviteMutation();
   const [declineInvitation, { isLoading: isDeclining }] =
@@ -50,57 +53,64 @@ const InvitationCard = ({ event,handleAcceptInvitation }: UpcomingEventCardProps
     }
   };
   return (
-    <div className="w-full bg-white rounded-2xl  p-4 flex flex-col items-center">
-      {/* Group Image */}
-      <div className="w-full h-[350px] bg-gray-200 rounded-xl mb-4 relative">
+    <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+      {/* Event Image */}
+      <div className="relative w-full h-48 sm:h-52 md:h-56 overflow-hidden">
         <Image
           src={event?.eventId?.eventImage}
           alt={event?.eventId?.eventName}
-          width={350}
-          height={350}
-          className="w-full h-full object-cover rounded-2xl mb-4"
+          width={400}
+          height={300}
+          className="w-full h-full object-cover"
         />
-        <div className="absolute px-4 py-5 rounded-xl top-0 left-0 right-0 bottom-0 bg-gray-950/20">
-          <div className="w-full h-full flex flex-col justify-between">
-            <div className="flex  justify-between items-center">
+        <div className="absolute inset-0  flex flex-col justify-between bg-black/40 p-4">
+          <div className="w-full flex justify-end">
+            <div className="bg-white rounded-full px-3 py-1.5 flex items-center gap-1.5">
+              <PiUserBold size={14} className="text-secondary" />
+              <span className="text-xs font-semibold text-gray-800">
+                {event?.eventId?.interestCount}
+              </span>
+            </div>
+          </div>
+          <div className="w-full">
+            <div className="flex items-center gap-3 mb-1">
               <Image
                 src={event?.eventId?.creatorId?.profileImage}
-                alt={getFullName(event?.eventId?.creatorId) || "Creator"}
-                width={60}
-                height={60}
-                className="size-[60px] rounded-full object-cover mr-3 "
+                alt={`${event?.eventId?.creatorId?.firstName} ${event?.eventId?.creatorId?.lastName}`}
+                width={40}
+                height={40}
+                className="w-10 h-10 rounded-full object-cover border-2 border-white mb-1"
               />
-              <div className="bg-white rounded-full px-4 py-2 flex items-center gap-1">
-                <PiUserBold size={24} className="text-secondary" />
-                <span className="text-sm font-semibold text-gray-800">
-                  {event?.eventId?.interestCount}
-                </span>
-              </div>
+              <h3 className="text-lg font-bold text-white truncate">
+                {event?.eventId?.eventName}
+              </h3>
             </div>
-            <h2 className="text-xl md:text-2xl font-bold text-white">
-              {event?.eventId?.eventName}
-            </h2>
+            <p className="text-white/80 text-sm line-clamp-2 truncate">
+              {event?.eventId?.description || "No description available"}
+            </p>
           </div>
         </div>
       </div>
-      {/* Buttons */}
-      <div className="flex flex-col gap-4 w-full">
-        <CustomButton
-          loading={isAccepting}
+
+      {/* Action Buttons */}
+      <div className="p-4 space-y-3">
+        <button
           onClick={handleAccept}
-          variant="default"
-          className="py-3"
+          disabled={isAccepting}
+          className="w-full bg-secondary cursor-pointer text-white font-medium py-2.5 px-4 rounded-lg hover:bg-secondary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
         >
-          Accept
-        </CustomButton>
-        <CustomButton
-          loading={isDeclining}
+          <Check size={16} />
+          {isAccepting ? "Accepting..." : "Accept"}
+        </button>
+
+        <button
           onClick={handleDecline}
-          variant="outline"
-          className="py-3"
+          disabled={isDeclining}
+          className="w-full border cursor-pointer border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed font-medium py-2.5 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
         >
-          Decline
-        </CustomButton>
+          <X size={16} />
+          {isDeclining ? "Declining..." : "Decline"}
+        </button>
       </div>
     </div>
   );

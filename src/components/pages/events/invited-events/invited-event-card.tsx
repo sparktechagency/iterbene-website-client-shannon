@@ -7,7 +7,7 @@ import { IEventInvitation } from "@/types/event.types";
 import Image from "next/image";
 import toast from "react-hot-toast";
 import { PiUserBold } from "react-icons/pi";
-import {  Check, X } from "lucide-react";
+import { Check, X } from "lucide-react";
 
 interface UpcomingEventCardProps {
   event: IEventInvitation;
@@ -65,34 +65,32 @@ const InvitedEventCard = ({
           height={300}
           className="w-full h-full object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
-        
-        {/* Interest Count Badge */}
-        <div className="absolute top-3 right-3 bg-white rounded-full px-3 py-1.5 flex items-center gap-1.5">
-          <PiUserBold size={14} className="text-secondary" />
-          <span className="text-xs font-semibold text-gray-800">
-            {event?.eventId?.interestCount}
-          </span>
-        </div>
-        {/* Creator Profile */}
-        <div className="absolute bottom-14 left-4">
-          <Image
-            src={event?.eventId?.creatorId?.profileImage}
-            alt={`${event?.eventId?.creatorId?.firstName} ${event?.eventId?.creatorId?.lastName}`}
-            width={40}
-            height={40}
-            className="w-10 h-10 rounded-full object-cover border-2 border-white"
-          />
-        </div>
-
-        {/* Event Name Overlay */}
-        <div className="absolute bottom-0 left-0 right-0 p-4">
-          <h3 className="text-lg font-bold text-white truncate mb-1">
-            {event?.eventId?.eventName}
-          </h3>
-          <p className="text-white/80 text-sm line-clamp-2">
-            {event?.eventId?.eventDescription || "No description available"}
-          </p>
+        <div className="absolute inset-0  flex flex-col justify-between bg-black/40 p-4">
+          <div className="w-full flex justify-end">
+            <div className="bg-white rounded-full px-3 py-1.5 flex items-center gap-1.5">
+              <PiUserBold size={14} className="text-secondary" />
+              <span className="text-xs font-semibold text-gray-800">
+                {event?.eventId?.interestCount}
+              </span>
+            </div>
+          </div>
+          <div className="w-full">
+            <div className="flex items-center gap-3 mb-1">
+              <Image
+                src={event?.eventId?.creatorId?.profileImage}
+                alt={`${event?.eventId?.creatorId?.firstName} ${event?.eventId?.creatorId?.lastName}`}
+                width={40}
+                height={40}
+                className="w-10 h-10 rounded-full object-cover border-2 border-white mb-1"
+              />
+              <h3 className="text-lg font-bold text-white truncate">
+                {event?.eventId?.eventName}
+              </h3>
+            </div>
+            <p className="text-white/80 text-sm line-clamp-2 truncate">
+              {event?.eventId?.description || "No description available"}
+            </p>
+          </div>
         </div>
       </div>
 
@@ -101,16 +99,16 @@ const InvitedEventCard = ({
         <button
           onClick={handleAccept}
           disabled={isAccepting}
-          className="w-full bg-secondary text-white font-medium py-2.5 px-4 rounded-lg hover:bg-secondary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
+          className="w-full bg-secondary cursor-pointer text-white font-medium py-2.5 px-4 rounded-lg hover:bg-secondary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
         >
           <Check size={16} />
           {isAccepting ? "Accepting..." : "Accept"}
         </button>
-        
+
         <button
           onClick={handleDecline}
           disabled={isDeclining}
-          className="w-full border border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed font-medium py-2.5 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
+          className="w-full border cursor-pointer border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed font-medium py-2.5 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
         >
           <X size={16} />
           {isDeclining ? "Declining..." : "Decline"}
