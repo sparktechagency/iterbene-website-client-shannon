@@ -237,9 +237,6 @@ const EditMyProfileDetails = ({
       type === "profile" ? profileImagePreview : coverImagePreview;
     console.log("imageSrc", imageSrc);
   };
-
-
-  console.log("Eerrors", errors);
   return (
     <>
       <section className="w-full grid grid-cols-1 md:grid-cols-3 gap-4 mt-8">

@@ -288,6 +288,13 @@ const inboxApi = baseApi.injectEndpoints({
         }
       },
     }),
+    viewAllMessagesInChat: builder.mutation({
+      query: (chatId) => ({
+        url: `/messages/view-all-messages/${chatId}`,
+        method: "PATCH",
+      }),
+      invalidatesTags: ["MessageNotifications"],
+    }),
   }),
 });
 
@@ -296,4 +303,5 @@ export const {
   useGetChatsQuery,
   useGetMessagesQuery,
   useSendMessageMutation,
+  useViewAllMessagesInChatMutation,
 } = inboxApi;

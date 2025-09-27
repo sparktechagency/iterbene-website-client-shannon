@@ -7,11 +7,12 @@ import {
   ArrowLeft,
   Camera,
   Type,
-  ZoomIn,
-  ZoomOut,
   AlignCenter,
   AlignLeft,
   AlignRight,
+  ChevronLeft,
+  ChevronRight,
+  X,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React, { useCallback, useRef, useState } from "react";
@@ -26,6 +27,8 @@ type TextAlignType = "left" | "center" | "right";
 const CreateJourney: React.FC = () => {
   const [currentView, setCurrentView] = useState<ViewType>("selection");
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [selectedImages, setSelectedImages] = useState<string[]>([]);
+  const [currentImageIndex, setCurrentImageIndex] = useState<number>(0);
   const [textContent, setTextContent] = useState<string>("");
   const [imageText, setImageText] = useState<string>("");
   const [textPosition, setTextPosition] = useState<{ x: number; y: number }>({
@@ -150,16 +153,28 @@ const CreateJourney: React.FC = () => {
   ];
 
   const handleImageSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e: ProgressEvent<FileReader>) => {
-        if (e.target?.result) {
-          setPreviewUrl(e.target.result as string);
-          setCurrentView("photo");
-        }
-      };
-      reader.readAsDataURL(file);
+    const files = event.target.files;
+    if (files && files.length > 0) {
+      const newImages: string[] = [];
+      let loadedCount = 0;
+
+      Array.from(files).forEach((file) => {
+        const reader = new FileReader();
+        reader.onload = (e: ProgressEvent<FileReader>) => {
+          if (e.target?.result) {
+            newImages.push(e.target.result as string);
+            loadedCount++;
+
+            if (loadedCount === files.length) {
+              setSelectedImages(newImages);
+              setPreviewUrl(newImages[0]);
+              setCurrentImageIndex(0);
+              setCurrentView("photo");
+            }
+          }
+        };
+        reader.readAsDataURL(file);
+      });
     }
   };
 
@@ -170,6 +185,8 @@ const CreateJourney: React.FC = () => {
   const resetToSelection = (): void => {
     setCurrentView("selection");
     setPreviewUrl(null);
+    setSelectedImages([]);
+    setCurrentImageIndex(0);
     setTextContent("");
     setImageText("");
     setTextPosition({ x: 0, y: 0 });
@@ -183,10 +200,6 @@ const CreateJourney: React.FC = () => {
     setRotate(0);
     setIsImageDragging(false);
   };
-
-  const handleZoomIn = (): void => setScale((prev) => Math.min(prev + 0.1, 3));
-  const handleZoomOut = (): void =>
-    setScale((prev) => Math.max(prev - 0.1, 0.5));
 
   const getFontFamily = (style: TextStyleType): string => {
     switch (style) {
@@ -271,7 +284,13 @@ const CreateJourney: React.FC = () => {
 
   // Enhanced zoom functions with better control
   const handleZoomChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setScale(parseFloat(event.target.value));
+    const newScale = parseFloat(event.target.value);
+    setScale(newScale);
+
+    // Auto-adjust position to keep image centered when scaling
+    if (newScale < 1) {
+      setImagePosition({ x: 0, y: 0 });
+    }
   };
 
   const resetImagePosition = () => {
@@ -283,8 +302,14 @@ const CreateJourney: React.FC = () => {
   // Mouse wheel zoom functionality with visual feedback
   const handleWheelZoom = (event: React.WheelEvent<HTMLDivElement>) => {
     event.preventDefault();
-    const delta = event.deltaY > 0 ? -0.1 : 0.1;
-    setScale((prev) => Math.max(0.5, Math.min(3, prev + delta)));
+    const delta = event.deltaY > 0 ? -0.05 : 0.05;
+    const newScale = Math.max(0.3, Math.min(2, scale + delta));
+    setScale(newScale);
+
+    // Auto-center when zooming out significantly
+    if (newScale < 0.8) {
+      setImagePosition({ x: 0, y: 0 });
+    }
 
     // Clear existing timeout
     if (zoomTimeoutRef.current) {
@@ -458,18 +483,25 @@ const CreateJourney: React.FC = () => {
         ctx.fillStyle = "#e5e7eb";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        // Calculate image scaling to fit canvas properly
+        // Calculate image scaling to fit canvas properly (Facebook-style)
         const aspectRatio = image.naturalWidth / image.naturalHeight;
+        const canvasAspectRatio = canvas.width / canvas.height;
         let drawWidth, drawHeight;
 
-        // Scale image to fill the canvas while maintaining aspect ratio
-        if (aspectRatio > canvas.width / canvas.height) {
-          drawHeight = canvas.height * scale;
+        // Always fit the image to fill the canvas (cover behavior)
+        if (aspectRatio > canvasAspectRatio) {
+          // Image is wider than canvas
+          drawHeight = canvas.height;
           drawWidth = drawHeight * aspectRatio;
         } else {
-          drawWidth = canvas.width * scale;
+          // Image is taller than canvas
+          drawWidth = canvas.width;
           drawHeight = drawWidth / aspectRatio;
         }
+
+        // Apply user scaling
+        drawWidth *= scale;
+        drawHeight *= scale;
 
         // Convert preview positions to canvas coordinates
         const scaleFactorX = canvas.width / 384; // 384px is preview width (w-96)
@@ -775,6 +807,7 @@ const CreateJourney: React.FC = () => {
           ref={fileInputRef}
           type="file"
           accept="image/*"
+          multiple
           onChange={handleImageSelect}
           className="hidden"
         />
@@ -798,20 +831,6 @@ const CreateJourney: React.FC = () => {
               <h2 className="text-xl font-bold">Text Journey</h2>
             </div>
 
-            {/* Text Style Selection */}
-            <div className="mb-4">
-              <SelectField
-                name="textStyle"
-                placeholder="Select text style"
-                value={textStyle}
-                onChange={(e) => setTextStyle(e.target.value as TextStyleType)}
-                items={textStyles.map((style) => ({
-                  value: style,
-                  label: style,
-                }))}
-              />
-            </div>
-
             {/* Text Size */}
             <div className="mb-4">
               <label className="text-sm font-medium mb-2 block">
@@ -825,6 +844,20 @@ const CreateJourney: React.FC = () => {
                 items={textSizes.map((size) => ({
                   value: size.value.toString(),
                   label: size.label,
+                }))}
+              />
+            </div>
+
+            {/* Text Style Selection */}
+            <div className="mb-4">
+              <SelectField
+                name="textStyle"
+                placeholder="Select text style"
+                value={textStyle}
+                onChange={(e) => setTextStyle(e.target.value as TextStyleType)}
+                items={textStyles.map((style) => ({
+                  value: style,
+                  label: style,
                 }))}
               />
             </div>
@@ -843,7 +876,7 @@ const CreateJourney: React.FC = () => {
                   <button
                     key={value}
                     onClick={() => setTextAlign(value as TextAlignType)}
-                    className={`p-2 rounded-lg border ${
+                    className={`p-2 rounded-lg cursor-pointer border ${
                       textAlign === value
                         ? "border-primary bg-primary text-white"
                         : "border-gray-300"
@@ -971,17 +1004,17 @@ const CreateJourney: React.FC = () => {
                 <div className="flex items-center gap-2 mb-2">
                   <input
                     type="range"
-                    min="0.5"
-                    max="3"
-                    step="0.1"
+                    min="0.3"
+                    max="2"
+                    step="0.05"
                     value={scale}
                     onChange={handleZoomChange}
                     className="flex-1 h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
                     style={{
                       background: `linear-gradient(to right, #3B82F6 0%, #3B82F6 ${
-                        ((scale - 0.5) / (3 - 0.5)) * 100
+                        ((scale - 0.3) / (2 - 0.3)) * 100
                       }%, #e5e7eb ${
-                        ((scale - 0.5) / (3 - 0.5)) * 100
+                        ((scale - 0.3) / (2 - 0.3)) * 100
                       }%, #e5e7eb 100%)`,
                     }}
                   />
@@ -996,27 +1029,6 @@ const CreateJourney: React.FC = () => {
                   </button>
                 </div>
               </div>
-
-              {/* Mobile zoom buttons */}
-              <div className="md:hidden flex justify-center gap-2 mb-4">
-                <button
-                  onClick={handleZoomOut}
-                  className="flex items-center justify-center w-10 h-10 bg-blue-100 hover:bg-blue-200 rounded-full transition-colors"
-                  disabled={scale <= 0.5}
-                >
-                  <ZoomOut size={16} className="text-blue-600" />
-                </button>
-                <span className="flex items-center px-3 py-2 bg-gray-100 rounded-full text-sm font-medium">
-                  {Math.round(scale * 100)}%
-                </span>
-                <button
-                  onClick={handleZoomIn}
-                  className="flex items-center justify-center w-10 h-10 bg-blue-100 hover:bg-blue-200 rounded-full transition-colors"
-                  disabled={scale >= 3}
-                >
-                  <ZoomIn size={16} className="text-blue-600" />
-                </button>
-              </div>
             </div>
 
             {/* Text Overlay */}
@@ -1030,27 +1042,7 @@ const CreateJourney: React.FC = () => {
                 rows={3}
                 maxLength={100}
               />
-              <div className="text-xs text-gray-500 text-right">
-                {imageText.length}/100 characters
-              </div>
-
               <>
-                {/* Text Style */}
-                <div className="mb-3">
-                  <SelectField
-                    name="textStyle"
-                    placeholder="Select text style"
-                    value={textStyle}
-                    onChange={(e) =>
-                      setTextStyle(e.target.value as TextStyleType)
-                    }
-                    items={textStyles.map((style) => ({
-                      value: style,
-                      label: style,
-                    }))}
-                  />
-                </div>
-
                 {/* Text Size */}
                 <div className="mb-3">
                   <label className="text-sm font-medium mb-2 block">
@@ -1067,7 +1059,21 @@ const CreateJourney: React.FC = () => {
                     }))}
                   />
                 </div>
-
+                {/* Text Style */}
+                <div className="mb-3">
+                  <SelectField
+                    name="textStyle"
+                    placeholder="Select text style"
+                    value={textStyle}
+                    onChange={(e) =>
+                      setTextStyle(e.target.value as TextStyleType)
+                    }
+                    items={textStyles.map((style) => ({
+                      value: style,
+                      label: style,
+                    }))}
+                  />
+                </div>
                 {/* Text Color */}
                 <div className="mb-3">
                   <h4 className="text-sm font-medium mb-2">Text Color</h4>
@@ -1086,6 +1092,49 @@ const CreateJourney: React.FC = () => {
                     ))}
                   </div>
                 </div>
+
+            {/* Multiple Images Navigation */}
+            {selectedImages.length > 1 && (
+              <div className="mb-4">
+                <h4 className="text-sm font-medium mb-2">Images ({selectedImages.length})</h4>
+                <div className="flex gap-2 overflow-x-auto pb-2">
+                  {selectedImages.map((image, index) => (
+                    <div key={index} className="relative flex-shrink-0">
+                      <img
+                        src={image}
+                        alt={`Image ${index + 1}`}
+                        className={`w-12 h-12 object-cover rounded cursor-pointer border-2 ${
+                          currentImageIndex === index ? "border-blue-500" : "border-gray-300"
+                        }`}
+                        onClick={() => {
+                          setCurrentImageIndex(index);
+                          setPreviewUrl(image);
+                          setImagePosition({ x: 0, y: 0 });
+                          setScale(1);
+                        }}
+                      />
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          const newImages = selectedImages.filter((_, i) => i !== index);
+                          setSelectedImages(newImages);
+                          if (newImages.length === 0) {
+                            resetToSelection();
+                          } else {
+                            const newIndex = Math.min(currentImageIndex, newImages.length - 1);
+                            setCurrentImageIndex(newIndex);
+                            setPreviewUrl(newImages[newIndex]);
+                          }
+                        }}
+                        className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-xs hover:bg-red-600"
+                      >
+                        <X size={10} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
               </>
             </div>
 
@@ -1110,7 +1159,7 @@ const CreateJourney: React.FC = () => {
             <div className="relative">
               <div className="relative">
                 <div
-                  className="story-container w-96 h-[500px] rounded-3xl overflow-hidden relative bg-gray-200  "
+                  className="story-container w-96 h-[500px] rounded-3xl overflow-hidden relative bg-gray-100 shadow-lg"
                   onWheel={handleWheelZoom}
                   onMouseMove={(e) => {
                     handleImageMouseMove(e);
@@ -1131,10 +1180,43 @@ const CreateJourney: React.FC = () => {
                     handleTextTouchEnd();
                   }}
                 >
+                  {/* Navigation arrows for multiple images */}
+                  {selectedImages.length > 1 && (
+                    <>
+                      <button
+                        onClick={() => {
+                          const newIndex = currentImageIndex > 0 ? currentImageIndex - 1 : selectedImages.length - 1;
+                          setCurrentImageIndex(newIndex);
+                          setPreviewUrl(selectedImages[newIndex]);
+                          setImagePosition({ x: 0, y: 0 });
+                          setScale(1);
+                        }}
+                        className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white rounded-full p-2 z-20 hover:bg-opacity-70 transition-all"
+                      >
+                        <ChevronLeft size={20} />
+                      </button>
+                      <button
+                        onClick={() => {
+                          const newIndex = currentImageIndex < selectedImages.length - 1 ? currentImageIndex + 1 : 0;
+                          setCurrentImageIndex(newIndex);
+                          setPreviewUrl(selectedImages[newIndex]);
+                          setImagePosition({ x: 0, y: 0 });
+                          setScale(1);
+                        }}
+                        className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white rounded-full p-2 z-20 hover:bg-opacity-70 transition-all"
+                      >
+                        <ChevronRight size={20} />
+                      </button>
+                      {/* Image counter */}
+                      <div className="absolute top-4 right-4 bg-black bg-opacity-50 text-white px-2 py-1 rounded-full text-xs z-20">
+                        {currentImageIndex + 1}/{selectedImages.length}
+                      </div>
+                    </>
+                  )}
                   {previewUrl && (
                     <>
                       <div
-                        className="absolute inset-0 cursor-pointer select-none"
+                        className="absolute inset-0 cursor-move select-none flex items-center justify-center"
                         onMouseDown={handleImageMouseDown}
                         onTouchStart={handleImageTouchStart}
                         style={{
@@ -1142,15 +1224,21 @@ const CreateJourney: React.FC = () => {
                           transformOrigin: "center center",
                           transition: isImageDragging
                             ? "none"
-                            : "transform 0.1s ease-out",
+                            : "transform 0.2s ease-out",
                         }}
                       >
                         <Image
                           ref={imgRef}
                           src={previewUrl}
                           alt="Journey preview"
-                          fill
-                          className="object-cover"
+                          width={384}
+                          height={500}
+                          className="max-w-none max-h-none object-cover"
+                          style={{
+                            width: "100%",
+                            height: "100%",
+                            objectFit: "cover",
+                          }}
                           draggable={false}
                         />
                       </div>

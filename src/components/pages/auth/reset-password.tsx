@@ -5,6 +5,7 @@ import CustomButton from "@/components/custom/custom-button";
 import CustomInput from "@/components/custom/custom-input";
 import { useResetPasswordMutation } from "@/redux/features/auth/authApi";
 import { TError } from "@/types/error";
+import { COOKIE_NAMES, getCookie, removeCookie } from "@/utils/cookies";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Lock } from "lucide-react";
 import Image from "next/image";
@@ -33,17 +34,17 @@ const resetPasswordValidationSchema = z
   })
   .refine((data) => data.newPassword === data.confirmPassword, {
     message: "Passwords do not match",
-    path: ["confirmPassword"], 
+    path: ["confirmPassword"],
   });
 
-  // define type for reset password form values
-  type ResetPasswordFormValues = z.infer<typeof resetPasswordValidationSchema>;
+// define type for reset password form values
+type ResetPasswordFormValues = z.infer<typeof resetPasswordValidationSchema>;
 
 const ResetPassword = () => {
   const router = useRouter();
   const [resetPassword, { isLoading }] = useResetPasswordMutation();
-
-   const {
+  const email = getCookie(COOKIE_NAMES.VERIFY_OTP_MAIL);
+  const {
     register,
     handleSubmit,
     formState: { errors },
@@ -54,9 +55,12 @@ const ResetPassword = () => {
   const handleResetPassword = async (values: FieldValues) => {
     try {
       const res = await resetPassword({
+        email: email,
         password: values?.newPassword,
       }).unwrap();
 
+      removeCookie(COOKIE_NAMES.VERIFY_OTP_MAIL);
+      removeCookie(COOKIE_NAMES.VERIFY_OTP_TYPE);
       toast.success(
         res?.message || "Password reset successful! Please login again."
       );
@@ -96,9 +100,7 @@ const ResetPassword = () => {
           </h1>
         </div>
         {/* Form content */}
-        <form
-          onSubmit={handleSubmit(handleResetPassword)}
-        >
+        <form onSubmit={handleSubmit(handleResetPassword)}>
           <div className="space-y-3 md:space-y-6 mt-8">
             <CustomInput
               name="newPassword"
@@ -119,7 +121,7 @@ const ResetPassword = () => {
               size="lg"
               icon={<Lock size={23} className="text-secondary" />}
               placeholder="Enter confirm password"
-               variant="default"
+              variant="default"
               type="password"
               register={register("confirmPassword")}
               error={errors.confirmPassword}

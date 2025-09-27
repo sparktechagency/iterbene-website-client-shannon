@@ -239,17 +239,12 @@ const PostCard = ({ post, setAllPosts }: PostCardProps) => {
             if (p._id === post._id) {
               // Ensure reactions array exists
               const currentReactions = p.reactions || [];
-              console.log("Current reactions:", currentReactions);
-
               // Check if user already has any reaction on this post
               const existingReaction = currentReactions.find(
                 (r) => r.userId._id === user._id
               );
               const isSameReaction =
                 existingReaction?.reactionType === reactionType;
-
-              console.log("Existing reaction:", existingReaction);
-              console.log("Is same reaction:", isSameReaction);
 
               let updatedReactions;
 
@@ -277,9 +272,6 @@ const PostCard = ({ post, setAllPosts }: PostCardProps) => {
                   createdAt: new Date(),
                 });
               }
-
-              console.log("Updated reactions:", updatedReactions);
-
               return {
                 ...p,
                 reactions: updatedReactions,

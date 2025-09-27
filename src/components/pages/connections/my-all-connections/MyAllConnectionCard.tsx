@@ -55,8 +55,8 @@ const MyAllConnectionCard = ({
   return (
     <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
       {/* Profile Image */}
-      <div className="relative w-full h-48 sm:h-52 md:h-56 overflow-hidden">
-        <Link href={`/${connection?.username}`}>
+      <Link href={`/${connection?.username}/timeline`} className="block">
+        <div className="relative w-full h-48 sm:h-52 md:h-56 overflow-hidden">
           <Image
             src={connection?.profileImage}
             alt={connection?.username}
@@ -64,16 +64,16 @@ const MyAllConnectionCard = ({
             height={300}
             className="w-full h-full object-cover cursor-pointer"
           />
-        </Link>
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
-        {/* User Name Overlay */}
-        <div className="absolute bottom-0 left-0 right-0 p-4">
-          <h3 className="text-lg font-bold text-white truncate">
-            {connection?.firstName} {connection?.lastName}
-          </h3>
-          <p className="text-white/80 text-sm">@{connection?.username}</p>
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
+          {/* User Name Overlay */}
+          <div className="absolute bottom-0 left-0 right-0 p-4">
+            <h3 className="text-lg font-bold text-white truncate">
+              {connection?.firstName} {connection?.lastName}
+            </h3>
+            <p className="text-white/80 text-sm">@{connection?.username}</p>
+          </div>
         </div>
-      </div>
+      </Link>
 
       {/* Action Buttons */}
       <div className="p-4 space-y-3">

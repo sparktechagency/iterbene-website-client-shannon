@@ -247,18 +247,55 @@ const Header: React.FC = () => {
     }
   }, [socket, user]);
 
-  // Set initial unviewed counts from API
+  // Set initial unviewed counts from API with localStorage persistence
   useEffect(() => {
-    if (notificationCountData?.data?.attributes?.count) {
-      setUnviewNotificationCount(notificationCountData.data.attributes.count);
+    if (notificationCountData?.data?.attributes?.count !== undefined) {
+      const apiCount = notificationCountData.data.attributes.count;
+      const lastViewedKey = `notifications_last_viewed_${user?._id}`;
+      const lastViewed = localStorage.getItem(lastViewedKey);
+      const now = Date.now();
+
+      // If user viewed notifications recently (within 5 minutes) and API still shows count,
+      // it means the API hasn't updated yet, so keep count at 0
+      if (lastViewed && (now - parseInt(lastViewed)) < 5 * 60 * 1000) {
+        setUnviewNotificationCount(0);
+      } else {
+        setUnviewNotificationCount(apiCount);
+      }
     }
-  }, [notificationCountData]);
+  }, [notificationCountData, user?._id]);
 
   useEffect(() => {
-    if (messageCountData?.data?.attributes?.count) {
-      setUnviewMessageCount(messageCountData.data.attributes.count);
+    if (messageCountData?.data?.attributes?.count !== undefined) {
+      const apiCount = messageCountData.data.attributes.count;
+      const lastViewedKey = `messages_last_viewed_${user?._id}`;
+      const lastViewed = localStorage.getItem(lastViewedKey);
+      const now = Date.now();
+
+      // If user viewed messages recently (within 5 minutes) and API still shows count,
+      // it means the API hasn't updated yet, so keep count at 0
+      if (lastViewed && (now - parseInt(lastViewed)) < 5 * 60 * 1000) {
+        setUnviewMessageCount(0);
+      } else {
+        setUnviewMessageCount(apiCount);
+      }
     }
-  }, [messageCountData]);
+  }, [messageCountData, user?._id]);
+
+  // Listen for immediate message notification updates from contact list
+  useEffect(() => {
+    const handleMessageNotificationViewed = (event: CustomEvent) => {
+      const { unviewedCount } = event.detail;
+      // Decrease the total unviewed count by the amount that was just viewed
+      setUnviewMessageCount(prevCount => Math.max(0, prevCount - unviewedCount));
+    };
+
+    window.addEventListener('messageNotificationViewed', handleMessageNotificationViewed as EventListener);
+
+    return () => {
+      window.removeEventListener('messageNotificationViewed', handleMessageNotificationViewed as EventListener);
+    };
+  }, []);
 
   // Desktop/Tablet dropdown states
   const [isMessagesOpen, setIsMessagesOpen] = useState<boolean>(false);
@@ -363,15 +400,24 @@ const Header: React.FC = () => {
       // Close other dropdowns first
       setIsNotificationsOpen(false);
       setIsUserOpen(false);
-      
+
       // Toggle messages dropdown
       const newIsOpen = !isMessagesOpen;
       setIsMessagesOpen(newIsOpen);
-      
-      // If opening the dropdown, mark all messages as viewed and reset count immediately
+
+      // If opening the dropdown, mark all messages as viewed and reset count
       if (newIsOpen && unviewMessageCount > 0) {
-        await viewAllMessageNotifications(undefined).unwrap();
+        // Set count to 0 optimistically and store timestamp
         setUnviewMessageCount(0);
+        const lastViewedKey = `messages_last_viewed_${user?._id}`;
+        localStorage.setItem(lastViewedKey, Date.now().toString());
+
+        try {
+          await viewAllMessageNotifications(undefined).unwrap();
+        } catch (apiError) {
+          console.error('Failed to mark messages as viewed:', apiError);
+          // Don't show error to user as it's not critical for UX
+        }
       }
     } catch (error) {
       const err = error as Error;
@@ -384,15 +430,24 @@ const Header: React.FC = () => {
       // Close other dropdowns first
       setIsMessagesOpen(false);
       setIsUserOpen(false);
-      
+
       // Toggle notifications dropdown
       const newIsOpen = !isNotificationsOpen;
       setIsNotificationsOpen(newIsOpen);
-      
-      // If opening the dropdown, mark all notifications as viewed and reset count immediately
+
+      // If opening the dropdown, mark all notifications as viewed and reset count
       if (newIsOpen && unviewNotificationCount > 0) {
-        await viewAllNotifications(undefined).unwrap();
+        // Set count to 0 optimistically and store timestamp
         setUnviewNotificationCount(0);
+        const lastViewedKey = `notifications_last_viewed_${user?._id}`;
+        localStorage.setItem(lastViewedKey, Date.now().toString());
+
+        try {
+          await viewAllNotifications(undefined).unwrap();
+        } catch (apiError) {
+          console.error('Failed to mark notifications as viewed:', apiError);
+          // Don't show error to user as it's not critical for UX
+        }
       }
     } catch (error) {
       const err = error as Error;
@@ -401,7 +456,6 @@ const Header: React.FC = () => {
   };
 
   const toggleUser = () => {
-    console.log("Clicked");
     setIsUserOpen(true);
     setIsMessagesOpen(false);
     setIsNotificationsOpen(false);
@@ -478,8 +532,6 @@ const Header: React.FC = () => {
     [router]
   );
 
-
-  console.log("isUserOpen", isUserOpen);
   return (
     <nav className="w-full bg-[#F0FAF9] h-[72px] md:h-[88px] lg:h-[112px] fixed top-0 left-0 z-40">
       <div className="w-full container mx-auto flex justify-between items-center h-full px-4 md:px-5">

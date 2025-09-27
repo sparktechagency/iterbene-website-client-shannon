@@ -58,6 +58,7 @@ export const baseApi = createApi({
     "Connections",
     "Itinerary",
     "Notifications",
+    "MessageNotifications",
     "SavedPost",
     "SearchHashtagPosts",
   ],

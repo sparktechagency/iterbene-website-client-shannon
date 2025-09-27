@@ -35,13 +35,13 @@ const notificationsApi = baseApi.injectEndpoints({
           params,
         };
       },
-      providesTags: ["Notifications"],
+      providesTags: ["MessageNotifications"],
     }),
     viewAllNotifications: builder.mutation({
       query: () => {
         return {
           url: `/notifications/view-all-notifications`,
-          method: "POST"
+          method: "POST",
         };
       },
 
@@ -52,7 +52,14 @@ const notificationsApi = baseApi.injectEndpoints({
         url: `/notifications/view-all-message-notifications`,
         method: "POST",
       }),
-      invalidatesTags: ["Notifications"],
+      invalidatesTags: ["MessageNotifications"],
+    }),
+    viewSingleMessageNotification: builder.mutation({
+      query: (senderId) => ({
+        url: `/notifications/view-single-message-notification/${senderId}`,
+        method: "PATCH",
+      }),
+      invalidatesTags: ["MessageNotifications"],
     }),
     viewSingleNotification: builder.mutation({
       query: (notificationId) => ({
@@ -74,6 +81,7 @@ const notificationsApi = baseApi.injectEndpoints({
         url: "/notifications/unview-message-notification-count",
         method: "GET",
       }),
+      providesTags: ["MessageNotifications"],
     }),
   }),
 });
@@ -83,6 +91,7 @@ export const {
   useGetAllNotificationsQuery,
   useViewAllNotificationsMutation,
   useViewAllMessageNotificationsMutation,
+  useViewSingleMessageNotificationMutation,
   useViewSingleNotificationMutation,
   useGetUnviewedNotificationsCountQuery,
   useGetUnviewedMessageNotificationsCountQuery,

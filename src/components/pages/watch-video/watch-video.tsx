@@ -4,8 +4,10 @@ import { IPost } from "@/types/post.types";
 import PostCard from "../home/posts/post-card";
 import PostCardSkeleton from "../home/posts/PostCardSkeleton";
 import { useState, useEffect, useMemo, useCallback } from "react";
+import useUser from "@/hooks/useUser";
 
 const WatchVideo = () => {
+  const user = useUser();
   const [currentPage, setCurrentPage] = useState(1);
   const [allPosts, setAllPosts] = useState<IPost[]>([]);
   const [loading, setLoading] = useState(false);
@@ -16,6 +18,7 @@ const WatchVideo = () => {
       { key: "mediaType", value: "video" },
       { key: "page", value: currentPage },
       { key: "limit", value: 10 },
+      ...(user?._id ? [{ key: "userId", value: user._id }] : []),
     ],
     {
       refetchOnMountOrArgChange: true,
@@ -130,7 +133,7 @@ const WatchVideo = () => {
   return (
     <section className="w-full space-y-4">
       {allPosts?.map((post) => (
-        <PostCard key={post?._id} post={post} setAllPosts={setAllPosts}/>
+        <PostCard key={post?._id} post={post} setAllPosts={setAllPosts} />
       ))}
 
       {loading && (

@@ -7,7 +7,6 @@ import Link from "next/link";
 import pdf from "@/asset/message/pdf.png";
 import { IUser } from "@/types/user.types";
 import {
-  Eye,
   Download,
   FileText,
   X,
@@ -193,19 +192,12 @@ const MessageItem: React.FC<MessageItemProps> = ({
   const displayedImages = fileUrls.slice(0, 2);
   const extraImagesCount = fileUrls.length - displayedImages.length;
 
-  const openPdfModal = (pdfUrl: string, fileName: string) => {
-    setSelectedPdfUrl(pdfUrl);
-    setSelectedFileName(fileName);
-    setPdfModalOpen(true);
-  };
 
   const closePdfModal = () => {
     setPdfModalOpen(false);
     setSelectedPdfUrl("");
     setSelectedFileName("");
   };
-
-  console.log("MessageItem:", message);
   return (
     <div
       className={`flex ${
@@ -631,13 +623,6 @@ const MessageItem: React.FC<MessageItemProps> = ({
 
                       <div className="flex items-center space-x-2 pt-2 border-t border-gray-100">
                         <button
-                          onClick={() => openPdfModal(fileUrl, fileName)}
-                          className="flex-1 flex items-center justify-center space-x-2 py-2 px-3 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors text-sm font-medium"
-                        >
-                          <Eye size={16} />
-                          <span>View</span>
-                        </button>
-                        <button
                           onClick={() => {
                             const link = document.createElement("a");
                             link.href = fileUrl;
@@ -645,7 +630,7 @@ const MessageItem: React.FC<MessageItemProps> = ({
                             link.target = "_blank";
                             link.click();
                           }}
-                          className="flex-1 flex items-center justify-center space-x-2 py-2 px-3 bg-gray-50 text-gray-600 rounded-lg hover:bg-gray-100 transition-colors text-sm font-medium"
+                          className="flex-1 flex cursor-pointer items-center justify-center space-x-2 py-2 px-3 bg-gray-50 text-gray-600 rounded-lg hover:bg-gray-100 transition-colors text-sm font-medium"
                         >
                           <Download size={16} />
                           <span>Download</span>

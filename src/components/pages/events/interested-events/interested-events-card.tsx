@@ -46,7 +46,7 @@ const InterestedEventCard = ({
         />
         <div className="absolute inset-0  flex flex-col justify-between bg-black/40 p-4">
           <div className="w-full flex justify-end">
-            <div className="bg-white rounded-full px-3 py-1.5 flex items-center gap-1.5">
+            <div className="bg-white rounded-full px-3 py-1.5 flex items-center gap-1">
               <PiUserBold size={14} className="text-secondary" />
               <span className="text-xs font-semibold text-gray-800">
                 {event?.interestCount}

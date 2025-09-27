@@ -41,7 +41,6 @@ const MyEventCard = ({
     setIsRemoveModalOpen(false);
   };
 
-  console.log("Event Data:", event);
   return (
     <>
       <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">

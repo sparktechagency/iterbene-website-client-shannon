@@ -7,8 +7,6 @@ import {
   X,
   FileText,
   Smile,
-  Eye,
-  Download,
   Play,
 } from "lucide-react";
 import React, { useState, useRef, useEffect, useMemo } from "react";
@@ -342,7 +340,7 @@ const MessageFooter = () => {
     <div className="w-full p-3 md:p-5">
       {/* Selected Files Preview - Instagram/Facebook Style */}
       {selectedFiles?.length > 0 && (
-        <div className="mb-3">
+        <div className="mb-1">
           <div
             ref={attachmentScrollRef}
             className="flex gap-2 sm:gap-3 overflow-x-auto p-2 scrollbar-hide"
@@ -358,13 +356,13 @@ const MessageFooter = () => {
                         alt="Selected"
                         width={80}
                         height={80}
-                        className="w-16 h-16 sm:w-20 sm:h-20 object-cover transition-transform group-hover:scale-105"
+                        className="w-16 h-16 sm:w-20 sm:h-20 object-cover transition-transform"
                       />
                       <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors rounded-xl"></div>
                     </div>
                     <button
                       onClick={() => removeFile(selectedFile.id)}
-                      className="absolute -top-1.5 -right-1.5 w-5 h h-5 bg-red-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-red-600 transition-all transform hover:scale-110 shadow-lg"
+                      className="absolute cursor-pointer -top-1.5 -right-1.5 w-5 h h-5 bg-red-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-red-600 transition-all transform hover:scale-110 shadow-lg"
                     >
                       <X size={12} />
                     </button>
@@ -415,44 +413,12 @@ const MessageFooter = () => {
                           <p className="text-xs text-gray-500 mb-3">
                             PDF • {formatFileSize(selectedFile.file.size)}
                           </p>
-                          <div className="flex items-center gap-3">
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                const fileUrl = URL.createObjectURL(
-                                  selectedFile.file
-                                );
-                                window.open(fileUrl, "_blank");
-                              }}
-                              className="flex items-center gap-1.5 text-xs font-medium text-blue-600 hover:text-blue-700 transition-colors px-2 py-1 rounded-lg hover:bg-blue-50"
-                            >
-                              <Eye size={12} />
-                              <span>Preview</span>
-                            </button>
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                const url = URL.createObjectURL(
-                                  selectedFile.file
-                                );
-                                const a = document.createElement("a");
-                                a.href = url;
-                                a.download = selectedFile.file.name;
-                                a.click();
-                                URL.revokeObjectURL(url);
-                              }}
-                              className="flex items-center gap-1.5 text-xs font-medium text-gray-600 hover:text-gray-700 transition-colors px-2 py-1 rounded-lg hover:bg-gray-50"
-                            >
-                              <Download size={12} />
-                              <span>Download</span>
-                            </button>
-                          </div>
                         </div>
                       </div>
                     </div>
                     <button
                       onClick={() => removeFile(selectedFile.id)}
-                      className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-red-600 transition-all transform hover:scale-110 shadow-lg"
+                      className="absolute cursor-pointer -top-1.5 -right-1.5 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-red-600 transition-all transform hover:scale-110 shadow-lg"
                     >
                       <X size={12} />
                     </button>
@@ -477,7 +443,7 @@ const MessageFooter = () => {
                     </div>
                     <button
                       onClick={() => removeFile(selectedFile.id)}
-                      className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-red-600 transition-all transform hover:scale-110 shadow-lg"
+                      className="absolute cursor-pointer -top-1.5 -right-1.5 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-red-600 transition-all transform hover:scale-110 shadow-lg"
                     >
                       <X size={12} />
                     </button>
@@ -506,6 +472,7 @@ const MessageFooter = () => {
           onChange={handleImageSelect}
           accept="video/*,image/*"
           multiple
+          maxLength={5}
           className="hidden"
         />
 

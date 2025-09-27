@@ -64,21 +64,22 @@ const NotificationsDropdown: React.FC<DropdownProps> = ({
 
   const notificationData = responseData?.data?.attributes?.results;
 
-  // Refetch notifications when dropdown opens
+  // Only refetch notifications when dropdown opens for the first time
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen && allNotifications.length === 0) {
       setCurrentPage(1);
-      setAllNotifications([]);
       refetchNotifications();
     }
-  }, [isOpen, refetchNotifications]);
+  }, [isOpen, refetchNotifications, allNotifications.length]);
 
   // Update notifications when data arrives
   useEffect(() => {
     if (notificationData?.length > 0) {
-      if (currentPage === 1) {
+      if (currentPage === 1 && allNotifications.length === 0) {
+        // Only set initial data if we don't have any notifications yet
         setAllNotifications(notificationData);
-      } else {
+      } else if (currentPage > 1) {
+        // Only append data for subsequent pages
         setAllNotifications((prev) => {
           const existingIds = new Set(prev.map((n) => n._id));
           const uniqueNewNotifications = notificationData?.filter(
@@ -88,7 +89,7 @@ const NotificationsDropdown: React.FC<DropdownProps> = ({
         });
       }
     }
-  }, [notificationData, currentPage]);
+  }, [notificationData, currentPage, allNotifications.length]);
 
   // Handle click inside dropdown
   useEffect(() => {
@@ -177,7 +178,11 @@ const NotificationsDropdown: React.FC<DropdownProps> = ({
 
               <div className="flex items-center gap-2">
                 <button
-                  onClick={() => refetchNotifications()}
+                  onClick={() => {
+                    setCurrentPage(1);
+                    setAllNotifications([]);
+                    refetchNotifications();
+                  }}
                   className="p-2 rounded-lg cursor-pointer text-gray-600 hover:bg-gray-100 transition-colors"
                   title="Refresh"
                 >

@@ -1,6 +1,7 @@
 import { useCallback, useRef, useState } from "react";
 import getImageDominantColor from "./getImageDominantColor";
 import Image from "next/image";
+import toast from "react-hot-toast";
 
 interface SmartImageProps {
   src: string;
@@ -8,11 +9,7 @@ interface SmartImageProps {
   className?: string;
 }
 
-const SmartImage = ({
-  src,
-  alt,
-  className = ""
-}: SmartImageProps) => {
+const SmartImage = ({ src, alt, className = "" }: SmartImageProps) => {
   const [bgColor, setBgColor] = useState("#f3f4f6");
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
@@ -24,8 +21,8 @@ const SmartImage = ({
         const dominantColor = await getImageDominantColor(imgRef.current);
         setBgColor(dominantColor);
         setImageLoaded(true);
-      } catch (error) {
-        console.log("Error extracting color:", error);
+      } catch {
+        toast.error("Failed to extract image color");
         setImageLoaded(true); // Mark as loaded even if color extraction fails
       }
     }

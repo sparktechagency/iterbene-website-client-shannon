@@ -41,29 +41,32 @@ const MessagesDropdown: React.FC<DropdownProps> = ({
 
   const messageNotificationData = responseData?.data?.attributes?.results;
 
-  // Reset state when dropdown opens
+  // Only refetch data when dropdown opens for the first time
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen && allNotifications.length === 0) {
       setCurrentPage(1);
-      setAllNotifications([]);
       refetch();
     }
-  }, [isOpen, refetch]);
+  }, [isOpen, refetch, allNotifications.length]);
 
   // Update notifications when new data arrives
   useEffect(() => {
     if (messageNotificationData?.length > 0) {
-      if (currentPage === 1) {
+      if (currentPage === 1 && allNotifications.length === 0) {
+        // Only set initial data if we don't have any notifications yet
         setAllNotifications(messageNotificationData);
-      } else {
-        const existingIds = new Set(allNotifications.map((n) => n._id));
-        const uniqueNewNotifications = messageNotificationData?.filter(
-          (n: INotification) => !existingIds.has(n._id)
-        );
-        setAllNotifications((prev) => [...prev, ...uniqueNewNotifications]);
+      } else if (currentPage > 1) {
+        // Only append data for subsequent pages
+        setAllNotifications((prev) => {
+          const existingIds = new Set(prev.map((n) => n._id));
+          const uniqueNewNotifications = messageNotificationData?.filter(
+            (n: INotification) => !existingIds.has(n._id)
+          );
+          return [...prev, ...uniqueNewNotifications];
+        });
       }
     }
-  }, [messageNotificationData, currentPage, allNotifications]);
+  }, [messageNotificationData, currentPage, allNotifications.length]);
 
   // Handle click inside dropdown to prevent closing
   useEffect(() => {
@@ -129,7 +132,11 @@ const MessagesDropdown: React.FC<DropdownProps> = ({
               </div>
               <div className="flex items-center gap-2">
                 <button
-                  onClick={() => refetch()}
+                  onClick={() => {
+                    setCurrentPage(1);
+                    setAllNotifications([]);
+                    refetch();
+                  }}
                   className="p-2 rounded-lg cursor-pointer text-gray-600 hover:bg-gray-100 transition-colors"
                   title="Refresh"
                 >

@@ -4,6 +4,7 @@ import { IPost } from "@/types/post.types";
 import PostCard from "../home/posts/post-card";
 import PostCardSkeleton from "../home/posts/PostCardSkeleton";
 import { useState, useEffect, useMemo, useCallback } from "react";
+import useUser from "@/hooks/useUser";
 
 const PhotosPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -11,12 +12,15 @@ const PhotosPage = () => {
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
 
+  const user = useUser();
+
   // API query parameters
   const { data: responseData, isLoading } = useFeedPostsQuery(
     [
       { key: "mediaType", value: "image" },
       { key: "page", value: currentPage },
       { key: "limit", value: 10 },
+      ...(user?._id ? [{ key: "userId", value: user._id }] : []),
     ],
     {
       refetchOnMountOrArgChange: true,

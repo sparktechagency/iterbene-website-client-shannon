@@ -92,7 +92,6 @@ const UserVerification = () => {
 
   const handleAgeVerify = () => {
     setErrorMessage("");
-    console.log("Clicked");
     setBooleanCookie(COOKIE_NAMES.ITER_BENE_VERIFIED, true);
     setIsVisible(false);
   };
