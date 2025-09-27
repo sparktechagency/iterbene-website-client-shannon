@@ -1,7 +1,5 @@
 import ConfirmationPopup from "@/components/custom/custom-popup";
-import {
-  useLeaveGroupMutation,
-} from "@/redux/features/group/groupApi";
+import { useLeaveGroupMutation } from "@/redux/features/group/groupApi";
 import { TError } from "@/types/error";
 import { IGroup } from "@/types/group.types";
 import Image from "next/image";
@@ -10,7 +8,7 @@ import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 import toast from "react-hot-toast";
 import { PiUserBold } from "react-icons/pi";
-import { Eye, LogOut } from "lucide-react";
+import {  Eye, LogOut } from "lucide-react";
 
 // Define the TypeScript interface for the card prop
 const JoinedGroupCard = ({
@@ -60,7 +58,7 @@ const JoinedGroupCard = ({
             className="w-full h-full object-cover"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
-          
+
           {/* Member Count Badge */}
           <div className="absolute top-3 right-3 bg-white rounded-full px-3 py-1.5 flex items-center gap-1.5">
             <PiUserBold size={14} className="text-secondary" />
@@ -87,7 +85,7 @@ const JoinedGroupCard = ({
               View Group
             </button>
           </Link>
-          
+
           <button
             disabled={isLeaveLoading}
             onClick={openLeaveModal}

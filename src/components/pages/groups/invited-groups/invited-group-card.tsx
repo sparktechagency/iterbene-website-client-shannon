@@ -8,7 +8,7 @@ import Image from "next/image";
 import React from "react";
 import toast from "react-hot-toast";
 import { PiUserBold } from "react-icons/pi";
-import { Check, X, Mail } from "lucide-react";
+import { Check, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 const InvitedGroupCard = ({
   group,
@@ -30,7 +30,7 @@ const InvitedGroupCard = ({
         handleOptimisticUpdateUi(group?._id);
       }
       toast.success("Successfully accepted the group!");
-      router.push(`/groups/${group?._id}`);
+      router.push(`/groups/${group?.groupId?._id}`);
     } catch (error) {
       const err = error as TError;
       toast.error(err?.data?.message || "Something went wrong!");
@@ -71,18 +71,12 @@ const InvitedGroupCard = ({
           </span>
         </div>
 
-        {/* Invitation Badge */}
-        <div className="absolute top-3 left-3 bg-secondary text-white rounded-full px-3 py-1.5 flex items-center gap-1.5">
-          <Mail size={12} />
-          <span className="text-xs font-medium">Invited</span>
-        </div>
-
         {/* Group Name Overlay */}
         <div className="absolute bottom-0 left-0 right-0 p-4">
           <h3 className="text-lg font-bold text-white truncate mb-1">
             {group?.groupId?.name}
           </h3>
-          <p className="text-white/80 text-sm line-clamp-2">
+          <p className="text-white/80 text-sm line-clamp-2 truncate">
             {group?.groupId?.description ||
               "You've been invited to join this group"}
           </p>
@@ -94,7 +88,7 @@ const InvitedGroupCard = ({
         <button
           disabled={isAcceptInviteLoading}
           onClick={handleAcceptInvite}
-          className="w-full bg-secondary hover:bg-secondary/90 disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium py-2.5 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
+          className="w-full bg-secondary cursor-pointer hover:bg-secondary/90 disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium py-2.5 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
         >
           <Check size={16} />
           {isAcceptInviteLoading ? "Accepting..." : "Accept Invitation"}
@@ -103,7 +97,7 @@ const InvitedGroupCard = ({
         <button
           disabled={isDeclineInviteLoading}
           onClick={handleDeclineInvite}
-          className="w-full border border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed font-medium py-2.5 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
+          className="w-full border border-gray-300 cursor-pointer text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed font-medium py-2.5 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
         >
           <X size={16} />
           {isDeclineInviteLoading ? "Declining..." : "Decline"}
