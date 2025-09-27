@@ -80,7 +80,7 @@ const ChatCard = ({ chat }: ChatListCardProps) => {
 
           <div>
             <h1 className="text-sm md:text-base">
-              {getFullName(receiverDetails) || "Unknown User"}
+              {receiverDetails ? getFullName(receiverDetails) : "Unknown User"}
             </h1>
             <p className="text-[14px] text-gray-600">
               {renderMessageContent()}

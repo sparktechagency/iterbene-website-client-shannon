@@ -1,6 +1,6 @@
 "use client";
 // Import necessary components and hooks
-import Header from "@/components/common/header";
+import Header from "@/components/common/Header";
 import AuthorBio from "@/components/pages/home/author-bio/author-bio";
 import ContactList from "@/components/pages/home/contact-list/contacts-list";
 import FriendRequest from "@/components/pages/home/friend-request/friend-request";

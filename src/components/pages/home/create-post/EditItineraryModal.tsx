@@ -1,6 +1,6 @@
 "use client";
 import { useEffect } from "react";
-import { FieldValues, useForm } from "react-hook-form";
+import { useForm, SubmitHandler, FieldValues } from "react-hook-form";
 import CustomModal from "@/components/custom/custom-modal";
 import CustomForm from "@/components/custom/custom-form";
 import CustomInput from "@/components/custom/custom-input";
@@ -15,6 +15,29 @@ import {
 import { TError } from "@/types/error";
 import toast from "react-hot-toast";
 import { IItinerary } from "@/types/itinerary.types";
+
+// Define the form data type to match DayCard expectations
+interface ItineraryFormData {
+  tripName: string;
+  travelMode: string;
+  departure: string;
+  arrival: string;
+  days: Array<{
+    dayNumber: number;
+    location: { latitude: number; longitude: number };
+    locationName: string;
+    activities: Array<{
+      time: string;
+      description: string;
+      link?: string;
+      duration: string;
+      cost?: number;
+      rating: number;
+    }>;
+    comment?: string;
+    weather?: string;
+  }>;
+}
 
 interface EditItineraryModalProps {
   visible: boolean;
@@ -41,7 +64,7 @@ const EditItineraryModal = ({
   const [editItinerary, { isLoading: isUpdating }] =
     useUpdateItineraryMutation();
 
-  const methods = useForm<FieldValues>({
+  const methods = useForm<ItineraryFormData>({
     defaultValues: {
       tripName: "",
       travelMode: "",
@@ -51,7 +74,7 @@ const EditItineraryModal = ({
     },
   });
 
-  const { control, reset } = methods;
+  const { control, reset, register } = methods;
 
   // Set default form values when itinerary data is fetched
   useEffect(() => {
@@ -67,7 +90,7 @@ const EditItineraryModal = ({
   }, [itinerary, reset]);
 
   // Handle form submission to update itinerary
-  const handleUpdateItinerary = async (values: FieldValues) => {
+  const handleUpdateItinerary = async (values: ItineraryFormData) => {
     try {
       const response = await editItinerary({
         id: itineraryId,
@@ -112,7 +135,7 @@ const EditItineraryModal = ({
       className="w-full p-2"
     >
       <CustomForm
-        onSubmit={handleUpdateItinerary}
+        onSubmit={handleUpdateItinerary as SubmitHandler<FieldValues>}
         defaultValues={{
           tripName: itinerary?.tripName || "",
           travelMode: itinerary?.travelMode || "",
@@ -130,6 +153,7 @@ const EditItineraryModal = ({
             size="md"
             fullWidth
             placeholder="Name your adventure (e.g., European Escape)"
+            register={register("tripName")}
             required
           />
           <CustomSelectField
@@ -147,6 +171,7 @@ const EditItineraryModal = ({
               { value: "boat", label: "Boat" },
               { value: "motorcycle", label: "Motorcycle" },
             ]}
+            register={register("travelMode")}
             required
           />
           <div className="grid grid-cols-2 gap-4 mb-4">
@@ -158,6 +183,7 @@ const EditItineraryModal = ({
               size="md"
               fullWidth
               placeholder="Where are you starting? (e.g., New York)"
+              register={register("departure")}
               required
             />
             <CustomInput
@@ -168,6 +194,7 @@ const EditItineraryModal = ({
               size="md"
               fullWidth
               placeholder="Where are you headed? (e.g., Paris)"
+              register={register("arrival")}
               required
             />
           </div>

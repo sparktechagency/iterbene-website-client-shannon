@@ -7,10 +7,35 @@ import { useForm, FormProvider } from "react-hook-form";
 import { IoClose } from "react-icons/io5";
 import DayCard from "./DayCard";
 
+interface ItineraryFormData {
+  tripName: string;
+  travelMode: string;
+  departure: string;
+  arrival: string;
+  days: {
+    dayNumber: number;
+    location: {
+      latitude: number;
+      longitude: number;
+    };
+    locationName: string;
+    activities: {
+      time: string;
+      description: string;
+      link?: string;
+      duration: string;
+      cost?: number;
+      rating: number;
+    }[];
+    comment?: string;
+    weather?: string;
+  }[];
+}
+
 interface CreateItineraryModalProps {
   visible: boolean;
   onClose: () => void;
-  handleCreateItinerary: (values: any) => void;
+  handleCreateItinerary: (values: ItineraryFormData) => void;
   isLoading: boolean;
 }
 
@@ -20,7 +45,7 @@ const CreateItineraryModal = ({
   handleCreateItinerary,
   isLoading,
 }: CreateItineraryModalProps) => {
-  const methods = useForm({
+  const methods = useForm<ItineraryFormData>({
     defaultValues: {
       tripName: "",
       travelMode: "",
@@ -37,7 +62,7 @@ const CreateItineraryModal = ({
     control,
   } = methods;
 
-  const onSubmit = (data: any) => {
+  const onSubmit = (data: ItineraryFormData) => {
     handleCreateItinerary(data);
   };
 

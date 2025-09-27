@@ -17,8 +17,9 @@ interface LocationSearchInputProps {
   onInputChange?: (value: string) => void;
   showSelectedInfo?: boolean;
   disabled?: boolean;
-  register: UseFormRegisterReturn;
+  register?: UseFormRegisterReturn;
   error?: FieldError;
+  value?: string; // Add value prop to support controlled components
 }
 
 const LocationSearchInput: React.FC<LocationSearchInputProps> = ({
@@ -33,6 +34,7 @@ const LocationSearchInput: React.FC<LocationSearchInputProps> = ({
   disabled = false,
   register,
   error,
+  value: externalValue,
 }) => {
   const [selectedLocation, setSelectedLocation] =
     useState<LocationDetails | null>(null);
@@ -59,15 +61,21 @@ const LocationSearchInput: React.FC<LocationSearchInputProps> = ({
   // Handle input change
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;
-    setInputValue(newValue);
+    
+    // Update local state if not controlled externally
+    if (!externalValue) {
+      setInputValue(newValue);
+    }
 
     // Clear selected location when user types
     if (selectedLocation) {
       setSelectedLocation(null);
     }
 
-    // Update form state
-    register.onChange(e);
+    // Update form state if register is provided
+    if (register) {
+      register.onChange(e);
+    }
     onInputChange?.(newValue);
 
     if (newValue.length === 0) {
@@ -85,14 +93,21 @@ const LocationSearchInput: React.FC<LocationSearchInputProps> = ({
 
       if (locationDetails) {
         setSelectedLocation(locationDetails);
-        setInputValue(prediction.description);
+        
+        // Update local state if not controlled externally
+        if (!externalValue) {
+          setInputValue(prediction.description);
+        }
+        
         setShowDropdown(false);
         clearPredictions();
 
-        // Update form state with the selected description
-        register.onChange({
-          target: { value: prediction.description, name },
-        });
+        // Update form state with the selected description if register is provided
+        if (register) {
+          register.onChange({
+            target: { value: prediction.description, name },
+          });
+        }
 
         // Call callbacks
         onLocationSelect?.(locationDetails);
@@ -105,12 +120,20 @@ const LocationSearchInput: React.FC<LocationSearchInputProps> = ({
 
   // Show dropdown when predictions are available
   useEffect(() => {
-    if (predictions.length > 0 && inputValue.length >= 2) {
+    const valueToCheck = externalValue !== undefined ? externalValue : inputValue;
+    if (predictions.length > 0 && valueToCheck.length >= 2) {
       setShowDropdown(true);
     } else {
       setShowDropdown(false);
     }
-  }, [predictions, inputValue]);
+  }, [predictions, inputValue, externalValue]);
+
+  // Update local state when external value changes
+  useEffect(() => {
+    if (externalValue !== undefined) {
+      setInputValue(externalValue);
+    }
+  }, [externalValue]);
 
   // Handle clicks outside dropdown
   useEffect(() => {
@@ -130,7 +153,8 @@ const LocationSearchInput: React.FC<LocationSearchInputProps> = ({
 
   // Handle input focus
   const handleInputFocus = () => {
-    if (predictions.length > 0 && inputValue.length >= 2) {
+    const valueToCheck = externalValue !== undefined ? externalValue : inputValue;
+    if (predictions.length > 0 && valueToCheck.length >= 2) {
       setShowDropdown(true);
     }
   };
@@ -184,7 +208,7 @@ const LocationSearchInput: React.FC<LocationSearchInputProps> = ({
             ref={inputRef}
             id={name}
             type="text"
-            value={inputValue}
+            value={externalValue !== undefined ? externalValue : inputValue}
             onChange={handleInputChange}
             onFocus={handleInputFocus}
             placeholder={!isInitialized ? "Loading..." : placeholder}

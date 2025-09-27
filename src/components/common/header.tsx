@@ -40,6 +40,7 @@ import MessagesDropdown from "./MessagesDropdown";
 import NotificationsDropdown from "./NotificationsDropdown";
 import SearchDropdown from "./SearchDropdown";
 import UserDropdown from "./UserDropdown";
+import { useAuth } from "@/hooks/useAuth";
 
 // Mobile Menu Component
 const MobileMenu: React.FC<{
@@ -47,11 +48,13 @@ const MobileMenu: React.FC<{
   isOpen: boolean;
   onClose: () => void;
 }> = ({ user, isOpen, onClose }) => {
+  const { logout } = useAuth();
   const router = useRouter();
 
   const handleLogout = async () => {
     // Close mobile menu first
     onClose();
+    await logout();
     router.push("/login");
   };
 
@@ -257,7 +260,7 @@ const Header: React.FC = () => {
 
       // If user viewed notifications recently (within 5 minutes) and API still shows count,
       // it means the API hasn't updated yet, so keep count at 0
-      if (lastViewed && (now - parseInt(lastViewed)) < 5 * 60 * 1000) {
+      if (lastViewed && now - parseInt(lastViewed) < 5 * 60 * 1000) {
         setUnviewNotificationCount(0);
       } else {
         setUnviewNotificationCount(apiCount);
@@ -274,7 +277,7 @@ const Header: React.FC = () => {
 
       // If user viewed messages recently (within 5 minutes) and API still shows count,
       // it means the API hasn't updated yet, so keep count at 0
-      if (lastViewed && (now - parseInt(lastViewed)) < 5 * 60 * 1000) {
+      if (lastViewed && now - parseInt(lastViewed) < 5 * 60 * 1000) {
         setUnviewMessageCount(0);
       } else {
         setUnviewMessageCount(apiCount);
@@ -287,13 +290,21 @@ const Header: React.FC = () => {
     const handleMessageNotificationViewed = (event: CustomEvent) => {
       const { unviewedCount } = event.detail;
       // Decrease the total unviewed count by the amount that was just viewed
-      setUnviewMessageCount(prevCount => Math.max(0, prevCount - unviewedCount));
+      setUnviewMessageCount((prevCount) =>
+        Math.max(0, prevCount - unviewedCount)
+      );
     };
 
-    window.addEventListener('messageNotificationViewed', handleMessageNotificationViewed as EventListener);
+    window.addEventListener(
+      "messageNotificationViewed",
+      handleMessageNotificationViewed as EventListener
+    );
 
     return () => {
-      window.removeEventListener('messageNotificationViewed', handleMessageNotificationViewed as EventListener);
+      window.removeEventListener(
+        "messageNotificationViewed",
+        handleMessageNotificationViewed as EventListener
+      );
     };
   }, []);
 
@@ -415,7 +426,7 @@ const Header: React.FC = () => {
         try {
           await viewAllMessageNotifications(undefined).unwrap();
         } catch (apiError) {
-          console.error('Failed to mark messages as viewed:', apiError);
+          console.error("Failed to mark messages as viewed:", apiError);
           // Don't show error to user as it's not critical for UX
         }
       }
@@ -445,7 +456,7 @@ const Header: React.FC = () => {
         try {
           await viewAllNotifications(undefined).unwrap();
         } catch (apiError) {
-          console.error('Failed to mark notifications as viewed:', apiError);
+          console.error("Failed to mark notifications as viewed:", apiError);
           // Don't show error to user as it's not critical for UX
         }
       }
@@ -460,7 +471,6 @@ const Header: React.FC = () => {
     setIsMessagesOpen(false);
     setIsNotificationsOpen(false);
   };
-
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen((prev) => !prev);
@@ -517,7 +527,7 @@ const Header: React.FC = () => {
       switch (type) {
         case "user":
           const userResult = result as IUser;
-          router.push(`/${userResult?.username}`);
+          router.push(`/${userResult?.username}/timeline`);
           break;
         case "hashtag":
           const hashtagResult = result as IHashtag;
@@ -628,11 +638,7 @@ const Header: React.FC = () => {
                   />
                 </div>
 
-                <div 
-                  ref={userRef} 
-                  onClick={toggleUser}
-                  className="relative"
-                >
+                <div ref={userRef} onClick={toggleUser} className="relative">
                   <motion.div>
                     <Image
                       src={user?.profileImage || "/path/to/default-avatar.png"}
@@ -643,7 +649,11 @@ const Header: React.FC = () => {
                       alt="userImage"
                     />
                   </motion.div>
-                  <UserDropdown user={user} isOpen={isUserOpen} setIsUserOpen = {setIsUserOpen} />
+                  <UserDropdown
+                    user={user}
+                    isOpen={isUserOpen}
+                    setIsUserOpen={setIsUserOpen}
+                  />
                 </div>
               </div>
 

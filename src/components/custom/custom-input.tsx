@@ -110,7 +110,7 @@ const CustomInput = ({
             placeholder={placeholder}
             maxLength={maxLength}
             onChange={(e) => {
-              register.onChange(e);
+              register?.onChange(e);
               onChange?.(e);
             }}
             onClick={onClick}
@@ -130,7 +130,7 @@ const CustomInput = ({
             maxLength={maxLength}
             placeholder={placeholder}
             onChange={(e) => {
-              register.onChange(e);
+              register?.onChange(e);
               onChange?.(e);
             }}
             onClick={onClick}

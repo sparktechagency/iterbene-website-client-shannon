@@ -4,7 +4,7 @@ import { useParams } from "next/navigation";
 import { motion } from "framer-motion";
 import useUser from "@/hooks/useUser";
 import { useGetSingleUserQuery } from "@/redux/features/users/userApi";
-import Header from "@/components/common/header";
+import Header from "@/components/common/Header";
 import MyProfileHeader from "./MyProfileHeader/MyProfileHeader";
 import UserProfileHeader from "./UserProfileHeader/UserProfileHeader";
 import UserProfileSkeleton from "./UserProfileSkeleton";

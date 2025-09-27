@@ -6,7 +6,27 @@ import { Control, useFieldArray, useFormContext } from "react-hook-form";
 import CustomRating from "@/components/custom/CustomRating";
 
 interface ActivityCardProps {
-  control: Control;
+  control: Control<{
+    tripName: string;
+    travelMode: string;
+    departure: string;
+    arrival: string;
+    days: Array<{
+      dayNumber: number;
+      location: { latitude: number; longitude: number };
+      locationName: string;
+      activities: Array<{
+        time: string;
+        description: string;
+        link?: string;
+        duration: string;
+        cost?: number;
+        rating: number;
+      }>;
+      comment?: string;
+      weather?: string;
+    }>;
+  }>;
   dayIndex: number;
 }
 
@@ -19,7 +39,27 @@ const ActivityCard = ({ control, dayIndex }: ActivityCardProps) => {
   const {
     register,
     formState: { errors },
-  } = useFormContext();
+  } = useFormContext<{
+    tripName: string;
+    travelMode: string;
+    departure: string;
+    arrival: string;
+    days: Array<{
+      dayNumber: number;
+      location: { latitude: number; longitude: number };
+      locationName: string;
+      activities: Array<{
+        time: string;
+        description: string;
+        link?: string;
+        duration: string;
+        cost?: number;
+        rating: number;
+      }>;
+      comment?: string;
+      weather?: string;
+    }>;
+  }>();
 
   const addActivity = () => {
     append({

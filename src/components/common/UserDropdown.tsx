@@ -17,6 +17,7 @@ import { HiOutlineUserGroup } from "react-icons/hi";
 import { IoChatboxEllipsesOutline, IoSettingsOutline } from "react-icons/io5";
 import { MdAlternateEmail } from "react-icons/md";
 import { AnimatePresence, motion } from "framer-motion";
+import { useAuth } from "@/hooks/useAuth";
 interface DropdownProps {
   user?: IUser;
   isOpen: boolean;
@@ -29,6 +30,7 @@ const UserDropdown: React.FC<DropdownProps> = ({
 }) => {
   const router = useRouter();
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const { logout } = useAuth();
 
   useEffect(() => {
     const handleClickInside = (event: MouseEvent) => {
@@ -48,6 +50,7 @@ const UserDropdown: React.FC<DropdownProps> = ({
   }, []);
 
   const handleLogout = async () => {
+    await logout();
     router.push("/login");
     setIsUserOpen(false);
   };
@@ -146,7 +149,9 @@ const UserDropdown: React.FC<DropdownProps> = ({
                     <HiOutlineUserGroup className="w-5 h-5 text-gray-600" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-gray-700 text-base font-semibold">Groups</p>
+                    <p className="text-gray-700 text-base font-semibold">
+                      Groups
+                    </p>
                     <p className="text-xs text-gray-500 mt-0.5">
                       Join communities
                     </p>
@@ -162,7 +167,9 @@ const UserDropdown: React.FC<DropdownProps> = ({
                     <FiMapPin className="w-5 h-5 text-gray-600" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-gray-700 text-base font-semibold">Maps</p>
+                    <p className="text-gray-700 text-base font-semibold">
+                      Maps
+                    </p>
                     <p className="text-xs text-gray-500 mt-0.5">
                       Explore locations
                     </p>
@@ -178,7 +185,9 @@ const UserDropdown: React.FC<DropdownProps> = ({
                     <FaRegCalendarAlt className="w-5 h-5 text-gray-600" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-gray-700 text-base font-semibold">Events</p>
+                    <p className="text-gray-700 text-base font-semibold">
+                      Events
+                    </p>
                     <p className="text-xs text-gray-500 mt-0.5">
                       Discover events
                     </p>
@@ -228,7 +237,9 @@ const UserDropdown: React.FC<DropdownProps> = ({
                     <BadgeInfo className="w-5 h-5 text-gray-600" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-gray-700 text-base font-semibold">About</p>
+                    <p className="text-gray-700 text-base font-semibold">
+                      About
+                    </p>
                     <p className="text-xs text-gray-500 mt-0.5">
                       Learn more about us
                     </p>

@@ -1,5 +1,5 @@
 "use client";
-import Header from "@/components/common/header";
+import Header from "@/components/common/Header";
 import Chats from "@/components/pages/message-inbox/chats/chats";
 import useUser from "@/hooks/useUser";
 import { useSocket } from "@/lib/socket";

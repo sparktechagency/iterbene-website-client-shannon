@@ -8,7 +8,27 @@ import ActivityCard from "./ActivityCard";
 import LocationSearchInput from "@/components/custom/LocationSearchInput";
 
 interface DayCardProps {
-  control: Control;
+  control: Control<{
+    tripName: string;
+    travelMode: string;
+    departure: string;
+    arrival: string;
+    days: Array<{
+      dayNumber: number;
+      location: { latitude: number; longitude: number };
+      locationName: string;
+      activities: Array<{
+        time: string;
+        description: string;
+        link?: string;
+        duration: string;
+        cost?: number;
+        rating: number;
+      }>;
+      comment?: string;
+      weather?: string;
+    }>;
+  }>;
 }
 
 const DayCard = ({ control }: DayCardProps) => {
@@ -22,7 +42,27 @@ const DayCard = ({ control }: DayCardProps) => {
     watch,
     register,
     formState: { errors },
-  } = useFormContext();
+  } = useFormContext<{
+    tripName: string;
+    travelMode: string;
+    departure: string;
+    arrival: string;
+    days: Array<{
+      dayNumber: number;
+      location: { latitude: number; longitude: number };
+      locationName: string;
+      activities: Array<{
+        time: string;
+        description: string;
+        link?: string;
+        duration: string;
+        cost?: number;
+        rating: number;
+      }>;
+      comment?: string;
+      weather?: string;
+    }>;
+  }>();
 
   // Watch all days to get current values
   const watchedDays = watch("days");
@@ -97,7 +137,8 @@ const DayCard = ({ control }: DayCardProps) => {
           </div>
           <div className="mb-3">
             <LocationSearchInput
-              label="Location"
+              name={`days.${dayIndex}.locationName`}
+              label="Location" 
               required
               value={watchedDays?.[dayIndex]?.locationName || ""}
               showSelectedInfo={false}

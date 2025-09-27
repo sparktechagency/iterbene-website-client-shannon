@@ -1,5 +1,5 @@
 "use client";
-import Header from "@/components/common/header";
+import Header from "@/components/common/Header";
 import useUser from "@/hooks/useUser";
 import { useGetSingleUserQuery } from "@/redux/features/users/userApi";
 import { useParams } from "next/navigation";
