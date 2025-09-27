@@ -22,10 +22,9 @@ const MyMapHeader = () => {
       rotateX: 0,
       filter: "blur(0px)",
       transition: {
-        type: "spring",
+        type: "spring" as const,
         stiffness: 300,
         damping: 20,
-        duration: 0.6,
       },
     },
     exit: {
@@ -92,13 +91,6 @@ const MyMapHeader = () => {
                 initial="hidden"
                 animate="visible"
                 exit="exit"
-                transition={{
-                  type: "spring",
-                  stiffness: 300,
-                  damping: 25,
-                  mass: 0.8, // Slightly lower mass for smoother scaling
-                  duration: 0.3, // Slightly longer for noticeable scale effect
-                }}
                 className="absolute right-0 top-8 w-[400px] bg-white border border-gray-200 rounded-lg shadow-lg p-4 z-[9999]"
               >
                 <motion.h3 className="font-semibold text-gray-900 mb-3">
