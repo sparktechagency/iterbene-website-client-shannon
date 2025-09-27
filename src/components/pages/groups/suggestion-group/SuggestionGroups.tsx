@@ -71,7 +71,7 @@ const SuggestionGroups: React.FC = () => {
   let content = null;
   if (isLoading || isLoadingMore) {
     content = (
-      <div className="w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {Array.from({ length: 3 }).map((_, index) => (
           <MyGroupCardSkeleton key={`skeleton-${index}`} />
         ))}
@@ -81,7 +81,7 @@ const SuggestionGroups: React.FC = () => {
     content = <p className="text-center">No suggested groups found</p>;
   } else if (allSuggestedGroups?.length > 0) {
     content = (
-      <div className="w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {allSuggestedGroups?.map((group: IGroup) => (
           <SuggestionGroupCard
             key={group?._id}
