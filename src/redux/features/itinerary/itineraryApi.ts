@@ -2,6 +2,13 @@ import { baseApi } from "../api/baseApi";
 
 const itineraryApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
+    createItineraryPdf: builder.mutation({
+      query: (data) => ({
+        url: "/itinerary/pdf",
+        method: "POST",
+        body: data,
+      }),
+    }),
     createItinerary: builder.mutation({
       query: (data) => ({
         url: "/itinerary",
@@ -30,6 +37,7 @@ const itineraryApi = baseApi.injectEndpoints({
 
 export const {
   useCreateItineraryMutation,
+  useCreateItineraryPdfMutation,
   useGetItineraryByIdQuery,
   useUpdateItineraryMutation,
 } = itineraryApi;

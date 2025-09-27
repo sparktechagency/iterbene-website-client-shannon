@@ -20,7 +20,7 @@ import { Tooltip } from "antd";
 import { AnimatePresence, motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
-import { JSX, useEffect, useRef, useState } from "react";
+import React, { JSX, useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { FaCalendarCheck } from "react-icons/fa";
 import { IoMdClose } from "react-icons/io";
@@ -68,17 +68,17 @@ const UserIteItineraryCard = ({ post, setTimelinePosts }: PostCardProps) => {
   const [incrementItinerary] = useIncrementItineraryViewCountMutation();
 
   const reactionIcons: { [key: string]: JSX.Element } = {
-    heart: <h1 className="text-2xl emoji-font">❤️</h1>,
-    suitcase: <h1 className="text-2xl emoji-font">🧳</h1>,
-    not_interested: <h1 className="text-2xl emoji-font">🚫</h1>,
-    smile: <h1 className="text-2xl emoji-font">🙂</h1>,
+    heart: <h1 className="text-[22px] emoji-font">❤️</h1>,
+    suitcase: <h1 className="text-[22px] emoji-font">🧳</h1>,
+    not_interested: <h1 className="text-[22px] emoji-font">🚫</h1>,
+    smile: <h1 className="text-[22px] emoji-font">🙂</h1>,
   };
 
   // Reaction colors
   const reactionColors: { [key: string]: string } = {
     heart: "text-red-500",
     suitcase: "text-blue-500",
-    not_interested: "text-orange-500",
+    not_interested: "text-rose-500",
     smile: "text-yellow-500",
   };
 
@@ -281,22 +281,34 @@ const UserIteItineraryCard = ({ post, setTimelinePosts }: PostCardProps) => {
         onEditClick={() => setShowPostEditModal(true)}
         setAllPosts={setTimelinePosts}
       />
-      <p className="text-gray-700 flex-1 mb-3">
-        {post?.content?.split(/(\s+)/).map((word, index) => {
-          const isHashtag = word.match(/^#\w+/);
-          return (
-            <span
-              key={index}
-              className={isHashtag ? "text-blue-500 font-bold" : ""}
-            >
-              {word}
-            </span>
-          );
-        })}
-      </p>
+      <div className="text-gray-700 mb-4 whitespace-pre-wrap break-words">
+        {/* Render text with highlighted hashtags */}
+        {post?.content?.split("\n").map((line, lineIndex) => (
+          <React.Fragment key={lineIndex}>
+            {line.split(/(\s+)/).map((word, wordIndex) => {
+              const isHashtag = word?.match(/^#\w+/);
+              return (
+                <span key={`${lineIndex}-${wordIndex}`}>
+                  {isHashtag ? (
+                    <Link
+                      href={`/search/hashtag/?q=${word.slice(1)}`}
+                      className="text-blue-600 hover:underline font-medium"
+                    >
+                      {word}
+                    </Link>
+                  ) : (
+                    word
+                  )}
+                </span>
+              );
+            })}
+            {lineIndex < post?.content?.split("\n").length - 1 && <br />}
+          </React.Fragment>
+        ))}
+      </div>
 
-      {/* Media */}
-      <UserIteItineraryContent post={post} />
+      {/* Media - only show if not PDF itinerary */}
+      {!(post?.itinerary?.isPdf) && <UserIteItineraryContent post={post} />}
 
       {/* Itinerary section */}
       {post?.itinerary && (
@@ -306,7 +318,7 @@ const UserIteItineraryCard = ({ post, setTimelinePosts }: PostCardProps) => {
         >
           <span>Click to view full itinerary</span>
           <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs">
-            PDF Download Available
+            {post?.itinerary?.isPdf ? "PDF View Available" : "PDF Download Available"}
           </span>
         </div>
       )}
@@ -413,13 +425,26 @@ const UserIteItineraryCard = ({ post, setTimelinePosts }: PostCardProps) => {
                       reactionColors[userReaction.reactionType]
                     }`}
                   >
-                   <span>{userReaction?.reactionType === 'not_interested' ? 'Not Interested' : userReaction?.reactionType}</span>
+                    <span className="text-sm md:text-base font-semibold">
+                      {userReaction?.reactionType === "not_interested"
+                        ? "Not Interested"
+                        : userReaction?.reactionType}
+                    </span>
                   </span>
                 </>
               ) : (
                 <div className="flex items-center gap-1">
-                  <h1 className="text-2xl emoji-font">❤️</h1>
-                  <span className="font-semibold text-gray-500">Heart</span>
+                  <h1
+                    className="text-[22px] emoji-font"
+                    style={{
+                      filter: "grayscale(100%)",
+                    }}
+                  >
+                    ❤️
+                  </h1>
+                  <span className="text-sm md:text-base font-semibold text-gray-500">
+                    Heart
+                  </span>
                 </div>
               )}
             </button>
@@ -453,7 +478,12 @@ const UserIteItineraryCard = ({ post, setTimelinePosts }: PostCardProps) => {
                       >
                         <Tooltip
                           title={
-                            reaction.charAt(0).toUpperCase() + reaction.slice(1)
+                            reaction?.charAt(0)?.toUpperCase() +
+                              reaction?.slice(1) ===
+                            "Not_interested"
+                              ? "Not Interested"
+                              : reaction?.charAt(0)?.toUpperCase() +
+                                reaction?.slice(1)
                           }
                         >
                           {reactionIcons[reaction]}

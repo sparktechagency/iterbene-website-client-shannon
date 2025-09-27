@@ -20,7 +20,7 @@ import { Tooltip } from "antd";
 import { AnimatePresence, motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
-import { JSX, useEffect, useRef, useState } from "react";
+import React, { JSX, useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { FaCalendarCheck } from "react-icons/fa";
 import { IoMdClose } from "react-icons/io";
@@ -68,17 +68,17 @@ const UserTimelineCard = ({ post, setTimelinePosts }: PostCardProps) => {
 
   // Reaction icon mapping
   const reactionIcons: { [key: string]: JSX.Element } = {
-    heart: <h1 className="text-2xl emoji-font">❤️</h1>,
-    suitcase: <h1 className="text-2xl emoji-font">🧳</h1>,
-    not_interested: <h1 className="text-2xl emoji-font">🚫</h1>,
-    smile: <h1 className="text-2xl emoji-font">🙂</h1>,
+    heart: <h1 className="text-[22px] emoji-font">❤️</h1>,
+    suitcase: <h1 className="text-[22px] emoji-font">🧳</h1>,
+    not_interested: <h1 className="text-[22px] emoji-font">🚫</h1>,
+    smile: <h1 className="text-[22px] emoji-font">🙂</h1>,
   };
 
   // Reaction colors
   const reactionColors: { [key: string]: string } = {
     heart: "text-red-500",
     suitcase: "text-blue-500",
-    not_interested: "text-orange-500",
+    not_interested: "text-rose-500",
     smile: "text-yellow-500",
   };
 
@@ -277,25 +277,31 @@ const UserTimelineCard = ({ post, setTimelinePosts }: PostCardProps) => {
         onEditClick={() => setShowPostEditModal(true)}
         setAllPosts={setTimelinePosts}
       />
-      <p className="text-gray-700 mb-4">
-        {post?.content?.split(/(\s+)/)?.map((word, index) => {
-          const isHashtag = word?.match(/^#\w+/);
-          return (
-            <span key={index}>
-              {isHashtag ? (
-                <Link
-                  href={`/search/hashtag/?q=${word.slice(1)}`}
-                  className="text-blue-600 hover:underline"
-                >
-                  {word}
-                </Link>
-              ) : (
-                word
-              )}
-            </span>
-          );
-        })}
-      </p>
+      <div className="text-gray-700 mb-4 whitespace-pre-wrap break-words">
+        {/* Render text with highlighted hashtags */}
+        {post?.content?.split("\n").map((line, lineIndex) => (
+          <React.Fragment key={lineIndex}>
+            {line.split(/(\s+)/).map((word, wordIndex) => {
+              const isHashtag = word?.match(/^#\w+/);
+              return (
+                <span key={`${lineIndex}-${wordIndex}`}>
+                  {isHashtag ? (
+                    <Link
+                      href={`/search/hashtag/?q=${word.slice(1)}`}
+                      className="text-blue-600 hover:underline font-medium"
+                    >
+                      {word}
+                    </Link>
+                  ) : (
+                    word
+                  )}
+                </span>
+              );
+            })}
+            {lineIndex < post?.content?.split("\n").length - 1 && <br />}
+          </React.Fragment>
+        ))}
+      </div>
 
       {/* Media */}
       <UserTimelineContentRender data={post?.media || []} />
@@ -415,13 +421,26 @@ const UserTimelineCard = ({ post, setTimelinePosts }: PostCardProps) => {
                       reactionColors[userReaction.reactionType]
                     }`}
                   >
-                    <span>{userReaction?.reactionType === 'not_interested' ? 'Not Interested' : userReaction?.reactionType}</span>
+                    <span className="text-sm md:text-base font-semibold">
+                      {userReaction?.reactionType === "not_interested"
+                        ? "Not Interested"
+                        : userReaction?.reactionType}
+                    </span>
                   </span>
                 </>
               ) : (
                 <div className="flex items-center gap-1">
-                  <h1 className="text-2xl emoji-font">❤️</h1>
-                  <span className="font-semibold text-gray-500">Heart</span>
+                  <h1
+                    className="text-[22px] emoji-font"
+                    style={{
+                      filter: "grayscale(100%)",
+                    }}
+                  >
+                    ❤️
+                  </h1>
+                  <span className="text-sm md:text-base font-semibold text-gray-500">
+                    Heart
+                  </span>
                 </div>
               )}
             </button>
@@ -455,7 +474,12 @@ const UserTimelineCard = ({ post, setTimelinePosts }: PostCardProps) => {
                       >
                         <Tooltip
                           title={
-                            reaction.charAt(0).toUpperCase() + reaction.slice(1)
+                            reaction?.charAt(0)?.toUpperCase() +
+                              reaction?.slice(1) ===
+                            "Not_interested"
+                              ? "Not Interested"
+                              : reaction?.charAt(0)?.toUpperCase() +
+                                reaction?.slice(1)
                           }
                         >
                           {reactionIcons[reaction]}

@@ -50,7 +50,7 @@ const UserIteItineraryContent: React.FC<UserIteItineraryContentProps> = ({
           </h2>
           <div className="flex items-center gap-4 text-sm text-gray-600">
             <div className="flex items-center gap-1">
-              {getTravelModeIcon(itinerary.travelMode)}
+              {itinerary?.travelMode && getTravelModeIcon(itinerary.travelMode)}
               <span className="capitalize">{itinerary.travelMode}</span>
             </div>
             <div className="flex items-center gap-1">
@@ -76,7 +76,8 @@ const UserIteItineraryContent: React.FC<UserIteItineraryContentProps> = ({
             <div className="flex-1 flex items-center justify-center">
               <div className="w-8 h-0.5 bg-gray-300"></div>
               <div className="mx-2 p-1 bg-blue-100 rounded-full">
-                {getTravelModeIcon(itinerary.travelMode)}
+                {itinerary?.travelMode &&
+                  getTravelModeIcon(itinerary.travelMode)}
               </div>
               <div className="w-8 h-0.5 bg-gray-300"></div>
             </div>
@@ -86,21 +87,12 @@ const UserIteItineraryContent: React.FC<UserIteItineraryContentProps> = ({
             </div>
           </div>
         </div>
-
-        {/* Footer */}
-        <div className="mt-4 pt-4 border-t border-gray-200 flex items-center justify-between text-sm text-gray-500">
-          <span>Click to view full itinerary</span>
-          <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs">
-            PDF Download Available
-          </span>
-        </div>
+        <ShowItineraryModal
+          visible={showItineraryModal}
+          onClose={() => setShowItineraryModal(false)}
+          itinerary={itinerary as IItinerary}
+        />
       </div>
-
-      <ShowItineraryModal
-        visible={showItineraryModal}
-        onClose={() => setShowItineraryModal(false)}
-        itinerary={itinerary as IItinerary}
-      />
     </>
   );
 };

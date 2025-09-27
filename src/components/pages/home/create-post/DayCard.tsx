@@ -6,6 +6,7 @@ import { Button } from "antd";
 import { Control, useFieldArray, useFormContext } from "react-hook-form";
 import ActivityCard from "./ActivityCard";
 import LocationSearchInput from "@/components/custom/LocationSearchInput";
+import { useEffect, useCallback } from "react";
 
 interface DayCardProps {
   control: Control<{
@@ -67,7 +68,7 @@ const DayCard = ({ control }: DayCardProps) => {
   // Watch all days to get current values
   const watchedDays = watch("days");
 
-  const addDay = () => {
+  const addDay = useCallback(() => {
     append({
       dayNumber: fields.length + 1,
       location: { latitude: 0, longitude: 0 },
@@ -85,12 +86,14 @@ const DayCard = ({ control }: DayCardProps) => {
       comment: "",
       weather: "",
     });
-  };
+  }, [append, fields.length]);
 
-  // One day automatically active
-  if (fields.length === 0) {
-    addDay();
-  }
+  // One day automatically active - moved to useEffect to avoid setState during render
+  useEffect(() => {
+    if (fields.length === 0) {
+      addDay();
+    }
+  }, [fields.length, addDay]);
 
   // Handle location select for specific day
   const handleLocationSelect = (

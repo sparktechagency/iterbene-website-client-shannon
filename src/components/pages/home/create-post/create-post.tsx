@@ -4,7 +4,7 @@ import CustomModal from "@/components/custom/custom-modal";
 import { LocationDetails, LocationPrediction, useGoogleLocationSearch } from "@/hooks/useGoogleLocationSearch";
 import useUser from "@/hooks/useUser";
 import { useGetHashtagsQuery } from "@/redux/features/hashtag/hashtagApi";
-import { useCreateItineraryMutation } from "@/redux/features/itinerary/itineraryApi";
+import { useCreateItineraryMutation, useCreateItineraryPdfMutation } from "@/redux/features/itinerary/itineraryApi";
 import {
   useCreatePostMutation,
   useUpdatePostMutation,
@@ -150,6 +150,7 @@ const CreatePost = ({
   const [itinerary, setItinerary] = useState<IItinerary | null>(null);
   const [editItineraryModal, setEditItineraryModal] = useState(false);
   const [createItinerary, { isLoading }] = useCreateItineraryMutation();
+  const [createItineraryPdf, { isLoading: isPdfLoading }] = useCreateItineraryPdfMutation();
 
   // Post
   const [createPost, { isLoading: isCreatingPost }] = useCreatePostMutation();
@@ -171,6 +172,7 @@ const CreatePost = ({
   // PDF modal
   const [showPdfModal, setShowPdfModal] = useState(false);
   const pdfInputRef = useRef<HTMLInputElement>(null);
+  const [selectedPdf, setSelectedPdf] = useState<File | null>(null);
 
   // Populate form fields if initialPostData is provided (edit mode)
   useEffect(() => {
@@ -417,6 +419,50 @@ const CreatePost = ({
     } else {
       setMedia((prev) => prev.filter((_, i) => i !== index));
       setMediaPreviews((prev) => prev.filter((_, i) => i !== index));
+    }
+  };
+
+  // Handle PDF file selection
+  const handlePdfFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+
+      // Validate file type
+      if (file.type !== 'application/pdf') {
+        toast.error('Please select a PDF file');
+        return;
+      }
+
+      // Validate file size (1MB = 1024 * 1024 bytes)
+      if (file.size > 1024 * 1024) {
+        toast.error('PDF file size should not exceed 1MB');
+        return;
+      }
+
+      setSelectedPdf(file);
+    }
+  };
+
+  // Handle PDF upload
+  const handlePdfUpload = async () => {
+    if (!selectedPdf) {
+      toast.error('Please select a PDF file');
+      return;
+    }
+
+    try {
+      const formData = new FormData();
+      formData.append('pdf', selectedPdf);
+
+      const response = await createItineraryPdf(formData).unwrap();
+      const itinerary = response?.data?.attributes;
+      setItinerary(itinerary);
+      setShowPdfModal(false);
+      setSelectedPdf(null);
+      toast.success("PDF itinerary uploaded successfully!");
+    } catch (error) {
+      const err = error as TError;
+      toast.error(err?.data?.message || "Failed to upload PDF!");
     }
   };
 
@@ -1062,19 +1108,39 @@ const CreatePost = ({
                   type="file"
                   accept="application/pdf"
                   ref={pdfInputRef}
+                  onChange={handlePdfFileChange}
                   className="hidden"
                 />
                 <BsUpload size={28} className="text-secondary mx-auto my-2" />
-                <p className="text-gray-500 mb-2">
-                  Click to upload or drag and drop
-                </p>
-                <p className="text-gray-400 text-sm">(PDF, max 1mb)</p>
-                <button
-                  onClick={() => pdfInputRef.current?.click()}
-                  className="mt-4 text-primary underline"
-                >
-                  Browse Files
-                </button>
+                {selectedPdf ? (
+                  <div className="text-center">
+                    <p className="text-green-600 mb-2 font-medium">
+                      Selected: {selectedPdf.name}
+                    </p>
+                    <p className="text-gray-400 text-sm">
+                      Size: {(selectedPdf.size / 1024).toFixed(1)} KB
+                    </p>
+                    <button
+                      onClick={() => setSelectedPdf(null)}
+                      className="mt-2 text-red-500 underline text-sm"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                ) : (
+                  <>
+                    <p className="text-gray-500 mb-2">
+                      Click to upload or drag and drop
+                    </p>
+                    <p className="text-gray-400 text-sm">(PDF, max 1mb)</p>
+                    <button
+                      onClick={() => pdfInputRef.current?.click()}
+                      className="mt-4 text-primary underline"
+                    >
+                      Browse Files
+                    </button>
+                  </>
+                )}
               </div>
               <CustomButton
                 fullWidth
@@ -1091,8 +1157,11 @@ const CreatePost = ({
                 fullWidth
                 className="mt-7 px-5 py-3"
                 variant="outline"
+                loading={isPdfLoading}
+                onClick={handlePdfUpload}
+                disabled={!selectedPdf || isPdfLoading}
               >
-                Save
+                {selectedPdf ? 'Upload PDF' : 'Save'}
               </CustomButton>
             </div>
           </CustomModal>
